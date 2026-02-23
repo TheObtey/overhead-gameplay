@@ -1,0 +1,9 @@
+{
+  "dependencies": [
+    "enet",
+    "glad",
+    "glfw3",
+    "glm",
+    "reactphysics3d"
+  ]
+}
