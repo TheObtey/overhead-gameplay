@@ -4,11 +4,22 @@
 ////////////////////////////////////////////////////
 
 #include <Node.h>
+#include "Logger.hpp"
+#include "Define.h"
+#include "Debug.h"
 
-#include <iostream>
-#include <memory>
+enum class Test
+{
+	HELLO, TEST
+};
+
+ENUM_CLASS_FLAGS(Test);
+
 int main()
 {
-	std::unique_ptr<Node> node = Node::CreateNode<Node>("HelloNode");
-    std::cout<<"Hello World !"<<std::endl;
+	int32 width = 10_mo;
+	Logger::Log("Hello logging system !");
+	Logger::LogWithLevel(Logger::LogLevel::WARNING, "Log line 2");
+
+	UNIMPLEMENTED;
 }
