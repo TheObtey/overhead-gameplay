@@ -3,21 +3,22 @@
 // https://github.com/AlexandreGlatz/cmake-generator
 ////////////////////////////////////////////////////
 
-#include "Logger.hpp"
 #include "Define.h"
+#include "Expected.hpp"
 
 #include <Node.h>
 
-enum class Test
+enum Test
 {
-	HELLO, TEST
+	OK = 1, 
+	FAIL = 2
 };
+
 
 ENUM_CLASS_FLAGS(Test);
 
 int main()
 {
-	int32 width = 10_mo;
-	Logger::Log("Hello logging system !", 39, "efwefe");
-	Logger::LogWithLevel(LogLevel::WARNING, "Log line 2");
+	Expected<float, Test> sucessExpected = 10.5f;
+	Expected<float, Test> failedExpected = Unexpected(FAIL);
 }
