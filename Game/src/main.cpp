@@ -3,9 +3,10 @@
 // https://github.com/AlexandreGlatz/cmake-generator
 ////////////////////////////////////////////////////
 
-#include <Node.h>
 #include "Logger.hpp"
 #include "Define.h"
+
+#include <Node.h>
 
 enum class Test
 {

@@ -11,12 +11,11 @@
 #include <mutex>
 #include <format>
 #include <chrono>
-
-#define ENGINE_NAME "FOUNDRY"
+#include <iostream>
 
 namespace ch = std::chrono;
 
-enum class LogLevel
+enum class LogLevel : int8
 {
 	DEBUG = 0, 
 	WARNING = 38, 
@@ -44,6 +43,9 @@ private:
 
 	static Logger& Instance();
 	static void SignalHandler(int32 signal);
+
+	static std::string ToColorCode(LogLevel level);
+	static std::string ToString(LogLevel level);
 
 private:
 

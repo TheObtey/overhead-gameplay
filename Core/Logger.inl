@@ -1,5 +1,3 @@
-
-#include "Logger.hpp"
 inline Logger& Logger::Instance()
 {
 	std::lock_guard<std::mutex> lock(s_mutex);
@@ -28,7 +26,7 @@ inline void Logger::CreateLogFile()
 	auto time = ch::floor<ch::seconds>(ch::system_clock::now());
 
 	std::filesystem::create_directory(LogDir);
-	m_file.open(LogDir/std::format("{:%Y-%m-%d_%H-%M-%S}.txt", time), std::ios::out);
+	m_file.open(LogDir/std::format("{:%Y-%m-%d_%H-%M-%S}.log", time), std::ios::out);
 
 	PurgeOldFiles();
 }
@@ -48,6 +46,28 @@ inline void Logger::PurgeOldFiles()
 	}
 }
 
+
+inline std::string Logger::ToString(LogLevel level)
+{
+	switch (level)
+	{
+		case LogLevel::DEBUG : return "DEBUG";
+		case LogLevel::WARNING : return "WARNING";
+		case LogLevel::ERROR : return "ERROR";
+		default: return "";
+	}
+}
+
+inline std::string Logger::ToColorCode(LogLevel level)
+{
+	switch (level)
+	{
+		case LogLevel::WARNING : return ANSI_GOLD;
+		case LogLevel::ERROR : return ANSI_RED;
+		default: return "";
+	}
+}
+
 template <typename ... Params>
 inline void Logger::Log(Params... params)
 {
@@ -60,12 +80,11 @@ inline void Logger::LogWithLevel(LogLevel level, Params... params)
 	Logger& instance = Instance();
 
 	auto time = ch::floor<ch::seconds>(ch::system_clock::now());
+
 	std::stringstream ss; 
-	ss << std::format("[{}m [{}] ({:%T}) >> ", static_cast<int32>(level), ENGINE_NAME, time);
-
+	ss << std::format("[{}] ({:%T}) >> ", ToString(level), time);
 	(ss << ... << params);
-	ss << ANSI_RESET << std::endl;
 
-	std::cout << ss.str();
-	instance.m_file << ss.str();
+	std::cout << ToColorCode(level) << ss.str() << ANSI_RESET << std::endl;
+	instance.m_file << ss.str() << std::endl;
 }

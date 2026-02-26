@@ -61,6 +61,10 @@ inline constexpr int32 operator""_kg(unsigned long long val) { return val * 1000
 
 //==================
 
+#define STRINGIFY2(X) STRINGIFY(X)
+#define STRINGIFY(X) #X
+
+
 #define ENUM_CLASS_FLAGS(EnumType)                                                \
 using T = std::underlying_type_t<EnumType>;                                       \
 inline constexpr EnumType operator|(EnumType lhs, EnumType rhs) {                 \
