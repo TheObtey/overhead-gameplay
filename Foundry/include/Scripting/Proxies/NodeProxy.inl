@@ -1,9 +1,4 @@
-#ifndef NODE__H_
-#include "Node.h"
-#endif
-
 #include "Event.hpp"
-
 #include <string>
 
 /*A node proxy class used to communicate between the scripting language and the engine API.

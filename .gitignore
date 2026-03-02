@@ -1,9 +1,12 @@
 build/
 out/
 vcpkg_installed/
-
+cmake-build-debug/
+cmake-build-debug-visual-studio/
+logs/
 compile_commands.json
 
 .ccls-cache/
 .cache/
 .vs/
+.idea/

@@ -3,7 +3,6 @@
 
 using Proxy = Node::Proxy;
 
-
 Proxy Proxy::CreateNodeProxy(std::string const& name)
 {
 	uptr<Node> node = Node::CreateNode<Node>(name);

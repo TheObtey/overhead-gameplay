@@ -12,7 +12,6 @@ project(FoundryProject)
 
 add_compile_definitions(_X86_)
 
-
 # Indication to the code that this is a debug build
 if (${IS_DEBUG_BUILD})
     add_compile_definitions(DEBUG_BUILD)

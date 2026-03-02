@@ -4,11 +4,13 @@
 #include "Node.h"
 #include "Scripting/Binder.h"
 
-static inline void REGISTER_PROXY()
-{
+void Test() { std::cout << "Hello world" << std::endl; }
 
+static void REGISTER_PROXY()
+{
 	//NodeProxy
 	Binder::BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
+	//Binder::BindFunction("Test", &Test);
 
 	Binder::BindClass<Node::Proxy>("Node", 
 			"GetName", &Node::Proxy::GetName);

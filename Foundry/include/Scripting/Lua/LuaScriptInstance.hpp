@@ -3,11 +3,8 @@
 
 #include "Scripting/ScriptInstance.h"
 
-#include <sol/forward.hpp>
-#include <sol/state.hpp>
-#include <sol/types.hpp>
 #include <functional>
-
+#include <sol/sol.hpp>
 
 class LuaScriptInstance : public ScriptInstance
 {
