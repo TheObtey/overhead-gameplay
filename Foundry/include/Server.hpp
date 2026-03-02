@@ -20,24 +20,31 @@ template <typename Derived> // The Curiously Recurring Template Pattern (CRTP)
 class Server
 {
 private:
-    Server() { static_assert(std::derived_from<Derived, Server>, "Derived must inherit from Server<Derived>"); }
-    friend Derived;
+    Server() 
+	{ 
+		static_assert(std::derived_from<Derived, Server>, "Derived must inherit from Server<Derived>"); 
+	}
+
 
 public:
-    static void FlushCommands() { Instance().FlushCommandsImpl(); }
-    static void BuildTasks(TaskGraph& graph) { Instance().BuildTasksImpl(); }
+    static void FlushCommands() { static_cast<Server<Derived>&>(Instance()).FlushCommandsImpl(); }
+    static void BuildTasks(TaskGraph& graph) { static_cast<Server<Derived>&>(Instance()).BuildTasksImpl(); }
 
-protected:
-
-    virtual ~Server() = default;
-
-    static Derived& Instance();
     virtual void FlushCommandsImpl() = 0;
     virtual void BuildTasksImpl(TaskGraph& graph) = 0;
 
 protected:
+
+    static Derived& Instance();
+	virtual void OnInitialize() {} ;
+	virtual void OnUnInitialize() {};
+
+    friend Derived;
+
+protected:
     static std::mutex s_mutex;
     std::queue<Command<Derived>> m_commands;
+	bool m_initialized = false;
 };
 
 template <typename Derived>

@@ -11,8 +11,6 @@ add_library(${PROJECT_NAME} SHARED
 
 add_library(Foundry::library ALIAS ${PROJECT_NAME})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE LOGGER_NAME=\"Toto\")
-
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(${PROJECT_NAME}

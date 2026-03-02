@@ -1,3 +1,7 @@
+#ifndef LOGGING__HPP_
+#include "Logger.hpp"
+#endif
+
 inline Logger& Logger::Instance()
 {
 	std::lock_guard<std::mutex> lock(s_mutex);

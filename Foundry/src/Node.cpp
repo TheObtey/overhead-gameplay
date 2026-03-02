@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-Node::Node(std::string const& name) : m_name(name)
+Node::Node(std::string const& name) :  m_name(name)
 {
     DEBUG("Node : " << m_name << " has been " << ANSI_GREEN << "created !" << ANSI_RESET << std::endl);
 }
@@ -24,6 +24,7 @@ Node::~Node()
 
 void Node::Update(float const delta)
 {
+	OnNodeUpdated(*this, delta);
     OnUpdate(delta);
     for (auto& name : m_childrenOrder)
     {

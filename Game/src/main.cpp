@@ -4,21 +4,21 @@
 ////////////////////////////////////////////////////
 
 #include "Define.h"
-#include "Expected.hpp"
+#include "Node.h"
+#include "ProxyRegistration.h"
+#include "Scripting/Lua/LuaScriptInstance.hpp"
 
-#include <Node.h>
-
-enum Test
-{
-	OK = 1, 
-	FAIL = 2
-};
-
-
-ENUM_CLASS_FLAGS(Test);
+#include <memory>
 
 int main()
-{
-	Expected<float, Test> sucessExpected = 10.5f;
-	Expected<float, Test> failedExpected = Unexpected(FAIL);
+{	
+	REGISTER_PROXY();
+
+	uptr<Node> node = Node::CreateNode<Node>("Ca marche nickel");
+
+	uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/test.lua");
+	Node::AttachScript(script, *node);
+
+
+	node->Update(10.0f);
 }

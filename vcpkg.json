@@ -1,5 +1,7 @@
 {
   "dependencies": [
+	"lua",
+	"sol2",
     "enet",
     "glad",
     "glfw3",

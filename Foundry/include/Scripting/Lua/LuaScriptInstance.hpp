@@ -1,0 +1,52 @@
+#ifndef FOUNDRY_LUA_ENVIRO__H_
+#define FOUNDRY_LUA_ENVIRO__H_
+
+#include "Scripting/ScriptInstance.h"
+
+#include <sol/forward.hpp>
+#include <sol/state.hpp>
+#include <sol/types.hpp>
+#include <functional>
+
+
+class LuaScriptInstance : public ScriptInstance
+{
+public:
+	LuaScriptInstance(std::string const& scriptPath);
+
+	template <typename T>
+	void AttachToProxy(T* const proxy);
+
+private:
+	void CallScriptOnInit() override;
+	void CallScriptOnUpdate(float dt) override;
+	void CallScriptOnDestroy() override;
+
+private:
+	sol::environment m_enviro;
+	sol::state& m_state;
+	std::string m_stringPath;
+
+	sol::protected_function m_initFunc;
+	sol::protected_function m_updateFunc;
+	sol::protected_function m_destroyFunc;
+};
+
+template <typename T>
+inline void LuaScriptInstance::AttachToProxy(T* const proxy)
+{
+	m_enviro["self"] = proxy;
+
+	proxy->OnSceneEnter += std::bind(&LuaScriptInstance::CallScriptOnInit, this);
+	proxy->OnUpdate += std::bind(&LuaScriptInstance::CallScriptOnUpdate, this, std::placeholders::_1);
+	proxy->OnSceneLeave += std::bind(&LuaScriptInstance::CallScriptOnDestroy, this) ;
+
+	auto file = m_state.script_file(m_stringPath, m_enviro);
+
+	m_initFunc = m_enviro["OnInit"];
+	m_updateFunc = m_enviro["OnUpdate"];
+	m_destroyFunc = m_enviro["OnDestroy"];
+}
+
+
+#endif // !FOUNDRY_LUA_ENVIRO__H_

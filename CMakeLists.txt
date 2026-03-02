@@ -12,10 +12,6 @@ project(FoundryProject)
 
 add_compile_definitions(_X86_)
 
-file(COPY ${PROJECT_SOURCE_DIR}/res/ 
-     DESTINATION ${PROJECT_BINARY_DIR}/res  
-)  
-
 
 # Indication to the code that this is a debug build
 if (${IS_DEBUG_BUILD})

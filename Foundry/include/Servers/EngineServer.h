@@ -25,8 +25,10 @@ public:
 
     void TestFunct() { std::cout << "Im a dummy function \n"; }
 
+private:
     void FlushCommandsImpl() override;
     void BuildTasksImpl(TaskGraph& graph) override;
+	void OnInitialize() override {}
 };
 
 #endif
