@@ -1,7 +1,6 @@
 project(Game)
 
-find_package(sol2 CONFIG REQUIRED)
-find_package(Lua REQUIRED)
+find_package(lua REQUIRED)
 
 set(MAIN "main" CACHE STRING "Select the program entry point")
 
@@ -11,11 +10,12 @@ set(SOURCE
 
 add_executable(${PROJECT_NAME} ${SOURCE})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
 file(COPY ${PROJECT_SOURCE_DIR}/../res/ 
      DESTINATION ${PROJECT_BINARY_DIR}/res  
 )  
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Foundry::library)
-target_link_libraries(Game PRIVATE ${LUA_LIBRARIES})
-target_link_libraries(Game PRIVATE sol2::sol2)
+target_link_libraries(${PROJECT_NAME} PRIVATE unofficial::lua::lua)
 
