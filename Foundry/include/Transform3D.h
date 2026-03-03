@@ -3,6 +3,11 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+/// /////////////////////////////////////////////////////////////////////////////////
+/// Classe Transform
+/// /////////////////////////////////////////////////////////////////////////////////
+
+
 class Transform3D
 {
 	glm::vec3 m_position;
@@ -15,19 +20,23 @@ class Transform3D
 
 	glm::mat4 m_rotationMatrix;
 	glm::mat4 m_invRotationMatrix;
-	glm::mat4 m_Transform;
+	glm::mat4 m_transform;
 	glm::mat4 m_invTransform;
 
 	bool m_isDirty;
 	bool m_isRotationDirty;
 	bool m_isInvDirty;
 
+	Transform3D* m_pParent;
+
 	void UpdateRotationMatrix();
 	void UpdateTransform();
 	void UpdateInvTransform();
+
 public:
 
 	Transform3D();
+	~Transform3D();
 
 	const glm::vec3& GetPosition() const;
 	float GetX() const;
@@ -49,7 +58,12 @@ public:
 	glm::mat4& GetMatrix();
 	glm::mat4& GetInvMatrix();
 
-	bool GetDirty() { return mIsDirty; }
+	bool GetDirty() { return m_isDirty; }
+
+	Transform3D* GetParent();
+
+	void SetParent(Transform3D* parent);
+	void SetChild(Transform3D* parent);
 
 	void SetPosition(glm::vec3 pos);
 	void SetX(float x);
@@ -71,6 +85,9 @@ public:
 	void AddRoll(float roll);
 	void AddScale(glm::vec3 scale);
 
-	void ApplyTransform(Transform3D& Transform3D);
+	void ApplyTransform(Transform3D& Transform3D); 
+
 	void Update();
+
+	Transform3D operator*(Transform3D& other) ;
 };
