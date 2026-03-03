@@ -14,6 +14,8 @@ public:
 	Transform2D(
 		float _x = 0.0f, 
 		float _y = 0.0f, 
+		float _width = 0.0f,
+		float _height = 0.0f,
 		float _scaleX = 1.0f, 
 		float _scaleY = 1.0f, 
 		float _theta = 0.0f, 
@@ -69,10 +71,8 @@ private:
 	uvec2		 m_scale;
 	float		 m_theta;
 	bool		 m_isStatic;
-
+	
 	Transform2D* m_pParent;
-
-	void UpdateRotation();
 };
 
 

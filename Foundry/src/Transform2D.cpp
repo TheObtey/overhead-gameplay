@@ -1,37 +1,47 @@
 #include "../include/Transform2D.h"
 
+#include <cmath>
+
 Transform2D::Transform2D(
 	float _x,
 	float _y,
+	float _width = 0.0f,
+	float _height = 0.0f,
 	float _scaleX,
 	float _scaleY,
 	float _theta,
 	bool _statism) :
 	m_position(_x, _y),
+	m_dimensions(_width, _height),
 	m_scale(_scaleX, _scaleY),
 	m_theta(_theta),
 	m_isStatic(_statism),
 	m_pParent(nullptr) {}
 
-Transform2D::~Transform2D() {}
+Transform2D::~Transform2D() 
+{
+	m_pParent = nullptr;
+}
 
 
 Transform2D::Transform2D(Transform2D const& other)
 {
-	m_position = other.m_position;
-	m_scale    = other.m_scale;
-	m_theta    = other.m_theta;
-	m_isStatic = other.m_isStatic;
-	m_pParent = other.m_pParent;
+	m_position   = other.m_position;
+	m_dimensions = other.m_dimensions;
+	m_scale      = other.m_scale;
+	m_theta      = other.m_theta;
+	m_isStatic   = other.m_isStatic;
+	m_pParent    = other.m_pParent;
 }
 
 Transform2D& Transform2D::operator=(Transform2D const& other)
 {
-	m_position = other.m_position;
-	m_scale    = other.m_scale;
-	m_theta    = other.m_theta;
-	m_isStatic = other.m_isStatic;
-	m_pParent = other.m_pParent;
+	m_position   = other.m_position;
+	m_dimensions = other.m_dimensions;
+	m_scale      = other.m_scale;
+	m_theta      = other.m_theta;
+	m_isStatic   = other.m_isStatic;
+	m_pParent    = other.m_pParent;
 
 	return *this;
 }
@@ -39,19 +49,21 @@ Transform2D& Transform2D::operator=(Transform2D const& other)
 
 Transform2D::Transform2D(Transform2D&& other) noexcept
 {
-	m_position = other.m_position;
-	m_scale    = other.m_scale;
-	m_theta    = other.m_theta;
-	m_isStatic = other.m_isStatic;
-	m_pParent = other.m_pParent;
+	m_position   = other.m_position;
+	m_dimensions = other.m_dimensions;
+	m_scale      = other.m_scale;
+	m_theta      = other.m_theta;
+	m_isStatic   = other.m_isStatic;
+	m_pParent    = other.m_pParent;
 }
 Transform2D& Transform2D::operator=(Transform2D&& other) noexcept
 {
-	m_position = other.m_position;
-	m_scale    = other.m_scale;
-	m_theta    = other.m_theta;
-	m_isStatic = other.m_isStatic;
-	m_pParent = other.m_pParent;
+	m_position   = other.m_position;
+	m_dimensions = other.m_dimensions;
+	m_scale      = other.m_scale;
+	m_theta      = other.m_theta;
+	m_isStatic   = other.m_isStatic;
+	m_pParent    = other.m_pParent;
 
 	return *this;
 }
@@ -59,10 +71,11 @@ Transform2D& Transform2D::operator=(Transform2D&& other) noexcept
 
 Transform2D Transform2D::operator*(Transform2D const& other) const
 {
-	Transform2D toReturn = {};
-	toReturn.m_position = m_position * other.m_position;
-	toReturn.m_scale    = m_scale    * other.m_scale;
-	toReturn.m_theta    = m_theta    * other.m_theta;
+	Transform2D toReturn  = {};
+	toReturn.m_position   = m_position   * other.m_position;
+	toReturn.m_dimensions = m_dimensions * other.m_dimensions;
+	toReturn.m_scale      = m_scale      * other.m_scale;
+	toReturn.m_theta      = m_theta      * other.m_theta;
 
 	return toReturn;
 }
@@ -70,19 +83,21 @@ Transform2D& Transform2D::operator*=(Transform2D const& other)
 {
 	if (m_isStatic) return *this;
 
-	m_position *= other.m_position;
-	m_scale    *= other.m_scale;
-	m_theta    *= other.m_theta;
+	m_position   *= other.m_position;
+	m_dimensions *= other.m_dimensions;
+	m_scale      *= other.m_scale;
+	m_theta      *= other.m_theta;
 
 	return *this;
 }
 
 Transform2D Transform2D::operator+(Transform2D const& other) const
 {
-	Transform2D toReturn = {};
-	toReturn.m_position = m_position + other.m_position;
-	toReturn.m_scale    = m_scale    + other.m_scale;
-	toReturn.m_theta    = m_theta    + other.m_theta;
+	Transform2D toReturn  = {};
+	toReturn.m_position   = m_position   + other.m_position;
+	toReturn.m_dimensions = m_dimensions + other.m_dimensions;
+	toReturn.m_scale      = m_scale      + other.m_scale;
+	toReturn.m_theta      = m_theta      + other.m_theta;
 
 	return toReturn;
 }
@@ -90,19 +105,21 @@ Transform2D& Transform2D::operator+=(Transform2D const& other)
 {
 	if (m_isStatic) return *this;
 
-	m_position += other.m_position;
-	m_scale    += other.m_scale;
-	m_theta    += other.m_theta;
+	m_position   += other.m_position;
+	m_dimensions += other.m_dimensions;
+	m_scale      += other.m_scale;
+	m_theta      += other.m_theta;
 
 	return *this;
 }
 
 Transform2D Transform2D::operator-(Transform2D const& other) const
 {
-	Transform2D toReturn = {};
-	toReturn.m_position = m_position - other.m_position;
-	toReturn.m_scale    = m_scale    - other.m_scale;
-	toReturn.m_theta    = m_theta    - other.m_theta;
+	Transform2D toReturn  = {};
+	toReturn.m_position   = m_position   - other.m_position;
+	toReturn.m_dimensions = m_dimensions - other.m_dimensions;
+	toReturn.m_scale      = m_scale      - other.m_scale;
+	toReturn.m_theta      = m_theta      - other.m_theta;
 
 	return toReturn;
 }
@@ -110,9 +127,10 @@ Transform2D& Transform2D::operator-=(Transform2D const& other)
 {
 	if (m_isStatic) return *this;
 
-	m_position -= other.m_position;
-	m_scale    -= other.m_scale;
-	m_theta -= other.m_theta;
+	m_position   -= other.m_position;
+	m_dimensions -= other.m_dimensions;
+	m_scale      -= other.m_scale;
+	m_theta      -= other.m_theta;
 
 	return *this;
 }
@@ -120,9 +138,10 @@ Transform2D& Transform2D::operator-=(Transform2D const& other)
 Transform2D Transform2D::operator/(Transform2D const& other) const
 {
 	Transform2D toReturn = {};
-	toReturn.m_position = m_position / other.m_position;
-	toReturn.m_scale    = m_scale    / other.m_scale;
-	toReturn.m_theta    = m_theta    / other.m_theta;
+	toReturn.m_position   = m_position   / other.m_position;
+	toReturn.m_dimensions = m_dimensions / other.m_dimensions;
+	toReturn.m_scale      = m_scale      / other.m_scale;
+	toReturn.m_theta      = m_theta      / other.m_theta;
 
 	return toReturn;
 }
@@ -130,9 +149,10 @@ Transform2D& Transform2D::operator/=(Transform2D const& other)
 {
 	if (m_isStatic) return *this;
 
-	m_position /= other.m_position;
-	m_scale    /= other.m_scale;
-	m_theta    /= other.m_theta;
+	m_position   /= other.m_position;
+	m_dimensions /= other.m_dimensions;
+	m_scale      /= other.m_scale;
+	m_theta      /= other.m_theta;
 
 	return *this;
 }
@@ -206,6 +226,9 @@ void Transform2D::AddTheta(float _theta)
 		m_theta = -180 + (int)_theta % 180;
 	else if (m_theta < -180.0f)
 		m_theta = 180 - (int)_theta % 180;
+
+	m_position.x = m_position.x * cos(m_theta) - m_position.y * sin(m_theta);
+	m_position.y = m_position.x * sin(m_theta) + m_position.y * cos(m_theta);
 }
 void Transform2D::SetTheta(float _theta)
 {
@@ -217,6 +240,9 @@ void Transform2D::SetTheta(float _theta)
 		m_theta = -180 + (int)_theta % 180;
 	else
 		m_theta = _theta;
+
+	m_position.x = m_position.x * cos(m_theta) - m_position.y * sin(m_theta);
+	m_position.y = m_position.x * sin(m_theta) + m_position.y * cos(m_theta);
 }
 float Transform2D::GetTheta() const
 {
@@ -239,11 +265,4 @@ void Transform2D::SetParent(Transform2D& _parent)
 Transform2D* Transform2D::GetParent()
 {
 	return m_pParent;
-}
-
-void Transform2D::UpdateRotation()
-{
-	if (!m_pParent) return;
-
-
 }
