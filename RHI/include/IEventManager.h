@@ -7,17 +7,17 @@
 
 enum class GAMEPAD_ID
 {
-
+    //JOYSTICK 2 
 };
 
 enum class EVENT_INPUT
 {
-         
+    //KEY, MOUSE, GAMEPAD
 };
 
 enum class EVENT
 {
-    
+    //PRESS, HOLD,  etc
 };
 
 class IEventManager 
@@ -40,4 +40,4 @@ protected:
     
 };
 
-#endif //!RHI_IENT_MANAGER__H_
+#endif //!RHI_IEVENT_MANAGER__H_
