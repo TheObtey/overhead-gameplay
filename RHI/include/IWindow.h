@@ -21,5 +21,6 @@ protected:
 protected:
     int m_width;
     int m_height;
+    std::string m_name;
 };
 #endif //!RHI_IWINDOW__H_
