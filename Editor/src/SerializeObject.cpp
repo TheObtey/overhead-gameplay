@@ -2,34 +2,41 @@
 #include "SerializeObject.h"
 
 #include <fstream>
+#include <map>
 
 
 void SerializeObject::Save(std::string outPath, uptr<Node>& root)
 {
 	json jsonRoot;
-	jsonRoot["Root"]["TYPE"] = 0;
-	jsonRoot["Root"]["Datas"] = root.get()->Serialize();
+	jsonRoot["Root"] = json::object();
+	std::map<std::string, std::string> mapDatas = root.get()->Serialize();
+	jsonRoot["Root"]["Children"] = json::array();
 	for (uint8 i = 0; i < root.get()->GetChildCount();i++)
 	{
-		jsonRoot["Root"]["Children"][i] = ParseNodeToJson(root.get()->GetChild(i), jsonRoot["Root"]["Children"][i]);
+		jsonRoot["Root"]["Children"][i] = ParseNodeToJson(root.get()->GetChild(i));
 	}
+	jsonRoot["Root"]["Datas"] = mapDatas;
+	jsonRoot["Root"]["TYPE"] = 0;
 
 	std::fstream File;
-	File.open(outPath, std::ios::out);
+	File.open("../res/" + outPath, std::ios::out);
 	File << jsonRoot;
 	File.close();
 }
 
-json SerializeObject::ParseNodeToJson(Node& pNode, json jsonData)
+json SerializeObject::ParseNodeToJson(Node& pNode)
 {
-	jsonData["TYPE"] = GetTypeFromNode(&pNode);
-	jsonData["Datas"] = pNode.Serialize();
+	json objectChildren = json::object();
+	objectChildren["TYPE"] = GetTypeFromNode(&pNode);
+	std::map<std::string, std::string> mapDatas = pNode.Serialize();
+	objectChildren["Datas"] = mapDatas;
+	objectChildren["Children"] = json::array();
 	for (uint8 i = 0; i < pNode.GetChildCount(); i++)
 	{
-		jsonData["Children"][i] = ParseNodeToJson(pNode.GetChild(i), jsonData["Children"][i]);
+		objectChildren["Children"][i] = ParseNodeToJson(pNode.GetChild(i));
 	}
 
-	return jsonData;
+	return objectChildren;
 }
 
 uptr<Node> SerializeObject::LoadFromJson(std::string path)

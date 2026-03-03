@@ -64,8 +64,8 @@ public:
 
 	//override this method if the inherited node is not trivially copyable
 	virtual std::unique_ptr<Node> Clone();
-	std::map<std::string, std::string> const& Serialize() { return {}; }
-	void Deserialize(std::map<std::string, std::string> const& object) {}
+	std::map<std::string, std::string> Serialize();
+	void Deserialize(std::map<std::string, std::string> const& object);
 
 	std::string GetName();
 	Node* GetParent();

@@ -34,7 +34,7 @@ public:
 	static uptr<Node> LoadFromJson(std::string path);
 
 private:
-	static json ParseNodeToJson(Node& pNode, json jsonData);
+	static json ParseNodeToJson(Node& pNode);
 	static Type GetTypeFromNode(Node* pNode);
 
 	static uptr<Node> ParseNodeData(json jsonData);

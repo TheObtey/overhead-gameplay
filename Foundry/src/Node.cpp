@@ -167,6 +167,18 @@ std::unique_ptr<Node> Node::Clone()
     return copy;
 }
 
+std::map<std::string, std::string> Node::Serialize()
+{
+	std::map<std::string, std::string> mapVariables = {};
+	mapVariables.insert(std::pair<std::string, std::string>("m_name", m_name));
+	return mapVariables;
+}
+
+void Node::Deserialize(std::map<std::string, std::string> const& object)
+{
+	m_name = object.at("m_name");
+}
+
 std::string Node::GetName() { return m_name; }
 Node* Node::GetParent() { return m_pOwner; }
 SceneTree* Node::GetSceneTree() { return m_pSceneTree; }

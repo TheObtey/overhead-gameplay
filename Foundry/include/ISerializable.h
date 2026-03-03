@@ -12,7 +12,7 @@ class SerializeObject;
 class ISerializable
 {
 public:
-	virtual std::map<std::string, std::string> const& Serialize() = 0;
+	virtual std::map<std::string, std::string> Serialize() = 0;
 	virtual void Deserialize(std::map<std::string, std::string> const& object) = 0;
 };
 
