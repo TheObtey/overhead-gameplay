@@ -3,7 +3,7 @@
 
 #include <string>
 
-#define BindProxy(P, X) struct P::ProxyBinding { void Bind() override { X } };
+#define BindProxy(P, X) struct P::ProxyBinding : Node::Proxy::ProxyBinding { void Bind(Binder& binder) override { X } };
 #define BIND(F) &Proxy::F
 #define OVERLOAD(Class, Ret, ...) static_cast<Ret (Class::*)(__VA_ARGS__)>
 
