@@ -12,6 +12,11 @@
 #include "raylib.h"
 #include "Transform3D.h"
 
+struct Node3D
+{
+	Transform3D transform;
+};
+
 int main()
 {
 	std::cout << "main transform 3D" << std::endl;
@@ -33,11 +38,18 @@ int main()
 	Mesh cubeMesh = GenMeshCube(2.0f, 2.0f, 2.0f);
 	Material cubeMaterial = LoadMaterialDefault();
 
-	Vector3 cubePosition = { -2.0f, 0.0f, 0.0f };
-	Transform3D cubeTransform;
-	Transform3D cube2Transform;
-	cube2Transform.SetParent(&cubeTransform);
-	cube2Transform.SetPosition({ 2.0,0.0,2.0 });
+	//Transform3D cubeTransform;
+	//Transform3D cube2Transform;
+	//cube2Transform.SetParent(&cubeTransform);
+	//cube2Transform.SetPosition({ 2.0,0.0,2.0 });
+
+	Node3D cube1;
+	Node3D cube2;
+	auto& tr1 = cube1.transform;
+	auto& tr2 = cube2.transform;
+
+	tr2.SetPosition({ 4.0,0.0,2.0 });
+	tr2.SetScale({ 3.0,0.5,2.0 });
 
 	DisableCursor();                    // Limit cursor to relative movement inside the window
 
@@ -51,24 +63,28 @@ int main()
 		if (IsKeyPressed(KEY_Z)) camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
 
 		// move cube
-		if (IsKeyDown(KEY_I)) cubeTransform.AddPosition({ 0.0, 0.0, 1.0 });
-		if (IsKeyDown(KEY_K)) cubeTransform.AddPosition({ 0.0, 0.0, -1.0 });
-		if (IsKeyDown(KEY_J)) cubeTransform.AddPosition({ -1.0, 0.0, 0.0 });
-		if (IsKeyDown(KEY_L)) cubeTransform.AddPosition({ 1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_I)) tr1.AddPosition({ 0.0, 0.0, 1.0 });
+		if (IsKeyDown(KEY_K)) tr1.AddPosition({ 0.0, 0.0, -1.0 });
+		if (IsKeyDown(KEY_J)) tr1.AddPosition({ -1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_L)) tr1.AddPosition({ 1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_G)) tr2.AddPosition({ 1.0, 0.0, 0.0 });
 
-		if (IsKeyDown(KEY_N)) cubeTransform.AddYaw(0.2);
-		if (IsKeyDown(KEY_B)) cubeTransform.AddPitch(0.2);
-		if (IsKeyDown(KEY_V)) cubeTransform.AddRoll(0.2);
+		if (IsKeyDown(KEY_N)) tr1.AddYaw(0.2);
+		if (IsKeyDown(KEY_B)) tr1.AddPitch(0.2);
+		if (IsKeyDown(KEY_V)) tr1.AddRoll(0.2);
 
-		if (IsKeyDown(KEY_C)) cubeTransform.AddScale({ 0.0, 0.0, 1.0});
-		if (IsKeyDown(KEY_X)) cubeTransform.AddScale({ 0.0, 0.0,-1.0});
+		if (IsKeyDown(KEY_C)) tr1.AddScale({ 1.0, 1.0, 1.0});
+		if (IsKeyDown(KEY_X)) tr1.AddScale({ -1.0, -1.0, -1.0});
 
 
 		// Update
 		//----------------------------------------------------------------------------------
 		UpdateCamera(&camera, CAMERA_FREE);
-		cube2Transform.Update();
-		cubeTransform.Update();
+		tr1.Update();
+		tr2.Update();
+
+		tr2 = tr2 * tr1;
+
 
 		//----------------------------------------------------------------------------------
 
@@ -80,8 +96,8 @@ int main()
 
 		BeginMode3D(camera);
 
-		glm::mat4 m1 = cubeTransform.GetMatrix();
-		glm::mat4 m2 = cube2Transform.GetMatrix();
+		glm::mat4& m1 = tr1.GetMatrix();
+		glm::mat4& m2 = tr2.GetMatrix();
 
 		Matrix rlMat1 = {
 			m1[0][0], m1[1][0], m1[2][0], m1[3][0],
