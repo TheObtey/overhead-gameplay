@@ -38,17 +38,18 @@ int main()
 	Mesh cubeMesh = GenMeshCube(2.0f, 2.0f, 2.0f);
 	Material cubeMaterial = LoadMaterialDefault();
 
-	//Transform3D cubeTransform;
-	//Transform3D cube2Transform;
-	//cube2Transform.SetParent(&cubeTransform);
-	//cube2Transform.SetPosition({ 2.0,0.0,2.0 });
-
 	Node3D cube1;
 	Node3D cube2;
+	Node3D cube3;
+	Node3D cube4;
 	auto& tr1 = cube1.transform;
 	auto& tr2 = cube2.transform;
+	auto& tr3 = cube3.transform;
+	auto& tr4 = cube4.transform;
 
 	tr2.SetPosition({ 4.0,0.0,2.0 });
+	tr3.SetPosition({ -4.0,0.0,-2.0 });
+	tr4.SetPosition({ -2.0,2.0,-2.0 });
 	tr2.SetScale({ 3.0,0.5,2.0 });
 
 	DisableCursor();                    // Limit cursor to relative movement inside the window
@@ -76,15 +77,17 @@ int main()
 		if (IsKeyDown(KEY_C)) tr1.AddScale({ 1.0, 1.0, 1.0});
 		if (IsKeyDown(KEY_X)) tr1.AddScale({ -1.0, -1.0, -1.0});
 
-
 		// Update
 		//----------------------------------------------------------------------------------
 		UpdateCamera(&camera, CAMERA_FREE);
 		tr1.Update();
 		tr2.Update();
+		tr3.Update();
+		tr4.Update();
 
 		tr2 = tr2 * tr1;
-
+		tr3 = tr3 * tr1;
+		tr4 = tr4 * tr3;
 
 		//----------------------------------------------------------------------------------
 
@@ -98,6 +101,8 @@ int main()
 
 		glm::mat4& m1 = tr1.GetMatrix();
 		glm::mat4& m2 = tr2.GetMatrix();
+		glm::mat4& m3 = tr3.GetMatrix();
+		glm::mat4& m4 = tr4.GetMatrix();
 
 		Matrix rlMat1 = {
 			m1[0][0], m1[1][0], m1[2][0], m1[3][0],
@@ -113,11 +118,31 @@ int main()
 			m2[0][3], m2[1][3], m2[2][3], m2[3][3]
 		};
 
+		Matrix rlMat3 = {
+			m3[0][0], m3[1][0], m3[2][0], m3[3][0],
+			m3[0][1], m3[1][1], m3[2][1], m3[3][1],
+			m3[0][2], m3[1][2], m3[2][2], m3[3][2],
+			m3[0][3], m3[1][3], m3[2][3], m3[3][3]
+		};
+
+		Matrix rlMat4 = {
+			m4[0][0], m4[1][0], m4[2][0], m4[3][0],
+			m4[0][1], m4[1][1], m4[2][1], m4[3][1],
+			m4[0][2], m4[1][2], m4[2][2], m4[3][2],
+			m4[0][3], m4[1][3], m4[2][3], m4[3][3]
+		};
+
 		cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = RED;
 		DrawMesh(cubeMesh, cubeMaterial, rlMat1);
 
 		cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = BLUE;
 		DrawMesh(cubeMesh, cubeMaterial, rlMat2);
+
+		cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = GREEN;
+		DrawMesh(cubeMesh, cubeMaterial, rlMat3);
+
+		cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = GREEN;
+		DrawMesh(cubeMesh, cubeMaterial, rlMat4);
 
 		DrawGrid(10, 1.0f);
 
