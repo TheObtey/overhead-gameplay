@@ -15,7 +15,6 @@ public:
 		float _x = 0.0f, float _y = 0.0f,
 		float _scaleX = 1.0f, float _scaleY = 1.0f,
 		float _theta = 0.0f,
-		float _translationX = 0.0f, float _translationY = 0.0f,
 		bool _statism = false
 	);
 	~Transform2D();
@@ -51,28 +50,23 @@ public:
 	void  SetRotation(float _theta);
 	mat2  GetRotationMatrix() const;
 
-	void SetTranslation(float _u, float _v);
-	void SetTranslation(vec2 _translation);
-	vec2 GetTranslation() const;
+	mat3 GetTransformationMatrix() const;
 
 	void  SetStatism(bool _statism);
 	bool  IsStatic() const;
 
-private:
-	vec2 m_position;
+	void Update();
 
+private:
 	mat3 m_scale;
 	mat3 m_rotation;
-	mat3 m_translation;
+	mat3 m_position;
 
 	mat3 m_transformationMatrix;
 
 	bool m_isDirty;
 
 	bool m_isStatic;
-
-
-	void Update();
 };
 
 

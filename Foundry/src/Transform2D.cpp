@@ -6,28 +6,26 @@ Transform2D::Transform2D(
 	float _x,		     float _y,
 	float _scaleX,	     float _scaleY,
 	float _theta,
-	float _translationX, float _translationY,
 	bool _statism) :
-	m_position(_x, _y),
 	m_isStatic(_statism),
 	m_isDirty(false)
 {
-	m_scale = mat3::mat(
+	m_scale = mat3(
 		_scaleX, 0, 0, 
 		0, _scaleY, 0,
 		0,    0,    1
 	);
-	m_rotation = mat3::mat(
+	m_rotation = mat3(
 		cos(_theta), -sin(_theta),	0,
 		sin(_theta), cos(_theta),	0,
 		0,				0,			1
 	);
-	m_translation = mat3::mat(
-		1, 0, _translationX,
-		0, 1, _translationY,
+	m_position = mat3(
+		1, 0, _x,
+		0, 1, _y,
 		0, 0,		1
 	);
-	m_transformationMatrix = mat3::mat(
+	m_transformationMatrix = mat3(
 		1, 0, 0,
 		0, 1, 0,
 		0, 0, 1
@@ -41,13 +39,11 @@ Transform2D::~Transform2D() {}
 
 Transform2D::Transform2D(Transform2D const& other)
 {
-	m_position = other.m_position;
-
 	m_scale = other.m_scale;
 	m_rotation = other.m_rotation;
-	m_translation = other.m_translation;
+	m_position = other.m_position;
 
-	m_transformationMatrix = (m_scale * m_rotation) * m_translation;
+	m_transformationMatrix = (m_scale * m_rotation) * m_position;
 
 	m_isStatic = other.m_isStatic;
 	m_isDirty = other.m_isDirty;
@@ -55,13 +51,11 @@ Transform2D::Transform2D(Transform2D const& other)
 
 Transform2D& Transform2D::operator=(Transform2D const& other)
 {
-	m_position = other.m_position;
-
 	m_scale = other.m_scale;
 	m_rotation = other.m_rotation;
-	m_translation = other.m_translation;
+	m_position = other.m_position;
 
-	m_transformationMatrix = (m_scale * m_rotation) * m_translation;
+	m_transformationMatrix = (m_scale * m_rotation) * m_position;
 
 	m_isStatic = other.m_isStatic;
 	m_isDirty = other.m_isDirty;
@@ -72,26 +66,22 @@ Transform2D& Transform2D::operator=(Transform2D const& other)
 
 Transform2D::Transform2D(Transform2D&& other) noexcept
 {
-	m_position = other.m_position;
-
 	m_scale = other.m_scale;
 	m_rotation = other.m_rotation;
-	m_translation = other.m_translation;
+	m_position = other.m_position;
 
-	m_transformationMatrix = (m_scale * m_rotation) * m_translation;
+	m_transformationMatrix = (m_scale * m_rotation) * m_position;
 
 	m_isStatic = other.m_isStatic;
 	m_isDirty = other.m_isDirty;
 }
 Transform2D& Transform2D::operator=(Transform2D&& other) noexcept
 {
-	m_position = other.m_position;
-
 	m_scale = other.m_scale;
 	m_rotation = other.m_rotation;
-	m_translation = other.m_translation;
+	m_position = other.m_position;
 
-	m_transformationMatrix = (m_scale * m_rotation) * m_translation;
+	m_transformationMatrix = (m_scale * m_rotation) * m_position;
 
 	m_isStatic = other.m_isStatic;
 	m_isDirty = other.m_isDirty;
@@ -103,11 +93,9 @@ Transform2D& Transform2D::operator=(Transform2D&& other) noexcept
 Transform2D Transform2D::operator*(Transform2D const& other) const
 {
 	Transform2D toReturn  = {};
-	toReturn.m_position   = m_position   * other.m_position;
-
 	toReturn.m_scale      = m_scale      * other.m_scale;
 	toReturn.m_rotation   = m_rotation   * other.m_rotation;
-	toReturn.m_translation = m_translation * other.m_translation;
+	toReturn.m_position = m_position * other.m_position;
 
 	toReturn.m_transformationMatrix = m_transformationMatrix * other.m_transformationMatrix;
 
@@ -120,11 +108,9 @@ Transform2D& Transform2D::operator*=(Transform2D const& other)
 {
 	if (m_isStatic) return *this;
 
-	m_position   *= other.m_position;
-
 	m_scale      *= other.m_scale;
 	m_rotation   *= other.m_rotation;
-	m_translation *= other.m_translation;
+	m_position *= other.m_position;
 
 	m_transformationMatrix *= other.m_transformationMatrix;
 
@@ -134,11 +120,9 @@ Transform2D& Transform2D::operator*=(Transform2D const& other)
 Transform2D Transform2D::operator+(Transform2D const& other) const
 {
 	Transform2D toReturn  = {};
-	toReturn.m_position   = m_position   + other.m_position;
-
 	toReturn.m_scale      = m_scale      + other.m_scale;
 	toReturn.m_rotation = m_rotation + other.m_rotation;
-	toReturn.m_translation = m_translation + other.m_translation;
+	toReturn.m_position = m_position + other.m_position;
 
 	toReturn.m_transformationMatrix = m_transformationMatrix + other.m_transformationMatrix;
 
@@ -148,11 +132,9 @@ Transform2D& Transform2D::operator+=(Transform2D const& other)
 {
 	if (m_isStatic) return *this;
 
-	m_position += other.m_position;
-
 	m_scale += other.m_scale;
 	m_rotation += other.m_rotation;
-	m_translation += other.m_translation;
+	m_position += other.m_position;
 
 	m_transformationMatrix += other.m_transformationMatrix;
 
@@ -162,11 +144,10 @@ Transform2D& Transform2D::operator+=(Transform2D const& other)
 Transform2D Transform2D::operator-(Transform2D const& other) const
 {
 	Transform2D toReturn  = {};
-	toReturn.m_position = m_position - other.m_position;
 
 	toReturn.m_scale = m_scale - other.m_scale;
 	toReturn.m_rotation = m_rotation - other.m_rotation;
-	toReturn.m_translation = m_translation - other.m_translation;
+	toReturn.m_position = m_position - other.m_position;
 
 	toReturn.m_transformationMatrix = m_transformationMatrix - other.m_transformationMatrix;
 
@@ -176,11 +157,9 @@ Transform2D& Transform2D::operator-=(Transform2D const& other)
 {
 	if (m_isStatic) return *this;
 
-	m_position -= other.m_position;
-
 	m_scale -= other.m_scale;
 	m_rotation -= other.m_rotation;
-	m_translation -= other.m_translation;
+	m_position -= other.m_position;
 
 	m_transformationMatrix -= other.m_transformationMatrix;
 
@@ -190,11 +169,10 @@ Transform2D& Transform2D::operator-=(Transform2D const& other)
 Transform2D Transform2D::operator/(Transform2D const& other) const
 {
 	Transform2D toReturn = {};
-	toReturn.m_position = m_position / other.m_position;
 
 	toReturn.m_scale = m_scale / other.m_scale;
 	toReturn.m_rotation = m_rotation / other.m_rotation;
-	toReturn.m_translation = m_translation / other.m_translation;
+	toReturn.m_position = m_position / other.m_position;
 
 	toReturn.m_transformationMatrix = m_transformationMatrix / other.m_transformationMatrix;
 
@@ -204,41 +182,22 @@ Transform2D& Transform2D::operator/=(Transform2D const& other)
 {
 	if (m_isStatic) return *this;
 
-	m_position /= other.m_position;
-
 	m_scale /= other.m_scale;
 	m_rotation /= other.m_rotation;
-	m_translation /= other.m_translation;
+	m_position /= other.m_position;
 
 	m_transformationMatrix /= other.m_transformationMatrix;
 
 	return *this;
 }
 
-void Transform2D::SetPosition(vec2 _pos)
-{
-	if (m_isStatic) return;
-
-	m_position = _pos;
-}
-void Transform2D::SetPosition(float _x, float _y)
-{
-	if (m_isStatic) return;
-
-	m_position.x = _x;
-	m_position.y = _y;
-}
-vec2 Transform2D::GetPosition() const
-{
-	return m_position;
-}
 
 void Transform2D::SetScale(vec2 _scale)
 {
 	if (m_isStatic) return;
 
 	m_scale[0][0] = _scale.x;
-	m_scale[1][0] = _scale.y;
+	m_scale[1][1] = _scale.y;
 
 	m_isDirty = true;
 }
@@ -250,13 +209,13 @@ void Transform2D::SetScale(float _x, float _y)
 		return;
 
 	m_scale[0][0] = _x;
-	m_scale[1][0] = _y;
+	m_scale[1][1] = _y;
 
 	m_isDirty = true;
 }
 uvec2 Transform2D::GetScale() const
 {
-	return { m_scale[0][0], m_scale[1][0] };
+	return { m_scale[0][0], m_scale[1][1] };
 }
 
 void Transform2D::SetRotation(float _theta)
@@ -272,33 +231,38 @@ void Transform2D::SetRotation(float _theta)
 }
 mat2 Transform2D::GetRotationMatrix() const
 {
-	return mat2::mat(
+	return mat2(
 		m_rotation[0][0], m_rotation[0][1],
 		m_rotation[1][0], m_rotation[1][1]
 	);
 }
 
-void Transform2D::SetTranslation(float _u, float _v)
+void Transform2D::SetPosition(float _u, float _v)
 {
 	if (m_isStatic) return;
 
-	m_translation[0][2] = _u;
-	m_translation[1][2] = _v;
+	m_position[0][2] = _u;
+	m_position[1][2] = _v;
 
 	m_isDirty = true;
 }
-void Transform2D::SetTranslation(vec2 _translation)
+void Transform2D::SetPosition(vec2 _translation)
 {
 	if (m_isStatic) return;
 
-	m_translation[0][2] = _translation.x;
-	m_translation[1][2] = _translation.y;
+	m_position[0][2] = _translation.x;
+	m_position[1][2] = _translation.y;
 
 	m_isDirty = true;
 }
-vec2 Transform2D::GetTranslation() const
+vec2 Transform2D::GetPosition() const
 {
-	return { m_translation[0][2], m_translation[1][2] };
+	return { m_position[0][2], m_position[1][2] };
+}
+
+mat3 Transform2D::GetTransformationMatrix() const
+{
+	return m_transformationMatrix;
 }
 
 void Transform2D::SetStatism(bool _statism)
@@ -314,18 +278,13 @@ void Transform2D::Update()
 {
 	if (m_isStatic) return;
 
-	m_transformationMatrix = mat3::mat(
+	m_transformationMatrix = mat3(
 		1, 0, 0,
 		0, 1, 0,
 		0, 0, 1 
 	);
 
-	m_transformationMatrix = (m_scale * m_rotation) * m_translation;
-
-	vec3 newPos = vec3(m_position.x, m_position.y, 1) * m_transformationMatrix;
-
-	m_position.x = newPos.x;
-	m_position.y = newPos.y;
+	m_transformationMatrix = (m_scale * m_rotation) * m_position;
 
 	m_isDirty = false;
 }
