@@ -8,7 +8,6 @@
 #include <sol/sol.hpp>
 #include <sol/state.hpp>
 
-
 template <>
 struct Command<class LuaServer> {};
 
@@ -36,4 +35,4 @@ private:
 	std::unordered_map<Node*, uptr<Node>> m_UnattachedNode {};
 };
 
-#endif // !FOUNDRY_LUA_SERVER__H_}
+#endif // !FOUNDRY_LUA_SERVER__H_

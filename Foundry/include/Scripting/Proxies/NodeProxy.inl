@@ -1,23 +1,26 @@
-#ifndef NODE__H_
-#include "Node.h"
-#endif
-
 #include "Event.hpp"
+#include "Scripting/Binder.h"
 
 #include <string>
 
+#define BindProxy(P, X) struct P::ProxyBinding : Node::Proxy::ProxyBinding { void Bind(Binder& binder) override { X } };
+#define BIND(F) &Proxy::F
+#define OVERLOAD(Class, Ret, ...) static_cast<Ret (Class::*)(__VA_ARGS__)>
+
 /*A node proxy class used to communicate between the scripting language and the engine API.
-The engine manage memory, scripting just get reffs.
+The engine manage memory, scripting just get refs.
 Should be scripting language agnostic.
 */
 class Node::Proxy
 {
 public:
-	static Proxy CreateNodeProxy(std::string const& name);
+	static Proxy* CreateNodeProxy(std::string const& name);
 	//Garbage collect node proxy in case lua loose reference to node
 	static void GCNodeProxy(Proxy* node);
 
 public:
+	struct ProxyBinding;
+
 	Proxy(Node& node);
 	Proxy(Proxy const& other) = delete;
 	Proxy(Proxy && other) noexcept;
@@ -27,14 +30,57 @@ public:
 
 	~Proxy() = default;
 
-	void AddChild(Proxy* node);
+	void AddChild(Proxy& child);
+	void RemoveChild(Proxy& child);
+	void RemoveChild(std::string const& name);
+	Proxy* FindChild(std::string const& name);
+	Proxy& GetChild(uint32 index);
+	std::vector<Proxy*> GetChildren();
+	uint32 GetChildCount();
+
+	Proxy* GetNode(std::string const& path);
+
+	void Destroy();
+	void Reparent(Proxy& newParent, bool keepGlobalTransform = true);
+	void MoveChild(Proxy& child, uint32 to);
+
+	Proxy* Clone();
 
 	std::string GetName();
+	Proxy* GetParent();
+	SceneTree* GetSceneTree();
 
 	Event<void()> OnSceneEnter;
 	Event<void(float)> OnUpdate;
 	Event<void()> OnSceneLeave;
 
+	operator Node&();
+
 private:
 	Node* m_pNode;
+};
+
+struct Node::Proxy::ProxyBinding
+{
+	virtual void Bind(Binder& binder)
+	{
+		binder.BindClass<Proxy>("Node",
+		Binder::GarbageCollect, BIND(GCNodeProxy),
+		"AddChild", BIND(AddChild),
+		"RemoveChild", OVERLOAD(Proxy, void, Proxy&)(BIND(RemoveChild)),
+		"RemoveChild", OVERLOAD(Proxy, void, std::string const&)(BIND(RemoveChild)),
+		"FindChild", BIND(FindChild),
+		"GetChild", BIND(GetChild),
+		"GetChildren", BIND(GetChildren),
+		"GetChildCount", BIND(GetChildCount),
+		"GetNode", BIND(GetNode),
+		"Destroy", BIND(Destroy),
+		"Reparent", BIND(Reparent),
+		"MoveChild", BIND(MoveChild),
+		"Clone", BIND(Clone),
+		"GetName", BIND(GetName),
+		"GetParent", BIND(GetParent),
+		"GetSceneTree", BIND(GetSceneTree));
+	}
+	virtual ~ProxyBinding() = default;
 };

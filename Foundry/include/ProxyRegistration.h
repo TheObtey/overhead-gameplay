@@ -4,14 +4,13 @@
 #include "Node.h"
 #include "Scripting/Binder.h"
 
-static inline void REGISTER_PROXY()
+#define BIND_PROXY(B, X) X::Proxy::ProxyBinding __##X##__; __##X##__.Bind(B)
+
+static void REGISTER_PROXY(Binder& binder)
 {
+	binder.BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
 
-	//NodeProxy
-	Binder::BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
-
-	Binder::BindClass<Node::Proxy>("Node", 
-			"GetName", &Node::Proxy::GetName);
+	BIND_PROXY(binder, Node);
 }
 
 #endif // !FOUNDRY_PROXY_REG__H_

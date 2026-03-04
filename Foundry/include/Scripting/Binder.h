@@ -3,16 +3,23 @@
 
 #include <string>
 
+using ScriptEngine = sol::state;
+
 class Binder
 {
 public:
 	static unsigned GarbageCollect;
 
+	explicit Binder(ScriptEngine& scriptEngine) : m_scriptEngine(scriptEngine) { }
+
 	template <typename T, typename ... Args> 
-	static void BindClass(std::string const& name, Args&& ... params);
+	void BindClass(std::string const& name, Args&& ... params);
 
 	template <typename T>
-	static void BindFunction(std::string const& name, T&& funciton);
+	void BindFunction(std::string const& name, T&& function);
+
+private:
+	ScriptEngine& m_scriptEngine;
 };
 
 //ifdef LUA

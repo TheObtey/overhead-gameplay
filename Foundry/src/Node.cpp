@@ -24,8 +24,8 @@ Node::~Node()
 
 void Node::Update(float const delta)
 {
-	OnNodeUpdated(*this, delta);
     OnUpdate(delta);
+	OnNodeUpdated(*this, delta);
     for (auto& name : m_childrenOrder)
     {
         m_children[name]->Update(delta);
@@ -120,7 +120,7 @@ std::vector<std::reference_wrapper<Node>> Node::GetChildren()
 	return res;
 }
 
-int32 Node::GetChildCount()
+uint32 Node::GetChildCount()
 {
     return m_children.size();
 }
@@ -146,7 +146,7 @@ void Node::Reparent(Node& newParent, bool keepGlobalTransform)
     m_pOwner = &newParent;
 }
 
-void Node::MoveChild(Node const& child, int32 to)
+void Node::MoveChild(Node const& child, uint32 to)
 {
     if (m_children.contains(child.m_name) == false) return;
 

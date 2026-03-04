@@ -14,9 +14,9 @@
 #  define DEBUG(x) do {} while (0)
 #endif
 
-#if  (__has_builtin(__builtin_debugtrap))
-#	define DEBUG_BREAK() __builtin_debugtrap()
-#endif
+//#if  (__has_builtin(__builtin_debugtrap))
+//#	define DEBUG_BREAK() __builtin_debugtrap()
+//#endif
 
 #define ASSERT(exp) assert(exp)
 #define ASSERTM(exp, msg) assert((void(msg), exp))

@@ -1,5 +1,6 @@
 #include "Servers/LuaServer.h"
 #include "Scripting/Binder.h"
+#include "ProxyRegistration.h"
 #include "Node.h"
 
 #include <sol/state.hpp>
@@ -8,8 +9,8 @@
 void LuaServer::OnInitialize()
 {
 	m_luaState.open_libraries(sol::lib::base, sol::lib::package, sol::lib::debug);
-
-	Binder binder;
+	Binder b(m_luaState);
+	REGISTER_PROXY(b);
 }
 
 void LuaServer::RegisterUnattachedNode(uptr<Node> &uNode)
