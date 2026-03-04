@@ -13,6 +13,11 @@
 #include <Node.h>
 #include <Define.h>
 
+/*TODO : Wait for the Typing of all the Node (ex: Node3D, Node2D, etc...)
+		When implemented :
+		Change Popups for a selection of the types of the node before creating it
+		use the Types and the new CreateNode for specific Type
+*/
 class Editor
 {
 public:
@@ -51,16 +56,17 @@ private:
 	void SetViewRoot(Node* node);
 	void ResetViewRoot();
 
-	// Popup for naming a node
+	// Popup create
+	/*TODO : Get Type of the Node and Create a Node from that type
+	Example : CreateNode of type Node3D*/
 	void ShowCreateNodePopup();
-
 	void ShowCreateChildPopup(Node* parent);
 	void ShowCreateSiblingPopup(Node* sibling);
 
 	// Popup for save/load
 
-	void ShowSaveScenePopup();
-	void ShowLoadScenePopup();
+	void ShowSaveSceneBrowsing();
+	void ShowLoadSceneBrowsing();
 
 private:
 	// Editor State

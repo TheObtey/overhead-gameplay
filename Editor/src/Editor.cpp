@@ -38,7 +38,6 @@ void Editor::Init()
 	m_sceneRoot = Node::CreateNode<Node>("SceneRoot");
 	m_viewRoot = m_sceneRoot.get(); // Default view on the root
 	
-	// Path after res/
 	strcpy_s(m_scenePathBuffer, "");
 	ImGui::FileBrowser SaveBrowseWindow(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
 	m_saveBrowser = SaveBrowseWindow;
@@ -99,9 +98,9 @@ void Editor::RenderUI()
 	ShowCreateChildPopup(m_pendingParent);
 	ShowCreateSiblingPopup(m_pendingSibling);
 
-	// Popups save/load
-	ShowSaveScenePopup();
-	ShowLoadScenePopup();
+	// File Browse 
+	ShowSaveSceneBrowsing();
+	ShowLoadSceneBrowsing();
 
 	ImGui::SetNextWindowPos(ImVec2(m_screenWidth - 120.0f, m_screenHeight - 40.0f));
 	ImGui::SetNextWindowSize(ImVec2(110, 30));
@@ -449,7 +448,7 @@ void Editor::CreateNode(std::string const& name, Node* parent)
 		std::cerr << "[Editor] Cannot create node: no scene root" << std::endl;
 		return;
 	}
-
+	// ye here
 	auto newNode = Node::CreateNode<Node>(name);
 	
 	if (parent)
@@ -653,7 +652,7 @@ void Editor::ShowCreateSiblingPopup(Node* sibling)
 	}
 }
 
-void Editor::ShowSaveScenePopup()
+void Editor::ShowSaveSceneBrowsing()
 {
 	if (m_showSavePopup)
 	{
@@ -677,7 +676,7 @@ void Editor::ShowSaveScenePopup()
 	}
 }
 
-void Editor::ShowLoadScenePopup()
+void Editor::ShowLoadSceneBrowsing()
 {
 	if (m_showLoadPopup)
 	{
