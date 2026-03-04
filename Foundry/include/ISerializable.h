@@ -10,6 +10,10 @@
 
 class SerializeObject;
 
+/*
+	* Used in Node to convert a variable in a string and store it in a std::map<sdt::string,std::string>
+*/
+
 class SerializeData
 {
 public:

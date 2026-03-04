@@ -1,46 +1,69 @@
 #include "ISerializable.h"
 
-std::string SplitString(std::string str, std::string delimiter)
-{
-	std::string out = "";
-	int32 it = str.find(",");
-	out += str.substr(0, it);
-
-	while (it != str.size()) {
-		int32 it = str.find(",");
-		out += str.substr(0, it);
-	}
-	return out;
-}
+#include <Logger.hpp>
 
 
-// Add Variables In Datas
 void SerializeData::AddVariable(std::string variableName, std::string const& variableData)
 {
+	if (m_datas.find(variableName) != m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " already store in Data");
+		return;
+	}
 	m_datas.insert({ variableName,variableData });
 }
 void SerializeData::AddVariable(std::string variableName, int32 const& variableData)
 {
-	m_datas.insert({ variableName, std::to_string(variableData)});
+	if (m_datas.find(variableName) != m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR,"Variable " + variableName + " already store in Data");
+		return;
+	}
+	m_datas.insert({ variableName, std::to_string(variableData) });
 }
 void SerializeData::AddVariable(std::string variableName, float const& variableData)
 {
-	m_datas.insert({ variableName,std::to_string(variableData)});
+	if (m_datas.find(variableName) != m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " already store in Data");
+		return;
+	}
+	m_datas.insert({ variableName,std::to_string(variableData) });
 }
 void SerializeData::AddVariable(std::string variableName, bool const& variableData)
 {
-	m_datas.insert({ variableName, variableData ? "true" : "false"});
+	if (m_datas.find(variableName) != m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " already store in Data");
+		return;
+	}
+	m_datas.insert({ variableName, variableData ? "true" : "false" });
 }
 void SerializeData::AddVariable(std::string variableName, glm::vec2 const& variableData)
 {
-	m_datas.insert({ variableName,ConvertVarToString(variableData)});
+	if (m_datas.find(variableName) != m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " already store in Data");
+		return;
+	}
+	m_datas.insert({ variableName,ConvertVarToString(variableData) });
 }
 void SerializeData::AddVariable(std::string variableName, glm::vec3 const& variableData)
 {
+	if (m_datas.find(variableName) != m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " already store in Data");
+		return;
+	}
 	m_datas.insert({ variableName,ConvertVarToString(variableData) });
 }
 void SerializeData::AddVariable(std::string variableName, glm::vec4 const& variableData)
 {
+	if (m_datas.find(variableName) != m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " already store in Data");
+		return;
+	}
 	m_datas.insert({ variableName,ConvertVarToString(variableData) });
 }
 
@@ -69,33 +92,68 @@ std::string SerializeData::ConvertVarToString(glm::vec4 variableData)
 	return variable;
 }
 
-// Get Variables from Datas
+
 void SerializeData::GetVariable(std::string variableName, std::string& variable) const
 {
+	if (m_datas.find(variableName) == m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " not stored in Datas");
+		return;
+	}
 	variable = m_datas.at(variableName);
 }
 void SerializeData::GetVariable(std::string variableName, int32& variableData) const
 {
+	if (m_datas.find(variableName) == m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " not stored in Datas");
+		return;
+	}
 	variableData = std::stoi(m_datas.at(variableName));
 }
 void SerializeData::GetVariable(std::string variableName, float& variableData) const
 {
+	if (m_datas.find(variableName) == m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " not stored in Datas");
+		return;
+	}
 	variableData = std::stof(m_datas.at(variableName));
 }
 void SerializeData::GetVariable(std::string variableName, bool& variableData) const
 {
+	if (m_datas.find(variableName) == m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " not stored in Datas");
+		return;
+	}
 	variableData = m_datas.at(variableName) == "true" ? true : false;
 }
 void SerializeData::GetVariable(std::string variableName, glm::vec2& variableData) const
 {
+	if (m_datas.find(variableName) == m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " not stored in Datas");
+		return;
+	}
 	variableData = ConvertStringToVec2(variableName);
 }
 void SerializeData::GetVariable(std::string variableName, glm::vec3& variableData) const
 {
+	if (m_datas.find(variableName) == m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " not stored in Datas");
+		return;
+	}
 	variableData = ConvertStringToVec3(variableName);
 }
 void SerializeData::GetVariable(std::string variableName, glm::vec4& variableData) const
 {
+	if (m_datas.find(variableName) == m_datas.end())
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Variable " + variableName + " not stored in Datas");
+		return;
+	}
 	variableData = ConvertStringToVec4(variableName);
 }
 

@@ -23,10 +23,8 @@ int main() {
 
 
     SerializeObject json;
-    uptr<Node> rootNode = json.LoadFromJson("test.json");
-    bool b = true;
-    bool c = false;
-
+    uptr<Node> rootNode = Node::CreateNode<Node>("Root");
+    SerializeObject::Save("testJson.json", rootNode);
     EngineServer::FlushCommands();
 
 }
