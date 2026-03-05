@@ -140,6 +140,11 @@ void Node::Destroy()
 void Node::Reparent(Node& newParent, bool keepGlobalTransform)
 {
     if (m_pOwner == nullptr) return;
+	if (newParent.m_name == m_pOwner->m_name)
+	{
+		OnParentChange(newParent);
+		return;
+	}
 
     newParent.m_children[m_name] = std::move(m_pOwner->m_children[m_name]);
     newParent.m_childrenOrder.push_back(m_name);

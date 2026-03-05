@@ -82,7 +82,7 @@ private:
 
 	void CheckParentTransform();
 	void UpdateWorldTransform();
-
+	void UpdateLocalTransform();
 };
 
 #include "Scripting/Proxies/Node3DProxy.inl"

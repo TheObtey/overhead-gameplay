@@ -23,8 +23,8 @@ int main()
 	std::cout << "main transform 3D" << std::endl;
 	// Initialization
    //--------------------------------------------------------------------------------------
-	const int screenWidth = 800;
-	const int screenHeight = 450;
+	const int screenWidth = 1500;
+	const int screenHeight = 850;
 
 	InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera free");
 
@@ -71,6 +71,7 @@ int main()
 	DisableCursor();                    // Limit cursor to relative movement inside the window
 
 	SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
+	EnableCursor();
 	//--------------------------------------------------------------------------------------
 
 	// Main game loop
@@ -86,11 +87,14 @@ int main()
 		if (IsKeyDown(KEY_L)) cube1ref.AddPosition({ 1.0, 0.0, 0.0,1.0f });
 		if (IsKeyDown(KEY_G)) cube2ref.AddPosition({ 1.0, 0.0, 0.0,1.0f });
 
+		if (IsKeyDown(KEY_RIGHT)) cube2ref.AddPosition({ 1.0, 0.0, 0.0,1.0f });
+		if (IsKeyDown(KEY_UP)) cube2ref.AddRoll(0.2);
+
 		if (IsKeyDown(KEY_N)) cube1ref.AddYaw(0.2);
 		if (IsKeyDown(KEY_B)) cube1ref.AddPitch(0.2);
 		if (IsKeyDown(KEY_V)) cube1ref.AddRoll(0.2);
 
-		if (IsKeyDown(KEY_C)) cube1ref.AddScale({ 1.0, 1.0, 1.0,1.0f});
+		if (IsKeyPressed(KEY_C)) cube1ref.AddScale({ 0.0, 1.0, 0.0,1.0f});
 		if (IsKeyDown(KEY_X)) cube1ref.AddScale({ -1.0, -1.0, -1.0,1.0f});
 
 		if (IsKeyPressed(KEY_Y))
@@ -100,7 +104,8 @@ int main()
 
 		// Update
 		//----------------------------------------------------------------------------------
-		UpdateCamera(&camera, CAMERA_FREE);
+		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+			UpdateCamera(&camera, CAMERA_FREE);
 
 		cube1->Update(0.016f);
 
@@ -116,9 +121,9 @@ int main()
 		BeginMode3D(camera);
 
 		glm::mat4 m1 = cube1->GetWorldMatrice();
-		glm::mat4 m2 = static_cast<Node3D&>(cube2ref).GetWorldMatrice();
-		glm::mat4 m3 = static_cast<Node3D&>(cube3ref).GetWorldMatrice();
-		glm::mat4 m4 = static_cast<Node3D&>(cube4ref).GetWorldMatrice();
+		glm::mat4 m2 = cube2ref.GetWorldMatrice();
+		glm::mat4 m3 = cube3ref.GetWorldMatrice();
+		glm::mat4 m4 = cube4ref.GetWorldMatrice();
 
 		//DEBUG(m4[0][])
 
