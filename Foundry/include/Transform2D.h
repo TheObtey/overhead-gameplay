@@ -1,5 +1,5 @@
-#ifndef ENGINE_TRANSFORM2D__H_
-#define ENGINE_TRANSFORM2D__H_
+#ifndef FOUNDRY_TRANSFORM2D__H_
+#define FOUNDRY_TRANSFORM2D__H_
 
 #include <glm/glm.hpp>
 
