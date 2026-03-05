@@ -14,7 +14,6 @@ private:
     struct exec_register {
         exec_register() 
         {
-            std::cout << "AAA" << std::endl;
             ISerializable::s_constructors[typeid(D).name()] = D::Register();
         }
     };
