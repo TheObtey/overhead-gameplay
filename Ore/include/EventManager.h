@@ -38,11 +38,13 @@ enum class EventInput
 //#endif
 
     KEY_A = GLFW_KEY_A,
-    KEY_M = GLFW_KEY_M,
-    KEY_SEMICOLON = GLFW_KEY_SEMICOLON,
+    KEY_M = GLFW_KEY_COMMA,
+    KEY_SEMICOLON = GLFW_KEY_M,
+    KEY_COMMA = GLFW_KEY_SEMICOLON,                 
     KEY_Q = GLFW_KEY_Q,
     KEY_W = GLFW_KEY_W,
     KEY_Z = GLFW_KEY_Z,  
+
     KEY_B = GLFW_KEY_B,
     KEY_C = GLFW_KEY_C,
     KEY_D = GLFW_KEY_D,
@@ -75,7 +77,6 @@ enum class EventInput
     KEY_8 = GLFW_KEY_8,
     KEY_9 = GLFW_KEY_9,
     KEY_APOSTROPHE = GLFW_KEY_APOSTROPHE, 
-    KEY_COMMA = GLFW_KEY_COMMA,                 
     KEY_MINUS = GLFW_KEY_MINUS,             
     KEY_PERIOD = GLFW_KEY_PERIOD,            
     KEY_SLASH = GLFW_KEY_SLASH,     

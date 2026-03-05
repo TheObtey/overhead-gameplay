@@ -6,10 +6,23 @@ Event<void(GamepadId)> EventManager::gamepadDisconnected = Event<void(GamepadId)
 
 bool EventManager::GetKey(Window window, EventInput key, EventAction event)
 {
-	int state = glfwGetKey(window.GetWindow(), (int)key);
+	int const scancode = glfwGetKeyScancode((int)key);
+	const char* ch = glfwGetKeyName((int)key, scancode);
+	
+	int val = 0;
+	if (ch != nullptr)
+	{
+		val = (int)toupper(ch[0]);
+		//Logger::Log(ch[0]);
+	}
+	else
+	{
+		val = (int)key;
+	}
+	int state = glfwGetKey(window.GetWindow(), val);
 	if (state == (int)event)
 	{
-		Logger::LogWithLevel(LogLevel::DEBUG, (char)key);
+		Logger::LogWithLevel(LogLevel::DEBUG, "TEST");
 		return true;
 	}
 	return false;

@@ -1,6 +1,5 @@
 #include "EventManager.h"
 #include <iostream>
-#include <locale>
 
 void hello(GamepadId id)
 {
@@ -21,7 +20,7 @@ int main()
 	EventManager::gamepadDisconnected.Subscribe(goodbye);
 	while (window.IsOpen())
 	{
-		EventManager::GetKey(window , EventInput::KEY_A, EventAction::PRESS);
+		EventManager::GetKey(window, EventInput::KEY_A, EventAction::PRESS);
 		//EventManager::GetKey(window , EventInput::KEY_Q, EventAction::PRESS);
 		//EventManager::GetKey(window , EventInput::KEY_W, EventAction::PRESS);
 		//EventManager::GetKey(window , EventInput::KEY_M, EventAction::PRESS);
