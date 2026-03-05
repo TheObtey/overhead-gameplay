@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+std::unordered_map<GLFWwindow*, Window*> Window::s_windows = {};
 Window::Window(int width, int height, std::string name)
 {
 	glfwInit();
@@ -51,14 +52,9 @@ void Window::Open()
 
 	glfwMakeContextCurrent(m_pWindow);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		Logger::LogWithLevel(LogLevel::ERROR, "Failed to initialize GLAD");
-		return;
-	}
+	glfwSetFramebufferSizeCallback(m_pWindow, Window::FrameBufferResizeCallback);
 
-	glfwSetFramebufferSizeCallback(m_pWindow, FrameBufferSizeCallback);
-
+    s_windows[m_pWindow] = this;
 	onOpenEvent();
 }
 
@@ -68,7 +64,16 @@ void Window::Present()
 	glfwPollEvents();
 }
 
-void FrameBufferSizeCallback(GLFWwindow* pWindow, int width, int height)
+void Window::SetSize(uint16 width, uint16 height)
 {
-	glViewport(0, 0, width, height);
+    m_width = width;
+    m_height = height;
+
+    glfwSetWindowSize(m_pWindow, m_width, m_height);
+}
+
+void Window::FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height)
+{
+    Window* pCurrentWindow = s_windows[pWindow];
+    pCurrentWindow->onResizeEvent();
 }

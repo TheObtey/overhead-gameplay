@@ -3,25 +3,31 @@
 
 #include "IWindow.h"
 
+#include <map>
 
 class GLFWwindow;
 class Window : public IWindow
 {
 public:
     Window(int width, int height, std::string name);
-    virtual ~Window() override;
+    ~Window() override;
 
-    virtual void Close() override;
-    virtual bool IsOpen() override;
-    virtual void Present() override;
+    void Close() override;
+    bool IsOpen() override;
+    void Present() override;
+
+    void SetSize(uint16 width, uint16 height) override;
+    static void FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height);
 
 protected:
-    virtual void Open() override;
+    void Open() override;
 
 private:
+    GLFWwindow* Get() { return m_pWindow;}
+    static std::unordered_map<GLFWwindow*, Window*> s_windows;
     GLFWwindow* m_pWindow;
-};
 
-void FrameBufferSizeCallback(GLFWwindow* pWindow, int width, int height);
+    friend class Viewport;
+};
 
 #endif //!ORE_WINDOW__H_

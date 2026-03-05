@@ -2,6 +2,7 @@
 #define RHI_IWINDOW__H_
 
 #include "Event.hpp"
+#include "Define.h"
 
 #include <string>
 
@@ -14,10 +15,11 @@ public:
     virtual void Close() = 0;
     virtual bool IsOpen() = 0; 
     virtual void Present() = 0; 
-
+    virtual void SetSize(uint16 width, uint16 height) = 0;
+   
     Event<void()> onOpenEvent;
     Event<void()> onCloseEvent;
-    static Event<void()> onResizeEvent;
+    Event<void()> onResizeEvent;
 
 protected:
     virtual void Open() = 0;
@@ -30,4 +32,4 @@ protected:
 
 inline IWindow::~IWindow() {}
 
-#endif //!RHI_IWINDOW__H_
+#endif //!RHI_IWINDOW__H_ 
