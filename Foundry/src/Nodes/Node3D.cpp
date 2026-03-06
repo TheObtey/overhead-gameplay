@@ -55,18 +55,19 @@ void Node3D::UpdateWorldTransform()
 		if (!m_flags.worldDirty && !parent->m_flags.worldDirty) return;
 
 		m_worldScale = m_transform.GetScale() * parent->m_worldScale;
-		m_worldRotation.w = 1.0f;
-		m_worldRotation = m_transform.GetRotation() + parent->m_worldRotation;
-		m_worldRotation.w = 1.0f;
+
+		m_worldRotation = parent->m_worldRotation * m_transform.GetRotationQuat();
+
 		m_worldPosition = m_transform.GetPosition() * parent->m_worldScale;
 
-		glm::mat4 rotMatrix = glm::transpose(glm::toMat4(glm::quat(parent->m_worldRotation)));
+		glm::mat4 rotMatrix = glm::transpose(glm::toMat4(parent->m_worldRotation));
 		m_worldPosition = m_worldPosition * rotMatrix;
+
 		m_worldPosition += parent->m_worldPosition;
 		m_worldPosition.w = 1.0f;
 		
-		m_worldTransform = parent->m_worldTransform * m_transform.GetMatrix();
-		//m_worldTransform = Maths::Translate(m_worldPosition) * glm::toMat4(glm::quat(m_worldRotation))* Maths::Scale(m_worldScale);
+		//m_worldTransform = parent->m_worldTransform * m_transform.GetMatrix();
+		m_worldTransform = Maths::Translate(m_worldPosition) * glm::toMat4(m_worldRotation) * Maths::Scale(m_worldScale);
 
 		//glm::mat4 posMatrix = Maths::Translate(m_worldPosition);
 		//posMatrix = glm::toMat4(glm::quat(parent->m_worldRotation)) * posMatrix;
@@ -80,8 +81,8 @@ void Node3D::UpdateWorldTransform()
 	{
 		if (!m_flags.worldDirty) return;
 		m_worldPosition = m_transform.GetPosition();
-		m_worldScale = m_transform.GetScale();
-		m_worldRotation = m_transform.GetRotation();
+		m_worldScale = m_transform.GetScale();		
+		m_worldRotation = m_transform.GetRotationQuat();
 		m_worldTransform = m_transform.GetMatrix();
 
 	}
@@ -106,9 +107,10 @@ void Node3D::UpdateLocalTransform()
 	newScale.w = 1.0f;
 	m_transform.SetScale(newScale);
 
-	glm::vec4 newRot = m_worldRotation - parent->m_worldRotation;
-	newRot.w = 1.0f;
-	m_transform.SetRotation(newRot);
+	glm::quat newRot =  m_worldRotation * glm::inverse(parent->m_worldRotation);
+	//newRot.w = 1.0f;
+	//m_transform.SetRotation(newRot);
+	m_transform.SetRotationQuat(newRot);
 
 	//glm::mat4 posMatrix = Maths::Translate(newLocal);
 	//posMatrix = glm::inverse(glm::toMat4(glm::quat(parent->m_worldRotation))) * posMatrix;
@@ -129,7 +131,7 @@ glm::vec4 const& Node3D::GetWorldScale()
 	return m_worldScale;
 }
 
-glm::vec4 const& Node3D::GetWorldRotation()
+glm::quat const& Node3D::GetWorldRotation()
 {
 	return m_worldRotation;
 }
@@ -146,6 +148,6 @@ void Node3D::SetWorldScale(glm::vec4 const& worldScale)
 }
 void Node3D::SetWorldRotation(glm::vec4 const& worldRot)
 {
-	m_worldRotation = worldRot;
-	m_flags.worldDirty = true;
+	//m_worldRotation = worldRot;
+	//m_flags.worldDirty = true;
 }

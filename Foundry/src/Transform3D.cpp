@@ -30,7 +30,8 @@ void Transform3D::UpdateRotationMatrix()
 {
 	if (m_isRotationDirty == false) return;
 
-	m_rotationMatrix = Maths::RotateYawPitchRoll(m_rotation);
+	//m_rotationMatrix = Maths::RotateYawPitchRoll(m_rotation);
+	m_rotationMatrix = glm::mat4_cast(m_rotationQuat);
 	m_invRotationMatrix = glm::inverse(m_rotationMatrix);
 
 	m_right = { m_rotationMatrix[0][0], m_rotationMatrix[0][1], m_rotationMatrix[0][2], 1.0f };
@@ -81,6 +82,10 @@ const glm::mat4& Transform3D::GetInverseMatrixRotation()
 const glm::vec4& Transform3D::GetRotation() const
 {
 	return m_rotation;
+}
+const glm::quat& Transform3D::GetRotationQuat() const
+{
+	return m_rotationQuat;
 }
 
 float Transform3D::GetYaw() const
@@ -169,12 +174,23 @@ void Transform3D::SetZ(float z)
 
 void Transform3D::SetRotation(glm::vec4 rot)
 {
+
 	m_rotation = rot;
 	m_rotation.w = 1.0f;
+	m_rotationQuat = glm::quat_cast(Maths::RotateYawPitchRoll(glm::vec3(rot)));
+
 	m_isDirty = true;
 	m_isInvDirty = true;
 	m_isRotationDirty = true;
 }
+void Transform3D::SetRotationQuat(glm::quat rot)
+{
+	m_rotationQuat = rot;
+	m_isDirty = true;
+	m_isInvDirty = true;
+	m_isRotationDirty = true;
+}
+
 
 void Transform3D::SetYaw(float yaw)
 {
@@ -239,8 +255,18 @@ void Transform3D::AddZ(float z)
 
 void Transform3D::AddRotation(glm::vec4 rot)
 {
-	m_rotation += rot;
-	m_rotation.w = 1.0f;
+	//m_rotation += rot;
+	//m_rotation.w = 1.0f;
+
+
+	glm::vec3 up = GetUp();
+	m_rotationQuat = glm::normalize(glm::angleAxis(rot[1], up) * m_rotationQuat);
+	glm::vec3 right = GetRight();
+	m_rotationQuat = glm::normalize(glm::angleAxis(rot[0], right) * m_rotationQuat);
+	glm::vec3 forward = GetForward();
+	m_rotationQuat = glm::normalize(glm::angleAxis(rot[3], forward) * m_rotationQuat);
+
+
 	m_isDirty = true;
 	m_isInvDirty = true;
 	m_isRotationDirty = true;
@@ -248,7 +274,11 @@ void Transform3D::AddRotation(glm::vec4 rot)
 
 void Transform3D::AddYaw(float yaw)
 {
-	m_rotation.x += yaw;
+	//m_rotation.x += yaw;
+
+	glm::vec3 up = GetUp();
+	m_rotationQuat = glm::normalize(glm::angleAxis(yaw, up) * m_rotationQuat);
+
 	m_isDirty = true;
 	m_isInvDirty = true;
 	m_isRotationDirty = true;
@@ -256,7 +286,10 @@ void Transform3D::AddYaw(float yaw)
 
 void Transform3D::AddPitch(float pitch)
 {
-	m_rotation.y += pitch;
+	//m_rotation.y += pitch;
+	glm::vec3 right = GetRight();
+	m_rotationQuat = glm::normalize(glm::angleAxis(pitch, right) * m_rotationQuat);
+
 	m_isDirty = true;
 	m_isInvDirty = true;
 	m_isRotationDirty = true;
@@ -264,7 +297,10 @@ void Transform3D::AddPitch(float pitch)
 
 void Transform3D::AddRoll(float roll)
 {
-	m_rotation.z += roll;
+	//m_rotation.z += roll;
+	glm::vec3 forward = m_forward;
+	m_rotationQuat = glm::normalize(glm::angleAxis(roll, forward) * m_rotationQuat);
+
 	m_isDirty = true;
 	m_isInvDirty = true;
 	m_isRotationDirty = true;

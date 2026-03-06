@@ -78,7 +78,7 @@ public:
 
 	glm::vec4 const& GetWorldPosition();
 	glm::vec4 const& GetWorldScale();
-	glm::vec4 const& GetWorldRotation();
+	glm::quat const& GetWorldRotation();
 
 	void SetWorldPosition(glm::vec4 const& worldPos);
 	void SetWorldScale(glm::vec4 const& worldScale);
@@ -91,7 +91,8 @@ private:
 
 	glm::vec4 m_worldPosition{0.0f, 0.0f, 0.0f, 1.0f};
 	glm::vec4 m_worldScale{ 1.0f };
-	glm::vec4 m_worldRotation{ 0.0f,0.0f,0.0f,1.0f };
+	//glm::vec4 m_worldRotation{ 0.0f,0.0f,0.0f,1.0f };
+	glm::quat m_worldRotation{ 0.0f,0.0f,0.0f,1.0f };
 
 	bool m_isParentNode3D;
 	bool m_isDirty;

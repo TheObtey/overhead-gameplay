@@ -4,6 +4,8 @@
 
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+//#include <glm/ext/quaternion_float.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 /// /////////////////////////////////////////////////////////////////////////////////
 /// Classe Transform
@@ -27,6 +29,7 @@ public:
 	const glm::mat4& GetMatrixRotation();
 	const glm::mat4& GetInverseMatrixRotation();
 	const glm::vec4& GetRotation() const;
+	const glm::quat& GetRotationQuat() const;
 	float GetYaw() const;
 	float GetPitch() const;
 	float GetRoll() const;
@@ -47,6 +50,7 @@ public:
 	void SetY(float y);
 	void SetZ(float z);
 	void SetRotation(glm::vec4 rot);
+	void SetRotationQuat(glm::quat rot);
 	void SetYaw(float yaw);
 	void SetPitch(float pitch);
 	void SetRoll(float roll);
@@ -75,6 +79,7 @@ private:
 	glm::vec4 m_up;
 	glm::vec4 m_forward;
 
+	glm::quat m_rotationQuat{ 1, 0, 0, 0 };
 	glm::mat4 m_rotationMatrix;
 	glm::mat4 m_invRotationMatrix;
 	glm::mat4 m_transform{ 1.0f };
