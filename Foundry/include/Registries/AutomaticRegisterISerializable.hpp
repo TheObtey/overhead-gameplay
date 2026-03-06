@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _AUTOMATIC_REGISTER_ISERIALIZABLE__H
+#define _AUTOMATIC_REGISTER_ISERIALIZABLE__H
 
 #include <iostream>
 
@@ -26,3 +27,5 @@ private:
 
 template <typename T>
 inline bool AutomaticRegisterISerializable<T>::s_registered = false;
+
+#endif //_AUTOMATIC_REGISTER_ISERIALIZABLE__H
