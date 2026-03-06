@@ -53,7 +53,7 @@ int main()
 	cube3->SetPosition({ -6.0,5.0,-2.0,1.0f });
 	cube4->SetPosition({ -2.0,2.0,-2.0,1.0f });
 
-	cube2->SetScale({ 3.0,0.5,2.0,1.0f });
+	cube2->SetScale({ 2.0,4.0,2.0,1.0f });
 
 	cube1->AddChild(std::move(cube2));
 	cube1->AddChild(std::move(cube3));

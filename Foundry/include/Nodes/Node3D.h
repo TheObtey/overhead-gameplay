@@ -7,6 +7,13 @@
 /*
 Base class of every 3D object
 */
+
+struct FlagsDirty
+{
+	char worldDirty : 1 = true;
+	char localDirty : 1 = true;
+};
+
 class Node3D : public Node
 {
 public: 
@@ -69,6 +76,14 @@ public:
 	virtual void OnUpdate(float delta) override;
 	glm::mat4x4& GetWorldMatrice();
 
+	glm::vec4 const& GetWorldPosition();
+	glm::vec4 const& GetWorldScale();
+	glm::vec4 const& GetWorldRotation();
+
+	void SetWorldPosition(glm::vec4 const& worldPos);
+	void SetWorldScale(glm::vec4 const& worldScale);
+	void SetWorldRotation(glm::vec4 const& worldRot);
+
 private:
 
 	Transform3D m_transform;
@@ -79,6 +94,9 @@ private:
 	glm::vec4 m_worldRotation{ 0.0f,0.0f,0.0f,1.0f };
 
 	bool m_isParentNode3D;
+	bool m_isDirty;
+
+	FlagsDirty m_flags;
 
 	void CheckParentTransform();
 	void UpdateWorldTransform();

@@ -141,6 +141,7 @@ glm::mat4& Transform3D::GetInvMatrix()
 void Transform3D::SetPosition(glm::vec4 pos)
 {
 	m_position = pos;
+	m_position.w = 1.0f;
 	m_isDirty = true;
 	m_isInvDirty = true;
 }
@@ -169,6 +170,7 @@ void Transform3D::SetZ(float z)
 void Transform3D::SetRotation(glm::vec4 rot)
 {
 	m_rotation = rot;
+	m_rotation.w = 1.0f;
 	m_isDirty = true;
 	m_isInvDirty = true;
 	m_isRotationDirty = true;
@@ -201,6 +203,7 @@ void Transform3D::SetRoll(float roll)
 void Transform3D::SetScale(glm::vec4 scale)
 {
 	m_scale = scale;
+	m_scale.w = 1.0f;
 	m_isDirty = true;
 	m_isInvDirty = true;
 }
@@ -208,6 +211,7 @@ void Transform3D::SetScale(glm::vec4 scale)
 void Transform3D::AddPosition(glm::vec4 pos)
 {
 	m_position += pos;
+	m_position.w = 1.0f;
 	m_isDirty = true;
 	m_isInvDirty = true;
 }
@@ -236,6 +240,7 @@ void Transform3D::AddZ(float z)
 void Transform3D::AddRotation(glm::vec4 rot)
 {
 	m_rotation += rot;
+	m_rotation.w = 1.0f;
 	m_isDirty = true;
 	m_isInvDirty = true;
 	m_isRotationDirty = true;
@@ -268,6 +273,7 @@ void Transform3D::AddRoll(float roll)
 void Transform3D::AddScale(glm::vec4 scale)
 {
 	m_scale += scale;
+	m_scale.w = 1.0f;
 	m_isDirty = true;
 	m_isInvDirty = true;
 }
@@ -292,6 +298,7 @@ Transform3D Transform3D::operator*(Transform3D& other)
 {
 	Transform3D newTransform;
 	newTransform.m_position = m_position;
+	newTransform.m_position.w = 1.0f;
 	newTransform.m_transform = other.GetMatrix() * GetMatrix();
 	newTransform.m_isDirty = true;
 	newTransform.m_isRotationDirty = true;
