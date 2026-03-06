@@ -1,15 +1,14 @@
 #ifndef __EDITOR_H
 #define __EDITOR_H
 
+#include "EditorRaylib3D.h"
+
 #include <raylib.h>
 #include <raymath.h>
-
 #include <imgui.h>
 #include <imfilebrowser.h>
-
 #include <rlImGui.h>
 #include <rlImGuiColors.h>
-
 #include <Node.h>
 #include <Define.h>
 
@@ -76,6 +75,9 @@ private:
 	void ShowLoadSceneBrowsing();
 
 private:
+	// Editor Parts
+	EditorRaylib3D m_editorRaylib;
+
 	// Editor State
 	bool m_running = false;
 	int m_screenWidth = 1900;
@@ -110,7 +112,6 @@ private:
 	ImGui::FileBrowser m_loadBrowser;
 
 	// 3D Camera
-	Camera3D m_camera = {};
 
 	// UI States
 	bool m_showHierarchy = true;

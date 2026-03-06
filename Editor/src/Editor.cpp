@@ -27,13 +27,6 @@ void Editor::Init()
 	ImGui::GetIO().FontGlobalScale = 1.0f;
 	ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
-	// Static Cam 
-	m_camera.position = { 10.0f, 10.0f, 10.0f };
-	m_camera.target = { 0.0f, 0.0f, 0.0f };
-	m_camera.up = { 0.0f, 1.0f, 0.0f };
-	m_camera.fovy = 45.0f;
-	m_camera.projection = CAMERA_PERSPECTIVE;
-
 	//Node Tree For Avaible Node
 	m_newNodeTypeSelector = Node::CreateNode<Node>("Node");
 	m_newNodeTypeSelector.get()->AddChild(Node::CreateNode<Node>("Node3DTest"));
@@ -61,7 +54,7 @@ void Editor::Run()
 		
 		BeginDrawing();
 		ClearBackground(DARKGRAY);
-		
+
 		Render3D();
 		RenderUI();
 		
@@ -82,13 +75,6 @@ void Editor::Shutdown()
 
 void Editor::Update(float deltaTime)
 {
-	if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-		UpdateCamera(&m_camera, CAMERA_FREE);
-	}
-	if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
-		//UpdateCamera(&m_camera, CAMERA_ORBITAL);
-	}
-
 	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_S)) {
 		SaveSceneNoSpe();
 	}
@@ -104,10 +90,14 @@ void Editor::Update(float deltaTime)
 	EngineServer::FlushCommands();
 }
 
+void EditorRaylib3D::UpdateJson(json const& newJson)
+{
+}
+
 void Editor::Render3D()
 {
 	// switch 2d/32
-	DrawViewport3D();
+	m_editorRaylib.Render();
 }
 
 void Editor::RenderUI()
@@ -496,22 +486,7 @@ void Editor::DrawInspectorPanel()
 
 void Editor::DrawViewport3D()
 {
-
 	if (!m_showViewport) return;
-
-
-	BeginMode3D(m_camera);
-
-	DrawGrid(20, 1.0f);
-	DrawLine3D({ 0, 0, 0 }, { 500, 0, 0 }, RED);
-	DrawLine3D({ 0, 0, 0 }, { 0, 500, 0 }, GREEN);
-	DrawLine3D({ 0, 0, 0 }, { 0, 0, 500 }, BLUE);
-	DrawLine3D({ 0, 0, 0 }, { -500, 0, 0 }, RED);
-	DrawLine3D({ 0, 0, 0 }, { 0, -500, 0 }, GREEN);
-	DrawLine3D({ 0, 0, 0 }, { 0, 0,-500 }, BLUE);
-
-
-	EndMode3D();
 }
 
 void Editor::CreateNode(std::string Type,std::string const& name, Node* parent)
