@@ -1,10 +1,12 @@
 
 #include "EditorSerializer.h"
-#include "SerializeObject.hpp"
 
+#include <json.hpp>
+#include <SerializeObject.hpp>
 #include <Servers/EngineServer.h>
 #include <fstream>
-#include <map>
+
+using json = nlohmann::json;
 
 void EditorSerializer::Save(std::string outPath, uptr<Node>& root)
 {
@@ -13,7 +15,6 @@ void EditorSerializer::Save(std::string outPath, uptr<Node>& root)
 	json jsonRoot;
 	SerializedObject object;
 	object.SetType<Node>();
-
 	root.get()->Serialize(object);
 	jsonRoot["Root"] = object.m_elementsInSerializedObject;
 
@@ -22,6 +23,7 @@ void EditorSerializer::Save(std::string outPath, uptr<Node>& root)
 	File << jsonRoot;
 	File.close();
 }
+
 uptr<Node> EditorSerializer::LoadFromJson(std::string path)
 {
 	std::fstream file;

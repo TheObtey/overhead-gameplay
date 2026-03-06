@@ -1,13 +1,9 @@
 #ifndef _EDITORSERIALIZER__H
 #define _EDITORSERIALIZER__H
 
-#include "json.hpp"
-
 #include <Define.h>
 #include <Node.h>
 #include <string>
-
-using json = nlohmann::json;
 
 /*
 	* Object used to save a SceneTree from Editor

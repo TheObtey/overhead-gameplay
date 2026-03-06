@@ -11,6 +11,9 @@
 
 using json = nlohmann::json;
 
+/*
+	* Object used to convert Data of an object in json
+*/
 class SerializedObject
 {
 public:

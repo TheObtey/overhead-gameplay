@@ -8,7 +8,6 @@
 #include <iostream>
 #include <Node.h>
 
-
 int main() {
     //std::cout << "MAIN EDITOR" << std::endl;
     //uptr<Node> node = Node::CreateNode<Node>("grand parent");

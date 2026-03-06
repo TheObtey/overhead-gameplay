@@ -14,7 +14,8 @@
 class SerializedObject;
 
 /*
-	All Objects used in Editor must inherit from ISerializable to be used in Editor
+	* All Objects used in Editor must inherit from ISerializable to be used in Editor
+	* Store constructor of ISerializable for AutomaticRegistration
 */
 class ISerializable
 {
