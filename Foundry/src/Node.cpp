@@ -1,6 +1,7 @@
 #include "Node.h"
 #include "Debug.h"
 #include "Servers/EngineServer.h"
+#include "SerializeObject.hpp"
 
 #include <algorithm>
 #include <exception>
@@ -12,8 +13,7 @@
 #include <utility>
 #include <vector>
 
-
-Node::Node(std::string const& name) :  m_name(name)
+Node::Node(std::string const& name) : m_name(name)
 {
     DEBUG("Node : " << m_name << " has been " << ANSI_GREEN << "created !" << ANSI_RESET << std::endl);
 }
@@ -177,6 +177,38 @@ std::unique_ptr<Node> Node::Clone()
 
     return copy;
 }
+
+void Node::Serialize(SerializedObject& datas) const
+{
+	// Call baseClass::Serialize(datas) : Example Node::Serialize(datas)
+	datas.SetType<Node>();
+	datas.AddElement("m_name", m_name);
+	datas.AddArray("Children");
+	for (uint32 i = 0; i < m_children.size(); i++)
+	{
+		datas.AddElementInArray("Children", static_cast<ISerializable const&>(*m_children.at(m_childrenOrder[i])));
+	}
+}
+
+void Node::Deserialize(SerializedObject const& datas)
+{
+	// Call baseClass::Deserialize(datas) : Example Node::Deserialize(datas)
+	std::string t;
+	datas.GetType(t);
+	datas.GetElement("m_name",m_name);
+	std::vector<ISerializable*> tempList = datas.GetArray<ISerializable*>("Children");
+	for (uint32 i = 0; i < tempList.size(); i++)
+	{
+		uptr<Node> pNode = uptr<Node>((Node*)tempList[i]);
+		AddChild(pNode);
+	}
+}
+
+std::function<ISerializable* ()> Node::Register()
+{
+	return []()->ISerializable* { return (ISerializable*)Node::CreateNode<Node>("Node").release(); };
+}
+
 
 std::string Node::GetName() { return m_name; }
 Node* Node::GetParent() { return m_pOwner; }

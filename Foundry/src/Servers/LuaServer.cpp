@@ -8,9 +8,9 @@
 
 void LuaServer::OnInitialize()
 {
-	m_luaState.open_libraries(sol::lib::base, sol::lib::package, sol::lib::debug);
-	Binder b(m_luaState);
-	REGISTER_PROXY(b);
+	//LuaState::GetLuaState().open_libraries(sol::lib::base, sol::lib::package, sol::lib::debug);
+	//Binder b(m_luaState);
+	//REGISTER_PROXY(b);
 }
 
 void LuaServer::RegisterUnattachedNode(uptr<Node> &uNode)

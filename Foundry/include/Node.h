@@ -7,6 +7,7 @@
 #include "SceneTree.h"
 #include "Scripting/Lua/LuaScriptInstance.hpp"
 #include "ISerializable.h"
+#include "Registries/AutomaticRegisterISerializable.hpp"
 
 #include <functional>
 #include <memory>
@@ -18,6 +19,7 @@
 
 class Node;
 class SceneTree;
+class SerializedObject;
 
 template <typename T>
 concept NodeType = std::is_base_of_v<Node, T>;
@@ -27,10 +29,9 @@ template <typename T>
 using OptionalRef = std::optional<std::reference_wrapper<T>>;
 
 //Base class off every node in the tree
-class Node : public ISerializable
+class Node : public ISerializable, public AutomaticRegisterISerializable<Node>
 {
 public:
-
 	class Proxy;
 
 	virtual ~Node();
@@ -64,8 +65,9 @@ public:
 
 	//override this method if the inherited node is not trivially copyable
 	virtual std::unique_ptr<Node> Clone();
-	std::map<std::string, std::string> const& Serialize() { return {}; }
-	void Deserialize(std::map<std::string, std::string> const& object) {}
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	static std::function<ISerializable* ()> Register();
 
 	std::string GetName();
 	Node* GetParent();
