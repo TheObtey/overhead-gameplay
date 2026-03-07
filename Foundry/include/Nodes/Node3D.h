@@ -89,9 +89,8 @@ private:
 	glm::quat m_worldRotation{ 0.0f,0.0f,0.0f,1.0f };
 
 	bool m_isParentNode3D = false;
-	bool m_worldDirty = true;
-	bool m_localDirty = true;
-
+	bool m_worldDirty : 1 = true;
+	bool m_localDirty : 1 = true;
 };
 
 #include "Scripting/Proxies/Node3DProxy.inl"

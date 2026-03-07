@@ -13,10 +13,6 @@
 #include "Transform3D.h"
 #include "Nodes/Node3D.h"
 
-//struct Node3D
-//{
-//	Transform3D transform;
-//};
 
 int main()
 {
@@ -76,7 +72,7 @@ int main()
 
 		// move cube
 		if (IsKeyDown(KEY_I))
-			cube1ref.SetWorldPosition(cube1ref.GetWorldPosition() + glm::vec3(0.0f, 0.0f, -0.5f));
+			cube2ref.SetWorldPosition(cube2ref.GetWorldPosition() + glm::vec3(0.0f, 0.0f, -0.5f));
 		if (IsKeyDown(KEY_K)) cube1ref.AddPosition({ 0.0, 0.0, -1.0 });
 		if (IsKeyDown(KEY_J)) cube1ref.AddPosition({ -1.0, 0.0, 0.0 });
 		if (IsKeyDown(KEY_L)) cube1ref.AddPosition({ 1.0, 0.0, 0.0 });
@@ -177,6 +173,4 @@ int main()
 	//--------------------------------------------------------------------------------------
 	CloseWindow();        // Close window and OpenGL context
 	//--------------------------------------------------------------------------------------
-
-
 }

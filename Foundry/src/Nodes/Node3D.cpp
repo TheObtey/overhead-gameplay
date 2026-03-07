@@ -116,14 +116,17 @@ void Node3D::SetWorldPosition(glm::vec3 const& worldPos)
 {
 	m_worldPosition = glm::vec4(worldPos, 1.0f);
 	m_worldDirty = true;
+	UpdateLocalTransform();
 }
 void Node3D::SetWorldScale(glm::vec3 const& worldScale)
 {
 	m_worldScale = glm::vec4(worldScale, 1.0f);
 	m_worldDirty = true;
+	UpdateLocalTransform();
 }
 void Node3D::SetWorldRotation(glm::vec3 const& worldRot)
 {
 	m_worldRotation = glm::quat(worldRot);
 	m_worldDirty = true;
+	UpdateLocalTransform();
 }
