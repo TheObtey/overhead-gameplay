@@ -36,24 +36,19 @@ int main()
 	camera.fovy = 45.0f;                                // Camera field-of-view Y
 	camera.projection = CAMERA_PERSPECTIVE;             // Camera projection type
 
-	Mesh cubeMesh = GenMeshCube(2.0f, 2.0f, 2.0f);
+	Mesh cubeMesh = GenMeshCube(1.0f, 1.0f, 1.0f);
 	Material cubeMaterial = LoadMaterialDefault();
-
-	//Node3D cube1("f");
-	//Node3D cube2("b");
-	//Node3D cube3("c");
-	//Node3D cube4("v");
 
 	auto cube1 = Node::CreateNode<Node3D>("a");
 	auto cube2 = Node::CreateNode<Node3D>("b");
 	auto cube3 = Node::CreateNode<Node3D>("c");
 	auto cube4 = Node::CreateNode<Node3D>("y");
 
-	cube2->SetPosition({ 4.0,0.0,2.0,1.0f });
-	cube3->SetPosition({ -6.0,5.0,-2.0,1.0f });
-	cube4->SetPosition({ -2.0,2.0,-2.0,1.0f });
+	cube2->SetPosition({ 1.0,0.0,0.0});
+	cube3->SetPosition({ 2.0,0.0,0.0});
+	cube4->SetPosition({ 1.0,0.0,0.0});
 
-	cube2->SetScale({ 2.0,4.0,2.0,1.0f });
+	cube2->SetScale({ 1.0,4.0,1.0});
 
 	cube1->AddChild(std::move(cube2));
 	cube1->AddChild(std::move(cube3));
@@ -66,7 +61,6 @@ int main()
 	cube3ref.AddChild(std::move(cube4));
 	EngineServer::FlushCommands();
 	Node3D& cube4ref =  static_cast<Node3D&>(cube3ref.GetChild(0));
-
 
 	DisableCursor();                    // Limit cursor to relative movement inside the window
 
@@ -81,21 +75,22 @@ int main()
 		if (IsKeyPressed(KEY_Z)) camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
 
 		// move cube
-		if (IsKeyDown(KEY_I)) cube1ref.AddPosition({ 0.0, 0.0, 1.0,1.0f });
-		if (IsKeyDown(KEY_K)) cube1ref.AddPosition({ 0.0, 0.0, -1.0,1.0f });
-		if (IsKeyDown(KEY_J)) cube1ref.AddPosition({ -1.0, 0.0, 0.0,1.0f });
-		if (IsKeyDown(KEY_L)) cube1ref.AddPosition({ 1.0, 0.0, 0.0,1.0f });
-		if (IsKeyDown(KEY_G)) cube2ref.AddPosition({ 1.0, 0.0, 0.0,1.0f });
+		if (IsKeyDown(KEY_I))
+			cube1ref.SetWorldPosition(cube1ref.GetWorldPosition() + glm::vec3(0.0f, 0.0f, -0.5f));
+		if (IsKeyDown(KEY_K)) cube1ref.AddPosition({ 0.0, 0.0, -1.0 });
+		if (IsKeyDown(KEY_J)) cube1ref.AddPosition({ -1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_L)) cube1ref.AddPosition({ 1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_G)) cube2ref.AddPosition({ 1.0, 0.0, 0.0 });
 
-		if (IsKeyDown(KEY_RIGHT)) cube2ref.AddPosition({ 1.0, 0.0, 0.0,1.0f });
+		if (IsKeyDown(KEY_RIGHT)) cube2ref.AddPosition({ 1.0, 0.0, 0.0 });
 		if (IsKeyDown(KEY_UP)) cube2ref.AddRoll(0.2);
 
 		if (IsKeyDown(KEY_N)) cube1ref.AddYaw(0.2);
 		if (IsKeyDown(KEY_B)) cube1ref.AddPitch(0.2);
 		if (IsKeyDown(KEY_V)) cube1ref.AddRoll(0.2);
 
-		if (IsKeyPressed(KEY_C)) cube1ref.AddScale({ 0.0, 1.0, 0.0,1.0f});
-		if (IsKeyDown(KEY_X)) cube1ref.AddScale({ -1.0, -1.0, -1.0,1.0f});
+		if (IsKeyPressed(KEY_C)) cube1ref.AddScale({ 0.0, 1.0, 0.0});
+		if (IsKeyDown(KEY_X)) cube1ref.AddScale({ -1.0, -1.0, -1.0});
 
 		if (IsKeyPressed(KEY_Y))
 		{
@@ -120,10 +115,10 @@ int main()
 
 		BeginMode3D(camera);
 
-		glm::mat4 m1 = cube1->GetWorldMatrice();
-		glm::mat4 m2 = cube2ref.GetWorldMatrice();
-		glm::mat4 m3 = cube3ref.GetWorldMatrice();
-		glm::mat4 m4 = cube4ref.GetWorldMatrice();
+		glm::mat4 m1 = cube1->GetWorldMatrix();
+		glm::mat4 m2 = cube2ref.GetWorldMatrix();
+		glm::mat4 m3 = cube3ref.GetWorldMatrix();
+		glm::mat4 m4 = cube4ref.GetWorldMatrix();
 
 		//DEBUG(m4[0][])
 
@@ -173,11 +168,6 @@ int main()
 
 		DrawRectangle(10, 10, 320, 93, Fade(SKYBLUE, 0.5f));
 		DrawRectangleLines(10, 10, 320, 93, BLUE);
-
-		DrawText("Free camera default controls:", 20, 20, 10, BLACK);
-		DrawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, DARKGRAY);
-		DrawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, DARKGRAY);
-		DrawText("- Z to zoom to (0, 0, 0)", 40, 80, 10, DARKGRAY);
 
 		EndDrawing();
 		//----------------------------------------------------------------------------------

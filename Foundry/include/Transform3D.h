@@ -17,7 +17,7 @@ class Transform3D
 public:
 
 	Transform3D();
-	~Transform3D();
+	~Transform3D() = default;
 
 	Transform3D operator*(Transform3D& other);
 	void operator*=(Transform3D& other);
@@ -26,8 +26,8 @@ public:
 	float GetX() const;
 	float GetY() const;
 	float GetZ() const;
-	const glm::mat4& GetMatrixRotation();
-	const glm::mat4& GetInverseMatrixRotation();
+	const glm::mat4& GetMatrixRotation() const;
+	const glm::mat4& GetInverseMatrixRotation() const;
 	const glm::vec4& GetRotation() const;
 	const glm::quat& GetRotationQuat() const;
 	float GetYaw() const;
@@ -36,14 +36,14 @@ public:
 	float GetMaxScale() const;
 	float GetMinScale() const;
 	const glm::vec4& GetScale() const;
-	const glm::vec4& GetRight();
-	const glm::vec4& GetUp();
-	const glm::vec4& GetForward();
+	const glm::vec4& GetRight() const;
+	const glm::vec4& GetUp() const;
+	const glm::vec4& GetForward() const;
 
 	glm::mat4& GetMatrix();
 	glm::mat4& GetInvMatrix();
 
-	bool GetDirty() { return m_isDirty; }
+	bool GetDirty() const { return m_isDirty; }
 
 	void SetPosition(glm::vec4 pos);
 	void SetX(float x);
@@ -85,9 +85,9 @@ private:
 	glm::mat4 m_transform{ 1.0f };
 	glm::mat4 m_invTransform;
 
-	bool m_isDirty;
-	bool m_isRotationDirty;
-	bool m_isInvDirty;
+	bool m_isDirty = true;
+	bool m_isRotationDirty = true;
+	bool m_isInvDirty = true;
 
 	void UpdateRotationMatrix();
 	void UpdateTransform();

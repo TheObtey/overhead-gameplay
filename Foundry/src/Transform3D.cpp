@@ -1,8 +1,6 @@
 ﻿#include "Transform3D.h"
 #include "MathUtils.h"
 
-
-
 Transform3D::Transform3D() :
 	m_position(0.0f, 0.0f, 0.0f, 1.0f),
 	m_scale(1.0f, 1.0f, 1.0f, 1.0f),
@@ -13,16 +11,10 @@ Transform3D::Transform3D() :
 	Update();
 }
 
-Transform3D::~Transform3D()
-{
-}
-
 void Transform3D::UpdateTransform()
 {	
 	if (m_isDirty == false) return;
-
 	m_transform = Maths::Translate(m_position) * m_rotationMatrix *  Maths::Scale(m_scale);
-
 	m_isDirty = false;
 }
 
@@ -69,12 +61,12 @@ float Transform3D::GetZ() const
 	return m_position.z;
 }
 
-const glm::mat4& Transform3D::GetMatrixRotation()
+const glm::mat4& Transform3D::GetMatrixRotation() const
 {
 	return m_rotationMatrix;
 }
 
-const glm::mat4& Transform3D::GetInverseMatrixRotation()
+const glm::mat4& Transform3D::GetInverseMatrixRotation() const
 {
 	return m_invRotationMatrix;
 }
@@ -118,17 +110,17 @@ const glm::vec4& Transform3D::GetScale() const
 	return m_scale;
 }
 
-const glm::vec4& Transform3D::GetUp()
+const glm::vec4& Transform3D::GetUp() const
 {
 	return m_up;
 }
 
-const glm::vec4& Transform3D::GetRight()
+const glm::vec4& Transform3D::GetRight() const
 {
 	return m_right;
 }
 
-const glm::vec4& Transform3D::GetForward()
+const glm::vec4& Transform3D::GetForward() const
 {
 	return m_forward;
 }
@@ -177,7 +169,7 @@ void Transform3D::SetRotation(glm::vec4 rot)
 
 	m_rotation = rot;
 	m_rotation.w = 1.0f;
-	m_rotationQuat = glm::quat_cast(Maths::RotateYawPitchRoll(glm::vec3(rot)));
+	m_rotationQuat = glm::quat_cast(Maths::RotateYawPitchRoll(rot));
 
 	m_isDirty = true;
 	m_isInvDirty = true;
