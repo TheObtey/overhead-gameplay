@@ -1,14 +1,18 @@
 #include "Scripting/Lua/LuaScriptInstance.hpp"
-#include "Servers/LuaServer.h"
+#include "Scripting/ScriptingEngine.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 #include "Logger.hpp"
 
+
 LuaScriptInstance::LuaScriptInstance(std::string const& scriptPath) :
-	m_state(LuaServer::GetLuaState()),
+	m_state(ScriptingEngine::GetScriptEngine()),
 	m_stringPath(scriptPath)
 {
 	m_enviro = {m_state, sol::create};
-	m_enviro["CreateNode"] = m_state["CreateNode"];
 	m_enviro["print"] = m_state["print"];
+
+	for (std::string const& name : ScriptingEngine::GetRegisteredTypesName())
+		m_enviro[name] = m_state[name];
 }
 
 void LuaScriptInstance::CallScriptOnInit()

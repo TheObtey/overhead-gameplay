@@ -1,7 +1,7 @@
 #include "Node.h"
 #include "Debug.h"
 #include "Servers/EngineServer.h"
-#include "SerializeObject.hpp"
+#include "Serialization/SerializeObject.hpp"
 
 #include <algorithm>
 #include <exception>
@@ -204,9 +204,9 @@ void Node::Deserialize(SerializedObject const& datas)
 	}
 }
 
-std::function<ISerializable* ()> Node::Register()
+std::function<ISerializable* ()> Node::CreateInstance()
 {
-	return []()->ISerializable* { return (ISerializable*)Node::CreateNode<Node>("Node").release(); };
+	return []()->ISerializable* { return CreateNode<Node>("Node").release(); };
 }
 
 

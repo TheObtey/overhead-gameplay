@@ -13,6 +13,21 @@ void EngineServer::QueueFree(std::unique_ptr<Node>& node)
     Instance().m_commands.push({CommandType::FREE, std::move(node)});
 }
 
+void EngineServer::RegisterUnattachedNode(uptr<Node> &uNode)
+{
+    Instance().m_UnattachedNode[uNode.get()] = std::move(uNode);
+}
+
+void EngineServer::UnregisterUnattachedNode(Node *node)
+{
+    Instance().m_UnattachedNode.erase(node);
+}
+
+uptr<Node>& EngineServer::GetUnattachedNode(Node *ptr)
+{
+    return Instance().m_UnattachedNode[ptr];
+}
+
 void EngineServer::BuildTasksImpl(TaskGraph& graph)
 {
     Task t;

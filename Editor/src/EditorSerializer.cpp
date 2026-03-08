@@ -1,8 +1,8 @@
 
 #include "EditorSerializer.h"
 
-#include <json.hpp>
-#include <SerializeObject.hpp>
+#include <Serialization/json.hpp>
+#include <Serialization/SerializeObject.hpp>
 #include <Servers/EngineServer.h>
 #include <fstream>
 

@@ -1,20 +1,17 @@
 #ifndef NODE__H_
 #define NODE__H_
 
-#include "Debug.h"
 #include "Define.h"
 #include "Event.hpp"
 #include "SceneTree.h"
 #include "Scripting/Lua/LuaScriptInstance.hpp"
-#include "ISerializable.h"
+#include "Serialization/ISerializable.h"
 #include "Registries/AutomaticRegisterISerializable.hpp"
 
 #include <functional>
-#include <memory>
 #include <optional>
 #include <string>
 #include <sstream>
-#include <type_traits>
 #include <vector>
 
 class Node;
@@ -29,7 +26,7 @@ template <typename T>
 using OptionalRef = std::optional<std::reference_wrapper<T>>;
 
 //Base class off every node in the tree
-class Node : public ISerializable, public AutomaticRegisterISerializable<Node>
+class Node : public AutomaticRegisterISerializable<Node>, public ISerializable
 {
 public:
 	class Proxy;
@@ -67,7 +64,6 @@ public:
 	virtual std::unique_ptr<Node> Clone();
 	virtual void Serialize(SerializedObject& datas) const override;
 	virtual void Deserialize(SerializedObject const& datas) override;
-	static std::function<ISerializable* ()> Register();
 
 	std::string GetName();
 	Node* GetParent();
@@ -79,6 +75,9 @@ public:
 
 	template <NodeType T>
 	static void AttachScript(uptr<LuaScriptInstance>& script, T& node);
+
+	static std::function<ISerializable*()> CreateInstance();
+	static void Test() {};
 
 	//====Event======
 	Event<void(Node&)> OnSceneEnter;
@@ -103,7 +102,6 @@ protected:
 
 	uptr<Proxy> m_pProxy;
 	uptr<LuaScriptInstance> m_pScriptInstance;
-
 
 	std::unordered_map<std::string, std::unique_ptr<Node>> m_children{};
 	std::vector<std::string> m_childrenOrder{};

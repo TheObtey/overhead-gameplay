@@ -1,4 +1,4 @@
-#include "SerializeObject.hpp"
+#include "Serialization/SerializeObject.hpp"
 
 void SerializedObject::GetType(std::string& type) const
 {
