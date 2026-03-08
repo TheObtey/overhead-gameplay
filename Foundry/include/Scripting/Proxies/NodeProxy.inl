@@ -64,8 +64,8 @@ struct Node::Proxy::ProxyBinding : AutomaticRegisterProxy<Node::Proxy::ProxyBind
 	static void Bind(Binder& binder)
 	{
 		binder.BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
-		binder.BindClass<Proxy>("Node",
-			Binder::MetaFunction::GarbageCollect, BIND(GCNodeProxy),
+		binder.BindClass<Proxy>("node",
+			sol::meta_function::garbage_collect, BIND(GCNodeProxy),
 			"AddChild", BIND(AddChild),
 			"RemoveChild", OVERLOAD(Proxy, void, Proxy&)(BIND(RemoveChild)),
 			"RemoveChild", OVERLOAD(Proxy, void, std::string const&)(BIND(RemoveChild)),

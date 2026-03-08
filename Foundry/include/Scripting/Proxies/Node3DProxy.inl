@@ -48,7 +48,7 @@ private:
 };
 
 BindProxy(Node3D::Proxy,
-	return binder.BindClass<Node3D::Proxy>("Node3D",
+	return binder.BindClass<Node3D::Proxy>("node3d",
 	"GetPosition", BIND(GetPosition),
 	"GetX", BIND(GetX),
 	"GetY", BIND(GetY),

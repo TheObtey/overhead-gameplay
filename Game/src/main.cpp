@@ -7,7 +7,7 @@
 #include "Node.h"
 #include "Servers/EngineServer.h"
 #include "Scripting/Lua/LuaScriptInstance.hpp"
-#include "Scripting/Proxies/Vec3Proxy.hpp"
+#include "Scripting/Proxies/MathsProxy.hpp"
 
 #include <memory>
 
