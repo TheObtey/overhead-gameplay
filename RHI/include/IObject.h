@@ -10,9 +10,6 @@ public:
 
     virtual void Load() = 0;
     virtual void Unload() = 0;
-
-protected:
-    uint32 m_id;
 };
 
 #endif //!RHI_IOBJECT__H_

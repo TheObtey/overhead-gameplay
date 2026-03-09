@@ -9,24 +9,18 @@
 #include <variant>
 #include <vector>
 
-struct Resource
-{
-    std::variant<IGeometry, ITexture> info;
-    uint8 type;
-};
 
 class IPass 
 {
 public:
-    IPass(IShader const& shader, std::vector<Resource> resources);
-    ~IPass();
+    virtual ~IPass() = 0;
 
     virtual void AddShader(IShader const& shader) = 0;
 
     template <typename ... Args>
     void AddInput(Args ... args); 
     
-    virtual uptr<ITexture> Execute() = 0;
+    //virtual uptr<ITexture> Execute() = 0;
 protected:
 
 };
