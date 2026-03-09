@@ -8,9 +8,9 @@
 
 static void REGISTER_PROXY(Binder& binder)
 {
-	binder.BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
+	
 
-	BIND_PROXY(binder, Node);
+	//BIND_PROXY(binder, Node);
 }
 
 #endif // !FOUNDRY_PROXY_REG__H_

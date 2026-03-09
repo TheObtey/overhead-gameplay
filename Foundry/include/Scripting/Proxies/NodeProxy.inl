@@ -1,11 +1,13 @@
 #include "Event.hpp"
 #include "Scripting/Binder.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 
 #include <string>
 
 #define BindProxy(P, X) struct P::ProxyBinding { void Bind() override { X } };
 #define BIND(F) &Proxy::F
 #define OVERLOAD(Class, Ret, ...) static_cast<Ret (Class::*)(__VA_ARGS__)>
+
 
 /*A node proxy class used to communicate between the scripting language and the engine API.
 The engine manage memory, scripting just get refs.
@@ -58,29 +60,32 @@ public:
 
 private:
 	Node* m_pNode;
-};
 
-struct Node::Proxy::ProxyBinding
-{
-	virtual void Bind(Binder& binder)
+	struct ProxyBinding : public AutomaticRegisterProxy<Node::Proxy::ProxyBinding>
 	{
-		binder.BindClass<Proxy>("Node",
-		Binder::GarbageCollect, BIND(GCNodeProxy),
-		"AddChild", BIND(AddChild),
-		"RemoveChild", OVERLOAD(Proxy, void, Proxy&)(BIND(RemoveChild)),
-		"RemoveChild", OVERLOAD(Proxy, void, std::string const&)(BIND(RemoveChild)),
-		"FindChild", BIND(FindChild),
-		"GetChild", BIND(GetChild),
-		"GetChildren", BIND(GetChildren),
-		"GetChildCount", BIND(GetChildCount),
-		"GetNode", BIND(GetNode),
-		"Destroy", BIND(Destroy),
-		"Reparent", BIND(Reparent),
-		"MoveChild", BIND(MoveChild),
-		"Clone", BIND(Clone),
-		"GetName", BIND(GetName),
-		"GetParent", BIND(GetParent),
-		"GetSceneTree", BIND(GetSceneTree));
-	}
-	virtual ~ProxyBinding() = default;
+		virtual void Bind(Binder& binder)
+		{
+			binder.BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
+			binder.BindClass<Proxy>("Node",
+				Binder::GarbageCollect, BIND(GCNodeProxy),
+				"AddChild", BIND(AddChild),
+				"RemoveChild", OVERLOAD(Proxy, void, Proxy&)(BIND(RemoveChild)),
+				"RemoveChild", OVERLOAD(Proxy, void, std::string const&)(BIND(RemoveChild)),
+				"FindChild", BIND(FindChild),
+				"GetChild", BIND(GetChild),
+				"GetChildren", BIND(GetChildren),
+				"GetChildCount", BIND(GetChildCount),
+				"GetNode", BIND(GetNode),
+				"Destroy", BIND(Destroy),
+				"Reparent", BIND(Reparent),
+				"MoveChild", BIND(MoveChild),
+				"Clone", BIND(Clone),
+				"GetName", BIND(GetName),
+				"GetParent", BIND(GetParent),
+				"GetSceneTree", BIND(GetSceneTree));
+		};
+		virtual ~ProxyBinding() = default;
+	};
+
+	ProxyBinding m_proxyBinding;
 };
