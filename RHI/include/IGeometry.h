@@ -9,14 +9,13 @@ using GeometryID = uint32;
 class IGeometry 
 {
 public:
-    IGeometry();
-    ~IGeometry();
+    virtual ~IGeometry() = 0;
 
-    void AddPoints(std::vector<float> points);
-    void AddIndices(std::vector<uint32> indices);
+    virtual void AddPoints(std::vector<float> points) = 0;
+    virtual void AddIndices(std::vector<uint32> indices) = 0;
 
     GeometryID Load();
-    void Unload(GeometryID id);
+    void Unload();
 
 protected:
     GeometryID m_id;

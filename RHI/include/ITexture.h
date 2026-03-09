@@ -6,9 +6,8 @@
 class ITexture 
 {
 public:
-    ITexture(std::string_view buffer);
-    ~ITexture();
-
+    virtual ~ITexture() = 0;
+    
 protected:
     int width;
     int height;

@@ -8,6 +8,7 @@ class IVertexArrayObject : public IObject
 public:
     virtual ~IVertexArrayObject() = 0;
 
+    virtual void Bind() override = 0;
     virtual void Load() override = 0;
     virtual void Unload() override = 0;
 };    
