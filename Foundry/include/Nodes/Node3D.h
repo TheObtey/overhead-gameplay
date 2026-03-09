@@ -73,7 +73,7 @@ public:
 	glm::mat4& GetMatrix()						{ return m_transform.GetMatrix(); }
 	glm::mat4& GetInvMatrix()					{ return m_transform.GetInvMatrix(); }
 
-	virtual void OnUpdate(float delta) override;
+	virtual void OnUpdate(double delta) override;
 
 private:
 	void CheckParentTransform();

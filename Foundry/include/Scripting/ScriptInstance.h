@@ -9,7 +9,8 @@ public:
 	virtual ~ScriptInstance() = default;
 
 	virtual void CallScriptOnInit() = 0;
-	virtual void CallScriptOnUpdate(float dt) = 0;
+	virtual void CallScriptOnUpdate(double dt) = 0;
+	virtual void CallScriptOnPhysicsUpdate(double dt) = 0;
 	virtual void CallScriptOnDestroy() = 0;
 
 };

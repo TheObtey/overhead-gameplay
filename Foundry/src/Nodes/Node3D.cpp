@@ -11,7 +11,7 @@ Node3D::Node3D(std::string const& name) : Node(name), m_isParentNode3D(false)
 	UpdateWorldTransform();
 }
 
-void Node3D::OnUpdate(float delta)
+void Node3D::OnUpdate(double delta)
 {
 	Node::OnUpdate(delta);
 	m_localDirty = m_transform.GetDirty();

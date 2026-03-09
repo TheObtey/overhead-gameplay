@@ -3,7 +3,6 @@
 
 #include "Define.h"
 #include "Event.hpp"
-#include "SceneTree.h"
 #include "Scripting/Lua/LuaScriptInstance.hpp"
 #include "Serialization/ISerializable.h"
 #include "Registries/AutomaticRegisterISerializable.hpp"
@@ -14,7 +13,6 @@
 #include <sstream>
 #include <vector>
 
-class Node;
 class SceneTree;
 class SerializedObject;
 
@@ -33,8 +31,10 @@ public:
 
 	virtual ~Node();
 
-	virtual void OnUpdate(float delta) { };
-	void Update(float delta);
+	void Update(double delta);
+	virtual void OnUpdate(double delta) {  };
+	void PhysicsUpdate(double delta);
+	virtual void OnPhysicsUpdate(double delta) {  };
 
 	void AddChild(std::unique_ptr<Node>&& child);
 	void AddChild(std::unique_ptr<Node>& child);
@@ -82,7 +82,8 @@ public:
 
 	//====Event======
 	Event<void(Node&)> OnSceneEnter;
-	Event<void(Node&, float)> OnNodeUpdated;
+	Event<void(Node&, double)> OnNodeUpdated;
+	Event<void(Node&, double)> OnNodePhysicsUpdated;
 	Event<void(Node&)> OnSceneLeave;
 	Event<void(Node&)> OnParentChange;
 

@@ -19,9 +19,10 @@ void Proxy::GCNodeProxy(Proxy* nodeProxy)
 
 Proxy::Proxy(Node& node) : m_pNode(&node)  
 {
-	node.OnSceneEnter  += [&](Node& n){ OnSceneEnter();};
-	node.OnNodeUpdated += [&](Node& n, float const dt){ OnUpdate(dt); };
-	node.OnSceneLeave  += [&](Node& n){ OnSceneLeave(); };
+	node.OnSceneEnter			+= [&](Node& n){ OnSceneEnter();};
+	node.OnNodeUpdated			+= [&](Node& n, double const dt){ OnUpdate(dt); };
+	node.OnNodePhysicsUpdated   += [&](Node& n, double const dt){ OnPhysicsUpdate(dt); };
+	node.OnSceneLeave			+= [&](Node& n){ OnSceneLeave(); };
 }
 
 Proxy::Proxy(Proxy&& other) noexcept

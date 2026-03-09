@@ -1,4 +1,5 @@
 #include "Node.h"
+#include "SceneTree.h"
 #include "Debug.h"
 #include "Servers/EngineServer.h"
 #include "Serialization/SerializeObject.hpp"
@@ -22,14 +23,21 @@ Node::~Node()
     DEBUG("Node : " << m_name << " has been " << ANSI_RED << "deleted !" << ANSI_RESET << std::endl);
 }
 
-void Node::Update(float const delta)
+void Node::Update(double const delta)
 {
     OnUpdate(delta);
 	OnNodeUpdated(*this, delta);
     for (auto& name : m_childrenOrder)
-    {
         m_children[name]->Update(delta);
-    }
+
+}
+
+void Node::PhysicsUpdate(double delta)
+{
+	OnPhysicsUpdate(delta);
+	OnNodePhysicsUpdated(*this, delta);
+	for (auto& name : m_childrenOrder)
+		m_children[name]->PhysicsUpdate(delta);
 }
 
 void Node::AddChild(std::unique_ptr<Node>&& child)
@@ -134,6 +142,8 @@ void Node::Destroy()
         m_pOwner->RemoveChild(*this);
         return;
     }
+
+	if (m_pSceneTree) m_pSceneTree->m_root.reset();
 }
 
 void Node::Reparent(Node& newParent, bool keepGlobalTransform)

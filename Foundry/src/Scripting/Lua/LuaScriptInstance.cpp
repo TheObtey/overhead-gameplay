@@ -27,10 +27,22 @@ void LuaScriptInstance::CallScriptOnInit()
 	}
 }
 
-void LuaScriptInstance::CallScriptOnUpdate(float dt)
+void LuaScriptInstance::CallScriptOnUpdate(double dt)
 {
 	if(!m_updateFunc.valid()) return;
 	auto result = m_updateFunc(dt);
+
+	if (!result.valid())
+	{
+		sol::error err = result;
+		Logger::LogWithLevel(LogLevel::ERROR, "Lua script error : ", err.what());
+	}
+}
+
+void LuaScriptInstance::CallScriptOnPhysicsUpdate(double dt)
+{
+	if(!m_updatePhysicsFunc.valid()) return;
+	auto result = m_updatePhysicsFunc(dt);
 
 	if (!result.valid())
 	{

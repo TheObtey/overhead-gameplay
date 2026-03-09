@@ -1,5 +1,6 @@
 #include "Event.hpp"
 #include "Scripting/Binder.h"
+#include "SceneTree.h"
 #include "Registries/AutomaticRegisterProxy.hpp"
 
 #include <string>
@@ -51,7 +52,8 @@ public:
 	SceneTree* GetSceneTree();
 
 	Event<void()> OnSceneEnter;
-	Event<void(float)> OnUpdate;
+	Event<void(double)> OnUpdate;
+	Event<void(double)> OnPhysicsUpdate;
 	Event<void()> OnSceneLeave;
 
 	operator Node&();

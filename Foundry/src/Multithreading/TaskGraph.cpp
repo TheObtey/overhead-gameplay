@@ -1,8 +1,8 @@
 #include "Multithreading/TaskGraph.h"
 
-void TaskGraph::AddTask(Task const& task)
+void TaskGraph::AddTask(uptr<Task>& task)
 {
-    m_taskQueue.push(&task);
+    m_taskQueue.push(std::move(task));
 }
 
 void TaskGraph::Execute()
