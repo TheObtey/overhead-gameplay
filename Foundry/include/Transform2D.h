@@ -10,6 +10,13 @@
 class Transform2D
 {
 public:
+	enum class Axis : unsigned int
+	{
+		X = 0,
+		Y = 1,
+		Z = 2
+	};
+
 	Transform2D(
 		float _x = 0.0f, float _y = 0.0f,
 		float _scaleX = 1.0f, float _scaleY = 1.0f,
@@ -37,7 +44,14 @@ public:
 	Transform2D  operator/(Transform2D const& other) const;
 	Transform2D& operator/=(Transform2D const& other);
 
-		  
+
+	void		SetShearing(glm::vec2 _shear);
+	void		SetShearing(float _u, float _v);
+	void		SetShearingOnAxis(Axis _axis, float _shear);
+	glm::vec2	GetShearing() const;
+
+	void		SetMirroringOnAxis(Axis _axis);
+
 	void		SetScale(glm::vec2 _scale);
 	void		SetScale(float _width, float _height);
 	glm::uvec2	GetScale() const;
@@ -50,6 +64,7 @@ public:
 	glm::vec2	GetPosition() const;
 
 	glm::mat3	GetTransformationMatrix() const;
+	void		SetTransformationMatrix();
 
 	void		SetStatism(bool _statism);
 	bool		IsStatic() const;
@@ -59,8 +74,9 @@ public:
 private:
 	bool m_isStatic;
 	bool m_isDirty;
-	
+
 	glm::vec3 m_scale;
+	glm::vec3 m_shear;
 	glm::vec3 m_rotation;
 	glm::vec3 m_position;
 	

@@ -12,7 +12,8 @@ Transform2D::Transform2D(
 	bool _statism) :
 	m_isStatic(_statism),
 	m_scale({ _scaleX, _scaleY, 1.0f }),
-	m_rotation( {0.0f,0.0f,0.0f} ),
+	m_shear({ 0.0f, 0.0f, 0.0f }),
+	m_rotation({ 0.0f,0.0f,0.0f } ),
 	m_position(_x, _y, 0.0f),
 	m_isDirty(false)
 {
@@ -175,6 +176,36 @@ Transform2D& Transform2D::operator/=(Transform2D const& _other)
 }
 
 
+void Transform2D::SetShearing(glm::vec2 _shear)
+{
+	m_shear = { _shear.x, _shear.y, 1.0f };
+
+	m_isDirty = true;
+}
+void Transform2D::SetShearing(float _shearX, float _shearY)
+{
+	m_shear = { _shearX, _shearY, 1.0f };
+
+	m_isDirty = true;
+}
+void Transform2D::SetShearingOnAxis(Axis _axis, float _shear)
+{
+	m_shear[static_cast<int>(_axis)] = _shear;
+
+	m_isDirty = true;
+}
+glm::vec2 Transform2D::GetShearing() const
+{
+	return { m_shear.x, m_shear.y };
+}
+
+void Transform2D::SetMirroringOnAxis(Axis _axis)
+{
+	m_position[static_cast<int>(_axis)] *= -1.0f;
+
+	m_isDirty = true;
+}
+
 void Transform2D::SetScale(glm::vec2 _scale)
 {
 	if (m_isStatic) return;
@@ -271,6 +302,12 @@ void Transform2D::Update()
 		0, 0, 1
 	);
 
+	glm::mat3 Sh = glm::mat3(
+		1, m_shear.x, 0,
+		m_shear.y, 1, 0,
+		0, 0, 1
+	);
+
 	glm::mat3 R = glm::toMat3(glm::quat(m_rotation));
 
 	glm::mat3 T = glm::mat3(
@@ -279,7 +316,7 @@ void Transform2D::Update()
 		0, 0, 1
 	);
 
-	m_transformationMatrix = (S * R) * T;
+	m_transformationMatrix = ((S * Sh) * R) * T;
 
 	m_isDirty = false;
 }
