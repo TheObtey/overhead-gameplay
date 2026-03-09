@@ -4,12 +4,13 @@ find_package(unofficial-enet CONFIG REQUIRED)
 find_package(ReactPhysics3D REQUIRED)
 find_package(lua REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
+find_package(raylib REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 add_library(${PROJECT_NAME} STATIC
-    ${SOURCES}
-)
+    ${SOURCES})
 
 add_library(Foundry::library ALIAS ${PROJECT_NAME})
 
@@ -23,4 +24,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ReactPhysics3D::ReactPhysics3D)
 target_link_libraries(${PROJECT_NAME} PUBLIC unofficial::enet::enet)
 target_link_libraries(${PROJECT_NAME} PUBLIC Ore::library)
 target_link_libraries(${PROJECT_NAME} PUBLIC unofficial::lua::lua)
+target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
+target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
 

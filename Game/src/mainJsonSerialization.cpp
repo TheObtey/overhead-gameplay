@@ -5,8 +5,11 @@
 
 #include <EditorSerializer.h>
 #include <Servers/EngineServer.h>
-#include <iostream>
-#include <Node.h>
+
+//#include "Scripting/Proxies/NodeProxy.inl"
+
+#include "Node.h"
+#include "Scripting/Proxies/MathsProxy.hpp"
 
 int main() {
     //std::cout << "MAIN EDITOR" << std::endl;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0...4.0)
+cmake_minimum_required(VERSION 3.24...4.0)
 
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 #set(CMAKE_C_COMPILER "clang" CACHE STRING "C compiler" FORCE)

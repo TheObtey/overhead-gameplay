@@ -2,36 +2,23 @@
 #define _AUTOMATIC_REGISTER_PROXY__H
 
 #include "Scripting/Binder.h"
-#include "Scripting/ScriptingEngineImplementation.h"
+#include "Scripting/ScriptingEngine.h"
 
-#include <iostream>
-
-//template <typename T>
-//concept CanRegisterISerializable = requires(T t)
-//{
-//    { T::Register() } -> std::same_as<std::function<ISerializable*()>>;
-//};
+#define REGISTER_SERIALIZABLE_OBJECT(name) inline static name Binding {};
 
 template<typename D>
-struct AutomaticRegisterProxy
-{
-public:
+struct AutomaticRegisterProxy {
     AutomaticRegisterProxy()
     {
-        if (!s_registered)
-        {
-            s_registered = true;
-            Binder B(ScriptingEngineImplementation::GetScriptEngine());
-            D proxy; 
-            proxy.Bind(B);
-        }
-    };
+        //TODO Find a better way
+        static bool guard = false;
 
-private:
-    static bool s_registered;
+        if (guard) return;
+        Binder B(ScriptingEngine::GetScriptEngine());
+        D::Bind(B);
+        ScriptingEngine::RegisterTypeNames(B.GetRegisteredTypesName());
+        guard = true;
+    }
 };
-
-template <typename T> 
-inline bool AutomaticRegisterProxy<T>::s_registered = false;
 
 #endif //_AUTOMATIC_REGISTER_PROXY__H

@@ -5,6 +5,7 @@
     "enet",
     "glad",
     "glfw3",
+    "raylib",
     "glm",
     "reactphysics3d",
     "raylib",
