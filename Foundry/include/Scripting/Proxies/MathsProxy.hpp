@@ -58,7 +58,7 @@ namespace MathsProxy
 
     inline auto Lerp = sol::overload(
         [](glm::vec3 const& vec1, glm::vec3 const& vec2, float const delta) { return (1.0f - delta) * vec1 + delta * vec2; },
-        [](float const a, float const b, float const c){ std::lerp(a, b, c); }
+        [](float const a, float const b, float const c){ return std::lerp(a, b, c); }
     );
 
     inline auto Abs = sol::overload(
@@ -123,5 +123,7 @@ struct Vec3ProxyBinder : AutomaticRegisterProxy<Vec3ProxyBinder> {
         maths.set("Random", MathsProxy::Random);
     }
 };
+
+inline static Vec3ProxyBinder Vec3Binding {};
 
 #endif

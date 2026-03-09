@@ -4,27 +4,16 @@
 #include "Scripting/Binder.h"
 #include "Scripting/ScriptingEngine.h"
 
+#define REGISTER_SERIALIZABLE_OBJECT(name) inline static name Binding {};
+
 template<typename D>
-struct AutomaticRegisterProxy
-{
-private:
-    struct exec_register
+struct AutomaticRegisterProxy {
+    AutomaticRegisterProxy()
     {
-        exec_register()
-        {
-            Binder B(ScriptingEngine::GetScriptEngine());
-            D::Bind(B);
-            ScriptingEngine::RegisterTypeNames(B.GetRegisteredTypesName());
-        }
-    };
-
-    template<exec_register&> struct ref_it { };
-
-    static exec_register register_object;
-    static ref_it<register_object> referrer;
+        Binder B(ScriptingEngine::GetScriptEngine());
+        D::Bind(B);
+        ScriptingEngine::RegisterTypeNames(B.GetRegisteredTypesName());
+    }
 };
-
-template<typename D> typename AutomaticRegisterProxy<D>::exec_register
-    AutomaticRegisterProxy<D>::register_object;
 
 #endif //_AUTOMATIC_REGISTER_PROXY__H

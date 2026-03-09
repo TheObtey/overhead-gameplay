@@ -5,7 +5,7 @@
 
 template<typename D>
 struct AutomaticRegisterISerializable {
-private:
+public:
     struct exec_register
     {
         exec_register()
@@ -26,7 +26,7 @@ private:
     static bool s_registered;
 };
 
-template<typename  D> typename AutomaticRegisterISerializable<D>::exec_register
+template<typename D> AutomaticRegisterISerializable<D>::exec_register
     AutomaticRegisterISerializable<D>::register_object;
 
 template <typename D>

@@ -60,7 +60,8 @@ private:
 	Node* m_pNode;
 };
 
-struct Node::Proxy::ProxyBinding : AutomaticRegisterProxy<Node::Proxy::ProxyBinding> {
+struct Node::Proxy::ProxyBinding : AutomaticRegisterProxy<ProxyBinding>
+{
 	static void Bind(Binder& binder)
 	{
 		binder.BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
@@ -83,3 +84,5 @@ struct Node::Proxy::ProxyBinding : AutomaticRegisterProxy<Node::Proxy::ProxyBind
 			"GetSceneTree", BIND(GetSceneTree));
 	};
 };
+
+inline static Node::Proxy::ProxyBinding NodeBinding {};

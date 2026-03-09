@@ -9,8 +9,6 @@
 using ScriptEngine = sol::state;
 #endif
 
-#include <list>
-
 class ScriptingEngine
 {
 public:

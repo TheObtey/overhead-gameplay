@@ -3,7 +3,6 @@
 
 #define OVERLOAD(Class, Ret, ...) static_cast<Ret (Class::*)(__VA_ARGS__)>
 
-#include "Define.h"
 #include "ScriptingEngine.h"
 
 class Binder

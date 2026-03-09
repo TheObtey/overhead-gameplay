@@ -35,7 +35,7 @@ public:
 
 	void AddPosition(glm::vec3 const pos)		{ m_pNode->AddPosition(pos); }
 	void AddX(float const x)					{ m_pNode->AddX(x); }
-	void AddY(float const y)						{ m_pNode->AddY(y); }
+	void AddY(float const y)					{ m_pNode->AddY(y); }
 	void AddZ(float const z)					{ m_pNode->AddZ(z); }
 	void AddRotation(glm::vec3 const rot)		{ m_pNode->AddRotation(rot); }
 	void AddYaw(float const yaw)				{ m_pNode->AddYaw(yaw); }
@@ -85,3 +85,5 @@ BindProxy(Node3D::Proxy,
 	"AddRoll", BIND(AddRoll),
 	"AddScale", BIND(AddScale));
 )
+
+inline static Node3D::Proxy::ProxyBinding Node3DBinding {};
