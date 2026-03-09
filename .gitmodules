@@ -1,0 +1,3 @@
+[submodule "start/tiny-code-action"]
+	path = start/tiny-code-action
+	url = git@github.com:rachartier/tiny-code-action.nvim.git

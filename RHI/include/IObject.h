@@ -1,0 +1,18 @@
+#ifndef RHI_IOBJECT__H_
+#define RHI_IOBJECT__H_
+
+#include "Define.h"
+
+class IObject 
+{
+public:
+    virtual ~IObject() = 0;
+
+    virtual void Load() = 0;
+    virtual void Unload() = 0;
+
+protected:
+    uint32 m_id;
+};
+
+#endif //!RHI_IOBJECT__H_
