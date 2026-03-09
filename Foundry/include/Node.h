@@ -66,6 +66,7 @@ public:
 	virtual void Deserialize(SerializedObject const& datas) override;
 
 	std::string GetName();
+	void SetName(std::string const& name);
 	Node* GetParent();
 	SceneTree* GetSceneTree();
 
