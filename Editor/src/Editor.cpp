@@ -166,6 +166,7 @@ void Editor::CreateNode(std::string type, std::string const& name, Node* parent)
 	}
 
 	uptr<Node> newNode = Node::CreateNode<Node>(name);
+	m_editorRaylib.AddDrawableObject(name, newNode.get());
 
 	if (parent)
 	{

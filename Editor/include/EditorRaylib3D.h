@@ -59,7 +59,8 @@ private:
 	glm::vec3 m_currentRotation;
 
 	json m_jsonElementFromRoot;
-	rl::Camera3D m_camera = {};
+	rl::Camera3D m_camera;
+	rl::Material m_defaultMaterial;
 
 	std::map<std::string, uptr<DrawableElement>> m_loadedMeshs;
 	std::map<std::string, uptr<DrawableElement>> m_colliders;
