@@ -2,7 +2,7 @@
 #include "EditorSerializer.h"
 
 #include <Servers/EngineServer.h>
-#include <SerializeObject.hpp>
+#include <Serialization/SerializeObject.hpp>
 #include <iostream>
 #include <cstring>
 using namespace rl;
