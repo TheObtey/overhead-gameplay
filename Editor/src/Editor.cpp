@@ -166,6 +166,7 @@ void Editor::CreateNode(std::string type, std::string const& name, Node* parent)
 	}
 	std::string typefi = "class " + type;
 	ISerializable* outObject = ISerializable::s_constructors[typefi]();
+
 	uptr<Node> newNode = uptr<Node>(static_cast<Node*>(outObject));
 	newNode.get()->SetName(name);
 	m_editorRaylib.AddDrawableObject(name, newNode.get());

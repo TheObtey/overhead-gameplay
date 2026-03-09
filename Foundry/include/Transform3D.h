@@ -6,12 +6,15 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <Serialization/ISerializable.h>
+#include <Registries/AutomaticRegisterISerializable.hpp>
+
 /// /////////////////////////////////////////////////////////////////////////////////
 /// Classe Transform
 /// /////////////////////////////////////////////////////////////////////////////////
 
 
-class Transform3D
+class Transform3D /*: public AutomaticRegisterISerializable<Transform3D>, public ISerializable*/
 {
 public:
 
@@ -68,6 +71,10 @@ public:
 	void ApplyTransform(Transform3D& Transform3D); 
 
 	void Update();
+
+	//virtual void Serialize(SerializedObject& datas) const override;
+	//virtual void Deserialize(SerializedObject const& datas) override;
+	//static std::function<ISerializable* ()> CreateInstance();
 
 private:
 	glm::vec4 m_position;

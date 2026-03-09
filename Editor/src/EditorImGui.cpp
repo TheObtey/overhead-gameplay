@@ -13,7 +13,7 @@ void EditorImGui::Init()
 {
 	//Node Tree For Available Nodes
 	m_newNodeTypeSelector = Node::CreateNode<Node>("Node");
-	m_newNodeTypeSelector.get()->AddChild(Node::CreateNode<Node>("Node3DTest"));
+	m_newNodeTypeSelector.get()->AddChild(Node::CreateNode<Node>("Node3D"));
 	
 	ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 

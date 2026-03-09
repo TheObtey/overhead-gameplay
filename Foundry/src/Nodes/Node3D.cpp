@@ -130,3 +130,19 @@ void Node3D::SetWorldRotation(glm::vec3 const& worldRot)
 	m_worldDirty = true;
 	UpdateLocalTransform();
 }
+
+void Node3D::Serialize(SerializedObject& datas) const
+{
+	Node::Serialize(datas);
+}
+
+void Node3D::Deserialize(SerializedObject const& datas)
+{
+	Node::Deserialize(datas);
+}
+
+
+std::function<ISerializable* ()> Node3D::CreateInstance()
+{
+	return []()->ISerializable* { return CreateNode<Node3D>("Node3D").release(); };
+}

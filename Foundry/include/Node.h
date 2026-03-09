@@ -24,7 +24,7 @@ template <typename T>
 using OptionalRef = std::optional<std::reference_wrapper<T>>;
 
 //Base class off every node in the tree
-class Node : public AutomaticRegisterISerializable<Node>, public ISerializable
+class Node : private AutomaticRegisterISerializable<Node>, public ISerializable
 {
 public:
 	class Proxy;
@@ -126,7 +126,7 @@ std::unique_ptr<T> Node::CreateNode(std::string const& name)
 
 	uptr<concrete_Node> ptr = std::make_unique<concrete_Node>(name);
 	ptr->m_pProxy = std::make_unique<typename T::Proxy>(*ptr);
-	auto _ = ptr->register_object;
+	typename AutomaticRegisterISerializable<T>::exec_register& _ = AutomaticRegisterISerializable<T>::register_object;
 
     return std::move(ptr);
 }

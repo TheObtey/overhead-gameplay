@@ -1,5 +1,7 @@
 #include <Editor.h>
 
+#include <Scripting/Lua/LuaBindings.h>
+
 int main()
 {
 	Editor editor;
