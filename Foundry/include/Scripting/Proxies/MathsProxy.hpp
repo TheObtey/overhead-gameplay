@@ -7,15 +7,45 @@
 #include "Scripting/Binder.h"
 
 #include <glm/geometric.hpp>
+#include <glm/vec4.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 #include <sol/sol.hpp>
 
 namespace MathsProxy
 {
+
+    //===================== vec2 =====================
+    inline auto vec2_addition_overload = sol::overload(
+        [](glm::vec2 const& left, glm::vec2 const& right) { return left + right ; },
+        [](glm::vec2 const& left, float const right)      { return left + right ; },
+        [](float const left, glm::vec2 const& right)      { return left + right ; }
+    );
+
+    inline auto vec2_subtraction_overload = sol::overload(
+        [](glm::vec2 const& left, glm::vec2 const& right) { return left - right ; },
+        [](glm::vec2 const& left, float const right)      { return left - right ; },
+        [](float const left, glm::vec2 const& right)      { return left - right ; }
+    );
+
+    inline auto vec2_multiplication_overload = sol::overload(
+        [](glm::vec2 const& left, glm::vec2 const& right) { return left * right ; },
+        [](glm::vec2 const& left, float const right)      { return left * right ; },
+        [](float const left, glm::vec2 const& right)      { return left * right ; }
+    );
+
+    inline auto vec2_division_overload = sol::overload(
+        [](glm::vec2 const& left, glm::vec2 const& right) { return left / right ; },
+        [](glm::vec2 const& left, float const right)      { return left / right ; },
+        [](float const left, glm::vec2 const& right)      { return left / right ; }
+    );
+
+    //===================== vec3 =====================
+
     inline auto vec3_addition_overload = sol::overload(
         [](glm::vec3 const& left, glm::vec3 const& right) { return left + right ; },
-        [](glm::vec3 const& left, float right)      { return left + right ; },
-        [](float left, glm::vec3 const& right)      { return left + right ; }
+        [](glm::vec3 const& left, float const right)      { return left + right ; },
+        [](float const left, glm::vec3 const& right)      { return left + right ; }
     );
 
     inline auto vec3_subtraction_overload = sol::overload(
@@ -36,20 +66,55 @@ namespace MathsProxy
         [](float const left, glm::vec3 const& right)      { return left / right ; }
     );
 
+    //===================== vec4 =====================
+
+    inline auto vec4_addition_overload = sol::overload(
+        [](glm::vec4 const& left, glm::vec4 const& right) { return left + right ; },
+        [](glm::vec4 const& left, float const right)      { return left + right ; },
+        [](float const left, glm::vec4 const& right)      { return left + right ; }
+    );
+
+    inline auto vec4_subtraction_overload = sol::overload(
+        [](glm::vec4 const& left, glm::vec4 const& right) { return left - right ; },
+        [](glm::vec4 const& left, float const right)      { return left - right ; },
+        [](float const left, glm::vec4 const& right)      { return left - right ; }
+    );
+
+    inline auto vec4_multiplication_overload = sol::overload(
+        [](glm::vec4 const& left, glm::vec4 const& right) { return left * right ; },
+        [](glm::vec4 const& left, float const right)      { return left * right ; },
+        [](float const left, glm::vec4 const& right)      { return left * right ; }
+    );
+
+    inline auto vec4_division_overload = sol::overload(
+        [](glm::vec4 const& left, glm::vec4 const& right) { return left / right ; },
+        [](glm::vec4 const& left, float const right)      { return left / right ; },
+        [](float const left, glm::vec4 const& right)      { return left / right ; }
+    );
+
+
     inline auto Length =  sol::overload(
-        [](glm::vec3 const& vec) { return glm::length(vec); }
+        [](glm::vec4 const& vec) { return glm::length(vec); },
+        [](glm::vec3 const& vec) { return glm::length(vec); },
+        [](glm::vec2 const& vec) { return glm::length(vec); }
     );
 
     inline auto Normalized =  sol::overload(
-        [](glm::vec3 const& vec) { return glm::normalize(vec); }
+        [](glm::vec4 const& vec) { return glm::normalize(vec); },
+        [](glm::vec3 const& vec) { return glm::normalize(vec); },
+        [](glm::vec2 const& vec) { return glm::normalize(vec); }
     );
 
     inline auto Equal =  sol::overload(
-        [](glm::vec3 const& vec1, glm::vec3 const& vec2) { return glm::equal(vec1, vec2); }
+        [](glm::vec4 const& vec1, glm::vec4 const& vec2) { return glm::equal(vec1, vec2); },
+        [](glm::vec3 const& vec1, glm::vec3 const& vec2) { return glm::equal(vec1, vec2); },
+        [](glm::vec2 const& vec1, glm::vec2 const& vec2) { return glm::equal(vec1, vec2); }
     );
 
     inline auto Dot = sol::overload(
-        [](glm::vec3 const& vec1, glm::vec3 const& vec2) { return glm::dot(vec1, vec2); }
+        [](glm::vec4 const& vec1, glm::vec4 const& vec2) { return glm::dot(vec1, vec2); },
+        [](glm::vec3 const& vec1, glm::vec3 const& vec2) { return glm::dot(vec1, vec2); },
+        [](glm::vec2 const& vec1, glm::vec2 const& vec2) { return glm::dot(vec1, vec2); }
     );
 
     inline auto Cross = sol::overload(
@@ -58,6 +123,7 @@ namespace MathsProxy
 
     inline auto Lerp = sol::overload(
         [](glm::vec3 const& vec1, glm::vec3 const& vec2, float const delta) { return (1.0f - delta) * vec1 + delta * vec2; },
+        [](glm::vec2 const& vec1, glm::vec2 const& vec2, float const delta) { return (1.0f - delta) * vec1 + delta * vec2; },
         [](float const a, float const b, float const c){ return std::lerp(a, b, c); }
     );
 
