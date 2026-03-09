@@ -23,12 +23,22 @@ public:
     static void QueueAttach(std::unique_ptr<Node>& node, Node* const to);
     static void QueueFree(std::unique_ptr<Node>& node);
 
+    //Send a non-owning raw pointer to lua and keep the uptr alive here
+    static void RegisterUnattachedNode(uptr<Node>& uNode);
+    static void UnregisterUnattachedNode(Node* node);
+
+    static uptr<Node>& GetUnattachedNode(Node* ptr);
+
     void TestFunct() { std::cout << "Im a dummy function \n"; }
 
 private:
     void FlushCommandsImpl() override;
     void BuildTasksImpl(TaskGraph& graph) override;
 	void OnInitialize() override {}
+
+private:
+    std::unordered_map<Node*, uptr<Node>> m_UnattachedNode {};
+
 };
 
 #endif

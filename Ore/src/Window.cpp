@@ -5,12 +5,14 @@
 #include "EventManager.h"
 
 
-Window::Window(int width, int height, std::string name)
+std::unordered_map<GLFWwindow*, Window*> Window::s_windows = {};
+Window::Window(int width, int height, std::string name, bool enableTransparency)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, enableTransparency);
 
 	m_width = width;
 	m_height = height;
@@ -51,15 +53,9 @@ void Window::Open()
 
 	glfwMakeContextCurrent(m_pWindow);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		Logger::LogWithLevel(LogLevel::ERROR, "Failed to initialize GLAD");
-		return;
-	}
+	glfwSetFramebufferSizeCallback(m_pWindow, Window::FrameBufferResizeCallback);
 
-	glfwSetFramebufferSizeCallback(m_pWindow, FrameBufferSizeCallback);
-	glfwSetJoystickCallback(EventManager::JoystickCallback);
-
+    s_windows[m_pWindow] = this;
 	onOpenEvent();
 }
 
@@ -69,12 +65,21 @@ void Window::Present()
 	glfwPollEvents();
 }
 
-GLFWwindow* Window::GetWindow()
+void Window::SetSize(uint16 width, uint16 height)
 {
-	return m_pWindow;
+    m_width = width;
+    m_height = height;
+
+    glfwSetWindowSize(m_pWindow, m_width, m_height);
 }
 
-void FrameBufferSizeCallback(GLFWwindow* pWindow, int width, int height)
+void Window::FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height)
 {
-	glViewport(0, 0, width, height);
+    Window* pCurrentWindow = s_windows[pWindow];
+    pCurrentWindow->onResizeEvent();
+}
+
+void Window::SetDecoration(bool hasDecoration)
+{
+    glfwWindowHint(GLFW_DECORATED, hasDecoration);
 }
