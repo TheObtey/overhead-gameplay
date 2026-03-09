@@ -9,11 +9,11 @@ namespace rl
 #include <raymath.h>
 #include <raygizmo.h>
 }
-
 #include <Node.h>
 #include <Define.h>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+
 #define RLIGHTS_IMPLEMENTATION
 #include "rlights.h"
 

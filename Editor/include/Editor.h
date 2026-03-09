@@ -38,6 +38,7 @@ private:
 	void SaveSceneNoSpe();
 
 	void LoadDrawableObject(Node* pNode);
+
 	json& GetNodeJson(std::string const& name);
 	void RemoveNode(std::string const& name);
 
@@ -54,9 +55,6 @@ private:
 	// Scene
 	uptr<Node> m_sceneRoot = nullptr;
 	std::string m_scenePathBuffer;
-	json m_currentJson;
-
-	std::map<std::string, SerializedObject*> m_elementDataForInspector;
 };
 
 #endif // __EDITOR_H
