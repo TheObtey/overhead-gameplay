@@ -19,22 +19,11 @@ namespace rl
 
 using json = nlohmann::json;
 
-class CustomDrawableElement
+struct DrawableElement
 {
-public:
-	virtual void Draw() = 0;
-
-private:
-	glm::vec3 pos;
-	glm::vec3 scale;
-	glm::vec3 rotation;
+	uptr<rl::Mesh> mesh;
+	glm::mat4 worldMatrix;
 };
-
-//class Light : CustomDrawableElement
-//{
-//	void Draw() override { }
-//};
-
 
 class EditorRaylib3D
 {
@@ -44,13 +33,12 @@ public:
 	~EditorRaylib3D();
 
 	void InitWindow(float const& width, float const& height);
-	void LoadDrawableObject(json const& jsonObject);
 	void Render();
 	void Update(float deltaTime);
-	void UpdateJson(json const& newJson);
 	void Shutdown();
 
-	void AddDrawableElement(json const& elementToDraw);
+	void AddDrawableObject(std::string const& name,Node* jsonObject);
+	void UpdateDrawableElement(std::string const& name, Node const* jsonObject);
 	void RemoveDrawableElement(std::string const& elementName);
 
 private:
@@ -58,9 +46,9 @@ private:
 	
 	void CheckIfIsDrawable(json element);
 
-	void Draw3DMesh(json& nodeMesh3D);
-	void DrawCollider3D();
-	void DrawLight();
+	void Instanciate3DMesh(std::string const& name, Node* nodeMesh3D);
+	void InstanciateCollider3D();
+	void InstanciateLight();
 
 
 private:
@@ -73,7 +61,9 @@ private:
 	json m_jsonElementFromRoot;
 	rl::Camera3D m_camera = {};
 
-	std::map<std::string, uptr<rl::Mesh>> m_loadedMeshs;
+	std::map<std::string, uptr<DrawableElement>> m_loadedMeshs;
+	std::map<std::string, uptr<DrawableElement>> m_colliders;
+	std::map<std::string, uptr<DrawableElement>> m_light;
 };
 
 #endif // __EDITOR_RAYLIB3D__H_

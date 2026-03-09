@@ -200,6 +200,10 @@ void Editor::LoadScene(std::string const& path)
 		m_sceneRoot = EditorSerializer::LoadFromJson(path);
 		m_editorImgui.SetSceneRoot(m_sceneRoot.get());
 		m_scenePathBuffer = path;
+
+		// Update NodeList
+		LoadDrawableObject(m_sceneRoot.get());
+		
 		std::cout << "[Editor] Scene loaded: " << path << std::endl;
 	}
 	catch (std::exception const& e)
@@ -208,12 +212,13 @@ void Editor::LoadScene(std::string const& path)
 	}
 }
 
-void Editor::UpdateNode(std::string const& name, Node* pNode)
+void Editor::LoadDrawableObject(Node* pNode)
 {
-	//SerializeObject obj = {};
-	//pNode->Serialize
-
-
+	m_editorRaylib.AddDrawableObject(pNode->GetName(), pNode);
+	for (uint32 i = 0; i < pNode->GetChildCount(); i++)
+	{
+		LoadDrawableObject(&pNode->GetChild(i));
+	}
 }
 
 void Editor::SaveScene(std::string const& path)

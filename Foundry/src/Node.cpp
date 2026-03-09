@@ -172,21 +172,28 @@ void Node::Serialize(SerializedObject& datas) const
 {
 	// Call baseClass::Serialize(datas) : Example Node::Serialize(datas)
 	datas.SetType<Node>();
-	datas.AddElement("m_name", m_name);
-	datas.AddArray("Children");
+	datas.AddPublicElement("m_name", &m_name);
+	datas.AddPrivateArray("Children");
+	std::string parent = "";
+	if (m_pOwner != nullptr)
+		parent = m_pOwner->GetName();
+
+	datas.AddPrivateElement("m_pOwner", &parent);
+
 	for (uint32 i = 0; i < m_children.size(); i++)
 	{
-		datas.AddElementInArray("Children", static_cast<ISerializable const&>(*m_children.at(m_childrenOrder[i])));
+		datas.AddPrivateElementInArray("Children", static_cast<ISerializable const*>(m_children.at(m_childrenOrder[i]).get()));
 	}
+
 }
 
 void Node::Deserialize(SerializedObject const& datas)
 {
 	// Call baseClass::Deserialize(datas) : Example Node::Deserialize(datas)
-	std::string t;
-	datas.GetType(t);
-	datas.GetElement("m_name",m_name);
-	std::vector<ISerializable*> tempList = datas.GetArray<ISerializable*>("Children");
+	std::string t = datas.GetType();
+	datas.GetPublicElement("m_name",&m_name);
+
+	std::vector<ISerializable*> tempList = datas.GetPrivateArray<ISerializable*>("Children");
 	for (uint32 i = 0; i < tempList.size(); i++)
 	{
 		uptr<Node> pNode = uptr<Node>((Node*)tempList[i]);

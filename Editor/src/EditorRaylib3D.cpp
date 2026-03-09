@@ -18,11 +18,6 @@ void EditorRaylib3D::InitWindow(float const& width, float const& height)
 	m_camera.projection = rl::CAMERA_PERSPECTIVE;
 }
 
-void EditorRaylib3D::LoadDrawableObject(json const& jsonObject)
-{
-	CheckIfIsDrawable(jsonObject);
-}
-
 void EditorRaylib3D::Update(float deltaTime)
 {
 	if (rl::IsMouseButtonDown(rl::MOUSE_BUTTON_RIGHT)) {
@@ -32,6 +27,72 @@ void EditorRaylib3D::Update(float deltaTime)
 		UpdateCamera(&m_camera, rl::CAMERA_ORBITAL);
 	}
 }
+
+void EditorRaylib3D::AddDrawableObject(std::string const& name, Node* pNode)
+{
+	if (dynamic_cast<Node*>(pNode) != nullptr) // TestTemp
+	{
+		Instanciate3DMesh(name, pNode);
+	}
+
+	//if (dynamic_cast<NodeLight*>(pNode) != nullptr)
+	//{
+	//	//DrawLight();
+	//}
+	//else if (dynamic_cast<NodeMesh3D*>(pNode) != nullptr)
+	//{
+	//	Instanciate3DMesh(name, jsonObject);
+	//}
+	//else if (dynamic_cast<NodeCollider3D*>(pNode) != nullptr)
+	//{
+	//	//DrawCollider3D(m_loadedMeshs[element["DATAS"]["m_name"]]);
+	//}
+}
+
+void EditorRaylib3D::UpdateDrawableElement(std::string const& name, Node const* jsonObject)
+{
+}
+
+void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3D) // NodeMesh3D
+{
+	if (m_loadedMeshs.find(name) != m_loadedMeshs.end())
+	{
+		// ERROR
+	}
+	else
+	{
+		rl::Mesh m_mesh = rl::GenMeshCube(1, 1, 1);
+		// Custom Mesh with Mesh3D
+		rl::UploadMesh(&m_mesh, false);
+
+		DrawableElement newElement = {};
+		newElement.mesh = std::make_unique<rl::Mesh>(m_mesh); // GetMesh;..
+		Node* pNode3DParent = nullptr; // Node3D
+		glm::mat4 worldMatrix = { 1.0f }
+		;
+		while (pNode3DParent == nullptr)
+		{
+			Node* pParent = pNodeMesh3D->GetParent();
+			pNode3DParent = pParent;
+
+			//pNode3DParent = dynamic_cast<Node3D*>(pParent);
+			if (pParent == nullptr) break;
+			//if (pNode3DParent != nullptr) worldMatrix = pNode3DParent.GetWorldMatrix;
+		}
+
+		newElement.worldMatrix = worldMatrix;
+		//m_loadedMeshs[name] = std::make_unique<DrawableElement>(newElement);
+	}
+}
+
+void EditorRaylib3D::InstanciateCollider3D()
+{
+}
+
+void EditorRaylib3D::InstanciateLight()
+{
+}
+
 
 void EditorRaylib3D::Render()
 {
@@ -54,57 +115,6 @@ void EditorRaylib3D::DrawViewPort()
 	rl::DrawLine3D({ 0, 0, 0 }, { -500, 0, 0 }, rl::RED);
 	rl::DrawLine3D({ 0, 0, 0 }, { 0, -500, 0 }, rl::GREEN);
 	rl::DrawLine3D({ 0, 0, 0 }, { 0, 0,-500 }, rl::BLUE);
-}
-
-void EditorRaylib3D::CheckIfIsDrawable(json element)
-{
-	if (element["TYPE"] == "class Node3D")
-	{
-		for (uint32 i = 0; i < element["Children"].size(); i++)
-		{
-			// CreateWorldMatrix From Values
-			CheckIfIsDrawable(element["Children"][i]);
-		}
-		return;
-	}
-	else if (element["TYPE"] == "class NodeLight")
-	{
-		DrawLight();
-	}
-	else if (element["TYPE"] == "class NodeMesh3D")
-	{
-		// Recupérer les vertices 
-		Draw3DMesh(element);
-	}
-	else if (element["TYPE"] == "class NodeCollider3D")
-	{
-		//DrawCollider3D(m_loadedMeshs[element["DATAS"]["m_name"]]);
-	}
-
-	for (uint32 i = 0; i < element["Children"].size(); i++)
-	{
-		CheckIfIsDrawable(element["Children"][i]);
-	}
-}
-
-void EditorRaylib3D::Draw3DMesh(json& nodeMesh3D)
-{
-	rl::Mesh m_mesh = {};
-
-	//m_mesh.vertices = ...;
-	//m_mesh.indices = ...;
-	//m_mesh.vertexCount = m_mesh.vertices.size();
-	//m_mesh.triangleCount = m_mesh.indices.size() / 3;
-
-	rl::UploadMesh(&m_mesh,false);
-}
-
-void EditorRaylib3D::DrawCollider3D()
-{
-}
-
-void EditorRaylib3D::DrawLight()
-{
 }
 
 

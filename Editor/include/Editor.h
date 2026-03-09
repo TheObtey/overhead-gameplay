@@ -29,6 +29,7 @@ private:
 	// Scene Management	
 	void CreateNewScene();
 	void CreateNode(std::string type, std::string const& name, Node* parent = nullptr);
+	void UpdateNode(std::string name, json const& newDatas);
 	void DeleteNode(Node* node);
 
 	// Load/Save
@@ -36,8 +37,7 @@ private:
 	void SaveScene(std::string const& path);
 	void SaveSceneNoSpe();
 
-	void UpdateNode(std::string const& name, Node* pNode);
-
+	void LoadDrawableObject(Node* pNode);
 	json& GetNodeJson(std::string const& name);
 	void RemoveNode(std::string const& name);
 
@@ -51,10 +51,12 @@ private:
 	int m_screenWidth = 1900;
 	int m_screenHeight = 900;
 
-			// Scene
+	// Scene
 	uptr<Node> m_sceneRoot = nullptr;
 	std::string m_scenePathBuffer;
-	std::map<std::string, json> m_nodeInHierarchy;
+	json m_currentJson;
+
+	std::map<std::string, SerializedObject*> m_elementDataForInspector;
 };
 
 #endif // __EDITOR_H
