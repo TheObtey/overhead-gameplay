@@ -36,6 +36,7 @@ private:
 	void SaveScene(std::string const& path);
 	void SaveSceneNoSpe();
 
+	//For Inscpetor
 	void UpdateNode(std::string const& name, Node* pNode);
 
 	json& GetNodeJson(std::string const& name);
@@ -51,9 +52,11 @@ private:
 	int m_screenWidth = 1900;
 	int m_screenHeight = 900;
 
-			// Scene
+	// Scene
 	uptr<Node> m_sceneRoot = nullptr;
 	std::string m_scenePathBuffer;
+
+	//For Inscpetor
 	std::map<std::string, json> m_nodeInHierarchy;
 };
 

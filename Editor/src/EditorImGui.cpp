@@ -15,11 +15,12 @@ void EditorImGui::Init()
 	m_newNodeTypeSelector = Node::CreateNode<Node>("Node");
 	m_newNodeTypeSelector.get()->AddChild(Node::CreateNode<Node>("Node3DTest"));
 	
-	ImGui::GetIO().FontGlobalScale = 1.0f;
 	ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
-	ImGui::FileBrowser SaveBrowseWindow(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-	
+
+	ImGui::FileBrowser SaveBrowseWindow(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir | ImGuiFileBrowserFlags_ConfirmOnEnter);
+	ImGui::FileBrowser LoadBrowseWindow(ImGuiFileBrowserFlags_ConfirmOnEnter);
 	m_saveBrowser = SaveBrowseWindow;
+	m_loadBrowser = LoadBrowseWindow;
 	m_saveBrowser.SetDirectory("../res");
 	m_loadBrowser.SetDirectory("../res");
 }
@@ -585,6 +586,8 @@ void EditorImGui::ShowSaveAsSceneBrowsing()
 		m_saveBrowser.Open();
 		m_showSaveAsPopup = false;
 	}
+	m_saveBrowser.SetWindowSize(m_fileBrowsingSizeX, m_fileBrowsingSizeY);
+	m_saveBrowser.SetWindowPos(m_screenWidth/2 - m_fileBrowsingSizeX/2, m_screenHeight/2 - m_fileBrowsingSizeY/2);
 
 	m_saveBrowser.SetTitle("Save scene to Json file");
 	m_saveBrowser.SetTypeFilters({ ".json" });
@@ -597,6 +600,10 @@ void EditorImGui::ShowSaveAsSceneBrowsing()
 		{
 			m_haveFileSelected = true;
 			m_command.type = EditorCommand::Type::SAVE_SCENE;
+			if (m_scenePathBuffer.substr(m_scenePathBuffer.length() - 5) == ".json") {
+				m_scenePathBuffer = m_scenePathBuffer.substr(0, m_scenePathBuffer.length()-5);
+			}
+
 			m_command.stringParam1 = m_scenePathBuffer;
 		}
 		m_saveBrowser.ClearSelected();
@@ -611,6 +618,9 @@ void EditorImGui::ShowLoadSceneBrowsing()
 		m_loadBrowser.Open();
 		m_showLoadPopup = false;
 	}
+
+	m_loadBrowser.SetWindowSize(m_fileBrowsingSizeX, m_fileBrowsingSizeY);
+	m_loadBrowser.SetWindowPos(m_screenWidth / 2 - m_fileBrowsingSizeX / 2, m_screenHeight / 2 - m_fileBrowsingSizeY / 2);
 
 	m_loadBrowser.SetTitle("Load scene from Json file");
 	m_loadBrowser.SetTypeFilters({ ".json" });

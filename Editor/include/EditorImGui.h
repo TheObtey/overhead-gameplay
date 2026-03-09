@@ -91,6 +91,8 @@ private:
 	bool m_showLoadPopup = false;
 	ImGui::FileBrowser m_saveBrowser;
 	ImGui::FileBrowser m_loadBrowser;
+	int m_fileBrowsingSizeX = 800;
+	int m_fileBrowsingSizeY = 450;
 
 	bool m_haveFileSelected = false;
 	std::string m_scenePathBuffer;
