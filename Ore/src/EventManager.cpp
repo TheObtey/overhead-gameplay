@@ -19,7 +19,7 @@ bool EventManager::GetKey(Window window, EventInput key, EventAction event)
 	{
 		val = (int)key;
 	}
-	int state = glfwGetKey(window.GetWindow(), val);
+	int state = glfwGetKey(window.Get(), val);
 	if (state == (int)event)
 	{
 		Logger::LogWithLevel(LogLevel::DEBUG, "TEST");
@@ -30,7 +30,7 @@ bool EventManager::GetKey(Window window, EventInput key, EventAction event)
 
 bool EventManager::GetMouseKey(Window window, EventInput key, EventAction event)
 {
-	int state = glfwGetMouseButton(window.GetWindow(), (int)key);
+	int state = glfwGetMouseButton(window.Get(), (int)key);
 	if (state == (int)event)
 	{
 		Logger::LogWithLevel(LogLevel::DEBUG, (int)key);
@@ -82,5 +82,6 @@ bool EventManager::GetButton(GamepadId id, EventInput button)
 			return true;
 		}
 	}
+    return false;
 }
 

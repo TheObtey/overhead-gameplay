@@ -29,6 +29,7 @@ private:
     GLFWwindow* m_pWindow;
 
     friend class Viewport;
+    friend class EventManager;
 };
 
 #endif //!ORE_WINDOW__H_

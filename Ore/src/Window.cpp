@@ -54,6 +54,7 @@ void Window::Open()
 	glfwMakeContextCurrent(m_pWindow);
 
 	glfwSetFramebufferSizeCallback(m_pWindow, Window::FrameBufferResizeCallback);
+    glfwSetJoystickCallback(EventManager::JoystickCallback);
 
     s_windows[m_pWindow] = this;
 	onOpenEvent();
