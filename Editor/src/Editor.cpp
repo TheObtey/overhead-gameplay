@@ -2,7 +2,7 @@
 #include "EditorSerializer.h"
 
 #include <Servers/EngineServer.h>
-#include <SerializeObject.hpp>
+#include <Serialization/SerializeObject.hpp>
 #include <iostream>
 #include <cstring>
 using namespace rl;
@@ -164,18 +164,20 @@ void Editor::CreateNode(std::string type, std::string const& name, Node* parent)
 		std::cerr << "[Editor] Cannot create node: no scene root" << std::endl;
 		return;
 	}
-
-	uptr<Node> newNode = Node::CreateNode<Node>(name);
+	std::string typefi = "class " + type;
+	ISerializable* outObject = ISerializable::s_constructors[typefi]();
+	uptr<Node> NewNode = uptr<Node>(static_cast<Node*>(outObject));
+	NewNode.get()->SetName(name);
 
 	if (parent)
 	{
-		parent->AddChild(newNode);
+		parent->AddChild(NewNode);
 		std::cout << "[Editor] Node '" << name << "' added as child of '" 
 		          << parent->GetName() << "'" << std::endl;
 	}
 	else
 	{
-		m_sceneRoot->AddChild(newNode);
+		m_sceneRoot->AddChild(NewNode);
 		std::cout << "[Editor] Node '" << name << "' added to scene root" << std::endl;
 	}
 }
@@ -212,8 +214,6 @@ void Editor::UpdateNode(std::string const& name, Node* pNode)
 {
 	//SerializeObject obj = {};
 	//pNode->Serialize
-
-
 }
 
 void Editor::SaveScene(std::string const& path)
