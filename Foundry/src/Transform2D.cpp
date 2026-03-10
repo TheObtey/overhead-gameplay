@@ -308,7 +308,11 @@ void Transform2D::Update()
 		0, 0, 1
 	);
 
-	glm::mat3 R = glm::toMat3(glm::quat(m_rotation));
+	glm::mat3 R = glm::mat3(
+		cos(m_rotation.z), sin(m_rotation.z), 0,
+		-sin(m_rotation.z), cos(m_rotation.z), 0,
+		0, 0, 1
+	);
 
 	glm::mat3 T = glm::mat3(
 		1, 0, 0,
@@ -316,7 +320,7 @@ void Transform2D::Update()
 		m_position.x, m_position.y, 1
 	);
 
-	m_transformationMatrix = ((S * Sh) * R) * T;
+	m_transformationMatrix = T * R * Sh * S;
 
 	m_isDirty = false;
 }

@@ -33,7 +33,7 @@ public:
 
 	void		SetScale(glm::vec2 _scale);
 	void		SetScale(float _width, float _height);
-	glm::uvec2	GetScale() const;
+	glm::vec2	GetScale() const;
 
 	void		SetRotation(float _x, float _y);
 	glm::vec2	GetRotation() const;
@@ -54,7 +54,7 @@ public:
 	void		SetWorldRotation(glm::vec3& _worldRot);
 	void		SetWorldPosition(glm::vec3& _worldPos);
 
-	virtual void OnUpdate(float _delta) override;
+	virtual void OnUpdate(double _delta) override;
 	virtual void Reparent(Node& _newParent, bool _keepGlobalTransform = true) override;
 	
 	void		CheckParentTransform();
