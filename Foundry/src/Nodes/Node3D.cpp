@@ -130,3 +130,8 @@ void Node3D::SetWorldRotation(glm::vec3 const& worldRot)
 	m_worldDirty = true;
 	UpdateLocalTransform();
 }
+
+ISerializable* Node3D::CreateInstance()
+{
+	return CreateNode<Node3D>("Node3D").release();
+}
