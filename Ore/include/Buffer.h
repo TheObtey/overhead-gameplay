@@ -13,22 +13,22 @@ enum class BufferType
 
 
 template<typename T>
-class Buffer : public IBuffer<T>
+class Buffer final : public IBuffer<T>
 {
 public:
-    Buffer(std::vector<T> data, uint32 id, BufferType type);
+    Buffer(std::vector<T> const& data, uint32 id, BufferType type, bool isDataPersistant);
     ~Buffer() override;
 
-    void Load() override;
+    void Bind() override;
     void Unload() override;
 
     T* Map(uint32 offset, uint32 size) override;
     void Unmap() override;
-    void Bind() override;
-    void StoreData(std::vector<T> data) override;
+
+protected:
+    void StoreData(std::vector<T> const& data, bool isPersistant) override;
 
 private:
-    std::vector<T> m_data;
     BufferType m_type;
     GLuint m_id;
 };

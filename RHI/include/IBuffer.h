@@ -13,9 +13,9 @@ public:
     virtual T* Map(uint32 offset, uint32 size) = 0;
     virtual void Unmap() = 0;
     virtual void Bind() = 0;
-    virtual void StoreData(std::vector<T> data) = 0;
 
 protected:
+    virtual void StoreData(std::vector<T>& data) = 0;
 
 };
 

@@ -3,11 +3,11 @@
 #include <glad/glad.h>
 
 template <typename T>
-Buffer<T>::Buffer(std::vector<T> data, uint32 id, BufferType type)
+Buffer<T>::Buffer(std::vector<T> const& data, uint32 id, BufferType type, bool isDataPersistant)
 {
     m_id = id;
     m_type = type;    
-    m_data = data;
+    StoreData(data, isDataPersistant);
 }
 
 template <typename T>
@@ -30,20 +30,10 @@ void Buffer<T>::Unmap()
 }
 
 template<typename T>
-void Buffer<T>::StoreData(std::vector<T> data)
+void Buffer<T>::StoreData(std::vector<T> const& data, bool isPersistant)
 {
-    glBufferStorage((int)m_type, sizeof(data.data()), data.data(), GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT);
+    int flag = 0;
+    isPersistant ? flag = GL_MAP_PERSISTENT_BIT : flag = GL_MAP_COHERENT_BIT;  
+    glBufferStorage((int)m_type, sizeof(data.data()), data.data(), flag);
 }
 
-template<typename T>
-void Buffer<T>::Load()
-{
-    Bind();
-    StoreData(m_data);
-}
-
-template<typename T>
-void Buffer<T>::Unload()
-{
-    glClearBufferData((int)m_type, sizeof(m_data.data), m_data.data());    
-}
