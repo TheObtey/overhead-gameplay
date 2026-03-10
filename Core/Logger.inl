@@ -37,12 +37,12 @@ inline void Logger::PurgeOldFiles()
 
 	for (auto& file : std::filesystem::directory_iterator{LogDir})
 	{
-	    const auto file_time_sys = ch::clock_cast<ch::system_clock>(file.last_write_time());
+	    //const auto file_time_sys = ch::clock_cast<ch::system_clock>(file.last_write_time());
 
-		if ((time - file_time_sys) >= ch::minutes(10))
-		{
-			std::filesystem::remove(file.path());
-		}
+		//if ((time - file_time_sys) >= ch::minutes(10))
+		//{
+		//	std::filesystem::remove(file.path());
+		//}
 	}
 }
 

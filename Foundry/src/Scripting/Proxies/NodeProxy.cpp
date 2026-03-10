@@ -1,4 +1,4 @@
-#include "Servers/LuaServer.h"
+#include "Servers/EngineServer.h"
 #include "Node.h"
 
 using Proxy = Node::Proxy;
@@ -7,21 +7,22 @@ Proxy* Proxy::CreateNodeProxy(std::string const& name)
 {
 	uptr<Node> node = Node::CreateNode<Node>(name);
 	Proxy* const ptr = node->m_pProxy.get();
-	LuaServer::RegisterUnattachedNode(node);
+	EngineServer::RegisterUnattachedNode(node);
 	return ptr;
 }
 
 void Proxy::GCNodeProxy(Proxy* nodeProxy)
 {
 	if (nodeProxy)
-		LuaServer::UnregisterUnattachedNode(nodeProxy->m_pNode);
+		EngineServer::UnregisterUnattachedNode(nodeProxy->m_pNode);
 }
 
 Proxy::Proxy(Node& node) : m_pNode(&node)  
 {
-	node.OnSceneEnter  += [&](Node& n){ OnSceneEnter();};
-	node.OnNodeUpdated += [&](Node& n, float const dt){ OnUpdate(dt); };
-	node.OnSceneLeave  += [&](Node& n){ OnSceneLeave(); };
+	node.OnSceneEnter			+= [&](Node& n){ OnSceneEnter();};
+	node.OnNodeUpdated			+= [&](Node& n, double const dt){ OnUpdate(dt); };
+	node.OnNodePhysicsUpdated   += [&](Node& n, double const dt){ OnPhysicsUpdate(dt); };
+	node.OnSceneLeave			+= [&](Node& n){ OnSceneLeave(); };
 }
 
 Proxy::Proxy(Proxy&& other) noexcept
@@ -38,9 +39,9 @@ Proxy& Proxy::operator=(Proxy&& other) noexcept
 }
 
 void Proxy::AddChild(Proxy& child){
-	uptr<Node>& unode = LuaServer::GetUnattachedNode(child.m_pNode);
+	uptr<Node>& unode = EngineServer::GetUnattachedNode(child.m_pNode);
 	m_pNode->AddChild(unode);
-	LuaServer::UnregisterUnattachedNode(unode.get());
+	EngineServer::UnregisterUnattachedNode(unode.get());
 }
 
 void Proxy::RemoveChild(Proxy& child)
@@ -105,7 +106,7 @@ Proxy* Proxy::Clone()
 {
 	uptr<Node> node = m_pNode->Clone();
 	Proxy* const ptr = node->m_pProxy.get();
-	LuaServer::RegisterUnattachedNode(node);
+	EngineServer::RegisterUnattachedNode(node);
 	return ptr;
 }
 
