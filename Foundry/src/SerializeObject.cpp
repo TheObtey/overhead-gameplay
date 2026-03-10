@@ -7,6 +7,11 @@ SerializedObject::SerializedObject()
 	m_elementsInSerializedObject["PUBLIC_DATAS"] = json::object();
 }
 
+void SerializedObject::SetType(std::string className)
+{
+	m_elementsInSerializedObject["PRIVATE_DATAS"]["TYPE"] = className;
+}
+
 std::string SerializedObject::GetType() const
 {
 	return m_elementsInSerializedObject["PRIVATE_DATAS"]["TYPE"];

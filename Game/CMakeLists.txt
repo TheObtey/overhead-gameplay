@@ -1,7 +1,6 @@
 project(Game)
 
 set(MAIN "main" CACHE STRING "Select the program entry point")
-
 set(SOURCE
     src/${MAIN}.cpp 
 )

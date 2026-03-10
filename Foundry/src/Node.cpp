@@ -190,7 +190,7 @@ std::unique_ptr<Node> Node::Clone()
 void Node::Serialize(SerializedObject& datas) const
 {
 	// Call baseClass::Serialize(datas) : Example Node::Serialize(datas)
-	datas.SetType<Node>();
+	datas.SetType("Node");
 	datas.AddPublicElement("m_name", &m_name);
 	datas.AddPrivateArray("Children");
 	std::string parent = "";

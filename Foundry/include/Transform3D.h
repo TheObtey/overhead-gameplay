@@ -7,14 +7,14 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <Serialization/ISerializable.h>
-#include <Registries/AutomaticRegisterISerializable.hpp>
+#include <Registries/AutomaticRegister.hpp>
 
 /// /////////////////////////////////////////////////////////////////////////////////
 /// Classe Transform
 /// /////////////////////////////////////////////////////////////////////////////////
 
 
-class Transform3D /*: public AutomaticRegisterISerializable<Transform3D>, public ISerializable*/
+class Transform3D : public ISerializable
 {
 public:
 
@@ -72,9 +72,9 @@ public:
 
 	void Update();
 
-	//virtual void Serialize(SerializedObject& datas) const override;
-	//virtual void Deserialize(SerializedObject const& datas) override;
-	//static std::function<ISerializable* ()> CreateInstance();
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	static ISerializable* CreateInstance();
 
 private:
 	glm::vec4 m_position;
@@ -99,6 +99,8 @@ private:
 	void UpdateTransform();
 	void UpdateInvTransform();
 };
+
+inline REGISTER_ISERIALIZABLE(Transform3D, Transform3D::CreateInstance);
 
 
 #endif //FOUNDRY_TRANSFORM3D__H_

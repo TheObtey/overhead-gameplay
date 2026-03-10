@@ -14,7 +14,7 @@ void EditorSerializer::Save(std::string outPath, uptr<Node>& root)
 
 	json jsonRoot;
 	SerializedObject object;
-	object.SetType<Node>();
+	object.SetType("Node");
 	root.get()->Serialize(object);
 	jsonRoot["Root"] = object.m_elementsInSerializedObject;
 
@@ -27,7 +27,7 @@ void EditorSerializer::Save(std::string outPath, uptr<Node>& root)
 uptr<Node> EditorSerializer::LoadFromJson(std::string path)
 {
 	std::fstream file;
-	file.open(path + ".json", std::ios::in);
+	file.open(path, std::ios::in);
 	json jsonFile{ json::parse(file) };
 	file.close();
 

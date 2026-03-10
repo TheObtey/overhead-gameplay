@@ -1,5 +1,6 @@
 #include "Nodes/Node3D.h"
 #include "MathUtils.h"
+#include "Serialization/SerializeObject.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/detail/type_quat.hpp>
@@ -134,11 +135,33 @@ void Node3D::SetWorldRotation(glm::vec3 const& worldRot)
 void Node3D::Serialize(SerializedObject& datas) const
 {
 	Node::Serialize(datas);
+	datas.SetType("Node3D");
+	datas.AddPublicElement("m_transform", static_cast<ISerializable const*>(&m_transform));
+	datas.AddPublicElement("m_worldPositionX", &m_worldPosition.x);
+	datas.AddPublicElement("m_worldPositionY", &m_worldPosition.y);
+	datas.AddPublicElement("m_worldPositionZ", &m_worldPosition.z);
+	datas.AddPublicElement("m_worldScaleX", &m_worldScale.x);
+	datas.AddPublicElement("m_worldScaleY", &m_worldScale.y);
+	datas.AddPublicElement("m_worldScaleZ", &m_worldScale.z);
+	datas.AddPublicElement("m_worldRotationX", &m_worldRotation.x);
+	datas.AddPublicElement("m_worldRotationY", &m_worldRotation.y);
+	datas.AddPublicElement("m_worldRotationZ", &m_worldRotation.z);
 }
+
 
 void Node3D::Deserialize(SerializedObject const& datas)
 {
 	Node::Deserialize(datas);
+	datas.GetPublicElement("m_transform", static_cast<ISerializable*>(&m_transform));
+	datas.GetPublicElement("m_worldPositionX", &m_worldPosition.x);
+	datas.GetPublicElement("m_worldPositionY", &m_worldPosition.y);
+	datas.GetPublicElement("m_worldPositionZ", &m_worldPosition.z);
+	datas.GetPublicElement("m_worldScaleX", &m_worldScale.x);
+	datas.GetPublicElement("m_worldScaleY", &m_worldScale.y);
+	datas.GetPublicElement("m_worldScaleZ", &m_worldScale.z);
+	datas.GetPublicElement("m_worldRotationX", &m_worldRotation.x);
+	datas.GetPublicElement("m_worldRotationY", &m_worldRotation.y);
+	datas.GetPublicElement("m_worldRotationZ", &m_worldRotation.z);
 }
 
 ISerializable* Node3D::CreateInstance()

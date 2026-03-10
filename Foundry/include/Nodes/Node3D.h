@@ -4,14 +4,11 @@
 #include "Node.h"
 #include "Transform3D.h"
 
-#include <Serialization/ISerializable.h>
-#include <Registries/AutomaticRegisterISerializable.hpp>
-
 /*
 Base class of every 3D object
 */
 
-class Node3D : public Node, private AutomaticRegisterISerializable<Node3D>, public ISerializable
+class Node3D : public Node
 {
 public: 
 	// Gameplay ------------------------------------------------------------------
@@ -72,7 +69,6 @@ public:
 	virtual void Reparent(Node& newParent, bool keepGlobalTransform = true) override;
 	virtual void Serialize(SerializedObject& datas) const override;
 	virtual void Deserialize(SerializedObject const& datas) override;
-	static std::function<ISerializable* ()> CreateInstance();
 
 	// Engine ------------------------------------------------------------------
 

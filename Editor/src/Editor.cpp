@@ -39,18 +39,18 @@ void Editor::Init()
 
 void Editor::Run()
 {
-	while (m_running && !rl::WindowShouldClose())
+	while (m_running && !WindowShouldClose())
 	{
-		float deltaTime = rl::GetFrameTime();
+		float deltaTime = GetFrameTime();
 		Update(deltaTime);
 		
-		rl::BeginDrawing();
-		rl::ClearBackground(rl::DARKGRAY);
+		BeginDrawing();
+		ClearBackground(DARKGRAY);
 
 		Render3D();
 		RenderUI();
 		
-		rl::EndDrawing();
+		EndDrawing();
 	}
 }
 
@@ -59,7 +59,7 @@ void Editor::Shutdown()
 	if (m_running)
 	{
 		rlImGuiShutdown();
-		rl::CloseWindow();
+		CloseWindow();
 		m_running = false;
 		std::cout << "[Editor] Shutdown successfully!" << std::endl;
 	}
@@ -67,11 +67,12 @@ void Editor::Shutdown()
 
 void Editor::Update(float deltaTime)
 {
+	m_editorRaylib.Update(deltaTime);
 
 	// Keyboard shortcuts
-	if (rl::IsKeyDown(rl::KEY_LEFT_CONTROL) && rl::IsKeyPressed(rl::KEY_S))
+	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
 	{
-		if (rl::IsKeyDown(rl::KEY_LEFT_SHIFT))
+		if (IsKeyDown(KEY_LEFT_SHIFT))
 		{
 			m_editorImgui.ShowSaveAs();
 		}
@@ -81,7 +82,7 @@ void Editor::Update(float deltaTime)
 		}
 	}
 
-	if (rl::IsKeyDown(rl::KEY_LEFT_CONTROL) && rl::IsKeyPressed(rl::KEY_N))
+	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_N))
 	{
 		CreateNewScene();
 	}
@@ -164,8 +165,7 @@ void Editor::CreateNode(std::string type, std::string const& name, Node* parent)
 		std::cerr << "[Editor] Cannot create node: no scene root" << std::endl;
 		return;
 	}
-	std::string typefi = "class " + type;
-	ISerializable* outObject = ISerializable::s_constructors[typefi]();
+	ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(type);
 
 	uptr<Node> newNode = uptr<Node>(static_cast<Node*>(outObject));
 	newNode.get()->SetName(name);

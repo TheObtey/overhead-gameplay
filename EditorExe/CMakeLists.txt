@@ -1,8 +1,14 @@
 project(EditorExe)
 
-file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+#file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES} )
+set(MAIN "main" CACHE STRING "Select the program entry point")
+
+set(SOURCE
+    src/${MAIN}.cpp 
+)
+
+add_executable(${PROJECT_NAME} ${SOURCE} )
 
 #add_library(${PROJECT_NAME} SHARED
 #    ${SOURCES}

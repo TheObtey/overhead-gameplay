@@ -3,6 +3,7 @@
 
 #include "ISerializable.h"
 #include "json.hpp"
+#include "Registries/AutomaticRegister.hpp"
 
 #include <Define.h>
 #include <Logger.hpp>
@@ -19,8 +20,7 @@ class SerializedObject
 public:
 	SerializedObject();
 
-	template<typename T>
-	void SetType();
+	void SetType(std::string className);
 
 	std::string GetType() const;
 	
@@ -77,13 +77,6 @@ private:
 	json m_elementsInSerializedObject;
 	friend class EditorSerializer;
 };
-template <typename T>
-void SerializedObject::SetType()
-{
-	std::string t = typeid(T).name();
-	m_elementsInSerializedObject["PRIVATE_DATAS"]["TYPE"] = t;
-}
-
 
 template <typename T>
 inline void SerializedObject::AddPrivateElement(std::string variableName, T const* variableData)
@@ -171,7 +164,7 @@ inline void SerializedObject::GetPrivateElement<ISerializable>(std::string eleme
 {
 	SerializedObject jsonObject = {};
 	jsonObject.m_elementsInSerializedObject = m_elementsInSerializedObject["PRIVATE_DATAS"][elementName];
-	ISerializable* outObject = ISerializable::s_constructors[jsonObject.GetType()]();
+	ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(jsonObject.GetType());
 	outObject->Deserialize(jsonObject);
 	outVariable = outObject;
 }
@@ -188,7 +181,7 @@ inline void SerializedObject::GetPrivateElementInDictionnary<ISerializable>(std:
 {
 	SerializedObject jsonObject = {};
 	jsonObject.m_elementsInSerializedObject = m_elementsInSerializedObject["PRIVATE_DATAS"][dictionnaryName][elementName];
-	ISerializable* outObject = ISerializable::s_constructors[jsonObject.GetType()]();
+	ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(jsonObject.GetType());
 	outObject->Deserialize(jsonObject);
 	outVariable = outObject;
 }
@@ -213,7 +206,7 @@ inline std::vector<ISerializable*> SerializedObject::GetPrivateArray(std::string
 	{
 		SerializedObject jsonObject = {};
 		jsonObject.m_elementsInSerializedObject = m_elementsInSerializedObject["PRIVATE_DATAS"][arrayName][i];
-		ISerializable* outObject = ISerializable::s_constructors[jsonObject.GetType()]();
+		ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(jsonObject.GetType());
 		outObject->Deserialize(jsonObject);
 		array.push_back(outObject);
 	}
@@ -310,7 +303,7 @@ inline void SerializedObject::GetPublicElement<ISerializable>(std::string elemen
 {
 	SerializedObject jsonObject = {};
 	jsonObject.m_elementsInSerializedObject = m_elementsInSerializedObject["PUBLIC_DATAS"][elementName];
-	ISerializable* outObject = ISerializable::s_constructors[jsonObject.GetType()]();
+	ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(jsonObject.GetType());
 	outObject->Deserialize(jsonObject);
 	outVariable = outObject;
 }
@@ -326,7 +319,7 @@ inline void SerializedObject::GetPublicElementInDictionnary<ISerializable>(std::
 {
 	SerializedObject jsonObject = {};
 	jsonObject.m_elementsInSerializedObject = m_elementsInSerializedObject["PUBLIC_DATAS"][dictionnaryName][elementName];
-	ISerializable* outObject = ISerializable::s_constructors[jsonObject.GetType()]();
+	ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(jsonObject.GetType());
 	outObject->Deserialize(jsonObject);
 	outVariable = outObject;
 }
@@ -351,7 +344,7 @@ inline std::vector<ISerializable*> SerializedObject::GetPublicArray(std::string 
 	{
 		SerializedObject jsonObject = {};
 		jsonObject.m_elementsInSerializedObject = m_elementsInSerializedObject["PUBLIC_DATAS"][arrayName][i];
-		ISerializable* outObject = ISerializable::s_constructors[jsonObject.GetType()]();
+		ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(jsonObject.GetType());
 		outObject->Deserialize(jsonObject);
 		array.push_back(outObject);
 	}

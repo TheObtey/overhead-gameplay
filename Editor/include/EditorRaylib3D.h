@@ -3,12 +3,8 @@
 
 #include <Serialization/json.hpp>
 
-namespace rl
-{
 #include <raylib.h>
-#include <raymath.h>
-#include <raygizmo.h>
-}
+
 #include <Node.h>
 #include <Define.h>
 #include <glm/vec4.hpp>
@@ -21,8 +17,9 @@ using json = nlohmann::json;
 
 struct DrawableElement
 {
-	uptr<rl::Mesh> mesh;
-	glm::mat4 worldMatrix;
+	uptr<Mesh> mesh;
+	Matrix worldMatrix;
+
 };
 
 class EditorRaylib3D
@@ -51,6 +48,8 @@ private:
 	void InstanciateLight();
 
 
+	Matrix ConvertGLMValuesToRaylibMat(glm::vec3 pos, glm::vec3 scale, glm::vec3 rot);
+
 private:
 	// List of Meshs will depends on NodeMesh for vertices later
 	
@@ -59,8 +58,8 @@ private:
 	glm::vec3 m_currentRotation;
 
 	json m_jsonElementFromRoot;
-	rl::Camera3D m_camera;
-	rl::Material m_defaultMaterial;
+	Camera3D m_camera;
+	Material m_defaultMaterial;
 
 	std::map<std::string, uptr<DrawableElement>> m_loadedMeshs;
 	std::map<std::string, uptr<DrawableElement>> m_colliders;
