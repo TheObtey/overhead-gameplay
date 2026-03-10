@@ -5,7 +5,7 @@
 
 #include <string>
 
-#define BindProxy(P, X) struct P::ProxyBinding  : AutomaticRegisterProxy<P::ProxyBinding> { static void Bind(Binder& binder) { X } };
+#define BindProxy(P, X) struct P::ProxyBinding { static void Bind(Binder& binder) { X } };
 #define BIND(F) &Proxy::F
 
 /*A node proxy class used to communicate between the scripting language and the engine API.
@@ -62,7 +62,7 @@ private:
 	Node* m_pNode;
 };
 
-struct Node::Proxy::ProxyBinding : AutomaticRegisterProxy<ProxyBinding>
+struct Node::Proxy::ProxyBinding
 {
 	static void Bind(Binder& binder)
 	{
@@ -87,4 +87,4 @@ struct Node::Proxy::ProxyBinding : AutomaticRegisterProxy<ProxyBinding>
 	};
 };
 
-inline static Node::Proxy::ProxyBinding NodeBinding {};
+REGISTER_PROXY(Node::Proxy::ProxyBinding, NodeProxy);
