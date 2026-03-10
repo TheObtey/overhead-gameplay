@@ -15,11 +15,6 @@ void TextureObject::Bind()
     glBindTexture((int)m_type, m_id);
 }
 
-void TextureObject::Load()
-{
-    Bind();
-}
-
 void TextureObject::GenerateTextureImage(DataType type, uint32& width, uint32& height, std::string imagePath)
 {
     if(imagePath == "")
@@ -51,4 +46,9 @@ void TextureObject::AddParameters(uint32 parameter, uint32 value)
 void TextureObject::AttachToFrameBuffer(uint32 frameBuffer, uint32 attachment)
 {
     glFramebufferTexture2D(frameBuffer, attachment, (int)m_type, m_id, 0);
+}
+
+void TextureObject::InitializeTextureView(uint32 origTexture, TextureType format, uint32 minLevels, uint32 numlevels, uint32 minLayer, uint32 numLayers)
+{
+    glTextureView(m_id, uint(m_type), origTexture, (int)format, minLevels, numlevels, minLayer, numLayers); 
 }
