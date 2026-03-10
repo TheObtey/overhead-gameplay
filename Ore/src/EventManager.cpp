@@ -97,7 +97,7 @@ std::string_view EventManager::GetGamepadName(GamepadId id)
 
     if(pName == NULL)
     {
-        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get gamepad's name at id :", id, "use CheckGamepad first to check if it is present");
+        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get gamepad's name at id :", (int)id, "use CheckGamepad first to check if it is present");
         return "";
     }
 
@@ -113,7 +113,7 @@ float EventManager::GetGamepadAxes(GamepadId id, EventInput key)
 
     if(pAxes == NULL)
     {
-        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get joytick's axes at id :", id, "use CheckGamepad first to check if it is present");
+        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get joytick's axes at id :", (int)id, "use CheckGamepad first to check if it is present");
         return {};
     }
 
@@ -128,7 +128,7 @@ bool EventManager::GetButton(GamepadId id, EventInput button)
 
     if(error == GLFW_FALSE)
     {
-        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get gamepad's button at id :", id, "use CheckGamepad first to check if it is present");
+        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get gamepad's button at id :", (int)id, "use CheckGamepad first to check if it is present");
         return false;
     }
 
