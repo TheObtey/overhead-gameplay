@@ -213,9 +213,9 @@ void Node::Deserialize(SerializedObject const& datas)
 	}
 }
 
-std::function<ISerializable* ()> Node::CreateInstance()
+ISerializable* Node::CreateInstance()
 {
-	return []()->ISerializable* { return CreateNode<Node>("Node").release(); };
+	return CreateNode<Node>("Node").release();
 }
 
 
