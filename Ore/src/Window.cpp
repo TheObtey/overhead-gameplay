@@ -4,6 +4,20 @@
 #include <glad/glad.h>
 #include "EventManager.h"
 
+void GLAPIENTRY
+MessageCallback( GLenum source,
+                 GLenum type,
+                 GLuint id,
+                 GLenum severity,
+                 GLsizei length,
+                 const GLchar* message,
+                 const void* userParam )
+{
+    Logger::Log("GL CALLBACK: ",( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ) ,
+            " type = ", type,
+            " severity = ", severity,
+            " message = ", message);
+}
 
 std::unordered_map<GLFWwindow*, Window*> Window::s_windows = {};
 Window::Window(int width, int height, std::string name, bool enableTransparency)
@@ -55,6 +69,11 @@ void Window::Open()
 
 	glfwSetFramebufferSizeCallback(m_pWindow, Window::FrameBufferResizeCallback);
     glfwSetJoystickCallback(EventManager::JoystickCallback);
+
+#ifdef DEBUG_BUILD
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(MessageCallback, 0);
+#endif
 
     s_windows[m_pWindow] = this;
 	onOpenEvent();
