@@ -7,6 +7,7 @@
 #include "Scripting/Binder.h"
 
 #include <glm/geometric.hpp>
+#include <glm/trigonometric.hpp>
 #include <glm/vec4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
@@ -182,13 +183,13 @@ namespace MathsProxy
     };
 
     inline auto RadToDeg = sol::overload(
-        [](float const rad) { return operator ""_rad_to_deg(rad); },
-        [](double const rad) { return operator ""_rad_to_deg(rad); }
+        [](float const rad) { return glm::degrees(rad); },
+        [](double const rad) { return glm::degrees(rad); }
     );
 
     inline auto DegToRad = sol::overload(
-        [](float const deg) { return operator ""_deg_to_rad(deg); },
-        [](double const deg) { return operator ""_deg_to_rad(deg); }
+        [](float const deg) { return glm::radians(deg); },
+        [](double const deg) { return glm::radians(deg); }
     );
 
     inline auto Cos = sol::overload(
