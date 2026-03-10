@@ -86,4 +86,4 @@ BindProxy(Node3D::Proxy,
 	"AddScale", BIND(AddScale));
 )
 
-inline static Node3D::Proxy::ProxyBinding Node3DBinding {};
+REGISTER_PROXY(Node3D::Proxy::ProxyBinding, Node3DProxy);

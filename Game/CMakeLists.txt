@@ -6,12 +6,18 @@ set(SOURCE
     src/${MAIN}.cpp 
 )
 
+if (MSVC)
+    add_compile_options(/bigobj)
+else ()
+    add_compile_options(-Wa,-mbig-obj)
+endif ()
+
 add_executable(${PROJECT_NAME} ${SOURCE})
 
 file(COPY ${PROJECT_SOURCE_DIR}/../res/ 
      DESTINATION ${PROJECT_BINARY_DIR}/../Game/res
 )  
 
-target_link_libraries(${PROJECT_NAME}  PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,Foundry::library>")
-#target_link_libraries(${PROJECT_NAME} PRIVATE Foundry::library)
+#target_link_libraries(${PROJECT_NAME}  PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,Foundry::library>")
+target_link_libraries(${PROJECT_NAME} PRIVATE Foundry::library)
 target_link_libraries(${PROJECT_NAME}  PRIVATE Editor::library)
