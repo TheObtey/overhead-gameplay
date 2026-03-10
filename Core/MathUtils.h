@@ -23,7 +23,7 @@ namespace Maths
 		);
 	}
 
-	static glm::mat4x4 RotateYawPitchRoll(const glm::vec3& YawPitchRoll) {
+	static glm::mat4x4 RotateYawPitchRoll(const glm::vec4& YawPitchRoll) {
 		glm::quat q = glm::angleAxis(YawPitchRoll.x, glm::vec3{ 0.0f, 1.0f, 0.0f });
 
 		glm::vec3 right = { 1.f, 0.f, 0.0f };

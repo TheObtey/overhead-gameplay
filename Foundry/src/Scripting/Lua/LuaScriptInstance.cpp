@@ -1,14 +1,18 @@
 #include "Scripting/Lua/LuaScriptInstance.hpp"
-#include "Servers/LuaServer.h"
+#include "Scripting/ScriptingEngine.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 #include "Logger.hpp"
 
+
 LuaScriptInstance::LuaScriptInstance(std::string const& scriptPath) :
-	m_state(LuaServer::GetLuaState()),
+	m_state(ScriptingEngine::GetScriptEngine()),
 	m_stringPath(scriptPath)
 {
 	m_enviro = {m_state, sol::create};
-	m_enviro["CreateNode"] = m_state["CreateNode"];
 	m_enviro["print"] = m_state["print"];
+
+	for (std::string const& name : ScriptingEngine::GetRegisteredTypesName())
+		m_enviro[name] = m_state[name];
 }
 
 void LuaScriptInstance::CallScriptOnInit()
@@ -23,10 +27,22 @@ void LuaScriptInstance::CallScriptOnInit()
 	}
 }
 
-void LuaScriptInstance::CallScriptOnUpdate(float dt)
+void LuaScriptInstance::CallScriptOnUpdate(double dt)
 {
 	if(!m_updateFunc.valid()) return;
 	auto result = m_updateFunc(dt);
+
+	if (!result.valid())
+	{
+		sol::error err = result;
+		Logger::LogWithLevel(LogLevel::ERROR, "Lua script error : ", err.what());
+	}
+}
+
+void LuaScriptInstance::CallScriptOnPhysicsUpdate(double dt)
+{
+	if(!m_updatePhysicsFunc.valid()) return;
+	auto result = m_updatePhysicsFunc(dt);
 
 	if (!result.valid())
 	{

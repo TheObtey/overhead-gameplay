@@ -28,7 +28,7 @@ private:
 
 public:
     static void FlushCommands() { static_cast<Server<Derived>&>(Instance()).FlushCommandsImpl(); }
-    static void BuildTasks(TaskGraph& graph) { static_cast<Server<Derived>&>(Instance()).BuildTasksImpl(); }
+    static void BuildTasks(TaskGraph& graph) { static_cast<Server<Derived>&>(Instance()).BuildTasksImpl(graph); }
 
     virtual void FlushCommandsImpl() = 0;
     virtual void BuildTasksImpl(TaskGraph& graph) = 0;

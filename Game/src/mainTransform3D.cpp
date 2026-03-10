@@ -11,19 +11,16 @@
 #include <memory>
 #include "raylib.h"
 #include "Transform3D.h"
+#include "Nodes/Node3D.h"
 
-struct Node3D
-{
-	Transform3D transform;
-};
 
 int main()
 {
 	std::cout << "main transform 3D" << std::endl;
 	// Initialization
    //--------------------------------------------------------------------------------------
-	const int screenWidth = 800;
-	const int screenHeight = 450;
+	const int screenWidth = 1500;
+	const int screenHeight = 850;
 
 	InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera free");
 
@@ -35,26 +32,36 @@ int main()
 	camera.fovy = 45.0f;                                // Camera field-of-view Y
 	camera.projection = CAMERA_PERSPECTIVE;             // Camera projection type
 
-	Mesh cubeMesh = GenMeshCube(2.0f, 2.0f, 2.0f);
+	Mesh cubeMesh = GenMeshCube(1.0f, 1.0f, 1.0f);
 	Material cubeMaterial = LoadMaterialDefault();
 
-	Node3D cube1;
-	Node3D cube2;
-	Node3D cube3;
-	Node3D cube4;
-	auto& tr1 = cube1.transform;
-	auto& tr2 = cube2.transform;
-	auto& tr3 = cube3.transform;
-	auto& tr4 = cube4.transform;
+	auto cube1 = Node::CreateNode<Node3D>("a");
+	auto cube2 = Node::CreateNode<Node3D>("b");
+	auto cube3 = Node::CreateNode<Node3D>("c");
+	auto cube4 = Node::CreateNode<Node3D>("y");
 
-	tr2.SetPosition({ 4.0,0.0,2.0 });
-	tr3.SetPosition({ -4.0,0.0,-2.0 });
-	tr4.SetPosition({ -2.0,2.0,-2.0 });
-	tr2.SetScale({ 3.0,0.5,2.0 });
+	cube2->SetPosition({ 1.0,0.0,0.0});
+	cube3->SetPosition({ 2.0,0.0,0.0});
+	cube4->SetPosition({ 1.0,0.0,0.0});
+
+	cube2->SetScale({ 1.0,4.0,1.0});
+
+	cube1->AddChild(std::move(cube2));
+	cube1->AddChild(std::move(cube3));
+
+	EngineServer::FlushCommands();
+	Node3D& cube1ref = *cube1.get();
+	Node3D& cube2ref =  static_cast<Node3D&>(cube1->GetChild(0));
+	Node3D& cube3ref =  static_cast<Node3D&>(cube1->GetChild(1));
+
+	cube3ref.AddChild(std::move(cube4));
+	EngineServer::FlushCommands();
+	Node3D& cube4ref =  static_cast<Node3D&>(cube3ref.GetChild(0));
 
 	DisableCursor();                    // Limit cursor to relative movement inside the window
 
 	SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
+	EnableCursor();
 	//--------------------------------------------------------------------------------------
 
 	// Main game loop
@@ -64,30 +71,35 @@ int main()
 		if (IsKeyPressed(KEY_Z)) camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
 
 		// move cube
-		if (IsKeyDown(KEY_I)) tr1.AddPosition({ 0.0, 0.0, 1.0 });
-		if (IsKeyDown(KEY_K)) tr1.AddPosition({ 0.0, 0.0, -1.0 });
-		if (IsKeyDown(KEY_J)) tr1.AddPosition({ -1.0, 0.0, 0.0 });
-		if (IsKeyDown(KEY_L)) tr1.AddPosition({ 1.0, 0.0, 0.0 });
-		if (IsKeyDown(KEY_G)) tr2.AddPosition({ 1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_I))
+			cube2ref.SetWorldPosition(cube2ref.GetWorldPosition() + glm::vec3(0.0f, 0.0f, -0.5f));
+		if (IsKeyDown(KEY_K)) cube1ref.AddPosition({ 0.0, 0.0, -1.0 });
+		if (IsKeyDown(KEY_J)) cube1ref.AddPosition({ -1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_L)) cube1ref.AddPosition({ 1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_G)) cube2ref.AddPosition({ 1.0, 0.0, 0.0 });
 
-		if (IsKeyDown(KEY_N)) tr1.AddYaw(0.2);
-		if (IsKeyDown(KEY_B)) tr1.AddPitch(0.2);
-		if (IsKeyDown(KEY_V)) tr1.AddRoll(0.2);
+		if (IsKeyDown(KEY_RIGHT)) cube2ref.AddPosition({ 1.0, 0.0, 0.0 });
+		if (IsKeyDown(KEY_UP)) cube2ref.AddRoll(0.2);
 
-		if (IsKeyDown(KEY_C)) tr1.AddScale({ 1.0, 1.0, 1.0});
-		if (IsKeyDown(KEY_X)) tr1.AddScale({ -1.0, -1.0, -1.0});
+		if (IsKeyDown(KEY_N)) cube1ref.AddYaw(0.2);
+		if (IsKeyDown(KEY_B)) cube1ref.AddPitch(0.2);
+		if (IsKeyDown(KEY_V)) cube1ref.AddRoll(0.2);
+
+		if (IsKeyPressed(KEY_C)) cube1ref.AddScale({ 0.0, 1.0, 0.0});
+		if (IsKeyDown(KEY_X)) cube1ref.AddScale({ -1.0, -1.0, -1.0});
+
+		if (IsKeyPressed(KEY_Y))
+		{
+			cube4ref.Reparent(cube1ref.GetChild(0));
+		}
 
 		// Update
 		//----------------------------------------------------------------------------------
-		UpdateCamera(&camera, CAMERA_FREE);
-		tr1.Update();
-		tr2.Update();
-		tr3.Update();
-		tr4.Update();
+		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+			UpdateCamera(&camera, CAMERA_FREE);
 
-		tr2 = tr2 * tr1;
-		tr3 = tr3 * tr1;
-		tr4 = tr4 * tr3;
+		cube1->Update(0.016f);
+
 
 		//----------------------------------------------------------------------------------
 
@@ -99,10 +111,12 @@ int main()
 
 		BeginMode3D(camera);
 
-		glm::mat4& m1 = tr1.GetMatrix();
-		glm::mat4& m2 = tr2.GetMatrix();
-		glm::mat4& m3 = tr3.GetMatrix();
-		glm::mat4& m4 = tr4.GetMatrix();
+		glm::mat4 m1 = cube1->GetWorldMatrix();
+		glm::mat4 m2 = cube2ref.GetWorldMatrix();
+		glm::mat4 m3 = cube3ref.GetWorldMatrix();
+		glm::mat4 m4 = cube4ref.GetWorldMatrix();
+
+		//DEBUG(m4[0][])
 
 		Matrix rlMat1 = {
 			m1[0][0], m1[1][0], m1[2][0], m1[3][0],
@@ -151,11 +165,6 @@ int main()
 		DrawRectangle(10, 10, 320, 93, Fade(SKYBLUE, 0.5f));
 		DrawRectangleLines(10, 10, 320, 93, BLUE);
 
-		DrawText("Free camera default controls:", 20, 20, 10, BLACK);
-		DrawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, DARKGRAY);
-		DrawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, DARKGRAY);
-		DrawText("- Z to zoom to (0, 0, 0)", 40, 80, 10, DARKGRAY);
-
 		EndDrawing();
 		//----------------------------------------------------------------------------------
 	}
@@ -164,6 +173,4 @@ int main()
 	//--------------------------------------------------------------------------------------
 	CloseWindow();        // Close window and OpenGL context
 	//--------------------------------------------------------------------------------------
-
-
 }

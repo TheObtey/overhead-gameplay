@@ -4,9 +4,8 @@
 ////////////////////////////////////////////////////
 
 #include "Define.h"
-#include "Node.h"
+#include "Scripting/Lua/LuaBindings.h"
 #include "Servers/EngineServer.h"
-#include "Scripting/Lua/LuaScriptInstance.hpp"
 
 #include <memory>
 

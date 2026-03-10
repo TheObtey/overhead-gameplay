@@ -1,18 +1,19 @@
 #include "Node.h"
+#include "SceneTree.h"
 #include "Debug.h"
 #include "Servers/EngineServer.h"
+#include "Serialization/SerializeObject.hpp"
 
 #include <algorithm>
 #include <exception>
 #include <functional>
 #include <memory>
-#include <ranges>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-Node::Node(std::string const& name) :  m_name(name)
+Node::Node(std::string const& name) : m_name(name)
 {
     DEBUG("Node : " << m_name << " has been " << ANSI_GREEN << "created !" << ANSI_RESET << std::endl);
 }
@@ -22,14 +23,21 @@ Node::~Node()
     DEBUG("Node : " << m_name << " has been " << ANSI_RED << "deleted !" << ANSI_RESET << std::endl);
 }
 
-void Node::Update(float const delta)
+void Node::Update(double const delta)
 {
     OnUpdate(delta);
 	OnNodeUpdated(*this, delta);
     for (auto& name : m_childrenOrder)
-    {
         m_children[name]->Update(delta);
-    }
+
+}
+
+void Node::PhysicsUpdate(double delta)
+{
+	OnPhysicsUpdate(delta);
+	OnNodePhysicsUpdated(*this, delta);
+	for (auto& name : m_childrenOrder)
+		m_children[name]->PhysicsUpdate(delta);
 }
 
 void Node::AddChild(std::unique_ptr<Node>&& child)
@@ -52,6 +60,7 @@ void Node::AttachChildImmediate(std::unique_ptr<Node>& child)
 	m_childrenOrder.push_back(childName);
 
 	m_children[childName]->OnSceneEnter(*m_children[childName]);
+	m_children[childName]->OnParentChange(*this);
 
 	DEBUG("Node : " << childName << " is now a child of : " << m_name << std::endl);
 }
@@ -133,17 +142,28 @@ void Node::Destroy()
         m_pOwner->RemoveChild(*this);
         return;
     }
+
+	if (m_pSceneTree) m_pSceneTree->m_root.reset();
 }
 
 void Node::Reparent(Node& newParent, bool keepGlobalTransform)
 {
     if (m_pOwner == nullptr) return;
+	if (newParent.m_name == m_pOwner->m_name)
+	{
+		OnParentChange(newParent);
+		return;
+	}
 
     newParent.m_children[m_name] = std::move(m_pOwner->m_children[m_name]);
     newParent.m_childrenOrder.push_back(m_name);
     std::erase(m_pOwner->m_childrenOrder, m_name);
     m_pOwner->m_children.erase(m_name);
     m_pOwner = &newParent;
+
+	DEBUG(m_name << " reparented to " << newParent.m_name);
+
+	OnParentChange(*this);
 }
 
 void Node::MoveChild(Node const& child, uint32 to)
@@ -166,6 +186,38 @@ std::unique_ptr<Node> Node::Clone()
 
     return copy;
 }
+
+void Node::Serialize(SerializedObject& datas) const
+{
+	// Call baseClass::Serialize(datas) : Example Node::Serialize(datas)
+	datas.SetType<Node>();
+	datas.AddElement("m_name", m_name);
+	datas.AddArray("Children");
+	for (uint32 i = 0; i < m_children.size(); i++)
+	{
+		datas.AddElementInArray("Children", static_cast<ISerializable const&>(*m_children.at(m_childrenOrder[i])));
+	}
+}
+
+void Node::Deserialize(SerializedObject const& datas)
+{
+	// Call baseClass::Deserialize(datas) : Example Node::Deserialize(datas)
+	std::string t;
+	datas.GetType(t);
+	datas.GetElement("m_name",m_name);
+	std::vector<ISerializable*> tempList = datas.GetArray<ISerializable*>("Children");
+	for (uint32 i = 0; i < tempList.size(); i++)
+	{
+		uptr<Node> pNode = uptr<Node>((Node*)tempList[i]);
+		AddChild(pNode);
+	}
+}
+
+std::function<ISerializable* ()> Node::CreateInstance()
+{
+	return []()->ISerializable* { return CreateNode<Node>("Node").release(); };
+}
+
 
 std::string Node::GetName() { return m_name; }
 Node* Node::GetParent() { return m_pOwner; }

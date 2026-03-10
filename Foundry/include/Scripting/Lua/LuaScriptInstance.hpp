@@ -16,7 +16,8 @@ public:
 
 private:
 	void CallScriptOnInit() override;
-	void CallScriptOnUpdate(float dt) override;
+	void CallScriptOnUpdate(double dt) override;
+	void CallScriptOnPhysicsUpdate(double dt) override;
 	void CallScriptOnDestroy() override;
 
 private:
@@ -26,6 +27,7 @@ private:
 
 	sol::protected_function m_initFunc;
 	sol::protected_function m_updateFunc;
+	sol::protected_function m_updatePhysicsFunc;
 	sol::protected_function m_destroyFunc;
 };
 
@@ -34,9 +36,10 @@ inline void LuaScriptInstance::AttachToProxy(T* const proxy)
 {
 	m_enviro["self"] = proxy;
 
-	proxy->OnSceneEnter += std::bind(&LuaScriptInstance::CallScriptOnInit, this);
-	proxy->OnUpdate += std::bind(&LuaScriptInstance::CallScriptOnUpdate, this, std::placeholders::_1);
-	proxy->OnSceneLeave += std::bind(&LuaScriptInstance::CallScriptOnDestroy, this) ;
+	proxy->OnSceneEnter			+= [this] { CallScriptOnInit(); };
+	proxy->OnUpdate				+= [this](double const dt) { CallScriptOnUpdate(dt); };
+	proxy->OnPhysicsUpdate		+= [this](double const dt) { CallScriptOnUpdate(dt); };
+	proxy->OnSceneLeave			+= [this] { CallScriptOnDestroy(); } ;
 
 	auto file = m_state.script_file(m_stringPath, m_enviro);
 
