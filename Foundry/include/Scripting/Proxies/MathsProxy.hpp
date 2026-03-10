@@ -96,7 +96,7 @@ namespace MathsProxy
     };
 };
 
-struct Vec3ProxyBinder : AutomaticRegisterProxy<Vec3ProxyBinder> {
+struct Vec3ProxyBinding {
     static void Bind(Binder& binder)
     {
         auto maths = binder.GetOrCreateNamespace("maths");
@@ -124,6 +124,6 @@ struct Vec3ProxyBinder : AutomaticRegisterProxy<Vec3ProxyBinder> {
     }
 };
 
-inline static Vec3ProxyBinder Vec3Binding {};
+REGISTER_PROXY(Vec3ProxyBinding, Vec3Proxy);
 
 #endif

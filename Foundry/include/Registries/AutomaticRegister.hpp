@@ -9,7 +9,7 @@
 class ISerializable;
 
 #define REGISTER_ISERIALIZABLE(ISerializable_name, create_func) \
-    bool ISerializable_name ## _entry = AutomaticRegisterISerializable<ISerializable>::add(#ISerializable_name, (create_func))
+    inline bool ISerializable_name ## _entry = AutomaticRegisterISerializable<ISerializable>::add(#ISerializable_name, (create_func))
 
 template <typename T>
 struct AutomaticRegisterISerializable
