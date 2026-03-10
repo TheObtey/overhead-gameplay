@@ -8,7 +8,6 @@
 Transform2D::Transform2D(
 	float _x,		     float _y,
 	float _scaleX,	     float _scaleY,
-	float _theta,
 	bool _statism) :
 	m_isStatic(_statism),
 	m_scale({ _scaleX, _scaleY, 1.0f }),
@@ -272,8 +271,9 @@ glm::vec2 Transform2D::GetPosition() const
 	return { m_position.x, m_position.y };
 }
 
-glm::mat3 Transform2D::GetTransformationMatrix() const
+glm::mat3& Transform2D::GetTransformationMatrix()
 {
+	Update();
 	return m_transformationMatrix;
 }
 
@@ -303,17 +303,17 @@ void Transform2D::Update()
 	);
 
 	glm::mat3 Sh = glm::mat3(
-		1, m_shear.x, 0,
-		m_shear.y, 1, 0,
+		1, m_shear.y, 0,
+		m_shear.x, 1, 0,
 		0, 0, 1
 	);
 
 	glm::mat3 R = glm::toMat3(glm::quat(m_rotation));
 
 	glm::mat3 T = glm::mat3(
-		1, 0, m_position.x,
-		0, 1, m_position.y,
-		0, 0, 1
+		1, 0, 0,
+		0, 1, 0,
+		m_position.x, m_position.y, 1
 	);
 
 	m_transformationMatrix = ((S * Sh) * R) * T;

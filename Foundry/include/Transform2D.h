@@ -20,7 +20,6 @@ public:
 	Transform2D(
 		float _x = 0.0f, float _y = 0.0f,
 		float _scaleX = 1.0f, float _scaleY = 1.0f,
-		float _theta = 0.0f,
 		bool _statism = false
 	);
 	~Transform2D();
@@ -63,7 +62,7 @@ public:
 	void		SetPosition(float _x, float _y);
 	glm::vec2	GetPosition() const;
 
-	glm::mat3	GetTransformationMatrix() const;
+	glm::mat3&	GetTransformationMatrix();
 	void		SetTransformationMatrix();
 
 	void		SetStatism(bool _statism);
