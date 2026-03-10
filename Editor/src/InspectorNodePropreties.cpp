@@ -28,11 +28,11 @@ void InspectorNodePropreties::Draw(SerializedObject& selected)
 		out.clear();
 		out.append(nameBuffer);
 		selected.AddPublicElement("m_name", &out);
+		json test = selected.GetJson();
+		auto ttt = test["PUBLIC_DATAS"]["m_name"].type();
 		std::cout << "[EditorImGui] Node renamed to: " << nameBuffer << std::endl;
 	}
-	
 	ImGui::Spacing();
-	selected.GetJson();
 	/*ImGui::Text("Parent: %s",
 		selected->GetParent()
 		? selected->GetParent()->GetName().c_str()

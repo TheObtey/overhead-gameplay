@@ -86,9 +86,6 @@ void SerializedObject::SetType()
 template <typename T>
 inline void SerializedObject::AddPrivateElement(std::string variableName, T const* variableData)
 {
-	//json Data = {};
-	//Data["TYPE"] = typeid(T).name();
-	//Data["DATA"] = *variableData;
 	m_elementsInSerializedObject["PRIVATE_DATAS"][variableName] = *variableData;
 }
 
@@ -200,13 +197,6 @@ inline std::vector<ISerializable*> SerializedObject::GetPrivateArray(std::string
 template <typename T>
 inline void SerializedObject::AddPublicElement(std::string variableName, T const* variableData)
 {
-	//json Data = {};
-	//std::string t = typeid(T).name();
-	//if (t == "class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >") {
-	//	t = "class std::String";
-	//}
-	//Data["TYPE"] = t;
-	//Data["DATA"] = *variableData;
 	m_elementsInSerializedObject["PUBLIC_DATAS"][variableName] = *variableData;
 }
 
