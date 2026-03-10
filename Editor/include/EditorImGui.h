@@ -1,4 +1,4 @@
-#ifndef __EDITORIMGUI_H
+﻿#ifndef __EDITORIMGUI_H
 #define __EDITORIMGUI_H
 
 #include "InspectorNodePropreties.h"
@@ -101,9 +101,11 @@ private:
 	std::string m_scenePathBuffer;
 
 	Node* m_selectedNode = nullptr;
+	Node* m_lastSelectedNode = nullptr; 
 
 	SerializedObject m_selectedNodeData;
 	json m_selectedNodeDataJson;
+	bool m_inspectorDirty = false;
 
 	Node* m_newNodeTypeSelected = nullptr;
 
@@ -121,6 +123,10 @@ private:
 
 	EditorCommand m_command;
 	InspectorNodePropreties m_Inspector;
+
+	void LoadInspectorData();
+	void ApplyInspectorChanges();
+
 };
 
 #endif //__EDITORIMGUI_H
