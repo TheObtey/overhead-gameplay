@@ -4,20 +4,18 @@
 #include "Scripting/Binder.h"
 #include "Scripting/ScriptingEngine.h"
 
-#define REGISTER_SERIALIZABLE_OBJECT(name) inline static name Binding {};
+#define LINE __LINE__
+#define REGISTER_PROXY(Class, name) static bool name = AutomaticRegisterProxy::Register<Class>();
 
-template<typename D>
-struct AutomaticRegisterProxy {
-    AutomaticRegisterProxy()
+struct AutomaticRegisterProxy
+{
+    template <typename T>
+    static bool Register()
     {
-        //TODO Find a better way
-        static bool guard = false;
-
-        if (guard) return;
         Binder B(ScriptingEngine::GetScriptEngine());
-        D::Bind(B);
+        T::Bind(B);
         ScriptingEngine::RegisterTypeNames(B.GetRegisteredTypesName());
-        guard = true;
+        return true;
     }
 };
 

@@ -7,6 +7,7 @@
 #include "Scripting/Lua/LuaBindings.h"
 #include "Servers/EngineServer.h"
 
+#include <Registries/AutomaticRegister.hpp>
 #include <memory>
 
 int main()

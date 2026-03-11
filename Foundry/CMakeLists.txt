@@ -9,6 +9,12 @@ find_package(glm CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
+if (MSVC)
+    add_compile_options(/bigobj)
+else ()
+    add_compile_options(-Wa,-mbig-obj)
+endif ()
+
 add_library(${PROJECT_NAME} STATIC
     ${SOURCES})
 

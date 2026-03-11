@@ -5,7 +5,7 @@
 #include "Event.hpp"
 #include "Scripting/Lua/LuaScriptInstance.hpp"
 #include "Serialization/ISerializable.h"
-#include "Registries/AutomaticRegisterISerializable.hpp"
+#include "Registries/AutomaticRegister.hpp"
 
 #include <functional>
 #include <optional>
@@ -24,7 +24,7 @@ template <typename T>
 using OptionalRef = std::optional<std::reference_wrapper<T>>;
 
 //Base class off every node in the tree
-class Node : public AutomaticRegisterISerializable<Node>, public ISerializable
+class Node : public ISerializable
 {
 public:
 	class Proxy;
@@ -76,7 +76,7 @@ public:
 	template <NodeType T>
 	static void AttachScript(uptr<LuaScriptInstance>& script, T& node);
 
-	static std::function<ISerializable*()> CreateInstance();
+	static ISerializable* CreateInstance();
 	static void Test() {};
 
 	//====Event======
@@ -114,6 +114,7 @@ private:
 	friend class unique_ptr;
 };
 
+REGISTER_ISERIALIZABLE(Node, Node::CreateInstance);
 
 //=== Templated function def ====
 template <NodeType T>
@@ -125,7 +126,6 @@ std::unique_ptr<T> Node::CreateNode(std::string const& name)
 
 	uptr<concrete_Node> ptr = std::make_unique<concrete_Node>(name);
 	ptr->m_pProxy = std::make_unique<typename T::Proxy>(*ptr);
-	auto _ = ptr->register_object;
 
     return std::move(ptr);
 }

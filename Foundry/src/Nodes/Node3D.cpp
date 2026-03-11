@@ -138,4 +138,7 @@ Node3D::operator reactphysics3d::Transform()
 	reactTr.setOrientation({ m_worldRotation.x, m_worldRotation.y, m_worldRotation.z, m_worldRotation.w });
 
 	return reactTr;
+ISerializable* Node3D::CreateInstance()
+{
+	return CreateNode<Node3D>("Node3D").release();
 }

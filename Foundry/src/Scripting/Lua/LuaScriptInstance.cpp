@@ -10,6 +10,7 @@ LuaScriptInstance::LuaScriptInstance(std::string const& scriptPath) :
 {
 	m_enviro = {m_state, sol::create};
 	m_enviro["print"] = m_state["print"];
+	m_enviro["os"] = m_state["os"];
 
 	for (std::string const& name : ScriptingEngine::GetRegisteredTypesName())
 		m_enviro[name] = m_state[name];
