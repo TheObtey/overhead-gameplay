@@ -21,8 +21,8 @@ void EditorImGui::Init()
 	ImGui::FileBrowser LoadBrowseWindow(ImGuiFileBrowserFlags_ConfirmOnEnter);
 	m_saveBrowser = SaveBrowseWindow;
 	m_loadBrowser = LoadBrowseWindow;
-	m_saveBrowser.SetDirectory("res");
-	m_loadBrowser.SetDirectory("res");
+	m_saveBrowser.SetDirectory("../Game/res");
+	m_loadBrowser.SetDirectory("../Game/res");
 }
 
 void EditorImGui::SetSceneRoot(Node* root)
