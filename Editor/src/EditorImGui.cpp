@@ -205,6 +205,19 @@ void EditorImGui::DrawMenuBar()
 			}
 			ImGui::EndMenu();
 		}
+		for (int x =0 ; x < 90 ; x++)
+			ImGui::Spacing();
+		if (ImGui::Button("Play", { 50,20 }))
+		{
+			SaveSceneNoSpecialisation();
+			m_play = true;
+		}
+		if (m_haveFileSelected && m_scenePathBuffer.length() != 0 && m_play == true) {
+
+			m_command.type = EditorCommand::Type::LUNCH_GAME;
+			m_command.stringParam1 = m_scenePathBuffer + ".json";
+		}
+
 
 		ImGui::EndMainMenuBar();
 	}
@@ -580,6 +593,7 @@ void EditorImGui::ShowCreateSiblingPopup(Node* sibling)
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
 			m_pendingSibling = nullptr;
+
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -715,5 +729,5 @@ void EditorImGui::ApplyInspectorChanges()
 
 	m_pRaylibEditor->UpdateDrawableElement(m_selectedNode->GetName(), m_selectedNode);
 
-	std::cout << "[EditorImGui] Applied inspector changes" << std::endl;
+	//std::cout << "[EditorImGui] Applied inspector changes" << std::endl;
 }

@@ -39,6 +39,8 @@ private:
 
 	void LoadDrawableObject(Node* pNode);
 
+	void StartFoundry(std::string const& path);
+
 	json& GetNodeJson(std::string const& name);
 	void RemoveNode(std::string const& name);
 

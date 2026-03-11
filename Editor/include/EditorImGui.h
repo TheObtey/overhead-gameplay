@@ -26,6 +26,7 @@ struct EditorCommand
 		SAVE_SCENE,
 		LOAD_SCENE,
 		EXIT_EDITOR,
+		LUNCH_GAME,
 		COUNT
 	};
 
@@ -127,6 +128,8 @@ private:
 	// Screen size for UI positioning
 	int m_screenWidth = 1900;
 	int m_screenHeight = 900;
+
+	bool m_play;
 
 	EditorCommand m_command;
 	InspectorNodePropreties m_Inspector;

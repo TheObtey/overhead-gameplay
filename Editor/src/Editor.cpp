@@ -123,10 +123,13 @@ void Editor::ProcessUICommands()
 	case EditorCommand::Type::LOAD_SCENE:
 		LoadScene(cmd.stringParam1);
 		break;
+	case EditorCommand::Type::LUNCH_GAME:
+		StartFoundry(cmd.stringParam1);
 
 	case EditorCommand::Type::EXIT_EDITOR:
 		m_running = false;
 		break;
+
 
 	default:
 		break;
@@ -230,6 +233,14 @@ void Editor::LoadDrawableObject(Node* pNode)
 	{
 		LoadDrawableObject(&pNode->GetChild(i));
 	}
+}
+
+void Editor::StartFoundry(std::string const& path)
+{
+	/*Cd to Game and check if */
+	//std::string cmd = "cd ../Game";
+	//system(cmd.c_str());
+
 }
 
 void Editor::SaveScene(std::string const& path)

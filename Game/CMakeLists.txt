@@ -1,11 +1,11 @@
 project(Game)
 
 set(MAIN "main" CACHE STRING "Select the program entry point")
-set(SOURCE
+set(SOURCEMAIN
     src/${MAIN}.cpp 
 )
 
-add_executable(${PROJECT_NAME} ${SOURCE})
+add_executable(${PROJECT_NAME} ${SOURCEMAIN})
 
 file(COPY ${PROJECT_SOURCE_DIR}/../res/ 
      DESTINATION ${PROJECT_BINARY_DIR}/../Game/res
