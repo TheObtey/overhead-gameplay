@@ -238,8 +238,8 @@ void Transform2D::SetRotation(float _rotX, float _rotY)
 	if (m_isStatic) return;
 
 	m_rotation.x = _rotX;
-	m_rotation.y = _rotY;
-	m_rotation.z = 1.0f;
+	m_rotation.y = 0.0f;
+	m_rotation.z = 0.0f;
 
 	m_isDirty = true;
 }
@@ -290,7 +290,7 @@ bool Transform2D::IsStatic() const
 
 void Transform2D::Update()
 {
-	if (m_isStatic) return;
+	if (m_isStatic || m_isDirty == false) return;
 
 	m_transformationMatrix = glm::mat3(
 		1, 0, 0,
@@ -322,7 +322,7 @@ void Transform2D::Update()
 		m_position.x, m_position.y, 1
 	);
 
-	m_transformationMatrix = T * R * Sh * S;
+	m_transformationMatrix = T * R * S;
 
 	m_isDirty = false;
 }

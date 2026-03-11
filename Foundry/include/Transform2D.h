@@ -1,6 +1,8 @@
 #ifndef FOUNDRY_TRANSFORM2D__H_
 #define FOUNDRY_TRANSFORM2D__H_
 
+#include "Define.h"
+
 #include <glm/glm.hpp>
 
 /// <summary>
@@ -10,7 +12,7 @@
 class Transform2D
 {
 public:
-	enum class Axis : unsigned int
+	enum class Axis : uint32
 	{
 		X = 0,
 		Y = 1,
@@ -63,12 +65,14 @@ public:
 	glm::vec2	GetPosition() const;
 
 	glm::mat3&	GetTransformationMatrix();
-	void		SetTransformationMatrix();
+	void		SetTransformationMatrix() {};
 
 	void		SetStatism(bool _statism);
 	bool		IsStatic() const;
 
 	void		Update();
+
+	bool GetDirty() const { return m_isDirty; }
 
 private:
 	bool m_isStatic;

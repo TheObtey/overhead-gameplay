@@ -76,11 +76,6 @@ public:
 	{
 		m_pNode2D->SetWorldPosition(_pos);
 	}
-	
-	void CheckParentTransform()
-	{
-		m_pNode2D->CheckParentTransform();
-	}
 
 private:
 	Node2D* m_pNode2D;
@@ -109,9 +104,7 @@ BindProxy(Node2D::Proxy,
 
 		"SetWorldScale", BIND(SetWorldScale),
 		"SetWorldRotation", BIND(SetWorldRotation),
-		"SetWorldPosition", BIND(SetWorldPosition),
-
-		"CheckParentTransform", BIND(CheckParentTransform));
+		"SetWorldPosition", BIND(SetWorldPosition));
 );
 
 inline static Node2D::Proxy::ProxyBinding Node2DBinding{};

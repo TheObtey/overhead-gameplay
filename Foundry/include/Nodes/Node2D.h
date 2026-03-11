@@ -15,8 +15,13 @@ public:
 		bool _statism = false
 	);
 	Node2D(Transform2D _transform);
-	Node2D(std::string const& name) : Node(name) {}
-	~Node2D();
+	Node2D(std::string const& name) : Node(name) {
+		OnParentChange += [&](Node& node) {
+			CheckParentTransform(node);
+			UpdateWorld();
+		};
+	}
+	~Node2D() override;
 
 
 	Node2D  operator*(Node2D const& other) const;
@@ -58,7 +63,7 @@ public:
 	virtual void OnUpdate(double _delta) override;
 	virtual void Reparent(Node& _newParent, bool _keepGlobalTransform = true) override;
 	
-	void		CheckParentTransform();
+	void		CheckParentTransform(Node& node);
 
 private:
 	Transform2D m_transform;
@@ -68,7 +73,10 @@ private:
 	glm::vec3 m_worldScale;
 	glm::mat3 m_worldTransform;
 
-	bool m_isParentNode2D;
+	bool m_isParentNode2D = false;
+
+	bool m_worldDirty : 1 = true;
+	bool m_localDirty : 1 = true;
 };
 
 #include "Scripting/Proxies/Node2DProxy.inl"

@@ -79,10 +79,10 @@ int main(int argc, char** argv)
 			parent->SetScale(parent->GetScale().x - 1.0f, parent->GetScale().y - 1.0f);
 		}
 
-		//parent->Update(0.0017);
+		parent->Update(0.0017);
 		//parent->UpdateLocal();
-		parent->UpdateWorld();
-		childRef.UpdateWorld();
+		//parent->UpdateWorld();
+		//childRef.UpdateWorld();
 
 		glm::mat3& m1 = parent->GetTransformationMatrix();
 		glm::mat3& m2 = childRef.GetTransformationMatrix();
