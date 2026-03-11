@@ -24,7 +24,7 @@ protected:
     void Open() override;
 
 private:
-    GLFWwindow* Get() { return m_pWindow;}
+    GLFWwindow* Get() const { return m_pWindow;}
     static std::unordered_map<GLFWwindow*, Window*> s_windows;
     GLFWwindow* m_pWindow;
 

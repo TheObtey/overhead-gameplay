@@ -69,6 +69,8 @@ void Window::Open()
 
 	glfwSetFramebufferSizeCallback(m_pWindow, Window::FrameBufferResizeCallback);
     glfwSetJoystickCallback(EventManager::JoystickCallback);
+    glfwSetKeyCallback(m_pWindow, EventManager::GetKeyCallback);
+    glfwSetMouseButtonCallback(m_pWindow, EventManager::GetMouseButtonCallBack);
 
 #ifdef DEBUG_BUILD
     glEnable(GL_DEBUG_OUTPUT);
