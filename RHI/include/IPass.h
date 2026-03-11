@@ -15,13 +15,6 @@ class IPass
 public:
     virtual ~IPass() = 0;
 
-    virtual void AddShader(IShader const& shader) = 0;
-
-    template <typename ... Args>
-    void AddInput(Args ... args); 
-    
-    //virtual uptr<ITexture> Execute() = 0;
-protected:
-
+    virtual void Execute() = 0;
 };
 #endif //!RHI_IPASS__H_
