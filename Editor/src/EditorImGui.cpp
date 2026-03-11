@@ -28,9 +28,9 @@ void EditorImGui::Init()
 void EditorImGui::SetSceneRoot(Node* root)
 {
 	m_sceneRoot = root;
-	m_viewRoot = root;
 	if (!m_viewRoot || m_viewRoot == m_sceneRoot)
 	{
+		m_viewRoot = root;
 	}
 }
 

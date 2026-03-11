@@ -4,8 +4,7 @@
 #include <Servers/EngineServer.h>
 #include <Serialization/SerializeObject.hpp>
 #include <iostream>
-#include <cstring>
-using namespace rl;
+
 #include <rlImGui.h>
 #include <rlImGuiColors.h>
 #include <Nodes/Node3D.h>
@@ -22,7 +21,7 @@ Editor::~Editor()
 void Editor::Init() 
 {
 	// Initialize Raylib window
-	m_editorRaylib.InitWindow(m_screenWidth, m_screenHeight);
+	m_editorRaylib.Init(m_screenWidth, m_screenHeight);
 
 	// DefaultNode
 	m_sceneRoot = Node::CreateNode<Node>("SceneRoot");

@@ -29,13 +29,13 @@ public:
 	EditorRaylib3D();
 	~EditorRaylib3D();
 
-	void InitWindow(float const& width, float const& height);
+	void Init(float const& width, float const& height);
 	void Render();
 	void Update(float deltaTime);
 	void Shutdown();
 
 	void AddDrawableObject(std::string const& name,Node* jsonObject);
-	void UpdateDrawableElement(std::string const& name, Node const* jsonObject);
+	void UpdateDrawableElement(std::string const& name, Node* pNode);
 	void RemoveDrawableElement(std::string const& elementName);
 
 private:
@@ -46,6 +46,8 @@ private:
 	void Instanciate3DMesh(std::string const& name, Node* nodeMesh3D);
 	void InstanciateCollider3D();
 	void InstanciateLight();
+
+	Matrix FindParentWorldMatrix(Node* pNode);
 
 
 	Matrix ConvertGLMValuesToRaylibMat(glm::vec3 pos, glm::vec3 scale, glm::vec3 rot);

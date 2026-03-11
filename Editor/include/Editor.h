@@ -44,8 +44,8 @@ private:
 
 private:
 	// Editor Parts
-	EditorRaylib3D m_editorRaylib;
-	EditorImGui m_editorImgui;
+	EditorRaylib3D m_editorRaylib = {};
+	EditorImGui m_editorImgui = {};
 
 	// Editor State
 	bool m_running = false;

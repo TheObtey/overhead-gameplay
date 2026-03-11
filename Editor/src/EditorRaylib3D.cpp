@@ -11,10 +11,10 @@ namespace rl
 EditorRaylib3D::EditorRaylib3D(){}
 EditorRaylib3D::~EditorRaylib3D(){}
 
-void EditorRaylib3D::InitWindow(float const& width, float const& height)
+void EditorRaylib3D::Init(float const& width, float const& height)
 {
 	SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
-	//InitWindow(width, height, "Foundry Editor");
+	InitWindow(width, height, "Foundry Editor");
 	SetTargetFPS(144);
 
 	// Static Cam 
@@ -58,8 +58,36 @@ void EditorRaylib3D::AddDrawableObject(std::string const& name, Node* pNode)
 	//}
 }
 
-void EditorRaylib3D::UpdateDrawableElement(std::string const& name, Node const* jsonObject)
+Matrix EditorRaylib3D::FindParentWorldMatrix(Node* pNode)
 {
+	Node3D* pNode3DParent = nullptr; // Node3D
+	Vector3 worldPos = { 0.0f };
+	Vector3 worldScale = { 1.0f,1.0f,1.0f };
+	Vector3 worldRot = { 0.0f };
+
+	pNode3DParent = dynamic_cast<Node3D*>(pNode);
+	while (pNode3DParent == nullptr)
+	{
+		Node* pParent = pNode->GetParent();
+
+		if (pParent == nullptr) break;
+		pNode3DParent = dynamic_cast<Node3D*>(pParent);
+		if (pNode3DParent != nullptr)
+		{
+			worldPos = { pNode3DParent->GetWorldPosition().x,pNode3DParent->GetWorldPosition().y, pNode3DParent->GetWorldPosition().z};
+			worldScale = { pNode3DParent->GetWorldScale().x,pNode3DParent->GetWorldScale().y, pNode3DParent->GetWorldScale().z };
+			worldRot = { pNode3DParent->GetWorldRotation().x,pNode3DParent->GetWorldRotation().y, pNode3DParent->GetWorldRotation().z };
+		}
+	}
+	return rl::MatrixMultiply(rl::MatrixRotateXYZ({ worldRot.x, worldRot.y, worldRot.z }), rl::MatrixMultiply(rl::MatrixScale(worldScale.x, worldScale.y, worldScale.z), rl::MatrixTranslate(worldPos.x, worldPos.y, worldPos.z)));
+}
+
+void EditorRaylib3D::UpdateDrawableElement(std::string const& name, Node* pNode)
+{
+	if (dynamic_cast<Node3D*>(pNode) != nullptr) // TestTemp
+	{
+		m_loadedMeshs[name].get()->worldMatrix = FindParentWorldMatrix(pNode);
+	}
 }
 
 void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3D) // NodeMesh3D
@@ -76,21 +104,7 @@ void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3
 		m_loadedMeshs[name] = std::make_unique<DrawableElement>();
 		m_loadedMeshs[name].get()->mesh = std::make_unique<Mesh>(m_mesh); // GetMesh;..
 
-		Node3D* pNode3DParent = nullptr; // Node3D
-		Vector3 worldPos = { 0.0f };
-		Vector3 worldScale = { 0.0f };
-		Vector3 worldRot = { 0.0f };
-
-		pNode3DParent = dynamic_cast<Node3D*>(pNodeMesh3D);
-		while (pNode3DParent == nullptr)
-		{
-			Node* pParent = pNodeMesh3D->GetParent();
-
-			pNode3DParent = dynamic_cast<Node3D*>(pParent);
-			if (pParent == nullptr) break;
-		}
-		Matrix wMatrix = rl::MatrixMultiply(rl::MatrixRotateXYZ({ worldRot.x, worldRot.y, worldRot.z }),rl::MatrixMultiply(rl::MatrixScale(worldScale.x, worldScale.y, worldScale.z),rl::MatrixTranslate(worldPos.x, worldPos.y, worldPos.z)));
-		m_loadedMeshs[name].get()->worldMatrix = wMatrix;
+		m_loadedMeshs[name].get()->worldMatrix = FindParentWorldMatrix(pNodeMesh3D);
 	}
 }
 
