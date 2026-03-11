@@ -228,7 +228,7 @@ void Transform2D::SetScale(float _x, float _y)
 
 	m_isDirty = true;
 }
-glm::uvec2 Transform2D::GetScale() const
+glm::vec2 Transform2D::GetScale() const
 {
 	return { m_scale.x, m_scale.y };
 }
@@ -254,6 +254,7 @@ void Transform2D::SetPosition(float _u, float _v)
 
 	m_position.x = _u;
 	m_position.y = _v;
+	m_position.z = 1.0f;
 
 	m_isDirty = true;
 }
@@ -263,6 +264,7 @@ void Transform2D::SetPosition(glm::vec2 _position)
 
 	m_position.x = _position.x;
 	m_position.y = _position.y;
+	m_position.z = 1.0f;
 
 	m_isDirty = true;
 }
@@ -309,8 +311,8 @@ void Transform2D::Update()
 	);
 
 	glm::mat3 R = glm::mat3(
-		cos(m_rotation.z), sin(m_rotation.z), 0,
-		-sin(m_rotation.z), cos(m_rotation.z), 0,
+		cos(m_rotation.x), sin(m_rotation.x), 0,
+		-sin(m_rotation.x), cos(m_rotation.x), 0,
 		0, 0, 1
 	);
 

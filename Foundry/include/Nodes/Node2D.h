@@ -15,6 +15,7 @@ public:
 		bool _statism = false
 	);
 	Node2D(Transform2D _transform);
+	Node2D(std::string const& name) : Node(name) {}
 	~Node2D();
 
 
@@ -50,7 +51,7 @@ public:
 	void		UpdateLocal();
 	void		UpdateWorld();
 
-	void		SetWorldScale(glm::vec3& _worldPScale);
+	void		SetWorldScale(glm::vec3& _worldScale);
 	void		SetWorldRotation(glm::vec3& _worldRot);
 	void		SetWorldPosition(glm::vec3& _worldPos);
 

@@ -5,7 +5,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/quaternion.hpp"
 
-
 Node2D::Node2D(
 	float _x, float _y,
 	float _scaleX, float _scaleY,
@@ -78,10 +77,6 @@ Node2D& Node2D::operator/=(Node2D const& other)
 void Node2D::SetScale(glm::vec2 _scale)
 {
 	m_transform.SetScale(_scale);
-	/*for (int i = 0; i < GetChildren().size(); i++)
-	{
-		reinterpret_cast<Node2D&>(GetChild(i)).SetScale(_scale);
-	}*/
 }
 
 void Node2D::SetScale(float  _width, float _height)
@@ -140,7 +135,7 @@ void Node2D::UpdateLocal()
 	Node2D* pParent = static_cast<Node2D*>(GetParent());
 
 	glm::mat3 parentInv = glm::inverse(pParent->m_worldTransform);
-	glm::mat3 localMatrix = parentInv * m_worldTransform;
+	glm::mat3 localMatrix = parentInv * m_transform.GetTransformationMatrix();
 
 	glm::vec2 pos = { localMatrix[2][0], localMatrix[2][1] };
 
@@ -151,9 +146,9 @@ void Node2D::UpdateLocal()
 
 	float rot = atan2(localMatrix[1][0], localMatrix[0][0]);
 
-	m_transform.SetPosition(pos);
 	m_transform.SetScale(scale);
 	m_transform.SetRotation(rot, 0);
+	m_transform.SetPosition(pos);
 }
 
 void Node2D::Reparent(Node& newParent, bool keepGlobalTransform)
@@ -182,8 +177,8 @@ void Node2D::CheckParentTransform()
 
 void Node2D::UpdateWorld()
 {
-	glm::vec2 localPos = m_transform.GetPosition();
 	glm::vec2 localScale = m_transform.GetScale();
+	glm::vec2 localPos = m_transform.GetPosition();
 	
 	float angle = m_transform.GetRotation().x;
 
@@ -207,11 +202,13 @@ void Node2D::UpdateWorld()
 
 	glm::mat3 localMatrix = T * R * S;
 
+	CheckParentTransform();
+
 	if (!m_isParentNode2D)
 	{
 		m_worldTransform = localMatrix;
 	}
-	else
+	else 
 	{
 		Node2D* pParent = static_cast<Node2D*>(GetParent());
 		m_worldTransform = pParent->m_worldTransform * localMatrix;
@@ -232,10 +229,23 @@ void Node2D::UpdateWorld()
 	};
 }
 
-void Node2D::SetWorldPosition(glm::vec3& worldPos)
+void Node2D::SetWorldScale(glm::vec3& _worldScale)
 {
-	m_worldTransform[2][0] = worldPos.x;
-	m_worldTransform[2][1] = worldPos.y;
+	m_worldScale = _worldScale;
+
+	UpdateLocal();
+}
+
+void Node2D::SetWorldRotation(glm::vec3& _worldRot)
+{
+	m_worldRotation = _worldRot;
+
+	UpdateLocal();
+}
+
+void Node2D::SetWorldPosition(glm::vec3& _worldPos)
+{
+	m_worldPosition = _worldPos;
 
 	UpdateLocal();
 }
