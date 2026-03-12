@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(FoundryProject)
 
+
 add_compile_definitions(_X86_)
 
 # Indication to the code that this is a debug build

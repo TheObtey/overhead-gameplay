@@ -546,6 +546,7 @@ void EditorImGui::SaveSceneNoSpecialisation()
 void EditorImGui::SelectedNode(Node* pNode)
 {
 	m_pSelectedNode = pNode;
+	m_pRaylibEditor->SetSelectedNode(pNode->GetName());
 	if (pNode)
 	{
 		std::cout << "[EditorImGui] Selected: " << pNode->GetName() << std::endl;

@@ -51,10 +51,12 @@ public:
 	glm::vec3 GetWorldPosition() const;
 	glm::vec3 GetWorldScale() const;
 	glm::vec3 GetWorldRotation() const;
+	glm::quat GetWorldRotationQuat() const;
 
 	void SetWorldPosition(glm::vec3 const& worldPos);
 	void SetWorldScale(glm::vec3 const& worldScale);
 	void SetWorldRotation(glm::vec3 const& worldRot);
+	void SetWorldRotationQuat(glm::quat const& worldRot);
 												
 	void AddPosition(glm::vec3 const pos)		{ m_transform.AddPosition(glm::vec4(pos, 1.0f)); }
 	void AddX(float const x)					{ m_transform.AddX(x); }

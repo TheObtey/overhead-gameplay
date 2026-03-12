@@ -1,5 +1,6 @@
 ﻿#include "InspectorNodePropreties.h"
 #include "EditorImGui.h"
+#include "EditorRaylib3D.h"
 
 #include <Node.h>
 #include <Serialization/SerializeObject.hpp>
@@ -23,10 +24,11 @@ void InspectorNodePropreties::DrawWindow(bool windowState, Node* pNode)
 		ImGui::PopStyleColor();
 		ImGui::Separator();
 		
-		if (pNode != m_pSelectedNode)
+		if (pNode != m_pSelectedNode || m_pImguiEditor->m_pRaylibEditor->IsGizmoDirty())
 		{
 			m_currentDatas = m_pImguiEditor->LoadInspectorData();
 			m_pSelectedNode = pNode;
+			m_pImguiEditor->m_pRaylibEditor->UpdateDirtyGizmo();
 		}
 
 		if (DrawDatas(m_currentDatas))

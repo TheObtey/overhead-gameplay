@@ -113,6 +113,11 @@ glm::vec3 Node3D::GetWorldRotation() const
 	return glm::eulerAngles(m_worldRotation);
 }
 
+glm::quat Node3D::GetWorldRotationQuat() const
+{
+	return m_worldRotation;
+}
+
 void Node3D::SetWorldPosition(glm::vec3 const& worldPos)
 {
 	m_worldPosition = glm::vec4(worldPos, 1.0f);
@@ -128,6 +133,13 @@ void Node3D::SetWorldScale(glm::vec3 const& worldScale)
 void Node3D::SetWorldRotation(glm::vec3 const& worldRot)
 {
 	m_worldRotation = glm::quat(worldRot);
+	m_worldDirty = true;
+	UpdateLocalTransform();
+}
+
+void Node3D::SetWorldRotationQuat(glm::quat const& worldRot)
+{
+	m_worldRotation = worldRot;
 	m_worldDirty = true;
 	UpdateLocalTransform();
 }

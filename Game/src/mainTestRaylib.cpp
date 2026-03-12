@@ -3,7 +3,7 @@
 // https://github.com/AlexandreGlatz/cmake-generator
 ////////////////////////////////////////////////////
 
-#include <EditorSerializer.h>
+//#include <EditorSerializer.h>
 #include <Servers/EngineServer.h>
 
 //#include "Scripting/Proxies/NodeProxy.inl"
@@ -33,9 +33,9 @@ int main() {
     rootNode.get()->AddChild(rootNode2);
     EngineServer::FlushCommands();
 
-    EditorSerializer::Save("testJson.json", rootNode);
+    //EditorSerializer::Save("testJson.json", rootNode);
 
-    uptr<Node> outRoot = EditorSerializer::LoadFromJson("testJson.json");
+    //uptr<Node> outRoot = EditorSerializer::LoadFromJson("testJson.json");
     EngineServer::FlushCommands();
 
 }
