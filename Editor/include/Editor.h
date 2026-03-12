@@ -37,6 +37,8 @@ private:
 	void SaveSceneNoSpe();
 
 	void LoadDrawableObject(Node* pNode);
+
+	void StartFoundry(std::string const& path);
 private:
 	// Editor Parts
 	EditorRaylib3D m_editorRaylib;

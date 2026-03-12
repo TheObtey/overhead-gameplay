@@ -2,10 +2,10 @@ project(EditorExe)
 
 #file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
-set(MAIN "main" CACHE STRING "Select the program entry point")
+set(MAINEDITOR "main" CACHE STRING "Select the program entry point")
 
 set(SOURCE
-    src/${MAIN}.cpp 
+    src/${MAINEDITOR}.cpp 
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE} )

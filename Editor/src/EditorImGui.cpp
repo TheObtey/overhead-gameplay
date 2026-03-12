@@ -136,6 +136,31 @@ void EditorImGui::DrawMenuBar()
 			}
 			ImGui::EndMenu();
 		}
+		for (int x =0 ; x < 90 ; x++)
+			ImGui::Spacing();
+
+		if (ImGui::Button(m_play ? "Stop" : "Play", ImVec2(60, 0)))
+		{
+			if (!m_play)
+			{
+				SaveSceneNoSpecialisation();
+				m_play = true; // Activer le flag
+			}
+			else
+			{
+				m_play = false;
+				std::cout << "[EditorImGui] Stopping game..." << std::endl;
+			}
+		}
+
+		if (m_haveFileSelected && m_scenePathBuffer.length() != 0 && m_play == true) {
+
+			m_command.type = EditorCommand::Type::LUNCH_GAME;
+			m_command.stringParam1 = m_scenePathBuffer + ".json";
+			m_play = false;
+
+		}
+
 
 		ImGui::EndMainMenuBar();
 	}

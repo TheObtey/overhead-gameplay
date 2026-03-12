@@ -4,6 +4,7 @@
 #include <Servers/EngineServer.h>
 #include <Serialization/SerializeObject.hpp>
 #include <iostream>
+#include <filesystem>
 
 #include <rlImGui.h>
 #include <rlImGuiColors.h>
@@ -123,6 +124,10 @@ void Editor::ProcessUICommands()
 		LoadScene(cmd.stringParam1);
 		break;
 
+	case EditorCommand::Type::LUNCH_GAME:
+		StartFoundry(cmd.stringParam1);
+		break;
+
 	case EditorCommand::Type::EXIT_EDITOR:
 		m_running = false;
 		break;
@@ -133,7 +138,6 @@ void Editor::ProcessUICommands()
 
 	cmd.Reset();
 }
-
 
 void Editor::Render3D()
 {
@@ -228,6 +232,48 @@ void Editor::LoadDrawableObject(Node* pNode)
 	for (uint32 i = 0; i < pNode->GetChildCount(); i++)
 	{
 		LoadDrawableObject(&pNode->GetChild(i));
+	}
+}
+
+void Editor::StartFoundry(std::string const& scenePath)
+{
+	if (!std::filesystem::exists(scenePath))
+	{
+		std::cerr << "[Editor] Scene file not found: " << scenePath << std::endl;
+		return;
+	}
+
+	std::filesystem::path absoluteScenePath = std::filesystem::absolute(scenePath);
+	std::filesystem::path gameExePath;
+
+	gameExePath = "../Game/Game.exe";
+	//gameExePath = "../Game/Game";
+	if (!std::filesystem::exists(gameExePath))
+	{
+		std::cerr << "[Editor] Game executable not found: " << gameExePath << std::endl;
+		std::cerr << "[Editor] Make sure to build the Game project first!" << std::endl;
+		return;
+	}
+	std::filesystem::path absoluteGamePath = std::filesystem::absolute(gameExePath);
+	std::string command;
+
+#ifdef _WIN32
+	// window "start"
+	command = "start \"Foundry Game\" \"" + absoluteGamePath.string() + "\" \"" + absoluteScenePath.string() + "\"";
+#else
+	// Linux ?
+	command = "\"" + absoluteGamePath.string() + "\" \"" + absoluteScenePath.string() + "\" &";
+#endif
+	std::cout << "[Editor] Executing: " << command << std::endl;
+	int result = std::system(command.c_str());
+
+	if (result == 0)
+	{
+		std::cout << "[Editor] Game launched successfully" << std::endl;
+	}
+	else
+	{
+		std::cerr << "[Editor] Failed to launch game (error code: " << result << ")" << std::endl;
 	}
 }
 
