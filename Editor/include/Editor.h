@@ -6,6 +6,9 @@
 
 #include <Define.h>
 #include <Node.h>
+#include <filesystem>
+#include <vector>
+#include <unordered_map>
 
 class Editor
 {
@@ -18,6 +21,8 @@ public:
 	void Shutdown();
 
 private:
+	using ScriptPathMap = std::unordered_map<std::string, std::string>;
+
 	// Main Loop
 	void Update(float deltaTime);
 	void Render3D();
@@ -39,6 +44,12 @@ private:
 	void LoadDrawableObject(Node* pNode);
 
 	void StartFoundry(std::string const& path);
+
+	void CollectLuaScripts(Node* pNode, std::vector<std::filesystem::path>& outScripts);
+	ScriptPathMap CopyLuaScriptsToOverhead(std::filesystem::path const& scenePath, std::filesystem::path const& gameExePath);
+	bool WritePlaySceneWithUpdatedScripts(std::filesystem::path const& outputScenePath, ScriptPathMap const& scriptMap);
+	void UpdateScriptPathsInJson(json& nodeJson, ScriptPathMap const& scriptMap);
+
 private:
 	// Editor Parts
 	EditorRaylib3D m_editorRaylib;

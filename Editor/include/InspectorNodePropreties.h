@@ -1,8 +1,12 @@
 #ifndef EDITOR_INSPECTOR_NODE_PROPERTIES_H__
 #define EDITOR_INSPECTOR_NODE_PROPERTIES_H__
 
-#include <string>
 #include <Serialization/json.hpp>
+
+#include <imgui.h>
+#include <imfilebrowser.h>
+
+#include <string>
 #include <map>
 
 class Node;
@@ -13,7 +17,9 @@ using json = nlohmann::json;
 class InspectorNodePropreties
 {
 public:
-    InspectorNodePropreties(EditorImGui* pImGuiEditor) : m_pImguiEditor(pImGuiEditor) {}
+
+    InspectorNodePropreties(EditorImGui* pImGuiEditor);
+
 
     void DrawWindow(bool windowState, Node* pSelectedNode);
 
@@ -21,6 +27,7 @@ public:
 
 private:
     bool DrawDatas(json& publicDataJson);
+    bool DrawLuaScriptPicker(json& publicDataJson);
 
 private:
     EditorImGui* m_pImguiEditor = nullptr;
@@ -36,6 +43,12 @@ private:
     Node* m_pSelectedNode = nullptr;
 
     json m_currentDatas;
+
+    bool m_showLuaBrowser = false;
+    ImGui::FileBrowser m_luaBrowser;
+    int m_fileBrowsingSizeX = 800;
+    int m_fileBrowsingSizeY = 450;
+
 };
 
 #endif //!EDITOR_INSPECTOR_NODE_PROPERTIES_H__

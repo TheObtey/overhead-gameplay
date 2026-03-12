@@ -202,7 +202,7 @@ void Node::Serialize(SerializedObject& datas) const
 	if (m_pScriptInstance.get() != nullptr)
 		scriptPath = m_pScriptInstance->GetPath();
 
-	datas.AddPrivateElement("m_scriptPath", &scriptPath);
+	datas.AddPublicElement("m_scriptPath", &scriptPath);
 
 	for (uint32 i = 0; i < m_children.size(); i++)
 	{
@@ -217,7 +217,7 @@ void Node::Deserialize(SerializedObject const& datas)
 	std::string t = datas.GetType();
 	datas.GetPublicElement("m_name",&m_name);
 	std::string path = {};
-	datas.GetPrivateElement("m_scriptPath", &path);
+	datas.GetPublicElement("m_scriptPath", &path);
 	if (path != "")
 	{
 		std::cout << "ATTACH " << path << std::endl;

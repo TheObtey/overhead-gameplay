@@ -5,10 +5,13 @@
 #include <Serialization/SerializeObject.hpp>
 #include <iostream>
 #include <filesystem>
+#include <unordered_set>
+#include <fstream>
 
 #include <rlImGui.h>
 #include <rlImGuiColors.h>
 #include <Nodes/Node3D.h>
+
 
 Editor::Editor() : m_editorRaylib() ,m_editorImgui(this,&m_editorRaylib)
 {}
@@ -235,6 +238,7 @@ void Editor::LoadDrawableObject(Node* pNode)
 	}
 }
 
+
 void Editor::StartFoundry(std::string const& scenePath)
 {
 	if (!std::filesystem::exists(scenePath))
@@ -247,31 +251,38 @@ void Editor::StartFoundry(std::string const& scenePath)
 	std::filesystem::path gameExePath;
 
 #ifdef _WIN32
-	// window "start"
 	gameExePath = "../Game/Game.exe";
 #else
-	// Linux ?
 	gameExePath = "../Game/Game";
 #endif
-	
+
 	if (!std::filesystem::exists(gameExePath))
 	{
 		std::cerr << "[Editor] Game executable not found: " << gameExePath << std::endl;
 		std::cerr << "[Editor] Make sure to build the Game project first!" << std::endl;
 		return;
 	}
+
 	std::filesystem::path absoluteGamePath = std::filesystem::absolute(gameExePath);
+
+	ScriptPathMap scriptMap = CopyLuaScriptsToOverhead(absoluteScenePath, absoluteGamePath);
+
+	std::filesystem::path playSceneDir = absoluteGamePath.parent_path() / "Overhead" / "SceneTrees";
+	std::filesystem::create_directories(playSceneDir);
+
+	std::filesystem::path playScenePath = playSceneDir / absoluteScenePath.filename();
+	if (!WritePlaySceneWithUpdatedScripts(playScenePath, scriptMap))
+	{
+		return;
+	}
+
 	std::string command;
 
 #ifdef _WIN32
-	// window "start"
-	command = "start \"Foundry Game\" \"" + absoluteGamePath.string() + "\" \"" + absoluteScenePath.string() + "\"";
+	command = "start \"Foundry Game\" \"" + absoluteGamePath.string() + "\" \"" + playScenePath.string() + "\"";
 #else
-	// Linux ?
-	command = "\"" + absoluteGamePath.string() + "\" \"" + absoluteScenePath.string() + "\" &";
+	command = "\"" + absoluteGamePath.string() + "\" \"" + playScenePath.string() + "\" &";
 #endif
-
-
 
 	std::cout << "[Editor] Executing: " << command << std::endl;
 	int result = std::system(command.c_str());
@@ -283,6 +294,127 @@ void Editor::StartFoundry(std::string const& scenePath)
 	else
 	{
 		std::cerr << "[Editor] Failed to launch game (error code: " << result << ")" << std::endl;
+	}
+}
+
+void Editor::CollectLuaScripts(Node* pNode, std::vector<std::filesystem::path>& outScripts)
+{
+	if (!pNode) return;
+
+	SerializedObject object;
+	pNode->Serialize(object);
+
+	auto const& data = object.GetJson();
+	if (data.contains("PUBLIC_DATAS") && data["PUBLIC_DATAS"].contains("m_scriptPath"))
+	{
+		std::string scriptPath = data["PUBLIC_DATAS"]["m_scriptPath"];
+		if (!scriptPath.empty())
+		{
+			outScripts.emplace_back(scriptPath);
+		}
+	}
+
+	for (uint32 i = 0; i < pNode->GetChildCount(); ++i)
+	{
+		CollectLuaScripts(&pNode->GetChild(i), outScripts);
+	}
+}
+
+Editor::ScriptPathMap Editor::CopyLuaScriptsToOverhead(std::filesystem::path const& scenePath, std::filesystem::path const& gameExePath)
+{
+	ScriptPathMap scriptMap;
+
+	if (!m_sceneRoot) return scriptMap;
+
+	std::filesystem::path scriptsDir = gameExePath.parent_path() / "Overhead" / "Scripts";
+	std::filesystem::create_directories(scriptsDir);
+
+	std::vector<std::filesystem::path> scripts;
+	CollectLuaScripts(m_sceneRoot.get(), scripts);
+
+	std::unordered_set<std::string> uniqueScripts;
+
+	for (std::filesystem::path const& scriptPath : scripts)
+	{
+		std::filesystem::path resolvedPath = scriptPath;
+		if (resolvedPath.is_relative())
+		{
+			resolvedPath = std::filesystem::absolute(scenePath.parent_path() / resolvedPath);
+		}
+
+		if (!std::filesystem::exists(resolvedPath))
+		{
+			std::cerr << "[Editor] Lua script not found: " << resolvedPath << std::endl;
+			continue;
+		}
+
+		if (!uniqueScripts.insert(resolvedPath.string()).second)
+			continue;
+
+		std::filesystem::path targetPath = scriptsDir / resolvedPath.filename();
+		std::filesystem::copy_file(resolvedPath, targetPath, std::filesystem::copy_options::overwrite_existing);
+
+		scriptMap[scriptPath.string()] = targetPath.string();
+		scriptMap[resolvedPath.string()] = targetPath.string();
+	}
+
+	return scriptMap;
+}
+
+bool Editor::WritePlaySceneWithUpdatedScripts(std::filesystem::path const& outputScenePath, ScriptPathMap const& scriptMap)
+{
+	try
+	{
+		if (!m_sceneRoot)
+		{
+			std::cerr << "[Editor] Cannot write play scene: no scene loaded" << std::endl;
+			return false;
+		}
+
+		SerializedObject object;
+		m_sceneRoot->Serialize(object);
+
+		json jsonRoot = json::array();
+		jsonRoot[0]["Root"] = object.GetJson();
+
+		UpdateScriptPathsInJson(jsonRoot[0]["Root"], scriptMap);
+
+		std::filesystem::create_directories(outputScenePath.parent_path());
+		std::ofstream file(outputScenePath, std::ios::out | std::ios::trunc);
+		file << jsonRoot;
+		file.close();
+
+		std::cout << "[Editor] Play scene exported: " << outputScenePath << std::endl;
+		return true;
+	}
+	catch (std::exception const& e)
+	{
+		std::cerr << "[Editor] Failed to write play scene: " << e.what() << std::endl;
+		return false;
+	}
+}
+
+void Editor::UpdateScriptPathsInJson(json& nodeJson, ScriptPathMap const& scriptMap)
+{
+	if (nodeJson.contains("PUBLIC_DATAS") && nodeJson["PUBLIC_DATAS"].contains("m_scriptPath"))
+	{
+		std::string scriptPath = nodeJson["PUBLIC_DATAS"]["m_scriptPath"];
+		if (!scriptPath.empty())
+		{
+			auto it = scriptMap.find(scriptPath);
+			if (it != scriptMap.end())
+			{
+				nodeJson["PUBLIC_DATAS"]["m_scriptPath"] = it->second;
+			}
+		}
+	}
+
+	if (nodeJson.contains("PRIVATE_DATAS") && nodeJson["PRIVATE_DATAS"].contains("Children"))
+	{
+		for (auto& child : nodeJson["PRIVATE_DATAS"]["Children"])
+		{
+			UpdateScriptPathsInJson(child, scriptMap);
+		}
 	}
 }
 

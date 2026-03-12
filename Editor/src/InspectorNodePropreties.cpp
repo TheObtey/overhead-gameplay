@@ -6,71 +6,82 @@
 #include <iostream>
 #include <imgui.h>
 
+InspectorNodePropreties::InspectorNodePropreties(EditorImGui* pImGuiEditor)
+    : m_pImguiEditor(pImGuiEditor),
+      m_luaBrowser(ImGuiFileBrowserFlags_ConfirmOnEnter)
+{
+    m_luaBrowser.SetTitle("Select Lua Script");
+    m_luaBrowser.SetTypeFilters({ ".lua" });
+    m_luaBrowser.SetDirectory("../Game/res");
+}
+
 void InspectorNodePropreties::DrawWindow(bool windowState, Node* pNode)
 {
-	m_isOpen = windowState;
-	if (!m_isOpen) return;
+    m_isOpen = windowState;
+    if (!m_isOpen) return;
 
-	float menuBarHeight = ImGui::GetFrameHeight();
-	ImGui::SetNextWindowPos(ImVec2(m_screenWidth - 400, menuBarHeight), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(400, m_screenHeight - menuBarHeight), ImGuiCond_Always);
-	ImGui::Begin("Inspector", &m_isOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    float menuBarHeight = ImGui::GetFrameHeight();
+    ImGui::SetNextWindowPos(ImVec2(m_screenWidth - 400, menuBarHeight), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(400, m_screenHeight - menuBarHeight), ImGuiCond_Always);
+    ImGui::Begin("Inspector", &m_isOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-	if (pNode)
-	{
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 1.0f, 1.0f));
-		ImGui::Text("Node Properties");
-		ImGui::PopStyleColor();
-		ImGui::Separator();
-		
-		if (pNode != m_pSelectedNode)
-		{
-			m_currentDatas = m_pImguiEditor->LoadInspectorData();
-			m_pSelectedNode = pNode;
-		}
+    if (pNode)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 1.0f, 1.0f));
+        ImGui::Text("Node Properties");
+        ImGui::PopStyleColor();
+        ImGui::Separator();
 
-		if (DrawDatas(m_currentDatas))
-		{
-			m_pImguiEditor->ApplyInspectorChanges(m_currentDatas);
-		}
+        if (pNode != m_pSelectedNode)
+        {
+            m_currentDatas = m_pImguiEditor->LoadInspectorData();
+            m_pSelectedNode = pNode;
+        }
 
-		ImGui::Separator();
+        bool wasModified = DrawDatas(m_currentDatas);
+        wasModified |= DrawLuaScriptPicker(m_currentDatas);
 
-		// Delete button
-		bool isSceneRoot = (m_pSelectedNode->GetParent() == nullptr);
+        if (wasModified)
+        {
+            m_pImguiEditor->ApplyInspectorChanges(m_currentDatas);
+        }
 
-		if (isSceneRoot)
-		{
-			ImGui::BeginDisabled();
-		}
+        ImGui::Separator();
 
-		if (ImGui::Button("Delete Node", ImVec2(-1, 0)))
-		{
-			if (!isSceneRoot)
-			{
-				EditorCommand command = {};
-				command.type = EditorCommand::Type::DELETE_NODE;
-				command.pNodeParam = m_pSelectedNode;
-				m_pSelectedNode = nullptr;
-				m_pImguiEditor->ResetSelectedNode();
-				m_pImguiEditor->SetCommand(command);
-			}
-		}
+        bool isSceneRoot = (m_pSelectedNode->GetParent() == nullptr);
 
-		if (isSceneRoot)
-		{
-			ImGui::EndDisabled();
-			ImGui::TextDisabled("Cannot delete scene root");
-		}
-	}
-	else
-	{
-		ImGui::TextDisabled("No node selected");
-		ImGui::Spacing();
-		ImGui::TextWrapped("Select a node in the Hierarchy panel to view and edit its properties.");
-	}
+        if (isSceneRoot)
+        {
+            ImGui::BeginDisabled();
+        }
 
-	ImGui::End();
+        if (ImGui::Button("Delete Node", ImVec2(-1, 0)))
+        {
+            if (!isSceneRoot)
+            {
+                EditorCommand command = {};
+                command.type = EditorCommand::Type::DELETE_NODE;
+                command.pNodeParam = m_pSelectedNode;
+                m_pSelectedNode = nullptr;
+                m_pImguiEditor->ResetSelectedNode();
+                m_pImguiEditor->SetCommand(command);
+            }
+        }
+
+        if (isSceneRoot)
+        {
+            ImGui::EndDisabled();
+            ImGui::TextDisabled("Cannot delete scene root");
+        }
+    }
+    else
+    {
+        ImGui::TextDisabled("No node selected");
+        ImGui::Spacing();
+        ImGui::TextWrapped("Select a node in the Hierarchy panel to view and edit its properties.");
+    }
+
+    ImGui::End();
 }
 
 bool InspectorNodePropreties::DrawDatas(json& publicDataJson)
@@ -149,4 +160,55 @@ bool InspectorNodePropreties::DrawDatas(json& publicDataJson)
 
 	}
 	return wasModified;
+}
+
+bool InspectorNodePropreties::DrawLuaScriptPicker(json& publicDataJson)
+{
+    bool wasModified = false;
+
+    ImGui::Separator();
+    ImGui::Text("Script");
+
+    std::string scriptPath = "";
+    if (publicDataJson.contains("m_scriptPath"))
+    {
+        scriptPath = publicDataJson["m_scriptPath"].get<std::string>();
+    }
+
+    char scriptBuffer[256];
+    strncpy(scriptBuffer, scriptPath.c_str(), sizeof(scriptBuffer));
+    ImGui::InputText("Lua Script", scriptBuffer, sizeof(scriptBuffer), ImGuiInputTextFlags_ReadOnly);
+
+    ImGui::SameLine();
+    if (ImGui::Button("Browse"))
+    {
+        m_showLuaBrowser = true;
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Clear"))
+    {
+        publicDataJson["m_scriptPath"] = "";
+        wasModified = true;
+    }
+
+    if (m_showLuaBrowser)
+    {
+        m_luaBrowser.Open();
+        m_showLuaBrowser = false;
+    }
+
+    m_luaBrowser.SetWindowSize(m_fileBrowsingSizeX, m_fileBrowsingSizeY);
+    m_luaBrowser.SetWindowPos(m_screenWidth / 2 - m_fileBrowsingSizeX / 2, m_screenHeight / 2 - m_fileBrowsingSizeY / 2);
+    m_luaBrowser.Display();
+
+    if (m_luaBrowser.HasSelected())
+    {
+        publicDataJson["m_scriptPath"] = m_luaBrowser.GetSelected().string();
+        wasModified = true;
+        m_luaBrowser.ClearSelected();
+        m_luaBrowser.Close();
+    }
+
+    return wasModified;
 }

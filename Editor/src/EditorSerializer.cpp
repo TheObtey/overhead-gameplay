@@ -31,6 +31,7 @@ uptr<Node> EditorSerializer::LoadFromJson(std::string path)
 	json jsonFile{ json::parse(file) };
 	file.close();
 
+	std::cout << "Hello " << path << std::endl;
 	SerializedObject object = {};
 	object.m_elementsInSerializedObject = jsonFile[0]["Root"];
 	uptr<Node> firstNode = Node::CreateNode<Node>("Node");
