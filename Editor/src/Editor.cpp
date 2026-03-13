@@ -37,6 +37,8 @@ void Editor::Init()
 	m_editorImgui.SetSceneRoot(m_sceneRoot.get());
 	m_editorImgui.SetScreenSize(m_screenWidth, m_screenHeight);
 
+	std::filesystem::path ScriptStock = "ScriptStock/.foundry";
+	std::filesystem::create_directories(ScriptStock);
 
 	m_running = true;
 	DEBUG( "[Editor] Initialized successfully!" << std::endl);
