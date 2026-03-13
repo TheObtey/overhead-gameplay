@@ -12,7 +12,7 @@ file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 if (MSVC)
     add_compile_options(/bigobj)
 else ()
-    add_compile_options(-Wa,-mbig-obj)
+    #add_compile_options(-Wa,-mbig-obj)
 endif ()
 
 add_library(${PROJECT_NAME} STATIC
@@ -30,6 +30,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ReactPhysics3D::ReactPhysics3D)
 target_link_libraries(${PROJECT_NAME} PUBLIC unofficial::enet::enet)
 target_link_libraries(${PROJECT_NAME} PUBLIC Ore::library)
 target_link_libraries(${PROJECT_NAME} PUBLIC unofficial::lua::lua)
+#target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
 target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
 

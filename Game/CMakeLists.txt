@@ -9,7 +9,7 @@ set(SOURCE
 if (MSVC)
     add_compile_options(/bigobj)
 else ()
-    add_compile_options(-Wa,-mbig-obj)
+    #add_compile_options(-Wa,-mbig-obj)
 endif ()
 
 add_executable(${PROJECT_NAME} ${SOURCE})
