@@ -81,12 +81,16 @@ inline constexpr EnumType& operator&=(EnumType& lhs, EnumType rhs) {            
     lhs = lhs & rhs;                                                              \
     return lhs;                                                                   \
 }                                                                                 \
+inline constexpr EnumType operator~(EnumType rhs) {                               \
+    return static_cast<EnumType>(~static_cast<T>(rhs));                           \
+}                                                                                 \
 inline constexpr bool Any(EnumType value) {                                       \
     return static_cast<T>(value) != 0;                                            \
 }                                                                                 \
 inline constexpr T cast(EnumType value)                                           \
 {                                                                                 \
     return static_cast<T>(value);                                                 \
-}                                                                                 
+} 
+
 
 #endif
