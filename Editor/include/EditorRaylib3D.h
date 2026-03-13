@@ -13,8 +13,8 @@ using json = nlohmann::json;
 struct DrawableElement
 {
 	uptr<Mesh> mesh;
-	Matrix worldMatrix;
-	Node3D* pNode;
+	Matrix worldMatrix; // Raylib Draw
+	Transform gizmoTransform; // Gizmo Transform
 };
 
 enum class GizmoFlags
@@ -78,6 +78,7 @@ private:
 
 	GizmoFlags m_gizmoFlags;
 	bool m_gizmoDirty = false;
+	bool m_updateGizmo = false;
 };
 
 #endif // __EDITOR_RAYLIB3D__H_

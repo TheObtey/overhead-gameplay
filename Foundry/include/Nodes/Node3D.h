@@ -27,6 +27,7 @@ public:
 
 	//Euler angles
 	glm::vec3 GetRotation() const				{ return m_transform.GetRotation(); }
+	glm::quat GetRotationQuat() const			{ return m_transform.GetRotationQuat(); }
 	float GetYaw() const						{ return m_transform.GetYaw(); }
 	float GetPitch() const						{ return m_transform.GetPitch(); }
 	float GetRoll() const						{ return m_transform.GetRoll(); }
@@ -42,6 +43,7 @@ public:
 	void SetY(float const y)					{ m_transform.SetY(y); }
 	void SetZ(float const z)					{ m_transform.SetZ(z); }
 	void SetRotation(glm::vec3 const rot)		{ m_transform.SetRotation(glm::vec4(rot, 1.0f)); }
+	void SetRotationQuat(glm::quat const rot)	{ m_transform.SetRotationQuat(rot); }
 	void SetYaw(float const yaw)				{ m_transform.SetYaw(yaw); }
 	void SetPitch(float const pitch)			{ m_transform.SetPitch(pitch); }
 	void SetRoll(float const roll)				{ m_transform.SetRoll(roll); }

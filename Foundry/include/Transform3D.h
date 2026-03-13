@@ -29,7 +29,7 @@ public:
 	float GetZ() const;
 	const glm::mat4& GetMatrixRotation() const;
 	const glm::mat4& GetInverseMatrixRotation() const;
-	const glm::vec4& GetRotation() const;
+	const glm::vec4 GetRotation() const;
 	const glm::quat& GetRotationQuat() const;
 	float GetYaw() const;
 	float GetPitch() const;

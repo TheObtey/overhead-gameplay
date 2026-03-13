@@ -5,22 +5,24 @@
 #include <Nodes/AllNodes.h>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <cmath>
 
 bool AreMatrixEqual(Matrix const& m1, Matrix const& m2)
 {
-	return (m1.m0 == m2.m0) && (m1.m1 == m2.m1) && (m1.m2 == m2.m2) && (m1.m3 == m2.m3) &&
-		(m1.m4 == m2.m4) && (m1.m5 == m2.m5) && (m1.m6 == m2.m6) && (m1.m7 == m2.m7) &&
-		(m1.m8 == m2.m8) && (m1.m9 == m2.m9) && (m1.m10 == m2.m10) && (m1.m11 == m2.m11) &&
-		(m1.m12 == m2.m12) && (m1.m13 == m2.m13) && (m1.m14 == m2.m14) && (m1.m15 == m2.m15);
+	float EPS = 0.0001f;
+	return ((m1.m0 - m2.m0) < EPS && (m2.m0 - m1.m0) < EPS) && ((m1.m1 - m2.m1) < EPS && (m2.m1 - m1.m1) < EPS) && ((m1.m2 - m2.m2) < EPS && (m2.m2 - m1.m2) < EPS) && ((m1.m3 - m2.m3) < EPS && (m2.m3 - m1.m3) < EPS) &&
+		   ((m1.m4 - m2.m4) < EPS && (m2.m4 - m1.m4) < EPS) && ((m1.m5 - m2.m5) < EPS && (m2.m5 - m1.m5) < EPS) && ((m1.m6 - m2.m6) < EPS && (m2.m6 - m1.m6) < EPS) && ((m1.m7 - m2.m7) < EPS && (m2.m7 - m1.m7) < EPS) &&
+		   ((m1.m8 - m2.m8) < EPS && (m2.m8 - m1.m8) < EPS) && ((m1.m9 - m2.m9) < EPS && (m2.m9 - m1.m9) < EPS) && ((m1.m10 - m2.m10) < EPS && (m2.m10 - m1.m10) < EPS) && ((m1.m11 - m2.m11) < EPS && (m2.m11 - m1.m11) < EPS) &&
+		   ((m1.m12 - m2.m12) < EPS && (m2.m12 - m1.m12) < EPS) && ((m1.m13 - m2.m13) < EPS && (m2.m13 - m1.m13) < EPS) && ((m1.m14 - m2.m14) < EPS && (m2.m14 - m1.m14) < EPS) && ((m1.m15 - m2.m15) < EPS && (m2.m15 - m1.m15) < EPS);
 }
 
 
 bool AreMatrixEqual(glm::mat4x4 const& m1, Matrix const& m2)
 {
-	return (m1[0][0] == m2.m0) && (m1[0][1] == m2.m1) && (m1[0][2] == m2.m2) && (m1[0][2] == m2.m3) &&
-		(m1[1][0] == m2.m4) && (m1[1][1] == m2.m5) && (m1[1][2] == m2.m6) && (m1[1][2] == m2.m7) &&
-		(m1[2][0] == m2.m8) && (m1[2][1] == m2.m9) && (m1[2][2] == m2.m10) && (m1[2][2] == m2.m11) &&
-		(m1[3][0] == m2.m12) && (m1[3][1] == m2.m13) && (m1[3][2] == m2.m14) && (m1[3][2] == m2.m15);
+	return (m1[0][0] == m2.m0) && (m1[0][1] == m2.m1) && (m1[0][2] == m2.m2) && (m1[0][3] == m2.m3) &&
+		(m1[1][0] == m2.m4) && (m1[1][1] == m2.m5) && (m1[1][2] == m2.m6) && (m1[1][3] == m2.m7) &&
+		(m1[2][0] == m2.m8) && (m1[2][1] == m2.m9) && (m1[2][2] == m2.m10) && (m1[2][3] == m2.m11) &&
+		(m1[3][0] == m2.m12) && (m1[3][1] == m2.m13) && (m1[3][2] == m2.m14) && (m1[3][3] == m2.m15);
 }
 
 Matrix GlmToMatrix(glm::mat4x4 const& m1)
@@ -31,6 +33,14 @@ Matrix GlmToMatrix(glm::mat4x4 const& m1)
 			m1[0][2], m1[1][2], m1[2][2], m1[3][2],
 			m1[0][3], m1[1][3], m1[2][3], m1[3][3]
 	};
+}
+
+bool AreTransform3DMAtrixEqual(Transform3D const* m1, Node3D const* m2)
+{
+	bool step = glm::vec3{ m1->GetPosition() } == m2->GetPosition();
+	step = step && glm::vec3{m1->GetScale()} == m2->GetScale();
+	step = step && m1->GetRotationQuat() == m2->GetRotationQuat();
+	return step;	
 }
 
 EditorRaylib3D::EditorRaylib3D() {}
@@ -52,7 +62,7 @@ void EditorRaylib3D::Init(float const& width, float const& height)
 	m_camera.projection = CAMERA_PERSPECTIVE;
 
 	m_defaultMaterial = LoadMaterialDefault();
-
+	m_gizmoFlags = GizmoFlags::TRANSLATE | GizmoFlags::SCALE | GizmoFlags::ROTATE;
 }
 
 void EditorRaylib3D::Update(float deltaTime)
@@ -130,27 +140,22 @@ void EditorRaylib3D::UpdateDrawableElement(Node* pNode)
 	{
 		std::string name = pNode->GetName();
 		Matrix newWorldMatrix = {};
-		Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNode, newWorldMatrix)); // Given by Node
-		//Matrix gMatrix = RayGizmo::GizmoToMatrix(m_loadedMeshs[name].get()->worldTransform); // Given by Gizmo
-
+		Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNode, newWorldMatrix)); // Matrix given by Inspector
 		if (!AreMatrixEqual(newWorldMatrix, m_loadedMeshs[name].get()->worldMatrix))
 		{
-			m_loadedMeshs[name].get()->worldMatrix = newWorldMatrix;
-			glm::vec3 pos = pNode3D->GetWorldPosition();
-			glm::vec3 scale = pNode3D->GetWorldScale();
-			glm::quat rot = pNode3D->GetWorldRotationQuat();
-
-			m_loadedMeshs[name]->pNode = pNode3D;
+			m_loadedMeshs[name]->gizmoTransform.translation = Vector3{ pNode3D->GetWorldPosition().x,pNode3D->GetWorldPosition().y,pNode3D->GetWorldPosition().z};
+			m_loadedMeshs[name]->gizmoTransform.scale = Vector3{ pNode3D->GetWorldScale().x,pNode3D->GetWorldScale().y,pNode3D->GetWorldScale().z};
+			m_loadedMeshs[name]->gizmoTransform.rotation = Quaternion{ pNode3D->GetWorldRotationQuat().x,pNode3D->GetWorldRotationQuat().y,pNode3D->GetWorldRotationQuat().z,pNode3D->GetWorldRotationQuat().w };
 		}
-		else if (!AreMatrixEqual(m_loadedMeshs[name].get()->pNode->GetWorldMatrix(), m_loadedMeshs[name].get()->worldMatrix))
+		else if (m_updateGizmo)
 		{
-			m_loadedMeshs[name].get()->worldMatrix = GlmToMatrix(m_loadedMeshs[name].get()->pNode->GetWorldMatrix());
-			pNode3D->SetWorldPosition(m_loadedMeshs[name].get()->pNode->GetWorldPosition());
-			pNode3D->SetWorldScale(m_loadedMeshs[name].get()->pNode->GetWorldScale());
-			pNode3D->SetWorldRotation(m_loadedMeshs[name].get()->pNode->GetWorldRotation());
-			//pNode3D->Update(1 / 16.0f);
+			m_updateGizmo = false;
+			pNode3D->SetWorldPosition({ m_loadedMeshs[name]->gizmoTransform.translation.x,m_loadedMeshs[name]->gizmoTransform.translation.y,m_loadedMeshs[name]->gizmoTransform.translation.z });
+			pNode3D->SetWorldScale({ m_loadedMeshs[name]->gizmoTransform.scale.x,m_loadedMeshs[name]->gizmoTransform.scale.y,m_loadedMeshs[name]->gizmoTransform.scale.z });
+			pNode3D->SetWorldRotationQuat({ m_loadedMeshs[name]->gizmoTransform.rotation.w,m_loadedMeshs[name]->gizmoTransform.rotation.x,m_loadedMeshs[name]->gizmoTransform.rotation.y,m_loadedMeshs[name]->gizmoTransform.rotation.z });
 			m_gizmoDirty = true;
 		}
+		m_loadedMeshs[name]->worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
 	}
 }
 
@@ -181,18 +186,15 @@ void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3
 		// Custom Mesh with Mesh3D
 		UploadMesh(&m_mesh, false);
 		m_loadedMeshs[name] = std::make_unique<DrawableElement>();
-		m_loadedMeshs[name].get()->mesh = std::make_unique<Mesh>(m_mesh); // GetMesh
+		m_loadedMeshs[name]->gizmoTransform = RayGizmo::GizmoIdentity();
+		m_loadedMeshs[name]->mesh = std::make_unique<Mesh>(m_mesh); // GetMesh
+		m_loadedMeshs[name]->worldMatrix = RayGizmo::GizmoToMatrix(RayGizmo::GizmoIdentity()); // GetMesh
 		Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNodeMesh3D, m_loadedMeshs[name].get()->worldMatrix));
 		if (pNode3D != nullptr)
 		{
-			glm::vec3 pos = pNode3D->GetWorldPosition();
-			glm::vec3 scale = pNode3D->GetWorldScale();
-			glm::quat rot = pNode3D->GetWorldRotationQuat();
-			m_loadedMeshs[name]->pNode = pNode3D;
-		}
-		else
-		{
-			//m_loadedMeshs[name]->worldTransform = RayGizmo::GizmoIdentity();
+			m_loadedMeshs[name]->gizmoTransform.translation = Vector3{ pNode3D->GetWorldPosition().x,pNode3D->GetWorldPosition().y,pNode3D->GetWorldPosition().z };
+			m_loadedMeshs[name]->gizmoTransform.scale = Vector3{ pNode3D->GetWorldScale().x,pNode3D->GetWorldScale().y,pNode3D->GetWorldScale().z };
+			m_loadedMeshs[name]->gizmoTransform.rotation = Quaternion{ pNode3D->GetWorldRotationQuat().x, pNode3D->GetWorldRotationQuat().y,pNode3D->GetWorldRotationQuat().z,pNode3D->GetWorldRotationQuat().w };
 		}
 
 	}
@@ -215,10 +217,13 @@ void EditorRaylib3D::Render()
 
 	for (std::map<std::string, uptr<DrawableElement>>::iterator it  = m_loadedMeshs.begin(); it != m_loadedMeshs.end(); it++)
 	{	
-		DrawMesh(*it->second.get()->mesh.get(), m_defaultMaterial, it->second.get()->worldMatrix);
+		DrawMesh(*it->second->mesh.get(), m_defaultMaterial, it->second->worldMatrix);
 		if (it->first == m_selectedObject)
 		{
-			RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), it->second.get()->pNode);
+			if(RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), &it->second->gizmoTransform))
+			{
+				m_updateGizmo = true;
+			}
 		}
 	}
 
