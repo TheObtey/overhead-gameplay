@@ -409,47 +409,67 @@ int main() {
     cam.fovy = 50.0f;
     cam.projection = CAMERA_PERSPECTIVE;
 
-	// Create physics world
-    rp3d::PhysicsCommon physicsCommon;
-    rp3d::PhysicsWorld::WorldSettings ws;
-	ws.defaultBounciness = 0.0f;
-	ws.defaultFrictionCoefficient = 0.5f;
-    ws.defaultVelocitySolverNbIterations = 3000;
-    ws.defaultPositionSolverNbIterations = 1500;
-    ws.isSleepingEnabled = true;    
-    ws.gravity = { 0, -19.81, 0 };
-    rp3d::PhysicsWorld* world = physicsCommon.createPhysicsWorld(ws);
+	////// Create physics world
+ //   rp3d::PhysicsCommon physicsCommon;
+ //   rp3d::PhysicsWorld::WorldSettings ws;
+	//ws.defaultBounciness = 0.0f;
+	//ws.defaultFrictionCoefficient = 0.5f;
+ //   ws.defaultVelocitySolverNbIterations = 3000;
+ //   ws.defaultPositionSolverNbIterations = 1500;
+ //   ws.isSleepingEnabled = true;    
+ //   ws.gravity = { 0, -19.81, 0 };
+ //   rp3d::PhysicsWorld* world = physicsCommon.createPhysicsWorld(ws);
 
-	//PhysicsServer::Init();
+	PhysicsServer::Init();
 
     // cube
     Vector3 pos = { 0.0f, 1.0f, 0.0f };
+    Vector3 pSize = { 1.0f, 1.0f, 1.0f };
     float   rotY = 0.0f;   
     float   rotX = 0.0f;   
 
-    rp3d::RigidBody* playerBody = world->createRigidBody(
-        rp3d::Transform(rp3d::Vector3(pos.x, pos.y, pos.z),
-            rp3d::Quaternion::identity()));
-    playerBody->setType(rp3d::BodyType::DYNAMIC);
-    playerBody->addCollider(
-        physicsCommon.createBoxShape(rp3d::Vector3(1.0f, 1.0f, 1.0f)),
-        rp3d::Transform::identity());
-	playerBody->enableGravity(true);
-	playerBody->setMass(1.0f);
+    auto RB_player = Node::CreateNode<NodeRigidBody>("rb_player");
+    auto player = Node::CreateNode<Node3D>("player");
+    player.get()->SetPosition({ pos.x,pos.y,pos.z });
+    //player->Update(0.016);
+    RB_player->Init(player.get());
+    RB_player->GetRigidBody().setType(rp3d::BodyType::DYNAMIC);
+    RB_player->AddBoxCollider({ pSize.x, pSize.y, pSize.z });
+    RB_player->GetRigidBody().enableGravity(false);
+    RB_player->GetRigidBody().setMass(1.0f);
+
+    //rp3d::RigidBody* playerBody = world->createRigidBody(
+    //    rp3d::Transform(rp3d::Vector3(pos.x, pos.y, pos.z),
+    //        rp3d::Quaternion::identity()));
+    //playerBody->setType(rp3d::BodyType::DYNAMIC);
+    //playerBody->addCollider(
+    //    physicsCommon.createBoxShape(rp3d::Vector3(1.0f, 1.0f, 1.0f)),
+    //    rp3d::Transform::identity());
+	//playerBody->enableGravity(false);
+	//playerBody->setMass(1.0f);
 
     //  Mur statique 
-    const Vector3   WALL_POS = { 6.0f, 1.0f, 0.0f };
+    const Vector3   WALL_POS = { 3.0f, 1.0f, 0.0f };
     const float     WALL_W = 1.0f;   
     const float     WALL_H = 4.0f;   
     const float     WALL_D = 6.0f;   
 
-    rp3d::RigidBody* wallBody = world->createRigidBody(
+    auto RB_wall = Node::CreateNode<NodeRigidBody>("rb_wall");
+    auto wall = Node::CreateNode<Node3D>("wall");
+    wall.get()->SetPosition({ WALL_POS.x,WALL_POS.y,WALL_POS.z });
+    RB_wall->Init(wall.get());
+    RB_wall->GetRigidBody().setType(rp3d::BodyType::STATIC);
+    RB_wall->AddBoxCollider(Vec3(WALL_W / 2, WALL_H / 2, WALL_D / 2));
+    //RB_wall->GetRigidBody().enableGravity(false);
+    //RB_wall->GetRigidBody().setMass(1.0f);
+
+   /* rp3d::RigidBody* wallBody = world->createRigidBody(
         rp3d::Transform(rp3d::Vector3(WALL_POS.x, WALL_POS.y, WALL_POS.z),
             rp3d::Quaternion::identity()));
     wallBody->setType(rp3d::BodyType::STATIC);
     wallBody->addCollider(
         physicsCommon.createBoxShape(rp3d::Vector3(WALL_W / 2, WALL_H / 2, WALL_D / 2)),
-        rp3d::Transform::identity());
+        rp3d::Transform::identity());*/
 
     //  Sol statique 
     const Vector3   FLOOR_POS = { 0.0f, -1.0f, 0.0f };
@@ -457,13 +477,20 @@ int main() {
     const float     FLOOR_H = 2.0f;   
     const float     FLOOR_D = 100.0f;   
 
-    rp3d::RigidBody* floorBody = world->createRigidBody(
-        rp3d::Transform(rp3d::Vector3(FLOOR_POS.x, FLOOR_POS.y, FLOOR_POS.z),
-            rp3d::Quaternion::identity()));
-    floorBody->setType(rp3d::BodyType::STATIC);
-    floorBody->addCollider(
-        physicsCommon.createBoxShape(rp3d::Vector3(FLOOR_W / 2, FLOOR_H / 2, FLOOR_D / 2)),
-        rp3d::Transform::identity());
+    auto RB_floor = Node::CreateNode<NodeRigidBody>("rb_floor");
+    auto floor = Node::CreateNode<Node3D>("floor");
+    floor.get()->SetPosition({ FLOOR_POS.x,FLOOR_POS.y,FLOOR_POS.z });
+    RB_floor->Init(floor.get());
+    RB_floor->GetRigidBody().setType(rp3d::BodyType::STATIC);
+    RB_floor->AddBoxCollider(Vec3(FLOOR_W / 2, FLOOR_H / 2, FLOOR_D / 2));
+
+    //rp3d::RigidBody* floorBody = world->createRigidBody(
+    //    rp3d::Transform(rp3d::Vector3(FLOOR_POS.x, FLOOR_POS.y, FLOOR_POS.z),
+    //        rp3d::Quaternion::identity()));
+    //floorBody->setType(rp3d::BodyType::STATIC);
+    //floorBody->addCollider(
+    //    physicsCommon.createBoxShape(rp3d::Vector3(FLOOR_W / 2, FLOOR_H / 2, FLOOR_D / 2)),
+    //    rp3d::Transform::identity());
 
     // params
     const float SPEED = 4.0f;
@@ -472,15 +499,18 @@ int main() {
     float accumulator = 0.0f;
     bool  isColliding = false;
 
-    playerBody->setAngularLockAxisFactor(rp3d::Vector3(0, 0, 0));
-    playerBody->setLinearDamping(8.0f);
+    //RB_player->GetRigidBody().setAngularLockAxisFactor(rp3d::Vector3(0.9, 0.9, 0.9));
+    //playerBody->setLinearLockAxisFactor
+    //RB_player->GetRigidBody().setLinearDamping(8.0f);
+    //playerBody->setAngularDamping(8.0f);
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         if (dt <= 0.0f || dt > 0.1f) dt = FIXED_DT;
 
         // --- move  ---
-        rp3d::Vector3 currentVel = playerBody->getLinearVelocity();
+        //rp3d::Vector3 currentVel = playerBody->getLinearVelocity();
+        rp3d::Vector3 currentVel = RB_wall->GetRigidBody().getLinearVelocity();
 
         rp3d::Vector3 input(0, 0, 0);
         if (IsKeyDown(KEY_W)) input.z += SPEED;
@@ -502,26 +532,51 @@ int main() {
             input.z + currentVel.z 
         );
 
-        playerBody->setLinearVelocity(newVel);
+        //playerBody->setLinearVelocity(newVel);
+        RB_player->GetRigidBody().setLinearVelocity(newVel);
 
+        //auto rotQuat = playerBody->getTransform().getOrientation();
+        auto rotQuat = RB_player->GetRigidBody().getTransform().getOrientation();
+        //auto aVel = playerBody->getAngularVelocity();
+        auto aVel = RB_player->GetRigidBody().getAngularVelocity();
         // --- rotate ---
-        if (IsKeyDown(KEY_LEFT))  rotY -= ROT_SPEED * dt;
-        if (IsKeyDown(KEY_RIGHT)) rotY += ROT_SPEED * dt;
-        if (IsKeyDown(KEY_UP))    rotX -= ROT_SPEED * dt;
-        if (IsKeyDown(KEY_DOWN))  rotX += ROT_SPEED * dt;
-        
+        if (IsKeyDown(KEY_LEFT))  aVel.x -= ROT_SPEED * dt;
+        if (IsKeyDown(KEY_RIGHT)) aVel.x += ROT_SPEED * dt;
+        if (IsKeyDown(KEY_DOWN))  aVel.y += ROT_SPEED * dt;
+        if (IsKeyDown(KEY_UP))    aVel.y -= ROT_SPEED * dt;
+
+        //playerBody->setAngularVelocity(aVel);
+        RB_player->GetRigidBody().setAngularVelocity(aVel);
+
+        //playerBody->applyLocalForceAtLocalPosition({ 0.0,0.0,10.0 }, { 10.0,0.0,0.0 });
+        //playerBody->applyLocalForceAtLocalPosition({ 0.0,0.0,10.0 }, {  0.0,0.0,10.0 }); // yaw
+        //playerBody->applyLocalTorque({ 0.0,1000.0,100.0 });
+        //playerBody->applyLocalForceAtLocalPosition({ 0.0,0.0,-1.0 }, { 1.0,0.0,0.0 }); // yaw
+                       
+
 		// --- update physics ---
         accumulator += dt;
         while (accumulator >= FIXED_DT) {
-            world->update(FIXED_DT);
+            //world->update(FIXED_DT);
+            PhysicsServer::GetPhysicsWorld().update(FIXED_DT);
             accumulator -= FIXED_DT;
         }
-        rp3d::Vector3 p = playerBody->getTransform().getPosition();
+        RB_player->Update(dt);
+        player->Update(dt);
+
+        RB_wall->Update(dt);
+        wall->Update(dt);
+        RB_floor->Update(dt);
+        floor->Update(dt);
+        
+        //rp3d::Vector3 p = playerBody->getTransform().getPosition();
+        rp3d::Vector3 p = RB_player->GetRigidBody().getTransform().getPosition();
         pos = { p.x, p.y, p.z };
 
         // --- test overlap ---
         OverlapCB cb;
-        world->testOverlap(playerBody, cb);
+        //world->testOverlap(playerBody, cb);
+        PhysicsServer::GetPhysicsWorld().testOverlap(&RB_player->GetRigidBody(), cb);
         isColliding = cb.hit;
 
         // --- draw ---
@@ -530,18 +585,28 @@ int main() {
 
         BeginMode3D(cam);
         DrawGrid(30, 1.0f);
+    
+        auto draw = [&](Vector3 p, rp3d::Quaternion q, Color c) {
+            // Convertir le quaternion rp3d en matrice column-major pour rlgl
+            float mat[16] = {
+                1 - 2 * (q.y * q.y + q.z * q.z),  2 * (q.x * q.y + q.w * q.z),      2 * (q.x * q.z - q.w * q.y),      0,
+                2 * (q.x * q.y - q.w * q.z),      1 - 2 * (q.x * q.x + q.z * q.z),  2 * (q.y * q.z + q.w * q.x),      0,
+                2 * (q.x * q.z + q.w * q.y),      2 * (q.y * q.z - q.w * q.x),      1 - 2 * (q.x * q.x + q.y * q.y),  0,
+                p.x,                          p.y,                          p.z,                          1
+            };
+            rlPushMatrix();
+            rlMultMatrixf(mat);
+            Color cubeColor = isColliding ? Color{ 255, 60, 60, 255 } : c;
+            DrawCube({ 0,0,0 }, 2.0f, 2.0f, 2.0f, cubeColor);
+            DrawCubeWires({ 0,0,0 }, 2.0f, 2.0f, 2.0f, DARKBLUE);
+            rlPopMatrix();
+            };
+
 
         // Cube joueur
-        rlPushMatrix();
-        rlTranslatef(pos.x, pos.y, pos.z);
-        rlRotatef(rotY, 0, 1, 0);
-        rlRotatef(rotX, 1, 0, 0);
-        Color cubeColor = isColliding
-            ? Color{ 255,  60,  60, 255 }
-        : Color{ 80, 160, 255, 255 };
-        DrawCube({ 0,0,0 }, 2.0f, 2.0f, 2.0f, cubeColor);
-        DrawCubeWires({ 0,0,0 }, 2.0f, 2.0f, 2.0f, DARKBLUE);
-        rlPopMatrix();
+        //draw(pos,playerBody->getTransform().getOrientation(), {80, 160, 255, 255});
+        draw(pos, RB_player->GetRigidBody().getTransform().getOrientation(), {80, 160, 255, 255});
+
 
         // Mur
         DrawCube(WALL_POS, WALL_W, WALL_H, WALL_D, { 180, 140, 80, 255 });
@@ -559,10 +624,12 @@ int main() {
         else
             DrawText("Aucune collision", 20, 118, 20, GREEN);
 
-        DrawText(TextFormat("Pos: (%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z),
-            10, GetScreenHeight() - 48, 16, GRAY);
-        DrawText(TextFormat("Rot: Y=%.1f  X=%.1f", rotY, rotX),
-            10, GetScreenHeight() - 26, 16, GRAY);
+        DrawText(TextFormat("RB_Pos: (%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z),
+            10, GetScreenHeight() - 48, 16, BLACK);
+        DrawText(TextFormat("PlayerPos: (%.1f, %.1f, %.1f)", player->GetPosition().x, player->GetPosition().y, player->GetPosition().z),
+            10, GetScreenHeight() - 26, 16, BLACK);
+        //DrawText(TextFormat("Rot: Y=%.1f  X=%.1f", rotY, rotX),
+        //    10, GetScreenHeight() - 26, 16, BLACK);
 
         EndDrawing();
     }

@@ -113,6 +113,10 @@ glm::vec3 Node3D::GetWorldRotation() const
 {
 	return glm::eulerAngles(m_worldRotation);
 }
+glm::quat Node3D::GetWorldRotationQuaternion() const
+{
+	return m_worldRotation;
+}
 
 void Node3D::SetWorldPosition(glm::vec3 const& worldPos)
 {

@@ -54,6 +54,7 @@ public:
 	glm::vec3 GetWorldPosition() const;
 	glm::vec3 GetWorldScale() const;
 	glm::vec3 GetWorldRotation() const;
+	glm::quat GetWorldRotationQuaternion() const;
 
 	void SetWorldPosition(glm::vec3 const& worldPos);
 	void SetWorldScale(glm::vec3 const& worldScale);

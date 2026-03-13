@@ -15,6 +15,10 @@ struct Vec3 : public rp::Vector3
 {
 	Vec3(float x, float y, float z) : rp::Vector3(x,y,z)
 	{ }
+	operator glm::vec3()
+	{
+		return glm::vec3(x, y, z);
+	}
 };
 
 class NodeRigidBody : public Node
