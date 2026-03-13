@@ -9,65 +9,45 @@ class Node2D : public Node
 public:
 	class Proxy;
 
-	Node2D(
-		float _x = 0.0f, float _y = 0.0f,
-		float _scaleX = 1.0f, float _scaleY = 1.0f,
-		bool _statism = false
-	);
-	Node2D(Transform2D _transform);
-	Node2D(std::string const& name) : Node(name) {
-		OnParentChange += [&](Node& node) {
-			CheckParentTransform(node);
-			UpdateWorld();
-		};
-	}
+	Node2D(std::string const& name);
 	~Node2D() override;
 
+	void				SetScale(glm::vec2 const& _scale);
+	void				SetScale(float _width, float _height);
+	glm::vec2 const&	GetScale() const;
 
-	Node2D  operator*(Node2D const& other) const;
-	Node2D& operator*=(Node2D const& other);
-	
-	Node2D  operator+(Node2D const& other) const;
-	Node2D& operator+=(Node2D const& other);
-	
-	Node2D  operator-(Node2D const& other) const;
-	Node2D& operator-=(Node2D const& other);
-	
-	Node2D  operator/(Node2D const& other) const;
-	Node2D& operator/=(Node2D const& other);
+	void				SetRotation(float _theta);
+	float				GetRotation() const;
 
+	void				SetShearing(glm::vec2 const& shear);
+	glm::vec2 const&	GetShearing() const;
 
-	void		SetScale(glm::vec2 _scale);
-	void		SetScale(float _width, float _height);
-	glm::vec2	GetScale() const;
+	void				SetPosition(glm::vec2 const& _pos);
+	void				SetPosition(float _x, float _y);
+	glm::vec2 const&	GetPosition() const;
 
-	void		SetRotation(float _theta);
-	float		GetRotation() const;
+	glm::mat3 const&	GetTransformationMatrix();
 
-	void		SetPosition(glm::vec2 _pos);
-	void		SetPosition(float _x, float _y);
-	glm::vec2	GetPosition() const;
+	void				SetMirroringOnAxis(Transform2D::Axis _axis);
 
-	glm::mat3&	GetTransformationMatrix();
+	void				SetStatism(bool _statism);
+	bool				IsStatic() const;
 
-	void		SetStatism(bool _statism);
-	bool		IsStatic() const;
+	void				SetWorldScale(glm::vec3 const& _worldScale);
+	void				SetWorldRotationAngle(float _worldRot);
+	void				SetWorldPosition(glm::vec3 const& _worldPos);
 
-	void		UpdateLocal();
-	void		UpdateWorld();
+	glm::vec3			const& GetWorldPosition() const;
+	glm::vec3			const& GetWorldScale() const;
+	float				GetWorldRotation() const;
 
-	void		SetWorldScale(glm::vec3 const& _worldScale);
-	void		SetWorldRotationAngle(float _worldRot);
-	void		SetWorldPosition(glm::vec3 const& _worldPos);
+	virtual void		OnUpdate(double _delta) override;
+	virtual void		Reparent(Node& _newParent, bool _keepGlobalTransform = true) override;
 
-	glm::vec3 const& GetWorldPosition() const { return m_worldPosition; }
-	glm::vec3 const& GetWorldScale() const { return m_worldScale; }
-	float GetWorldRotation() const { return m_worldRotationAngle; }
-
-	virtual void OnUpdate(double _delta) override;
-	virtual void Reparent(Node& _newParent, bool _keepGlobalTransform = true) override;
-	
-	void		CheckParentTransform(Node& node);
+private:
+	void				CheckParentTransform(Node& node);
+	void				UpdateLocal();
+	void				UpdateWorld();
 
 private:
 	Transform2D m_transform;

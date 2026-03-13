@@ -1,95 +1,37 @@
 #include "Nodes/Node2D.h"
 
-#include "glm/glm.hpp"
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/quaternion.hpp"
+#include "glm/glm.hpp"
 
-Node2D::Node2D(
-	float _x, float _y,
-	float _scaleX, float _scaleY,
-	bool _statism) : 
-	Node("Node2D"),
-	m_transform(
-		_x, _y,
-		_scaleX, _scaleY,
-		_statism),
-	m_worldScale(),
-	m_worldPosition(),
-	m_worldRotationAngle(),
-	m_worldTransform(),
-	m_isParentNode2D(false)
-{}
 
-Node2D::Node2D(Transform2D _transform) : 
-	Node("Node2D"),
-	m_transform(_transform), 
-	m_worldScale(),
-	m_worldPosition(),
-	m_worldRotationAngle(),
-	m_worldTransform(),
-	m_isParentNode2D(false)
-{}
+Node2D::Node2D(std::string const &name) : Node(name)
+{
+	OnParentChange += [&](Node& node)
+	{
+			CheckParentTransform(node);
+			UpdateWorld();
+	};
+}
 
 Node2D::~Node2D() {}
 
-
-Node2D Node2D::operator*(Node2D const& other) const
-{
-	return Node2D(m_transform * other.m_transform);
-}
-Node2D& Node2D::operator*=(Node2D const& other)
-{
-	m_transform *= other.m_transform;
-	return *this;
-}
-		
-Node2D Node2D::operator+(Node2D const& other) const
-{
-	return m_transform + other.m_transform;
-}
-Node2D& Node2D::operator+=(Node2D const& other)
-{
-	m_transform += other.m_transform;
-	return *this;
-}
-
-Node2D Node2D::operator-(Node2D const& other) const
-{
-	return m_transform - other.m_transform;
-}
-Node2D& Node2D::operator-=(Node2D const& other)
-{
-	m_transform -= other.m_transform;
-	return *this;
-}
-
-Node2D Node2D::operator/(Node2D const& other) const
-{
-	return m_transform / other.m_transform;
-}
-Node2D& Node2D::operator/=(Node2D const& other)
-{
-	m_transform /= other.m_transform;
-	return *this;
-}
-
-void Node2D::SetScale(glm::vec2 _scale)
+void Node2D::SetScale(glm::vec2 const& _scale)
 {
 	m_transform.SetScale(_scale);
 }
 
-void Node2D::SetScale(float  _width, float _height)
+void Node2D::SetScale(float const _width, float const _height)
 {
 	m_transform.SetScale(_width, _height);
 }
 
-glm::vec2 Node2D::GetScale() const
+glm::vec2 const& Node2D::GetScale() const
 {
 	return m_transform.GetScale();
 }
 
-void Node2D::SetRotation(float _theta)
+void Node2D::SetRotation(float const _theta)
 {
 	m_transform.SetRotation(_theta);
 }
@@ -98,22 +40,37 @@ float Node2D::GetRotation() const
 	return m_transform.GetRotation();
 }
 
-void Node2D::SetPosition(glm::vec2 _pos)
+void Node2D::SetShearing(glm::vec2 const &shear)
+{
+	m_transform.SetShearing(shear);
+}
+
+glm::vec2 const & Node2D::GetShearing() const
+{
+	return m_transform.GetShearing();
+}
+
+void Node2D::SetPosition(glm::vec2 const& _pos)
 {
 	m_transform.SetPosition(_pos);
 }
-void Node2D::SetPosition(float _x, float _y)
+void Node2D::SetPosition(float const _x, float const _y)
 {
 	m_transform.SetPosition(_x, _y);
 }
-glm::vec2 Node2D::GetPosition() const
+glm::vec2 const& Node2D::GetPosition() const
 {
 	return m_transform.GetPosition();
 }
 
-glm::mat3& Node2D::GetTransformationMatrix()
+glm::mat3 const& Node2D::GetTransformationMatrix()
 {
 	return m_worldTransform;
+}
+
+void Node2D::SetMirroringOnAxis(Transform2D::Axis const _axis)
+{
+	m_transform.SetMirroringOnAxis(_axis);
 }
 
 void Node2D::SetStatism(bool _statism)
@@ -212,7 +169,7 @@ void Node2D::SetWorldScale(glm::vec3 const& _worldScale)
 	UpdateLocal();
 }
 
-void Node2D::SetWorldRotationAngle(float _worldRot)
+void Node2D::SetWorldRotationAngle(float const _worldRot)
 {
 	m_worldRotationAngle = _worldRot;
 	m_worldDirty = true;
@@ -226,7 +183,22 @@ void Node2D::SetWorldPosition(glm::vec3 const& _worldPos)
 	UpdateLocal();
 }
 
-void Node2D::OnUpdate(double _delta)
+glm::vec3 const & Node2D::GetWorldPosition() const
+{
+	return m_worldPosition;
+}
+
+glm::vec3 const & Node2D::GetWorldScale() const
+{
+	return m_worldScale;
+}
+
+float Node2D::GetWorldRotation() const
+{
+	return m_worldRotationAngle;
+}
+
+void Node2D::OnUpdate(double const _delta)
 {
 	Node::OnUpdate(_delta);
 	m_localDirty = m_transform.GetDirty();

@@ -62,7 +62,6 @@ int main(int argc, char** argv)
 			childRef.SetWorldPosition(childRef.GetWorldPosition() - glm::vec3(0.0, 0.1f, 0.0));
 
 		}
-		
 		if (IsKeyDown(KEY_A))
 		{
 			parent->SetRotation(parent->GetRotation() + 0.1f);
@@ -81,13 +80,23 @@ int main(int argc, char** argv)
 			parent->SetScale(parent->GetScale().x - 1.0f, parent->GetScale().y - 1.0f);
 		}
 
+		if (IsKeyDown(KEY_V))
+		{
+			parent->SetMirroringOnAxis(Transform2D::Axis::Y);
+		}
+
+		if (IsKeyDown(KEY_B))
+		{
+			parent->SetShearing(parent->GetShearing() + glm::vec2(0.01f, 0.0f));
+		}
+
 		parent->Update(0.0017);
 		//parent->UpdateLocal();
 		//parent->UpdateWorld();
 		//childRef.UpdateWorld();
 
-		glm::mat3& m1 = parent->GetTransformationMatrix();
-		glm::mat3& m2 = childRef.GetTransformationMatrix();
+		glm::mat3 const& m1 = parent->GetTransformationMatrix();
+		glm::mat3 const& m2 = childRef.GetTransformationMatrix();
 
 		Matrix rlMat1 = {
 			m1[0][0], m1[1][0],   0.0f,    m1[2][0],
@@ -102,7 +111,6 @@ int main(int argc, char** argv)
 			  0.0f,     0.0f,     1.0f,    0.0f,
 			  0.0f,     0.0f,     0.0f,    1.0f
 		};
-
 
 
 		BeginDrawing();

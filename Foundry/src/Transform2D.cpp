@@ -175,13 +175,13 @@ Transform2D& Transform2D::operator/=(Transform2D const& _other)
 }
 
 
-void Transform2D::SetShearing(glm::vec2 _shear)
+void Transform2D::SetShearing(glm::vec2 const& _shear)
 {
 	m_shear = { _shear.x, _shear.y, 1.0f };
 
 	m_isDirty = true;
 }
-void Transform2D::SetShearing(float _shearX, float _shearY)
+void Transform2D::SetShearing(float const _shearX, float const _shearY)
 {
 	m_shear = { _shearX, _shearY, 1.0f };
 
@@ -189,23 +189,23 @@ void Transform2D::SetShearing(float _shearX, float _shearY)
 }
 void Transform2D::SetShearingOnAxis(Axis _axis, float _shear)
 {
-	m_shear[static_cast<int>(_axis)] = _shear;
+	m_shear[static_cast<int32>(_axis)] = _shear;
 
 	m_isDirty = true;
 }
-glm::vec2 Transform2D::GetShearing() const
+glm::vec2 const& Transform2D::GetShearing() const
 {
-	return { m_shear.x, m_shear.y };
+	return m_shear;
 }
 
 void Transform2D::SetMirroringOnAxis(Axis _axis)
 {
-	m_position[static_cast<int>(_axis)] *= -1.0f;
+	m_position[static_cast<int32>(_axis)] *= -1.0f;
 
 	m_isDirty = true;
 }
 
-void Transform2D::SetScale(glm::vec2 _scale)
+void Transform2D::SetScale(glm::vec2 const& _scale)
 {
 	if (m_isStatic) return;
 
@@ -228,12 +228,12 @@ void Transform2D::SetScale(float _x, float _y)
 
 	m_isDirty = true;
 }
-glm::vec2 Transform2D::GetScale() const
+glm::vec2 const& Transform2D::GetScale() const
 {
-	return { m_scale.x, m_scale.y };
+	return m_scale;
 }
 
-void Transform2D::SetRotation(float _theta)
+void Transform2D::SetRotation(float const _theta)
 {
 	if (m_isStatic) return;
 
@@ -246,7 +246,7 @@ float Transform2D::GetRotation() const
 	return m_theta;
 }
 
-void Transform2D::SetPosition(float _u, float _v)
+void Transform2D::SetPosition(float const _u, float const _v)
 {
 	if (m_isStatic) return;
 
@@ -256,7 +256,7 @@ void Transform2D::SetPosition(float _u, float _v)
 
 	m_isDirty = true;
 }
-void Transform2D::SetPosition(glm::vec2 _position)
+void Transform2D::SetPosition(glm::vec2 const& _position)
 {
 	if (m_isStatic) return;
 
@@ -266,17 +266,17 @@ void Transform2D::SetPosition(glm::vec2 _position)
 
 	m_isDirty = true;
 }
-glm::vec2 Transform2D::GetPosition() const
+glm::vec2 const& Transform2D::GetPosition() const
 {
 	return { m_position.x, m_position.y };
 }
 
-glm::mat3& Transform2D::GetTransformationMatrix()
+glm::mat3 const& Transform2D::GetTransformationMatrix() const
 {
 	return m_transformationMatrix;
 }
 
-void Transform2D::SetStatism(bool _statism)
+void Transform2D::SetStatism(bool const _statism)
 {
 	m_isStatic = _statism;
 }
@@ -301,6 +301,12 @@ void Transform2D::Update()
 		0, 0, 1
 	);
 
+	glm::mat3 Sh = glm::mat3(
+		1, m_shear.x, 0,
+		m_shear.y, 1, 0,
+		0, 0, 1
+	);
+
 	glm::mat3 R = glm::mat3(
 		cos(m_theta), -sin(m_theta), 0,
 		sin(m_theta), cos(m_theta), 0,
@@ -313,7 +319,12 @@ void Transform2D::Update()
 		m_position.x, m_position.y, 1
 	);
 
-	m_transformationMatrix = T * R * S;
+	m_transformationMatrix = T * R * Sh *  S;
 
 	m_isDirty = false;
+}
+
+bool Transform2D::GetDirty() const
+{
+	return m_isDirty;
 }

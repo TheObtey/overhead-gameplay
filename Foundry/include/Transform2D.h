@@ -14,8 +14,8 @@ class Transform2D
 public:
 	enum class Axis : uint32
 	{
-		X = 0,
-		Y = 1,
+		Y = 0,
+		X = 1,
 		Z = 2
 	};
 
@@ -46,33 +46,33 @@ public:
 	Transform2D& operator/=(Transform2D const& other);
 
 
-	void		SetShearing(glm::vec2 _shear);
-	void		SetShearing(float _u, float _v);
-	void		SetShearingOnAxis(Axis _axis, float _shear);
-	glm::vec2	GetShearing() const;
+	void				SetShearing(glm::vec2 const& _shear);
+	void				SetShearing(float _u, float _v);
+	void				SetShearingOnAxis(Axis _axis, float _shear);
+	glm::vec2 const&	GetShearing() const;
 
-	void		SetMirroringOnAxis(Axis _axis);
+	void				SetMirroringOnAxis(Axis _axis);
 
-	void		SetScale(glm::vec2 _scale);
-	void		SetScale(float _width, float _height);
-	glm::vec2	GetScale() const;
+	void				SetScale(glm::vec2 const& _scale);
+	void				SetScale(float _width, float _height);
+	glm::vec2 const&	GetScale() const;
 
-	void		SetRotation(float _theta);
-	float		GetRotation() const;
+	void				SetRotation(float _theta);
+	float				GetRotation() const;
 
-	void		SetPosition(glm::vec2 _pos);
-	void		SetPosition(float _x, float _y);
-	glm::vec2	GetPosition() const;
+	void				SetPosition(glm::vec2 const& _pos);
+	void				SetPosition(float _x, float _y);
+	glm::vec2 const&	GetPosition() const;
 
-	glm::mat3&	GetTransformationMatrix();
-	void		SetTransformationMatrix(glm::mat3 const& mat) { m_transformationMatrix = mat; }
+	glm::mat3 const&	GetTransformationMatrix() const;
+	void				SetTransformationMatrix(glm::mat3 const& mat) { m_transformationMatrix = mat; }
 
-	void		SetStatism(bool _statism);
-	bool		IsStatic() const;
+	void				SetStatism(bool _statism);
+	bool				IsStatic() const;
 
-	void		Update();
+	void				Update();
 
-	bool GetDirty() const { return m_isDirty; }
+	bool GetDirty() const;
 
 private:
 	bool m_isStatic = false;
