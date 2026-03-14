@@ -7,13 +7,16 @@
 class Pass : public IPass
 {
 public:
-    Pass(Shader& shader);
+    Pass(Shader const& shader);
+    Pass(Pass& other) {m_pShader = other.m_pShader;}
     ~Pass() override;
 
-    virtual void Execute() override = 0;
+    virtual void Execute() override {};
+    virtual void SetGBuffer(uint32 gbuffer) override {m_gBuffer = gbuffer;}
 
 protected:
     sptr<Shader> m_pShader;
+    uint32 m_gBuffer;
 
 };
 
