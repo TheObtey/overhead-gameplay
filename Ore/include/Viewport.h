@@ -2,8 +2,10 @@
 #define ORE_VIEWPORT__H_
 
 #include "IViewport.h"
+#include "RenderGraph.h"
 
 class Window;
+class Pass;
 class Viewport : public IViewport
 {
 public:
@@ -20,11 +22,14 @@ public:
     void Clear() override;
     void Present() override;
 
+    void AddPass(Pass& pass);
+
 protected:
     void Display() override; 
 
 private:
     sptr<Window> m_pWindow;
+    uptr<RenderGraph> m_pRenderGraph;
 };
 
 #endif

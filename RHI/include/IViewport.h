@@ -5,6 +5,7 @@
 #include "IWindow.h"
 #include "Color.h"
 
+class IPass;
 class IViewport
 {
 public:

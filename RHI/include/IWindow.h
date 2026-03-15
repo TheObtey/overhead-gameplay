@@ -21,7 +21,7 @@ public:
    
     Event<void()> onOpenEvent;
     Event<void()> onCloseEvent;
-    Event<void()> onResizeEvent;
+    Event<void(uint32 sizeX, uint32 sizeY)> onResizeEvent;
 
 protected:
     virtual void Open() = 0;
