@@ -73,10 +73,10 @@ void Window::Open()
     glfwSetMouseButtonCallback(m_pWindow, EventManager::GetMouseButtonCallBack);
     glfwSetCursorPosCallback(m_pWindow, EventManager::GetCursorPosCallBack);
 
-#ifdef DEBUG_BUILD
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, 0);
-#endif
+//#ifdef DEBUG_BUILD
+//    glEnable(GL_DEBUG_OUTPUT);
+//    glDebugMessageCallback(MessageCallback, 0);
+//#endif
 
     s_windows[m_pWindow] = this;
 	onOpenEvent();

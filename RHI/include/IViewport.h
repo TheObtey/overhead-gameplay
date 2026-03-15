@@ -21,7 +21,7 @@ public:
     virtual void Present() = 0;
 
 protected:
-    virtual void Display() = 0;
+    virtual void Setup() = 0;
 
 protected:
     uint16 m_width = 0;

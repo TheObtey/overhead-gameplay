@@ -2,6 +2,7 @@
 #define ORE_WINDOW__H_
 
 #include "IWindow.h"
+#include "Viewport.h"
 
 #include <map>
 
@@ -15,8 +16,10 @@ public:
     void Close() override;
     bool IsOpen() override;
     void Present() override;
+    void AddViewport(Viewport& viewport) {}; 
 
     void SetDecoration(bool hasDecoration) override;
+    void SetIcon(std::string const& path) override {};
     void SetSize(uint16 width, uint16 height) override;
     static void FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height);
 

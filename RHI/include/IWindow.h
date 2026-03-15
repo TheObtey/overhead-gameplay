@@ -18,6 +18,7 @@ public:
 
     virtual void SetDecoration(bool hasDecoration) = 0;
     virtual void SetSize(uint16 width, uint16 height) = 0;
+    virtual void SetIcon(std::string const& path) = 0;
    
     Event<void()> onOpenEvent;
     Event<void()> onCloseEvent;

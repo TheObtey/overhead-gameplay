@@ -2,12 +2,13 @@
 #define ORE_VIEWPORT__H_
 
 #include "IViewport.h"
+#include "Passes/Pass.h"
 
 class Window;
 class Viewport : public IViewport
 {
 public:
-    Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const& backgroundColor, Window& Window);
+    Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const& backgroundColor);
     ~Viewport() override;
     
     void SetSize(uint16 width, uint16 height) override;
@@ -19,12 +20,11 @@ public:
 
     void Clear() override;
     void Present() override;
+    
+    void AddPass(sptr<Pass> pPass);
 
 protected:
-    void Display() override; 
-
-private:
-    sptr<Window> m_pWindow;
+    void Setup() override; 
 };
 
 #endif
