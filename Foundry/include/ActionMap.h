@@ -1,7 +1,8 @@
 #ifndef FOUNDRY_ACTIONMAP__H_
 #define FOUNDRY_ACTIONMAP__H_
 
-#include "IAction.h"
+#include "Action.h"
+#include "IControl.h"
 
 #include <string_view>
 #include <string>
