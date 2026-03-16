@@ -2,6 +2,7 @@
 #define ORE_EVENT_MANAGER__H_
 
 #include <GLFW/glfw3.h>
+
 #include "Define.h"
 #include "Window.h"
 

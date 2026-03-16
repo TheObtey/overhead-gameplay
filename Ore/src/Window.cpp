@@ -1,11 +1,10 @@
 #include "Window.h"
 #include "Logger.hpp"
 #include "Define.h"
-#include <glad/glad.h>
 #include "EventManager.h"
 #include "Ore.h"
 
-
+#include <glad/glad.h>
 
 std::unordered_map<GLFWwindow*, Window*> Window::s_windows = {};
 Window::Window(int width, int height, std::string name, bool enableTransparency)

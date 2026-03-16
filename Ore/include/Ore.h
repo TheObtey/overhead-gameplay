@@ -2,7 +2,6 @@
 #define ORE_ORE__H_
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 namespace Ore
 {

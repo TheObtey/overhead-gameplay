@@ -49,7 +49,7 @@ private:
 	void				UpdateLocal();
 	void				UpdateWorld();
 
-private:
+protected:
 	Transform2D m_transform;
 
 	glm::vec3 m_worldPosition {};
