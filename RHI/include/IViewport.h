@@ -18,11 +18,11 @@ public:
     virtual uint16 GetWidth() = 0; 
     virtual uint16 GetHeight() = 0;
 
-    virtual void Clear() = 0;
-    virtual void Present() = 0;
+    virtual void Clear() const = 0;
+    virtual void Present() const = 0;
 
 protected:
-    virtual void Display() = 0;
+    virtual void Setup() = 0;
 
 protected:
     uint16 m_width = 0;

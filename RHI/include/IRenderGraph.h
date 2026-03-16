@@ -5,20 +5,18 @@
 #include "IGeometry.h"
 #include "IPass.h"
 
-#include <vector>
-
 class IRenderGraph 
 {
 public:
-    IRenderGraph();
-    ~IRenderGraph();
+    virtual ~IRenderGraph() = 0;
 
-    virtual void AddGeometries(std::vector<uptr<IGeometry>> geometries) = 0;
-    virtual void AddPass(uptr<IPass> pPass) = 0;
+    virtual void Execute() = 0;
 
 protected:
-    std::vector<uptr<IGeometry>> m_geometries;
-    std::vector<uptr<IPass>> m_passes; 
+    virtual void CreateGBuffer(uint32 screenWidth, uint32 screenHeight) = 0;
+    
 
 };
+
+inline IRenderGraph::~IRenderGraph() {};
 #endif //!RHI_IRENDER_GRAPH__H_

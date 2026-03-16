@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-GeometryPass::GeometryPass(Shader const& shader, std::vector<Mesh> const& meshes, Camera const& camera) : Pass(shader)
+GeometryPass::GeometryPass(Shader const& shader, std::vector<Mesh> const& meshes, Camera const& camera) : Pass(shader, camera)
 {
     for(int i = 0; i<meshes.size(); ++i)
     {
@@ -39,11 +39,4 @@ void GeometryPass::Execute()
         m_meshes[i]->Draw(m_pShader);
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_gBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glBlitFramebuffer(0,0, 800, 600, 0, 0, 800, 600, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

@@ -23,5 +23,5 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm-header-only)
 target_link_libraries(${PROJECT_NAME} PRIVATE glad::glad)
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
+target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
 

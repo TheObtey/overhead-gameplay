@@ -27,6 +27,7 @@ public:
 
     glm::mat4 GetProjectionMatrix(ProjectionType type, uint16 screenWidth, uint16 screenHeight, float near, float far) const;
     glm::mat4 GetViewMatrix() const;
+    glm::vec3 GetPosition() const {return m_position;}
     
     void UpdateVectors();
 

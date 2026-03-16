@@ -75,6 +75,9 @@ Shader::Shader(std::string const& vertBinaryPath, std::string const& fragBinaryP
         Logger::LogWithLevel(LogLevel::ERROR, "Program is not linked");
     }
 
+    glDetachShader(m_programId, vertex);
+    glDetachShader(m_programId, fragment);
+
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }

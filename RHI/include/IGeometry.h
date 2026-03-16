@@ -3,8 +3,6 @@
 
 #include "Define.h"
 
-#include <vector>
-
 class IGeometry 
 {
 public:
@@ -12,4 +10,5 @@ public:
 
 };
 
+inline IGeometry::~IGeometry() {};
 #endif //!RHI_IGEOMETRY__H_

@@ -27,7 +27,7 @@ glm::mat4 Camera::GetProjectionMatrix(ProjectionType type, uint16 screenWidth, u
     switch(type)
     {
     case ProjectionType::PERSPECTIVE :
-        projMatrix = glm::perspective(glm::radians(m_fov), (float)screenWidth / (float)screenHeight, .1f, 100.0f);
+        projMatrix = glm::perspective(glm::radians(m_fov), (float)screenWidth / (float)screenHeight, near, far);
         break;
     case ProjectionType::ORTHOGRAPHIC : 
         projMatrix = glm::ortho(0.0f, (float)screenWidth, (float)screenHeight, 0.0f, near, far);

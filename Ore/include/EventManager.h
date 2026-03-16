@@ -1,9 +1,9 @@
 #ifndef ORE_EVENT_MANAGER__H_
 #define ORE_EVENT_MANAGER__H_
 
+#include <GLFW/glfw3.h>
 #include "Define.h"
 #include "Window.h"
-#include <GLFW/glfw3.h>
 
 #define KEY_MODE_AZERTY
 
@@ -200,8 +200,9 @@ ENUM_CLASS_FLAGS(EventAction)
 class EventManager
 {
 public:
-    static bool GetKey(Window window, EventInput key, EventAction event);
-    static bool GetMouseKey(Window window, EventInput key, EventAction event);
+    static void GetKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void GetMouseButtonCallBack(GLFWwindow* window, int button, int action, int mods);
+    static void GetCursorPosCallBack(GLFWwindow* window, double xpos, double ypos);
 
     static bool CheckGamepad(GamepadId id);
     static void JoystickCallback(int jId, int event);
@@ -211,5 +212,9 @@ public:
 
     static Event<void(GamepadId)> gamepadConnected;
     static Event<void(GamepadId)> gamepadDisconnected;
+
+    static Event<void(EventInput key, EventAction action)> getKey;
+    static Event<void(EventInput mouse, EventAction action)> getMouse;
+    static Event<void(int32 posX, int32 posY)> getCursorPos;
 };
 #endif // !ORE_EVENT_MANAGER__H_

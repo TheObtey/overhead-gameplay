@@ -2,14 +2,14 @@
 #define ORE_VIEWPORT__H_
 
 #include "IViewport.h"
-#include "RenderGraph.h"
+#include "Passes/Pass.h"
 
 class Window;
 class Pass;
 class Viewport : public IViewport
 {
 public:
-    Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const& backgroundColor, Window& Window);
+    Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const& backgroundColor);
     ~Viewport() override;
     
     void SetSize(uint16 width, uint16 height) override;
@@ -19,17 +19,15 @@ public:
     uint16 GetWidth() override {return m_width;} 
     uint16 GetHeight() override  {return m_height;}
 
-    void Clear() override;
-    void Present() override;
+    void Clear() const override;
+    void Present() const override;
+    
+    void AddPass(sptr<Pass> pPass);
 
     void AddPass(Pass& pass);
 
 protected:
-    void Display() override; 
-
-private:
-    sptr<Window> m_pWindow;
-    uptr<RenderGraph> m_pRenderGraph;
+    void Setup() override; 
 };
 
 #endif

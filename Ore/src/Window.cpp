@@ -3,6 +3,7 @@
 #include "Define.h"
 #include <glad/glad.h>
 #include "EventManager.h"
+#include "Ore.h"
 
 
 
@@ -19,12 +20,11 @@ Window::Window(int width, int height, std::string name, bool enableTransparency)
 	m_height = height;
 	m_name = name;
 
-	Open();
 }
 
 Window::~Window()
 {
-
+    Close();
 }
 
 bool Window::IsOpen()
@@ -56,17 +56,42 @@ void Window::Open()
 
 	glfwSetFramebufferSizeCallback(m_pWindow, Window::FrameBufferResizeCallback);
     glfwSetJoystickCallback(EventManager::JoystickCallback);
+    glfwSetKeyCallback(m_pWindow, EventManager::GetKeyCallback);
+    glfwSetMouseButtonCallback(m_pWindow, EventManager::GetMouseButtonCallBack);
+    glfwSetCursorPosCallback(m_pWindow, EventManager::GetCursorPosCallBack);
+
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		Logger::LogWithLevel(LogLevel::ERROR, "Failed to initialize GLAD");
+		return;
+	}
 
 #ifdef DEBUG_BUILD
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(Ore::MessageCallback, 0);
 #endif
 
     s_windows[m_pWindow] = this;
 	onOpenEvent();
 }
 
+void Window::Clear()
+{
+    glfwMakeContextCurrent(m_pWindow);
+    for(Viewport const* pViewport : m_viewports)
+    {
+        pViewport->Clear();
+    }
+}
+
 void Window::Present()
 {
+    for(Viewport const* pViewport : m_viewports)
+    {
+        pViewport->Present();
+    }
+
 	glfwSwapBuffers(m_pWindow);
 	glfwPollEvents();
 }
@@ -88,4 +113,13 @@ void Window::FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int heigh
 void Window::SetDecoration(bool hasDecoration)
 {
     glfwWindowHint(GLFW_DECORATED, hasDecoration);
+}
+
+void Window::RemoveViewport(Viewport const& viewport)
+{
+    auto it = std::find(m_viewports.begin(), m_viewports.end(), &viewport);
+    if(it != m_viewports.end())
+    {
+        m_viewports.erase(it, m_viewports.end());
+    }
 }

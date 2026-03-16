@@ -1,9 +1,9 @@
 #include "TextureObject.h"
+#define STB_IMAGE_IMPLEMENTATION
 #include "Logger.hpp"
 
-#include <glad/glad.h>
-#define STB_IMAGE_IMPLEMENTATION
 #include <dependencies/stb_image.h>
+#include <glad/glad.h>
 
 TextureObject::TextureObject(uint32 id, TextureType type)
 {
@@ -22,6 +22,8 @@ void TextureObject::Bind()
 
 void TextureObject::GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::string imagePath)
 {
+    stbi_set_flip_vertically_on_load(true);
+
     int32 nrChannels, imageWidth, imageHeight;
     unsigned char* data = stbi_load(imagePath.c_str(), &imageWidth, &imageHeight, &nrChannels, 0);
 
@@ -30,7 +32,7 @@ void TextureObject::GenerateTextureFromImage(DataType type, uint32& width, uint3
 
     if(!data)
     {
-        Logger::LogWithLevel(LogLevel::ERROR, "Failed to load texture : " + imagePath);
+        Logger::LogWithLevel(LogLevel::ERROR, "Failed to load texture at pass : " + imagePath);
         stbi_image_free(data);
         return;
     }
@@ -43,6 +45,7 @@ void TextureObject::GenerateTextureFromImage(DataType type, uint32& width, uint3
     else if(nrChannels == 4)
         format = GL_RGBA;
 
+    Bind();
     glTexImage2D((uint32)m_type, 0, format, imageWidth, imageHeight, 0, format, (uint32)type, data);
     glGenerateMipmap((uint32)m_type);
 
@@ -71,5 +74,5 @@ void TextureObject::AttachToFrameBuffer(uint32 frameBuffer, uint32 attachment)
 
 void TextureObject::InitializeTextureView(uint32 origTexture, TextureType format, uint32 minLevels, uint32 numlevels, uint32 minLayer, uint32 numLayers)
 {
-    glTextureView(m_id, uint(m_type), origTexture, (uint32)format, minLevels, numlevels, minLayer, numLayers); 
+    glTextureView(m_id, (uint32)m_type, origTexture, (uint32)format, minLevels, numlevels, minLayer, numLayers); 
 }

@@ -14,16 +14,16 @@ public:
     
     virtual void Close() = 0;
     virtual bool IsOpen() = 0; 
+    virtual void Clear() = 0;
     virtual void Present() = 0; 
 
     virtual void SetDecoration(bool hasDecoration) = 0;
     virtual void SetSize(uint16 width, uint16 height) = 0;
+    virtual void SetIcon(std::string const& path) = 0;
    
     Event<void()> onOpenEvent;
     Event<void()> onCloseEvent;
-    Event<void(uint32 sizeX, uint32 sizeY)> onResizeEvent;
-
-protected:
+    Event<void()> onResizeEvent;
     virtual void Open() = 0;
 
 protected:

@@ -9,8 +9,10 @@
 int main()
 {
     Window window(800, 600, "ORE ORE OREORE ORE ORE OREORE OREORE");
-    //Viewport viewport(0, 0, 800, 600, Color(0.0f, 0.482f, 0.631f, 1.0f), window); 
-    Viewport viewport(0, 0, 800, 600, Color(0.0f, 0.0f, 0.0f, 1.0f), window); 
+    window.Open();
+    Viewport viewport(0, 0, 800, 600, Color::SKY_BLUE); 
+    //Viewport viewport(0, 0, 800, 600, Color::BLACK); 
+    window.AddViewport(viewport);
 
     std::vector<Vertex> vertices;
     vertices.push_back({glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f)});
@@ -106,13 +108,13 @@ int main()
 
 	while (window.IsOpen())
 	{
-        viewport.Clear();
+        window.Clear();
         
         geoPass.Execute();
         lightPass.Execute();
-        //viewport.Present();
 
         window.Present();
 	}
+
 	window.Close();
 }

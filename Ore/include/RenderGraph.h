@@ -2,6 +2,7 @@
 #define ORE_RENDER_GRAPH__H_
 
 #include "IRenderGraph.h"
+#include "TextureObject.h"
 
 class Pass;
 class RenderGraph : public IRenderGraph
@@ -19,6 +20,9 @@ protected:
 private:
     std::vector<uptr<IPass>> m_passes;
     uint32 m_gBuffer;
+    sptr<TextureObject> m_pGPosition;
+    sptr<TextureObject> m_pGNormal;
+    sptr<TextureObject> m_pGAlbedoSpec;
 
 };
 #endif
