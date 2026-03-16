@@ -17,20 +17,25 @@ TextureObject::~TextureObject()
 
 void TextureObject::Bind()
 {
-    glBindTexture((uint32)m_type, m_id);
+    glBindTexture(static_cast<uint32>(m_type), m_id);
 }
 
 void TextureObject::GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::string imagePath)
 {
-    stbi_set_flip_vertically_on_load(true);
+    if(imagePath == "")
+    {
+        glTexImage2D(static_cast<uint32>(m_type), 0, GL_RGBA16F, width, height, 0, static_cast<uint32>(type), GL_RGBA, NULL);
+        return;
+    }
 
     int32 nrChannels, imageWidth, imageHeight;
     unsigned char* data = stbi_load(imagePath.c_str(), &imageWidth, &imageHeight, &nrChannels, 0);
-
-    width = imageWidth;
-    height = imageHeight;
-
-    if(!data)
+    if(data)
+    {
+        glTexImage2D(static_cast<uint32>(m_type), 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(static_cast<uint32>(m_type));
+    }
+    else
     {
         Logger::LogWithLevel(LogLevel::ERROR, "Failed to load texture at pass : " + imagePath);
         stbi_image_free(data);
@@ -64,15 +69,15 @@ void TextureObject::GenerateTexture(DataType type, uint32 const& width, uint32 c
 
 void TextureObject::AddParameters(uint32 parameter, uint32 value)
 {
-    glTexParameteri((uint32)m_type, parameter, value);
+    glTextureParameteri(static_cast<uint32>(m_type), parameter, value);
 }
 
 void TextureObject::AttachToFrameBuffer(uint32 frameBuffer, uint32 attachment)
 {
-    glFramebufferTexture2D(frameBuffer, attachment, (uint32)m_type, m_id, 0);
+    glFramebufferTexture2D(frameBuffer, attachment, static_cast<uint32>(m_type), m_id, 0);
 }
 
 void TextureObject::InitializeTextureView(uint32 origTexture, TextureType format, uint32 minLevels, uint32 numlevels, uint32 minLayer, uint32 numLayers)
 {
-    glTextureView(m_id, (uint32)m_type, origTexture, (uint32)format, minLevels, numlevels, minLayer, numLayers); 
+    glTextureView(m_id, static_cast<uint32>(m_type), origTexture, static_cast<uint32>(format), minLevels, numlevels, minLayer, numLayers); 
 }
