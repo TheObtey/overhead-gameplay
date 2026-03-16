@@ -999,20 +999,24 @@ private:
 				{
 					GIZMO.activeTransform->rotation = GIZMO.startTransform.rotation;
 					//SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
-					const float delta = Clamp(Vector3DotProduct(mouseVec, Vector3Add(data->right, data->up)), -2 * PI, +2 * PI);
+					float delta = Clamp(Vector3DotProduct(mouseVec, Vector3Add(data->right, data->up)), -2 * PI, +2 * PI);
 
 					if (GIZMO.activeAxis & GZ_ACTIVE_X)
 					{
+						if (mouseVec.z > data->transform3D->translation.z) delta *= -1.0f;
 						const Quaternion q = QuaternionFromAxisAngle(data->axis[GZ_AXIS_X], delta);
 						data->transform3D->rotation = QuaternionMultiply(q,data->transform3D->rotation);
 					}
 					if (GIZMO.activeAxis & GZ_ACTIVE_Y)
 					{
+						if (mouseVec.x < data->transform3D->translation.x) delta *= -1.0f;
 						const Quaternion q = QuaternionFromAxisAngle(data->axis[GZ_AXIS_Y], delta);
 						data->transform3D->rotation = QuaternionMultiply(q, data->transform3D->rotation);
 					}
 					if (GIZMO.activeAxis & GZ_ACTIVE_Z)
 					{
+
+						if (mouseVec.x < data->transform3D->translation.x) delta *= -1.0f;
 						const Quaternion q = QuaternionFromAxisAngle(data->axis[GZ_AXIS_Z], delta);
 						data->transform3D->rotation = QuaternionMultiply(q, data->transform3D->rotation);
 					}

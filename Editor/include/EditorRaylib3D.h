@@ -15,6 +15,7 @@ struct DrawableElement
 	uptr<Mesh> mesh;
 	Matrix worldMatrix; // Raylib Draw
 	Transform gizmoTransform; // Gizmo Transform
+	bool gizmoUpdated = false;
 };
 
 enum class GizmoFlags
@@ -49,6 +50,13 @@ public:
 	void SetScaleGizmo(bool state);
 	void SetRotateGizmo(bool state);
 
+	enum RaylibAxis
+	{
+		X,Y,Z
+	};
+
+	void SetCameraOnAxis(RaylibAxis axis);
+
 	bool IsGizmoTranslate() { return Any(m_gizmoFlags & GizmoFlags::TRANSLATE); }
 	bool IsGizmoScale() { return Any(m_gizmoFlags & GizmoFlags::SCALE); }
 	bool IsGizmoRotate() { return Any(m_gizmoFlags & GizmoFlags::ROTATE); }
@@ -78,7 +86,6 @@ private:
 
 	GizmoFlags m_gizmoFlags;
 	bool m_gizmoDirty = false;
-	bool m_updateGizmo = false;
 };
 
 #endif // __EDITOR_RAYLIB3D__H_

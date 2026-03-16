@@ -147,9 +147,9 @@ void EditorRaylib3D::UpdateDrawableElement(Node* pNode)
 			m_loadedMeshs[name]->gizmoTransform.scale = Vector3{ pNode3D->GetWorldScale().x,pNode3D->GetWorldScale().y,pNode3D->GetWorldScale().z};
 			m_loadedMeshs[name]->gizmoTransform.rotation = Quaternion{ pNode3D->GetWorldRotationQuat().x,pNode3D->GetWorldRotationQuat().y,pNode3D->GetWorldRotationQuat().z,pNode3D->GetWorldRotationQuat().w };
 		}
-		else if (m_updateGizmo)
+		else if (m_loadedMeshs[name]->gizmoUpdated)
 		{
-			m_updateGizmo = false;
+			m_loadedMeshs[name]->gizmoUpdated = false;
 			pNode3D->SetWorldPosition({ m_loadedMeshs[name]->gizmoTransform.translation.x,m_loadedMeshs[name]->gizmoTransform.translation.y,m_loadedMeshs[name]->gizmoTransform.translation.z });
 			pNode3D->SetWorldScale({ m_loadedMeshs[name]->gizmoTransform.scale.x,m_loadedMeshs[name]->gizmoTransform.scale.y,m_loadedMeshs[name]->gizmoTransform.scale.z });
 			pNode3D->SetWorldRotationQuat({ m_loadedMeshs[name]->gizmoTransform.rotation.w,m_loadedMeshs[name]->gizmoTransform.rotation.x,m_loadedMeshs[name]->gizmoTransform.rotation.y,m_loadedMeshs[name]->gizmoTransform.rotation.z });
@@ -222,7 +222,7 @@ void EditorRaylib3D::Render()
 		{
 			if(RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), &it->second->gizmoTransform))
 			{
-				m_updateGizmo = true;
+				m_loadedMeshs[it->first]->gizmoUpdated = true;
 			}
 		}
 	}
@@ -252,6 +252,35 @@ void EditorRaylib3D::SetScaleGizmo(bool state)
 void EditorRaylib3D::SetRotateGizmo(bool state)
 {
 	state ? (m_gizmoFlags |= GizmoFlags::ROTATE) : (m_gizmoFlags &= ~(GizmoFlags::ROTATE));
+}
+
+void EditorRaylib3D::SetCameraOnAxis(RaylibAxis axis)
+{
+	Vector3 pos = m_loadedMeshs[m_selectedObject]->gizmoTransform.translation;
+	switch (axis)
+	{
+	case EditorRaylib3D::X:
+		pos.x += 2.0f;
+		m_camera.position = pos;
+		m_camera.target = Vector3(0.0f, 0.0f, 0.0f);
+		m_camera.up = Vector3(0.0f, 1.0f, 0.0f);
+		break;
+	case EditorRaylib3D::Y:
+		pos.y += 2.0f;
+		m_camera.position = pos;
+		m_camera.target = Vector3(0.0f, 0.0f, 0.0f);
+		m_camera.up = Vector3(0.0f, 0.0f, 1.0f);
+		break;
+	case EditorRaylib3D::Z:
+		pos.z += 2.0f;
+		m_camera.position = pos;
+		m_camera.target = Vector3(0.0f, 0.0f, 0.0f);
+		m_camera.up = Vector3(0.0f, 1.0f, 0.0f);
+		break;
+	default:
+		break;
+	}
+	//m_camera.projection = CAMERA_ORTHOGRAPHIC;
 }
 
 void EditorRaylib3D::Shutdown()

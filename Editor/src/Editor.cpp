@@ -176,8 +176,6 @@ void Editor::CreateNode(std::string const& type, std::string const& name, Node* 
 	uptr<Node> newNode = uptr<Node>(static_cast<Node*>(outObject));
 	newNode.get()->SetName(name);
 
-	
-	m_editorRaylib.AddDrawableObject(name, newNode.get());
 
 	if (pParent)
 	{
@@ -190,6 +188,8 @@ void Editor::CreateNode(std::string const& type, std::string const& name, Node* 
 		m_sceneRoot->AddChild(newNode);
 		std::cout << "[Editor] Node '" << name << "' added to scene root" << std::endl;
 	}
+
+	m_editorRaylib.AddDrawableObject(name, static_cast<Node*>(outObject));
 }
 
 void Editor::DeleteNode(Node* pNode)

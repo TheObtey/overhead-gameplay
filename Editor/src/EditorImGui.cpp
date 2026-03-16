@@ -535,6 +535,9 @@ void EditorImGui::DrawGizmoButtons()
 	bool scale = m_pRaylibEditor->IsGizmoScale();
 	bool rotate = m_pRaylibEditor->IsGizmoRotate();
 	bool all = translate && rotate && scale;
+	bool isopen = true;
+	ImGui::SetNextWindowSize(ImVec2(500,400), ImGuiCond_Always);
+	ImGui::Begin("Gizmo", &isopen, ImGuiWindowFlags_NoResize);
 
 	if (ImGui::Checkbox("All", &all) && m_pSelectedNode != nullptr)
 	{
@@ -542,21 +545,57 @@ void EditorImGui::DrawGizmoButtons()
 		m_pRaylibEditor->SetScaleGizmo(all);
 		m_pRaylibEditor->SetRotateGizmo(all);
 	}
-
+	ImGui::SameLine();
 	if (ImGui::Checkbox("Translate", &translate))
 	{
 		m_pRaylibEditor->SetTranslateGizmo(translate);
 	}
-	
+	ImGui::SameLine();
 	if (ImGui::Checkbox("Scale", &scale))
 	{
 		m_pRaylibEditor->SetScaleGizmo(scale);
 	}
-	
+	ImGui::SameLine();
 	if (ImGui::Checkbox("Rotate", &rotate))
 	{
 		m_pRaylibEditor->SetRotateGizmo(rotate);
 	}
+
+	ImGui::Text("Set Camera On Axis:");
+	if (ImGui::ColorButton("Lock Axis X",ImVec4(0.90f,0.16f,0.21f,1.0f),0,ImVec2(50,20)))
+	{
+		m_pRaylibEditor->SetCameraOnAxis(EditorRaylib3D::RaylibAxis::X);
+	}
+	ImGui::SameLine();
+	if (ImGui::ColorButton("Lock Axis Y", ImVec4(0.0f, 0.89f, 0.18f, 1.0f), 0, ImVec2(50, 20)))
+	{
+		m_pRaylibEditor->SetCameraOnAxis(EditorRaylib3D::RaylibAxis::Y);
+	}
+	ImGui::SameLine();
+	if (ImGui::ColorButton("Lock Axis Z", ImVec4(0.0f, 0.47f, 0.94f, 1.0f), 0, ImVec2(50, 20)))
+	{
+		m_pRaylibEditor->SetCameraOnAxis(EditorRaylib3D::RaylibAxis::Z);
+	}
+
+
+	//if (ImGui::Button("Show Axis X", ImVec2(50, 20)))
+	//{
+	//	m_pRaylibEditor->SetTranslateGizmo(all);
+	//	m_pRaylibEditor->SetScaleGizmo(all);
+	//	m_pRaylibEditor->SetRotateGizmo(all);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::Button("Show Axis Y", ImVec2(50, 20)))
+	//{
+	//	m_pRaylibEditor->SetTranslateGizmo(translate);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::Button("Show Axis Z", ImVec2(50, 20)))
+	//{
+	//	m_pRaylibEditor->SetScaleGizmo(scale);
+	//}
+
+	ImGui::End();
 }
 
 void EditorImGui::SaveSceneNoSpecialisation()
