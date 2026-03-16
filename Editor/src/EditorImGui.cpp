@@ -232,7 +232,7 @@ void EditorImGui::DrawHierarchyPanel()
 	{
 		ImGui::Spacing();
 		ImGui::Separator();
-		ImGui::Selectable("Déposer ici pour rattacher au Scene Root", false, ImGuiSelectableFlags_Disabled, ImVec2(-1, 0));
+		ImGui::Selectable("Drop here for root node", false, ImGuiSelectableFlags_Disabled, ImVec2(300, 0));
 		HandleHierarchyRootDropTarget();
 	}
 
@@ -594,7 +594,7 @@ void EditorImGui::ApplyInspectorChanges(json& datas)
 	m_pSelectedNode->Deserialize(m_selectedNodeData);
 	Node::SetStatusEditor(false);
 
-	DEBUG("[EditorImGui] Applied inspector changes" << std::endl);
+	//DEBUG("[EditorImGui] Applied inspector changes" << std::endl);
 }
 
 void EditorImGui::BeginHierarchyDragSource(Node& node)
