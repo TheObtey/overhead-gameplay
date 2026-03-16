@@ -16,7 +16,7 @@ OpenGLMessageCallback( GLenum source,
                  const void* userParam )
 {
     if(type == GL_DEBUG_TYPE_ERROR)
-        Logger::LogWithLevel(LogLevel::ERROR, "GL ERROR :", "type : ", type, "severity : ", severity, "message : ", message); 
+        Logger::LogWithLevel(LogLevel::ERROR, "GL ERROR :\n", "type : ", type, "\nseverity : ", severity, "\nmessage : ", message); 
 }
 
 Viewport::Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const& backgroundColor, Window& window)

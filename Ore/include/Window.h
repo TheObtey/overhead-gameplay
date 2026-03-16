@@ -19,6 +19,7 @@ public:
     void SetDecoration(bool hasDecoration) override;
     void SetSize(uint16 width, uint16 height) override;
     static void FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height);
+    static void Init();
 
 protected:
     void Open() override;
