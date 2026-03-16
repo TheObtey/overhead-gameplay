@@ -71,14 +71,17 @@ inline constexpr int32 operator""_kg(unsigned long long val) { return val * 1000
 #define OPERATING_SYSTEM_OTHER    0
 #define OPERATING_SYSTEM_LINUX    1
 #define OPERATING_SYSTEM_WINDOWS  2
+#define OPERATING_SYSTEM_MACOS    3
 
 #if defined(_WIN32) || defined(_WIN64)
-#define OPERATING_SYSTEM OPERATING_SYSTEM_WINDOWS
+    #define OPERATING_SYSTEM OPERATING_SYSTEM_WINDOWS
+#elif defined(__APPLE__) && defined(__MACH__)
+    #define OPERATING_SYSTEM OPERATING_SYSTEM_MACOS
 #elif defined(__linux__)
-#define OPERATING_SYSTEM OPERATING_SYSTEM_LINUX
+    #define OPERATING_SYSTEM OPERATING_SYSTEM_LINUX
 #else
-#define OPERATING_SYSTEM OPERATING_SYSTEM_OTHER
-#error "Not Supported"
+    #define OPERATING_SYSTEM OPERATING_SYSTEM_OTHER
+    #error "Unsupported operating system for this project."
 #endif
 
 

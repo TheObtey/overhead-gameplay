@@ -287,6 +287,14 @@ void Editor::StartFoundry(std::string const& scenePath)
 	gameExePath = "../Game/Game.exe";
 #elif OPERATING_SYSTEM == OPERATING_SYSTEM_LINUX
 	gameExePath = "../Game/Game";
+#elif OPERATING_SYSTEM == OPERATING_SYSTEM_MACOS
+	gameExePath = "../Game/Game.app/Contents/MacOS/Game";
+    if (!std::filesystem::exists(gameExePath))
+    {
+        gameExePath = "../Game/Game";
+    }
+#else
+    #error "Unsupported platform for launching the game."
 #endif
 
 	if (!std::filesystem::exists(gameExePath))
@@ -313,8 +321,10 @@ void Editor::StartFoundry(std::string const& scenePath)
 
 #if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
 	command = "start \"Foundry Game\" \"" + absoluteGamePath.string() + "\" \"" + playScenePath.string() + "\"";
-#elif OPERATING_SYSTEM == OPERATING_SYSTEM_LINUX
+#elif OPERATING_SYSTEM == OPERATING_SYSTEM_LINUX || OPERATING_SYSTEM == OPERATING_SYSTEM_MACOS
 	command = "\"" + absoluteGamePath.string() + "\" \"" + playScenePath.string() + "\" &";
+#else
+    #error "Unsupported platform for launching the game."
 #endif
 
 	DEBUG( "[Editor] Executing: " << command << std::endl);
