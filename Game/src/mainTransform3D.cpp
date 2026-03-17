@@ -91,7 +91,8 @@ int main() {
 	cam.fovy = 50.0f;
 	cam.projection = CAMERA_PERSPECTIVE;
 
-	PhysicsServer::Init();
+	//PhysicsServer::Init();
+	PhysicsServer::Poke();
 
 	//// cube
 	Vector3 pos = { 0.0f, 1.0f, 0.0f };

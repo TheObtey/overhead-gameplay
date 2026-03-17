@@ -172,6 +172,17 @@ void  NodeRigidBody::SetAngularDamping(float angularDamping)
 	if (m_pNode3D)
 		m_pRigidBody->setAngularDamping(angularDamping);
 }
+void NodeRigidBody::ResetForces()
+{
+	if (m_pNode3D)
+		m_pRigidBody->resetForce();
+}
+void NodeRigidBody::ResetTorque()
+{
+
+	if (m_pNode3D)
+		m_pRigidBody->resetTorque();
+}
 
 float NodeRigidBody::GetMass() const
 {
@@ -260,15 +271,4 @@ void NodeRigidBody::SetIsGravityEnabled(bool enabled)
 }
 
 
-void NodeRigidBody::ResetForces()
-{
-	if (m_pNode3D)
-		m_pRigidBody->resetForce();
-}
-void NodeRigidBody::ResetTorque()
-{
-
-	if (m_pNode3D)
-		m_pRigidBody->resetTorque();
-}
 

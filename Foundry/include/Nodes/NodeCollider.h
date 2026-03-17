@@ -73,11 +73,13 @@ private:
     rp3d::Transform   GetLocalRp3dTransform() const;
 
     rp3d::Collider* m_pCollider = nullptr;
-    rp3d::CollisionShape* m_pShape = nullptr;   // A GARDER PLUTOT DANS LE SERV POUR UNE SUELE INSTANTE DE CHAQUE SHAPE ?
+    rp3d::CollisionShape* m_pShape = nullptr;   // A GARDER PLUTOT DANS LE SERV POUR UNE SUELE INSTANCE DE CHAQUE SHAPE ?
     rp3d::RigidBody* m_pRigidBody = nullptr;
 
     glm::vec3 m_localPosition{ 0.0f, 0.0f, 0.0f };
     glm::quat m_localRotation{ 1.0f, 0.0f, 0.0f, 0.0f };
+
+	friend class PhysicsServer;
 };
 
 

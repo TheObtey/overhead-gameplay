@@ -92,6 +92,8 @@ public:
 	void SetSleepingState(bool isSleeping);
 	void SetIsGravityEnabled(bool enabled);
 
+
+	// fonction temporaire debug
 	glm::vec3 Getposition() const 
 	{ 
 		return rp3dToGlm(m_pRigidBody->getTransform().getPosition());
@@ -104,6 +106,8 @@ private:
 
 	Node3D* m_pNode3D;
 	rp3d::RigidBody* m_pRigidBody;
+
+	friend class PhysicsServer;
 };
 
 REGISTER_ISERIALIZABLE(NodeRigidBody, NodeRigidBody::CreateInstance);

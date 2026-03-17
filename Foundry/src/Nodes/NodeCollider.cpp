@@ -163,7 +163,7 @@ bool NodeCollider::IsWorldQueryCollider() const
 }
 
 
-void     NodeCollider::SetCollisionCategoryBits(uint16_t v)
+void NodeCollider::SetCollisionCategoryBits(uint16_t v)
 {
 	if (m_pCollider) m_pCollider->setCollisionCategoryBits(v);
 }
@@ -171,7 +171,8 @@ uint16_t NodeCollider::GetCollisionCategoryBits() const
 {
 	return m_pCollider ? m_pCollider->getCollisionCategoryBits() : 0x0001;
 }
-void     NodeCollider::SetCollideWithMaskBits(uint16_t v) {
+void NodeCollider::SetCollideWithMaskBits(uint16_t v) 
+{
 	if (m_pCollider) m_pCollider->setCollideWithMaskBits(v);
 }
 uint16_t NodeCollider::GetCollisionBitsMask() const
