@@ -1,8 +1,7 @@
 #ifndef ORE_ORE__H_
 #define ORE_ORE__H_
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "Define.h"
 
 namespace Ore
 {

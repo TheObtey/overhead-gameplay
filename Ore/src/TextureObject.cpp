@@ -3,7 +3,6 @@
 #include "Logger.hpp"
 
 #include <dependencies/stb_image.h>
-#include <glad/glad.h>
 
 TextureObject::TextureObject(uint32 id, TextureType type)
 {
@@ -22,27 +21,18 @@ void TextureObject::Bind()
 
 void TextureObject::GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::string imagePath)
 {
-    if(imagePath == "")
-    {
-        glTexImage2D(static_cast<uint32>(m_type), 0, GL_RGBA16F, width, height, 0, static_cast<uint32>(type), GL_RGBA, NULL);
-        return;
-    }
-
     int32 nrChannels, imageWidth, imageHeight;
     unsigned char* data = stbi_load(imagePath.c_str(), &imageWidth, &imageHeight, &nrChannels, 0);
-    if(data)
-    {
-        glTexImage2D(static_cast<uint32>(m_type), 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(static_cast<uint32>(m_type));
-    }
-    else
+    if(!data)
     {
         Logger::LogWithLevel(LogLevel::ERROR, "Failed to load texture at pass : " + imagePath);
         stbi_image_free(data);
         return;
     }
 
+
     GLenum format;
+    Logger::Log(nrChannels);
     if(nrChannels == 1)
         format = GL_RED;
     else if(nrChannels == 3)
@@ -69,7 +59,7 @@ void TextureObject::GenerateTexture(DataType type, uint32 const& width, uint32 c
 
 void TextureObject::AddParameters(uint32 parameter, uint32 value)
 {
-    glTextureParameteri(static_cast<uint32>(m_type), parameter, value);
+    glTexParameteri(static_cast<uint32>(m_type), parameter, value);
 }
 
 void TextureObject::AttachToFrameBuffer(uint32 frameBuffer, uint32 attachment)

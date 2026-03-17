@@ -3,6 +3,7 @@
 
 #include "IViewport.h"
 #include "Passes/Pass.h"
+#include "RenderGraph.h"
 
 class Window;
 class Pass;
@@ -28,6 +29,9 @@ public:
 
 protected:
     void Setup() override; 
+
+private:
+    uptr<RenderGraph> m_pRenderGraph;
 };
 
 #endif

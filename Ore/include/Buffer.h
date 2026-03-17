@@ -3,8 +3,6 @@
 
 #include "IBuffer.h"
 
-#include <glad/glad.h>
-
 enum class BufferType
 {
     BUFFER = GL_ARRAY_BUFFER, 

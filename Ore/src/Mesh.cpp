@@ -49,7 +49,8 @@ void Mesh::Draw(sptr<IShader> const shader)
             break;
         }
 
-        glUniform1i(glGetUniformLocation(pShader->GetProgramId(), (name).c_str()), i);
+        Logger::Log(name);
+        glUniform1i(glGetUniformLocation(pShader->GetProgramId(), name.c_str()), i);
         m_textures[i]->GetTextureObject().Bind();
     }
 

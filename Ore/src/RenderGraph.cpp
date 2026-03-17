@@ -3,8 +3,6 @@
 #include "Logger.hpp"
 #include "Passes/Pass.h"
 
-#include <glad/glad.h>
-
 RenderGraph::RenderGraph(uint32 screenWidth, uint32 screenHeight)
 {
     CreateGBuffer(screenWidth, screenHeight);

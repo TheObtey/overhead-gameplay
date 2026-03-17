@@ -3,8 +3,6 @@
 
 #include "ITextureObject.h"
 
-#include <glad/glad.h>
-
 enum class DataType
 {
     UBYTE = GL_UNSIGNED_BYTE,

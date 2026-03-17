@@ -1,7 +1,6 @@
 #include "Shader.h"
 #include "Logger.hpp"
 
-#include <glad/glad.h>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -39,18 +38,20 @@ Shader::Shader(std::string const& vertBinaryPath, std::string const& fragBinaryP
 
     Logger::Log("Start Shader");
 
+    const char* vertexBinaryCode = vertexBinary.c_str();
+    const char* fragmentBinaryCode = fragmentBinary.c_str();
     uint32 vertex, fragment;
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderBinary(1, &vertex, GL_SHADER_BINARY_FORMAT_SPIR_V, vertexBinary.c_str(), vertexBinary.size());
 
     std::string vsEntryPoint = "main";
-    glSpecializeShader(vertex, (const GLchar*)vsEntryPoint.c_str(), 0, nullptr, nullptr);
+    glSpecializeShader(vertex, static_cast<const GLchar*>(vsEntryPoint.c_str()), 0, nullptr, nullptr);
 
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderBinary(1, &fragment, GL_SHADER_BINARY_FORMAT_SPIR_V, fragmentBinary.c_str(), fragmentBinary.size());
 
     std::string fsEntryPoint = "main";
-    glSpecializeShader(fragment, (const GLchar*)fsEntryPoint.c_str(), 0, nullptr, nullptr);
+    glSpecializeShader(fragment, static_cast<const GLchar*>(fsEntryPoint.c_str()), 0, nullptr, nullptr);
 
     GLint isCompiled;
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &isCompiled);

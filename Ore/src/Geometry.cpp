@@ -6,7 +6,7 @@ Geometry::Geometry(std::vector<Vertex> const& vertices, std::vector<uint32> cons
 {
     Logger::Log("Start Geometry");
 
-    m_indiceSize = indices.size();
+    m_indiceSize = static_cast<uint32>(indices.size());
     GLuint vaoId;
 
     glGenVertexArrays(1, &vaoId);
@@ -39,7 +39,7 @@ void Geometry::Draw(sptr<Shader> shader)
     glDrawElements(GL_TRIANGLES, m_indiceSize, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
-    glActiveTexture(GL_TEXTURE0);
+    //glActiveTexture(GL_TEXTURE0);
 }
 
 void Geometry::AddPoints(std::vector<Vertex> const& vertices)
@@ -67,7 +67,7 @@ void Geometry::Setup()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
     glBindVertexArray(0);
 }

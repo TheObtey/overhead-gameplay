@@ -3,9 +3,9 @@
 
 #include "IPass.h"
 #include "Shader.h"
-#include "TextureObject.h"
 #include "Camera.h"
 
+class TextureObject;
 class Pass : public IPass
 {
 public:

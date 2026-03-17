@@ -1,9 +1,10 @@
 #ifndef ORE_EVENT_MANAGER__H_
 #define ORE_EVENT_MANAGER__H_
 
-#include <GLFW/glfw3.h>
 #include "Define.h"
-#include "Window.h"
+#include "Event.hpp"
+
+#include <GLFW/glfw3.h>
 
 #define KEY_MODE_AZERTY
 

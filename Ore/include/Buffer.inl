@@ -3,7 +3,7 @@ Buffer<T>::Buffer(std::vector<T> const& data, uint32 id, BufferType type, bool i
 {
     m_id = id;
     m_type = type;    
-    isDataPersistant ? m_dataPersistanceFlag = GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT|GL_MAP_READ_BIT : m_dataPersistanceFlag = GL_DYNAMIC_STORAGE_BIT;
+    isDataPersistant ? m_dataPersistanceFlag = GL_MAP_PERSISTENT_BIT|GL_MAP_COHERENT_BIT|GL_MAP_WRITE_BIT : m_dataPersistanceFlag = GL_DYNAMIC_STORAGE_BIT;
 
     Bind();
     StoreData(data);
@@ -25,25 +25,26 @@ Buffer<T>::~Buffer()
 template <typename T>
 void Buffer<T>::Bind()
 {
-    glBindBuffer((int)m_type, m_id);
+    glBindBuffer(static_cast<uint32>(m_type), m_id);
 }
 
 template<typename T>
 T* Buffer<T>::Map(uint32 offset, uint32 size)
 {
-    void* ptr = glMapBufferRange((int)m_type, offset, size, m_dataPersistanceFlag);
+    void* ptr = glMapBufferRange(static_cast<uint32>(m_type), offset, size, m_dataPersistanceFlag);
     return (T*)ptr;
 }
 
 template<typename T>
 void Buffer<T>::Unmap()
 {    
-    glUnmapBuffer((int)m_type);
+    glUnmapBuffer(static_cast<uint32>(m_type));
 }
 
 template<typename T>
 void Buffer<T>::StoreData(std::vector<T> const& data)
 {
-    glBufferStorage((int)m_type, data.size() * sizeof(T), data.data(), m_dataPersistanceFlag);
+    //glBufferStorage(static_cast<uint32>(m_type), data.size() * sizeof(T), &data[0], m_dataPersistanceFlag);
+    glBufferData(static_cast<uint32>(m_type), data.size() * sizeof(T), &data[0], GL_STATIC_DRAW);
 }
 
