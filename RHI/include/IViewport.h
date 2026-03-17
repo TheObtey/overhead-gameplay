@@ -19,8 +19,6 @@ public:
 
     virtual void Clear() const = 0;
     virtual void Present() const = 0;
-
-protected:
     virtual void Setup() = 0;
 
 protected:

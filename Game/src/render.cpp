@@ -25,7 +25,7 @@ void mouse(EventInput mousebutton, EventAction action)
         std::cout << "en effet cela fonctionne en effet" << std::endl;
 }
 
-void pos(int32 x, int32 y)
+void size(uint32 x, uint32 y)
 {
     std::cout << "x : " << x << std::endl << "y : "  << y << std::endl;
 }
@@ -38,12 +38,14 @@ int main()
     Viewport viewport(0,0,400,600, Color::BLUE);
     Viewport viewport1(400, 0, 400, 600, Color::SKY_BLUE);
 
+
     window.AddViewport(viewport);
     window.AddViewport(viewport1);
+    window.onResizeEvent.Subscribe(size);
 
     EventManager::getKey.Subscribe(key);
     EventManager::getMouse.Subscribe(mouse);
-    EventManager::getCursorPos.Subscribe(pos);
+    //EventManager::getCursorPos.Subscribe(pos);
 
 	while (window.IsOpen())
 	{
