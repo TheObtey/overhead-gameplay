@@ -19,13 +19,13 @@ public:
 	void ApplyLocalTorque(const glm::vec3& torque)			{ m_pNode->ApplyLocalTorque(torque); }
 	void ApplyWorldTorque(const glm::vec3& torque)			{ m_pNode->ApplyWorldTorque(torque); }
 
-	glm::vec3 const GetLinearVelocity() const				{ m_pNode->GetLinearVelocity(); }
-	glm::vec3 const GetAngularVelocity() const				{ m_pNode->GetAngularVelocity(); }
+	glm::vec3 const GetLinearVelocity() const				{ return m_pNode->GetLinearVelocity(); }
+	glm::vec3 const GetAngularVelocity() const				{ return m_pNode->GetAngularVelocity(); }
 	/// Return the linear decelerating factor				
-	float const		GetLinearDamping() const				{ m_pNode->GetLinearDamping(); }
+	float const		GetLinearDamping() const				{ return m_pNode->GetLinearDamping(); }
 	/// Return the angular velocity damping factor			
-	float const		GetAngularDamping() const				{ m_pNode->GetAngularDamping(); }
-	glm::vec3 const GetTotalForce() const					{ m_pNode->GetTotalForce(); }
+	float const		GetAngularDamping() const				{ return m_pNode->GetAngularDamping(); }
+	glm::vec3 const GetTotalForce() const					{ return m_pNode->GetTotalForce(); }
 
 
 	void SetLinearVelocity(const glm::vec3& velocity)		{ m_pNode->SetLinearVelocity(velocity); }
@@ -43,18 +43,18 @@ public:
 
 	// =========== Mass and Body Type ===========
 
-	float GetMass() const									{ m_pNode->GetMass(); }
+	float GetMass() const									{ return m_pNode->GetMass(); }
 	void  SetMass(float mass)								{ m_pNode->SetMass(mass); }
 
-	RigidBodyType GetBodyType() const						{ m_pNode->GetBodyType(); }
+	RigidBodyType GetBodyType() const						{ return m_pNode->GetBodyType(); }
 	void          SetBodyType(RigidBodyType type)			{ m_pNode->SetBodyType(type); }
 
 
 	// =========== Sleeping and Gravity ===========
 
-	bool IsSleeping() const									{ m_pNode->IsSleeping(); }
-	bool IsAllowedToSleep() const							{ m_pNode->IsAllowedToSleep(); }
-	bool IsGravityEnabled()									{ m_pNode->IsGravityEnabled(); }
+	bool IsSleeping() const									{ return m_pNode->IsSleeping(); }
+	bool IsAllowedToSleep() const							{ return m_pNode->IsAllowedToSleep(); }
+	bool IsGravityEnabled()									{ return m_pNode->IsGravityEnabled(); }
 
 	void SetSleepingEnabled(bool enabled)					{ m_pNode->SetSleepingEnabled(enabled); }
 	void SetSleepingState(bool isSleeping)					{ m_pNode->SetSleepingState(isSleeping); }
