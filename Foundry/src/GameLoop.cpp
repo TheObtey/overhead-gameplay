@@ -19,6 +19,7 @@ void GameLoop::StartGame(SceneTree& defaultTree)
     m_pDefaultTree = &defaultTree;
     m_pDefaultTree->OnGameStarted();
     m_pDefaultTree->OnSceneChanged();
+    UpdateServers();
     LoopGame();
 }
 

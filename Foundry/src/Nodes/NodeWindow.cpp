@@ -6,6 +6,7 @@ NodeWindow::NodeWindow(std::string const& name) : NodeViewport(name)
 {
     m_pWindow = std::make_unique<Window>(1920, 1080, name);
     m_pWindow->AddViewport(*m_pViewPort);
+    //m_pWindow->onResizeEvent += [&]() {  }
     GraphicServer::OpenWindow(m_pWindow.get());
 }
 

@@ -6,8 +6,7 @@
 
 NodeViewport::NodeViewport(std::string const& name) : Node2D(name)
 {
-	m_pViewPort = std::make_unique<Viewport>(0, 0, 1920, 1080, Color{1.0f, 0.0f, 0.0f, 1.0f} );
-	UpdateViewport();
+	m_pViewPort = std::make_unique<Viewport>(0, 0, 1920, 1080, Color::SKY_BLUE );
 }
 
 void NodeViewport::OnUpdate(double const delta)
