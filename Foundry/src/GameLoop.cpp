@@ -9,12 +9,12 @@
 
 void GameLoop::StartGame(SceneTree& defaultTree)
 {
-    //try { dynamic_cast<NodeWindow&>(defaultTree.GetRoot()); }
-    //catch (std::bad_cast ex)
-    //{
-    //    Logger::LogWithLevel(LogLevel::ERROR, "No window in default SceneTree");
-    //    std::exit(-1);
-    //}
+    try { dynamic_cast<NodeWindow&>(defaultTree.GetRoot()); }
+    catch (std::bad_cast ex)
+    {
+        Logger::LogWithLevel(LogLevel::ERROR, "No window in default SceneTree");
+        std::exit(-1);
+    }
 
     m_pDefaultTree = &defaultTree;
     m_pDefaultTree->OnGameStarted();
@@ -27,27 +27,27 @@ void GameLoop::LoopGame()
 {
     Clock<> clock;
     //while ();
-    //auto const&  window = static_cast<NodeWindow const&>(m_pDefaultTree->GetRoot());
-    //while (window.IsOpen())
-    //{
-    //    TaskGraph graph;
-    //    double const dt = clock.Reset();
-    //    Node& root = m_pDefaultTree->GetRoot();
+    auto const&  window = static_cast<NodeWindow const&>(m_pDefaultTree->GetRoot());
+    while (window.IsOpen())
+    {
+        TaskGraph graph;
+        double const dt = clock.Reset();
+        Node& root = m_pDefaultTree->GetRoot();
 
-    //    m_accumulator += dt;
-    //    do
-    //    {
-    //        m_accumulator -= PHYSICS_DT;
-    //        root.PhysicsUpdate(PHYSICS_DT);
-    //    }
-    //    while (m_accumulator > PHYSICS_DT);
+        m_accumulator += dt;
+        do
+        {
+            m_accumulator -= PHYSICS_DT;
+            root.PhysicsUpdate(PHYSICS_DT);
+        }
+        while (m_accumulator > PHYSICS_DT);
 
-    //    root.Update(dt);
-    //    UpdateServers();
-    //    BuildTasksGraph(graph);
+        root.Update(dt);
+        UpdateServers();
+        BuildTasksGraph(graph);
 
-    //    //graph.Execute();
-    //}
+        //graph.Execute();
+    }
 
     EndGame();
 }
