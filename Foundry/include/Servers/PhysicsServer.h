@@ -13,35 +13,48 @@ class NodeCollider;
 #include <reactphysics3d/reactphysics3d.h>
 #include <glm/ext/vector_float3.hpp>
 
+//template <>
 template <>
 struct Command<class PhysicsServer>
 {
 
-	Command()
+	Command() : To(nullptr), 
+		Type(CmdType::NONE), 
+		transform(nullptr), 
+		rigidBody(nullptr), 
+		position({ 0.0f, 0.0f, 0.0f }), 
+		force({ 0.0f, 0.0f, 0.0f }),	
+		bodyType(RigidBodyType::NONE),
+		mass(0.0f),
+		sleepingEnabled(false),
+		lockAxis({}),
+		rotation({ 0.0f, 0.0f, 0.0f, 1.0f }),
+		radius(0.0f),
+		mask(0)
 	{
-		transform = nullptr;
-		position = { 0.0f, 0.0f, 0.0f };
-		force = { 0.0f, 0.0f, 0.0f };		
-		bodyType = RigidBodyType::NONE;
-		mass = 0.0f;
-		enabled = false;
-		lockAxis[3] = { false };
+		
 	};
+
 	~Command()
 	{
-		if(transform)
+		if (transform)
 		{
 			delete transform;
 			transform = nullptr;
 		}
+		if (rigidBody)
+		{
+			delete rigidBody;
+			rigidBody = nullptr;
+		}
 	}
-
 
 	enum class CmdType : uint16
 	{
+		NONE,
 		// ========= Rigid Body commands ===========
 
-		CREATE_RIGID_BODY, 
+		CREATE_RIGID_BODY,
 		DESTROY_RIGID_BODY,
 
 		APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS,
@@ -101,38 +114,75 @@ struct Command<class PhysicsServer>
 	} Type;
 
 
-
-	Node* const To = nullptr;
-	
 	// Rigid body command parameters
-
-	rp3d::Transform* transform;
 	glm::vec3 position;
-	union
-	{
-		glm::vec3 gravity;
-		glm::vec3 velocity;
-		glm::vec3 force;
-		glm::vec3 torque;
-	};
 	RigidBodyType bodyType;
-	union
-	{
-		float linearDamping;
-		float angularDamping;
-		float mass;
-	};
-	union
-	{
-		bool enabled;
-		bool isSleeping;
-	};
+	rp3d::Transform* transform;
 	bool lockAxis[3];
 
 	// Collider command parameters
+	rp3d::RigidBody* rigidBody;
+	glm::quat rotation;
+	union { uint16_t category, mask; };
+	float radius;
 
+	// Both
+	Node* To = nullptr;
+	union {
+		// RigidBody
+		bool gravityEnabled, sleepingEnabled, isSleeping;
+		// Collider
+		bool trigger, isSimulationCollider, isWorldQueryCollider;
+	};
+	union {
+		// RigidBody
+		float linearDamping, angularDamping, mass;
+		// Collider
+		float height, bounciness, friction, density;
+	};
+	union {
+		// RigidBody
+		glm::vec3 gravity, velocity, force, torque;
+		// Collider
+		glm::vec3 halfExtents, pos;
+	};
 };
 
+//struct Cmd_RigidBody : public Command<class PhysicsServer>
+//{
+//	Cmd_RigidBody() : Command<class PhysicsServer>(), position(0, 0, 0), bodyType(RigidBodyType::NONE), transform(nullptr), lockAxis(false)
+//	{
+//
+//	};
+//	Cmd_RigidBody(glm::vec3 _position = { 0, 0, 0 }, RigidBodyType _bodyType = RigidBodyType::NONE, rp3d::Transform* _transform = nullptr, bool _lockAxis[3] = {}) :
+//		position(_position), bodyType(_bodyType), transform(_transform), lockAxis(_lockAxis)
+//	{
+//
+//	};
+//
+//
+//	glm::vec3 position;
+//	RigidBodyType bodyType;
+//	rp3d::Transform* transform;
+//	bool lockAxis[3];
+//};
+//struct Cmd_Collider : public Command<class PhysicsServer>
+//{
+//	Cmd_Collider() : Command<class PhysicsServer>(), rigidBody(nullptr), rotation(0, 0, 0, 1), category(0)
+//	{
+//
+//	};
+//	Cmd_Collider(rp3d::RigidBody* _rigidBody, glm::quat _rotation = {0,0,0,1}, uint16_t _category = 0)
+//		: Command<class PhysicsServer>(), rigidBody(_rigidBody), rotation(_rotation), category(0)		
+//	{
+//
+//	};
+//
+//	// Collider command parameters
+//	rp3d::RigidBody* rigidBody;
+//	glm::quat rotation;
+//	union {	uint16_t category, mask; };
+//};
 using CommandTyp = Command<PhysicsServer>::CmdType;
 
 class PhysicsServer : public Server<PhysicsServer>
@@ -142,6 +192,22 @@ public:
 	PhysicsServer();
 	~PhysicsServer();
 
+	static void PushCommand(Command<PhysicsServer> cmd, Node* target)
+	{
+		//glm::vec3 force = { 0.0f, 10.0f, 0.0f };
+		//Command<PhysicsServer> cmd
+		//{
+		//	CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS,
+		//	.To = &rb,
+		//	.force = force
+		//}
+		//cmd.Type = ;
+		//cmd.To = &rb;
+		//cmd.force = force;
+		//Instance().m_commands.push({ CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS, &rb, .force(force)}, target);
+		Instance().m_commands.push(cmd);
+	};
+	//Instance().m_commands.push(cmd);
 
 
 	static void Initialize();
@@ -159,69 +225,69 @@ public:
 
 	//static void SetGravity(const glm::vec3& gravity)    { Instance().m_pPhysicsWorld->setGravity(glmToRp3d(gravity)); }
 	//static glm::vec3 GetGravity()                       { return rp3dToGlm(Instance().m_pPhysicsWorld->getGravity()); }
-	static void SetGravity(const glm::vec3& gravity)    { m_pPhysicsWorld->setGravity(glmToRp3d(gravity)); }
-	static glm::vec3 GetGravity()                       { return rp3dToGlm(m_pPhysicsWorld->getGravity()); }
+	static void SetGravity(const glm::vec3& gravity) { m_pPhysicsWorld->setGravity(glmToRp3d(gravity)); }
+	static glm::vec3 GetGravity() { return rp3dToGlm(m_pPhysicsWorld->getGravity()); }
 
 	//static void EnableSleeping(bool enabled)            { Instance().m_pPhysicsWorld->enableSleeping(enabled); }
 
 
 	// =========== Rigid Body intermediate functions ===========
 
-	void ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb);
-	void ApplyLocalForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
-	void ApplyLocalForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
+	static void ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb);
+	static void ApplyLocalForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
+	static void ApplyLocalForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
 
-	void ApplyWorldForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb);
-	void ApplyWorldForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
-	void ApplyWorldForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
+	static void ApplyWorldForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb);
+	static void ApplyWorldForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
+	static void ApplyWorldForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
 
-	void ApplyLocalTorque(const glm::vec3& torque, NodeRigidBody& rb);
-	void ApplyWorldTorque(const glm::vec3& torque, NodeRigidBody& rb);
+	static void ApplyLocalTorque(const glm::vec3& torque, NodeRigidBody& rb);
+	static void ApplyWorldTorque(const glm::vec3& torque, NodeRigidBody& rb);
 
-	void SetLinearVelocity(const glm::vec3& velocity, NodeRigidBody& rb);
-	void SetAngularVelocity(const glm::vec3& velocity, NodeRigidBody& rb);
+	static void SetLinearVelocity(const glm::vec3& velocity, NodeRigidBody& rb);
+	static void SetAngularVelocity(const glm::vec3& velocity, NodeRigidBody& rb);
 	/// Set the linear decelerating factor				
-	void SetLinearDamping(float linearDamping, NodeRigidBody& rb);
+	static void SetLinearDamping(float linearDamping, NodeRigidBody& rb);
 	/// Set the angular decelerating factor				
-	void SetAngularDamping(float angularDamping, NodeRigidBody& rb);
+	static void SetAngularDamping(float angularDamping, NodeRigidBody& rb);
 
-	void LockLinearAxis(bool lockAxis[], NodeRigidBody& rb);
-	void LockAngularAxis(bool lockAxis[], NodeRigidBody& rb);
+	static void LockLinearAxis(bool lockAxis[], NodeRigidBody& rb);
+	static void LockAngularAxis(bool lockAxis[], NodeRigidBody& rb);
 
-	void ResetForces(NodeRigidBody& rb);
-	void ResetTorque(NodeRigidBody& rb);
+	static void ResetForces(NodeRigidBody& rb);
+	static void ResetTorque(NodeRigidBody& rb);
 
-	void SetMass(float mass, NodeRigidBody& rb);
-	void SetBodyType(RigidBodyType type, NodeRigidBody& rb);
+	static void SetMass(float mass, NodeRigidBody& rb);
+	static void SetBodyType(RigidBodyType type, NodeRigidBody& rb);
 
-	void SetSleepingEnabled(bool enabled, NodeRigidBody& rb);
-	void SetSleepingState(bool isSleeping, NodeRigidBody& rb);
-	void SetIsGravityEnabled(bool enabled, NodeRigidBody& rb);
+	static void SetSleepingEnabled(bool enabled, NodeRigidBody& rb);
+	static void SetSleepingState(bool isSleeping, NodeRigidBody& rb);
+	static void SetIsGravityEnabled(bool enabled, NodeRigidBody& rb);
 
 
 	// =========== Collider intermediate functions ===========
 
-	void AttachToRigidBody(rp3d::RigidBody* rigidBody, NodeCollider& c);
-	void Detach(NodeCollider& c);
-	void DestroyShape(NodeCollider& c);
+	static void AttachToRigidBody(rp3d::RigidBody* rigidBody, NodeCollider& c);
+	static void Detach(NodeCollider& c);
+	static void DestroyShape(NodeCollider& c);
 
-	void SetBoxShape(const glm::vec3& halfExtents, NodeCollider& c);
-	void SetSphereShape(float radius, NodeCollider& c);
-	void SetCapsuleShape(float radius, float height, NodeCollider& c);
+	static void SetBoxShape(const glm::vec3& halfExtents, NodeCollider& c);
+	static void SetSphereShape(float radius, NodeCollider& c);
+	static void SetCapsuleShape(float radius, float height, NodeCollider& c);
 
-	void SetLocalPosition(const glm::vec3& pos, NodeCollider& c);
-	void SetLocalRotation(const glm::quat& rot, NodeCollider& c);
+	static void SetLocalPosition(const glm::vec3& pos, NodeCollider& c);
+	static void SetLocalRotation(const glm::quat& rot, NodeCollider& c);
 
-	void SetBounciness(float bounciness, NodeCollider& c);
-	void SetFrictionCoefficient(float friction, NodeCollider& c);
-	void SetMassDensity(float density, NodeCollider& c);
+	static void SetBounciness(float bounciness, NodeCollider& c);
+	static void SetFrictionCoefficient(float friction, NodeCollider& c);
+	static void SetMassDensity(float density, NodeCollider& c);
 
-	void SetIsTrigger(bool trigger, NodeCollider& c);
-	void SetIsSimulationCollider(bool enabled, NodeCollider& c);
-	void SetIsWorldQueryCollider(bool enabled, NodeCollider& c);
+	static void SetIsTrigger(bool trigger, NodeCollider& c);
+	static void SetIsSimulationCollider(bool enabled, NodeCollider& c);
+	static void SetIsWorldQueryCollider(bool enabled, NodeCollider& c);
 
-	void SetCollisionCategoryBits(uint16_t category, NodeCollider& c);
-	void SetCollideWithMaskBits(uint16_t mask, NodeCollider& c);
+	static void SetCollisionCategoryBits(uint16_t category, NodeCollider& c);
+	static void SetCollideWithMaskBits(uint16_t mask, NodeCollider& c);
 
 private:
 	void FlushCommandsImpl() override;
@@ -269,22 +335,22 @@ private:
 	void S_AttachToRigidBody(rp3d::RigidBody* rigidBody, NodeCollider& c);
 	void S_Detach(NodeCollider& c);
 	void S_DestroyShape(NodeCollider& c);
-		 
+
 	void S_SetBoxShape(const glm::vec3& halfExtents, NodeCollider& c);
 	void S_SetSphereShape(float radius, NodeCollider& c);
 	void S_SetCapsuleShape(float radius, float height, NodeCollider& c);
-		 
+
 	void S_SetLocalPosition(const glm::vec3& pos, NodeCollider& c);
 	void S_SetLocalRotation(const glm::quat& rot, NodeCollider& c);
-		 
+
 	void S_SetBounciness(float bounciness, NodeCollider& c);
 	void S_SetFrictionCoefficient(float friction, NodeCollider& c);
 	void S_SetMassDensity(float density, NodeCollider& c);
-		 
+
 	void S_SetIsTrigger(bool trigger, NodeCollider& c);
 	void S_SetIsSimulationCollider(bool enabled, NodeCollider& c);
 	void S_SetIsWorldQueryCollider(bool enabled, NodeCollider& c);
-		 
+
 	void S_SetCollisionCategoryBits(uint16_t category, NodeCollider& c);
 	void S_SetCollideWithMaskBits(uint16_t mask, NodeCollider& c);
 

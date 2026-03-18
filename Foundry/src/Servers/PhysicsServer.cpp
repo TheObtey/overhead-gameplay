@@ -32,7 +32,7 @@ void PhysicsServer::OnUnInitialize()
 	m_pPhysicsWorld = nullptr;
 }
 
-void PhysicsServer::Initialize()
+void PhysicsServer::Initialize() // ajouter tous les params ?
 {
     rp3d::PhysicsWorld::WorldSettings settings;
 	settings.worldName = "MainWorld";
@@ -68,7 +68,7 @@ while (!m_commands.empty())
 {
     Command<PhysicsServer>& command = m_commands.front();
 
-	auto& node = static_cast<NodeRigidBody&>(*command.To);
+	//auto& node = static_cast<NodeRigidBody&>(*command.To);
 
     switch (command.Type)
     {
@@ -77,93 +77,126 @@ while (!m_commands.empty())
         break;
 
     case CommandTyp::DESTROY_RIGID_BODY:
-		DestroyRigidBody(node);
+		DestroyRigidBody(static_cast<NodeRigidBody&>(*command.To));
         break;
+
+
+		// =========== Rigid Body ===========
 
     case CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS:
-        ApplyLocalForceAtCenterOfMass(command.force, node);
+        S_ApplyLocalForceAtCenterOfMass(command.force, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::APPLY_LOCAL_FORCE_AT_LOCAL_POSITION:
-        ApplyLocalForceAtLocalPosition(command.force, command.position, node);
+		S_ApplyLocalForceAtLocalPosition(command.force, command.position, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::APPLY_LOCAL_FORCE_AT_WORLD_POSITION:
-        ApplyLocalForceAtWorldPosition(command.force, command.position, node);
+		S_ApplyLocalForceAtWorldPosition(command.force, command.position, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::APPLY_WORLD_FORCE_AT_CENTER_OF_MASS:
-        ApplyWorldForceAtCenterOfMass(command.force, node);
+		S_ApplyWorldForceAtCenterOfMass(command.force, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::APPLY_WORLD_FORCE_AT_LOCAL_POSITION:
-        ApplyWorldForceAtLocalPosition(command.force, command.position, node);
+		S_ApplyWorldForceAtLocalPosition(command.force, command.position, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::APPLY_WORLD_FORCE_AT_WORLD_POSITION:
-        ApplyWorldForceAtWorldPosition(command.force, command.position, node);
+		S_ApplyWorldForceAtWorldPosition(command.force, command.position, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::APPLY_LOCAL_TORQUE:
-        ApplyLocalTorque(command.torque, node);
+		S_ApplyLocalTorque(command.torque, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::APPLY_WORLD_TORQUE:
-        ApplyWorldTorque(command.torque, node);
+		S_ApplyWorldTorque(command.torque, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::SET_LINEAR_VELOCITY:
-        SetLinearVelocity(command.velocity, node);
+		S_SetLinearVelocity(command.velocity, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::SET_ANGULAR_VELOCITY:
-        SetAngularVelocity(command.velocity, node);
+		S_SetAngularVelocity(command.velocity, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::SET_LINEAR_DAMPING:
-        SetLinearDamping(command.linearDamping, node);
+		S_SetLinearDamping(command.linearDamping, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::SET_ANGULAR_DAMPING:
-        SetAngularDamping(command.angularDamping, node);
+		S_SetAngularDamping(command.angularDamping, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::LOCK_LINEAR_AXIS:
-        LockLinearAxis(command.lockAxis, node);
+		S_LockLinearAxis(command.lockAxis, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::LOCK_ANGULAR_AXIS:
-        LockAngularAxis(command.lockAxis, node);
+		S_LockAngularAxis(command.lockAxis, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::RESET_FORCES:
-        ResetForces(node);
+		S_ResetForces(static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::RESET_TORQUE:
-        ResetTorque(node);
+		S_ResetTorque(static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::SET_MASS:
-        SetMass(command.mass, node);
+		S_SetMass(command.mass, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::SET_BODY_TYPE:
-        SetBodyType(command.bodyType, node);
+		S_SetBodyType(command.bodyType, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::SET_SLEEPING_ENABLED:
-        SetSleepingEnabled(command.enabled, node);
+		S_SetSleepingEnabled(command.sleepingEnabled, static_cast<NodeRigidBody&>(*command.To));
         break;
-
     case CommandTyp::SET_SLEEPING_STATE:
-        SetSleepingState(command.isSleeping, node);
+		S_SetSleepingState(command.isSleeping, static_cast<NodeRigidBody&>(*command.To));
+        break;    case CommandTyp::SET_IS_GRAVITY_ENABLED:
+		S_SetIsGravityEnabled(command.gravityEnabled, static_cast<NodeRigidBody&>(*command.To));
         break;
 
-    case CommandTyp::SET_IS_GRAVITY_ENABLED:
-        SetIsGravityEnabled(command.enabled, node);
-        break;
 
+		// ========= Collider ===========
+
+	case CommandTyp::ATTACH_TO_RIGID_BODY:
+		S_AttachToRigidBody(command.rigidBody, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::DETACH:
+		S_Detach(static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::DESTROY_SHAPE:
+		S_DestroyShape(static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_BOX_SHAPE:
+		S_SetBoxShape(command.halfExtents, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_SPHERE_SHAPE:
+		S_SetSphereShape(command.radius, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_CAPSULE_SHAPE:
+		S_SetCapsuleShape(command.radius, command.height, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_LOCAL_POSITION:
+		S_SetLocalPosition(command.position, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_LOCAL_ROTATION:
+		S_SetLocalRotation(command.rotation, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_BOUNCINESS:
+		S_SetBounciness(command.bounciness, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_FRICTION_COEFFICIENT:
+		S_SetFrictionCoefficient(command.friction, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_MASS_DENSITY:
+		S_SetMassDensity(command.density, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_IS_TRIGGER:
+		S_SetIsTrigger(command.trigger, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_IS_SIMULATION_COLLIDER:
+		S_SetIsSimulationCollider(command.isSimulationCollider, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_IS_WORLD_QUERY_COLLIDER:
+		S_SetIsWorldQueryCollider(command.isWorldQueryCollider, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_COLLISION_CATEGORY_BITS:
+		S_SetCollisionCategoryBits(command.category, static_cast<NodeCollider&>(*command.To));
+		break;
+	case CommandTyp::SET_COLLIDE_WITH_MASK_BITS:
+		S_SetCollideWithMaskBits(command.mask, static_cast<NodeCollider&>(*command.To));
+		break;
     default:
         break;
     }
@@ -179,240 +212,322 @@ while (!m_commands.empty())
 
 void PhysicsServer::ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
-	//Command<PhysicsServer> cmd
-	//{
-	//	CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS,
-	//	.To = &rb,
-	//	.force = force
-	//}s
-	//cmd.Type = ;
-	//cmd.To = &rb;
-	//cmd.force = force;
-	//Instance().m_commands.push({ CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS, &rb, .force = force });
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS;
+	cmd.To = &rb;
+	cmd.force = force;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::ApplyLocalForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->applyLocalForceAtLocalPosition(glmToRp3d(force), glmToRp3d(point));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::APPLY_LOCAL_FORCE_AT_LOCAL_POSITION;
+	cmd.To = &rb;
+	cmd.force = force;
+	cmd.position = point;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::ApplyLocalForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->applyLocalForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::APPLY_LOCAL_FORCE_AT_WORLD_POSITION;
+	cmd.To = &rb;
+	cmd.force = force;
+	cmd.position = point;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::ApplyWorldForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->applyWorldForceAtCenterOfMass(glmToRp3d(force));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::APPLY_WORLD_FORCE_AT_CENTER_OF_MASS;
+	cmd.To = &rb;
+	cmd.force = force;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::ApplyWorldForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->applyWorldForceAtLocalPosition(glmToRp3d(force), glmToRp3d(point));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::APPLY_LOCAL_FORCE_AT_LOCAL_POSITION;
+	cmd.To = &rb;
+	cmd.force = force;
+	cmd.position = point;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::ApplyWorldForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->applyWorldForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::APPLY_LOCAL_FORCE_AT_WORLD_POSITION;
+	cmd.To = &rb;
+	cmd.force = force;
+	cmd.position = point;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::ApplyLocalTorque(const glm::vec3& torque, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->applyLocalTorque(glmToRp3d(torque));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::APPLY_LOCAL_TORQUE;
+	cmd.To = &rb;
+	cmd.torque = torque;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::ApplyWorldTorque(const glm::vec3& torque, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->applyWorldTorque(glmToRp3d(torque));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::APPLY_WORLD_TORQUE;
+	cmd.To = &rb;
+	cmd.torque = torque;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::SetLinearVelocity(const glm::vec3& velocity, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setLinearVelocity(glmToRp3d(velocity));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_LINEAR_VELOCITY;
+	cmd.To = &rb;
+	cmd.velocity = velocity;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::SetAngularVelocity(const glm::vec3& velocity, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setAngularVelocity(glmToRp3d(velocity));
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_ANGULAR_VELOCITY;
+	cmd.To = &rb;
+	cmd.velocity = velocity;
+	Instance().m_commands.push(cmd);
 }
 /// Set the linear decelerating factor
 void  PhysicsServer::SetLinearDamping(float linearDamping, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setLinearDamping(linearDamping);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_LINEAR_DAMPING;
+	cmd.To = &rb;
+	cmd.linearDamping = linearDamping;
+	Instance().m_commands.push(cmd);
 }
 /// Set the angular decelerating factor
 void  PhysicsServer::SetAngularDamping(float angularDamping, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setAngularDamping(angularDamping);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_ANGULAR_DAMPING;
+	cmd.To = &rb;
+	cmd.angularDamping = angularDamping;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::ResetForces(NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->resetForce();
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::RESET_FORCES;
+	cmd.To = &rb;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::ResetTorque(NodeRigidBody& rb)
 {
-
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->resetTorque();
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::RESET_TORQUE;
+	cmd.To = &rb;
+	Instance().m_commands.push(cmd);
 }
 
 void  PhysicsServer::SetMass(float mass, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setMass(mass);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_MASS;
+	cmd.To = &rb;
+	cmd.mass = mass;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::SetBodyType(RigidBodyType type, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D == nullptr) return;
-	switch (type)
-	{
-	case RigidBodyType::STATIC:
-		rb.m_pRigidBody->setType(rp3d::BodyType::STATIC);
-		break;
-	case RigidBodyType::KINEMATIC:
-		rb.m_pRigidBody->setType(rp3d::BodyType::KINEMATIC);
-		break;
-	case RigidBodyType::DYNAMIC:
-		rb.m_pRigidBody->setType(rp3d::BodyType::DYNAMIC);
-		break;
-	default:
-		DEBUG("Invalid RigidBodyType set in SetBodyType func\n");
-		break;
-	}
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_MASS;
+	cmd.To = &rb;
+	cmd.bodyType = type;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::LockLinearAxis(bool lockAxis[], NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setLinearLockAxisFactor(rp3d::Vector3{ lockAxis[0] == true ? 0.0f : 1.0f, lockAxis[1] == true ? 0.0f : 1.0f, lockAxis[2] == true ? 0.0f : 1.0f });
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::LOCK_LINEAR_AXIS;
+	cmd.To = &rb;
+	cmd.lockAxis[0] = lockAxis[0];
+	cmd.lockAxis[1] = lockAxis[1];
+	cmd.lockAxis[2] = lockAxis[2];
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::LockAngularAxis(bool lockAxis[], NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setAngularLockAxisFactor(rp3d::Vector3{ lockAxis[0] == true ? 0.0f : 1.0f, lockAxis[1] == true ? 0.0f : 1.0f, lockAxis[2] == true ? 0.0f : 1.0f });
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::LOCK_ANGULAR_AXIS;
+	cmd.To = &rb;
+	cmd.lockAxis[0] = lockAxis[0];
+	cmd.lockAxis[1] = lockAxis[1];
+	cmd.lockAxis[2] = lockAxis[2];
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::SetSleepingEnabled(bool enabled, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setIsAllowedToSleep(enabled);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_SLEEPING_ENABLED;
+	cmd.To = &rb;
+	cmd.sleepingEnabled = enabled;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::SetSleepingState(bool isSleeping, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->setIsSleeping(isSleeping);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_SLEEPING_STATE;
+	cmd.To = &rb;
+	cmd.isSleeping = isSleeping;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::SetIsGravityEnabled(bool enabled, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
-		rb.m_pRigidBody->enableGravity(enabled);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_IS_GRAVITY_ENABLED;
+	cmd.To = &rb;
+	cmd.gravityEnabled = enabled;
+	Instance().m_commands.push(cmd);
 }
 
 
 // =========== Collider intermediate function definitions ===========
 
-void PhysicsServer::AttachToRigidBody(rp3d::RigidBody* rigidBody, NodeCollider& c)
+void PhysicsServer::AttachToRigidBody(rp3d::RigidBody* _rigidBody, NodeCollider& c)
 {
-	if (!c.m_pShape) return;
-	c.m_pRigidBody = rigidBody;
-	c.m_pCollider = rigidBody->addCollider(c.m_pShape, c.GetLocalRp3dTransform());
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::ATTACH_TO_RIGID_BODY;
+	cmd.To = &c;
+	cmd.rigidBody = _rigidBody;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::Detach(NodeCollider& c)
 {
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::DETACH;
+	cmd.To = &c;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::DestroyShape(NodeCollider& c)
 {
-	if (!c.m_pShape) return;
-
-	auto& pc = PhysicsServer::GetPhysicsCommon(); // A REFAIRE POUR SUIVRE LOGIQUE SERVEUR
-
-	if (auto* s = dynamic_cast<rp3d::BoxShape*>(c.m_pShape))
-		pc.destroyBoxShape(s);
-	else if (auto* s = dynamic_cast<rp3d::SphereShape*>(c.m_pShape))
-		pc.destroySphereShape(s);
-	else if (auto* s = dynamic_cast<rp3d::CapsuleShape*>(c.m_pShape))
-		pc.destroyCapsuleShape(s);
-
-	c.m_pShape = nullptr;
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::DESTROY_SHAPE;
+	cmd.To = &c;
+	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::SetBoxShape(const glm::vec3& halfExtents, NodeCollider& c)
 {
-	Detach(c);
-	DestroyShape(c);
-	c.m_pShape = PhysicsServer::GetPhysicsCommon().createBoxShape({ halfExtents.x, halfExtents.y, halfExtents.z });
-
-	if (c.m_pRigidBody)
-		AttachToRigidBody(c.m_pRigidBody, c);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_BOX_SHAPE;
+	cmd.To = &c;
+	cmd.halfExtents = halfExtents;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::SetSphereShape(float radius, NodeCollider& c)
 {
-	Detach(c);
-	DestroyShape(c);
-	c.m_pShape = PhysicsServer::GetPhysicsCommon().createSphereShape(radius);
-	if (c.m_pRigidBody) AttachToRigidBody(c.m_pRigidBody, c);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_BOX_SHAPE;
+	cmd.To = &c;
+	cmd.radius = radius;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::SetCapsuleShape(float radius, float height, NodeCollider& c)
 {
-	Detach(c);
-	DestroyShape(c);
-	c.m_pShape = PhysicsServer::GetPhysicsCommon().createCapsuleShape(radius, height);
-	if (c.m_pRigidBody) AttachToRigidBody(c.m_pRigidBody, c);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_BOX_SHAPE;
+	cmd.To = &c;
+	cmd.radius = radius;
+	cmd.height = height;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::SetLocalPosition(const glm::vec3& pos, NodeCollider& c)
 {
-	c.m_localPosition = pos;
-	if (c.m_pCollider)
-		c.m_pCollider->setLocalToBodyTransform(c.GetLocalRp3dTransform());
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_LOCAL_POSITION;
+	cmd.To = &c;
+	cmd.pos = pos;
+	Instance().m_commands.push(cmd);
 }
 
 void PhysicsServer::SetLocalRotation(const glm::quat& rot, NodeCollider& c)
 {
-	c.m_localRotation = rot;
-	if (c.m_pCollider)
-		c.m_pCollider->setLocalToBodyTransform(c.GetLocalRp3dTransform());
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_LOCAL_POSITION;
+	cmd.To = &c;
+	cmd.rotation = rot;
+	Instance().m_commands.push(cmd);
 }
 
-void  PhysicsServer::SetBounciness(float v, NodeCollider& c)
+void  PhysicsServer::SetBounciness(float bounciness, NodeCollider& c)
 {
-	if (c.m_pCollider) c.m_pCollider->getMaterial().setBounciness(v);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_BOUNCINESS;
+	cmd.To = &c;
+	cmd.bounciness = bounciness;
+	Instance().m_commands.push(cmd);
 }
-void  PhysicsServer::SetFrictionCoefficient(float v, NodeCollider& c)
+void  PhysicsServer::SetFrictionCoefficient(float coef, NodeCollider& c)
 {
-	if (c.m_pCollider) c.m_pCollider->getMaterial().setFrictionCoefficient(v);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_FRICTION_COEFFICIENT;
+	cmd.To = &c;
+	cmd.friction = coef;
+	Instance().m_commands.push(cmd);
 }
-void  PhysicsServer::SetMassDensity(float v, NodeCollider& c)
+void  PhysicsServer::SetMassDensity(float mass, NodeCollider& c)
 {
-	if (c.m_pCollider) c.m_pCollider->getMaterial().setMassDensity(v);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_MASS_DENSITY;
+	cmd.To = &c;
+	cmd.friction = mass;
+	Instance().m_commands.push(cmd);
 }
-void PhysicsServer::SetIsTrigger(bool v, NodeCollider& c)
+void PhysicsServer::SetIsTrigger(bool value, NodeCollider& c)
 {
-	if (c.m_pCollider) c.m_pCollider->setIsTrigger(v);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_IS_TRIGGER;
+	cmd.To = &c;
+	cmd.trigger = value;
+	Instance().m_commands.push(cmd);
 }
-void PhysicsServer::SetIsSimulationCollider(bool v, NodeCollider& c)
+void PhysicsServer::SetIsSimulationCollider(bool value, NodeCollider& c)
 {
-	if (c.m_pCollider) c.m_pCollider->setIsSimulationCollider(v);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_IS_SIMULATION_COLLIDER;
+	cmd.To = &c;
+	cmd.isSimulationCollider = value;
+	Instance().m_commands.push(cmd);
 }
-void PhysicsServer::SetIsWorldQueryCollider(bool v, NodeCollider& c)
+void PhysicsServer::SetIsWorldQueryCollider(bool value, NodeCollider& c)
 {
-	if (c.m_pCollider) c.m_pCollider->setIsWorldQueryCollider(v);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_IS_SIMULATION_COLLIDER;
+	cmd.To = &c;
+	cmd.isWorldQueryCollider = value;
+	Instance().m_commands.push(cmd);
 }
-void PhysicsServer::SetCollisionCategoryBits(uint16_t v, NodeCollider& c)
+void PhysicsServer::SetCollisionCategoryBits(uint16_t value, NodeCollider& c)
 {
-	if (c.m_pCollider) c.m_pCollider->setCollisionCategoryBits(v);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_IS_SIMULATION_COLLIDER;
+	cmd.To = &c;
+	cmd.category = value;
+	Instance().m_commands.push(cmd);
 }
 
-void PhysicsServer::SetCollideWithMaskBits(uint16_t v, NodeCollider& c) 
+void PhysicsServer::SetCollideWithMaskBits(uint16_t mask, NodeCollider& c) 
 {
-	if (c.m_pCollider) c.m_pCollider->setCollideWithMaskBits(v);
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::SET_IS_SIMULATION_COLLIDER;
+	cmd.To = &c;
+	cmd.mask = mask;
+	Instance().m_commands.push(cmd);
 }
 
 

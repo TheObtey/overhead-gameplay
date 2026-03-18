@@ -12,8 +12,9 @@ static rp3d::Vector3 glmToRp3d(const glm::vec3& vec) { return rp3d::Vector3(vec.
 enum class CollisionShape { SPHERE, CAPSULE, CONVEX_POLYHEDRON, CONCAVE_SHAPE };
 enum class CollisionShapeName { TRIANGLE, SPHERE, CAPSULE, BOX, CONVEX_MESH, TRIANGLE_MESH, HEIGHTFIELD };
 
-
 enum class RigidBodyType { STATIC, KINEMATIC, DYNAMIC, NONE };
+
+class NodeCollider;
 
 class NodeRigidBody : public Node
 {

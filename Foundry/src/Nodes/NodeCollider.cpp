@@ -53,26 +53,24 @@ void NodeCollider::SetBoxShape(const glm::vec3& halfExtents)
 {
 	Detach();
 	DestroyShape();
-	m_pShape = PhysicsServer::GetPhysicsCommon().createBoxShape({ halfExtents.x, halfExtents.y, halfExtents.z });
-
-	if (m_pRigidBody)
-		AttachToRigidBody(m_pRigidBody);
+	if (m_pCollider)
+		PhysicsServer::SetBoxShape(halfExtents, *this);
 }
 
 void NodeCollider::SetSphereShape(float radius)
 {
 	Detach();
 	DestroyShape();
-	m_pShape = PhysicsServer::GetPhysicsCommon().createSphereShape(radius);
-	if (m_pRigidBody) AttachToRigidBody(m_pRigidBody);
+	if (m_pCollider)
+		PhysicsServer::SetSphereShape(radius, *this);
 }
 
 void NodeCollider::SetCapsuleShape(float radius, float height)
 {
 	Detach();
 	DestroyShape();
-	m_pShape = PhysicsServer::GetPhysicsCommon().createCapsuleShape(radius, height);
-	if (m_pRigidBody) AttachToRigidBody(m_pRigidBody);
+	if (m_pCollider)
+		PhysicsServer::SetCapsuleShape(radius, height, *this);
 }
 
 rp3d::Transform NodeCollider::GetLocalRp3dTransform() const
@@ -85,28 +83,41 @@ rp3d::Transform NodeCollider::GetLocalRp3dTransform() const
 
 void NodeCollider::SetLocalPosition(const glm::vec3& pos)
 {
-	m_localPosition = pos;
 	if (m_pCollider)
-		m_pCollider->setLocalToBodyTransform(GetLocalRp3dTransform());
+		PhysicsServer::SetLocalPosition(pos, *this);
 }
 
 void NodeCollider::SetLocalRotation(const glm::quat& rot)
 {
-	m_localRotation = rot;
 	if (m_pCollider)
-		m_pCollider->setLocalToBodyTransform(GetLocalRp3dTransform());
+		PhysicsServer::SetLocalRotation(rot, *this);		
 }
 
 
 void NodeCollider::AttachToRigidBody(rp3d::RigidBody* rigidBody)
 {
 	if (!m_pShape) return;
-	m_pRigidBody = rigidBody;
-	m_pCollider = rigidBody->addCollider(m_pShape, GetLocalRp3dTransform());
+	PhysicsServer::AttachToRigidBody(rigidBody, *this);
+	
+	
+	//Command<PhysicsServer> cmd;
+	//cmd.Type = CommandTyp::ATTACH_TO_RIGID_BODY;
+	////cmd.To = &c;
+	//cmd.rigidBody = rigidBody; 
+	//PhysicsServer::PushCommand(Command<PhysicsServer>{
+	//	.Type = CmdType::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS,
+	//		.rigidBody = &rb,
+	//		.force = force,
+	//		.To = target
+	//}, this);
+
+	//PhysicsServer::Instance().m_commands.push(cmd);
+	//PhysicsServer::Instance().m_commands.push({}, *this);
 }
 
 void NodeCollider::Detach()
 {
+	PhysicsServer::Detach(*this);
 	//if (m_pCollider && m_pRigidBody)
 	//	m_pRigidBody->removeCollider(m_pCollider);
 	//m_pCollider = nullptr;
@@ -114,7 +125,7 @@ void NodeCollider::Detach()
 
 void  NodeCollider::SetBounciness(float v)
 {
-	if (m_pCollider) m_pCollider->getMaterial().setBounciness(v);
+	if (m_pCollider) PhysicsServer::SetBounciness(v, *this);
 }
 float NodeCollider::GetBounciness() const
 {
@@ -122,7 +133,7 @@ float NodeCollider::GetBounciness() const
 }
 void  NodeCollider::SetFrictionCoefficient(float v)
 {
-	if (m_pCollider) m_pCollider->getMaterial().setFrictionCoefficient(v);
+	if (m_pCollider) PhysicsServer::SetFrictionCoefficient(v, *this);
 }
 float NodeCollider::GetFrictionCoefficient() const
 {
@@ -130,7 +141,7 @@ float NodeCollider::GetFrictionCoefficient() const
 }
 void  NodeCollider::SetMassDensity(float v)
 {
-	if (m_pCollider) m_pCollider->getMaterial().setMassDensity(v);
+	if (m_pCollider) PhysicsServer::SetMassDensity(v, *this);
 }
 float NodeCollider::GetMassDensity() const
 {
@@ -139,7 +150,7 @@ float NodeCollider::GetMassDensity() const
 
 void NodeCollider::SetIsTrigger(bool v)
 {
-	if (m_pCollider) m_pCollider->setIsTrigger(v);
+	if (m_pCollider) PhysicsServer::SetIsTrigger(v, *this);
 }
 bool NodeCollider::IsTrigger() const
 {
@@ -147,7 +158,7 @@ bool NodeCollider::IsTrigger() const
 }
 void NodeCollider::SetIsSimulationCollider(bool v)
 {
-	if (m_pCollider) m_pCollider->setIsSimulationCollider(v);
+	if (m_pCollider) PhysicsServer::SetIsSimulationCollider(v, *this);
 }
 bool NodeCollider::IsSimulationCollider() const
 {
@@ -155,7 +166,7 @@ bool NodeCollider::IsSimulationCollider() const
 }
 void NodeCollider::SetIsWorldQueryCollider(bool v)
 {
-	if (m_pCollider) m_pCollider->setIsWorldQueryCollider(v);
+	if (m_pCollider)PhysicsServer::SetIsWorldQueryCollider(v, *this);
 }
 bool NodeCollider::IsWorldQueryCollider() const
 {
@@ -165,7 +176,7 @@ bool NodeCollider::IsWorldQueryCollider() const
 
 void NodeCollider::SetCollisionCategoryBits(uint16_t v)
 {
-	if (m_pCollider) m_pCollider->setCollisionCategoryBits(v);
+	if (m_pCollider) PhysicsServer::SetCollisionCategoryBits(v, *this);
 }
 uint16_t NodeCollider::GetCollisionCategoryBits() const
 {
@@ -173,7 +184,7 @@ uint16_t NodeCollider::GetCollisionCategoryBits() const
 }
 void NodeCollider::SetCollideWithMaskBits(uint16_t v) 
 {
-	if (m_pCollider) m_pCollider->setCollideWithMaskBits(v);
+	if (m_pCollider) PhysicsServer::SetCollideWithMaskBits(v, *this);
 }
 uint16_t NodeCollider::GetCollisionBitsMask() const
 {
