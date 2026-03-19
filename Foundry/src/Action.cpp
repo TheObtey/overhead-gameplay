@@ -32,7 +32,7 @@ void Action::SetEvent(Event<RV(Args...)> const& event)
 }
 
 template <typename RV, typename... Args>
-Event<RV(Args...)>& Action::GetEvent(uint32 index) const
+Event<RV(Args...)>& Action::GetEvent() const
 {
 	return m_event;
 }

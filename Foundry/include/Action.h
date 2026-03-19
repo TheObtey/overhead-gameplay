@@ -33,7 +33,7 @@ public:
 	void SetEvent(Event<RV(Args...)> const& event);
 
 	template <typename RV, typename... Args>
-	Event<RV(Args...)>& GetEvent(uint32 index) const;
+	Event<RV(Args...)>& GetEvent() const;
 
 	uint32 AddControl(ControlType const& type, EventInput const& eventInput);
 

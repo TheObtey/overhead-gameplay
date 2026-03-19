@@ -22,9 +22,7 @@ ButtonControl::ButtonState ButtonControl::GetState()
 
 void ButtonControl::Read(IControl& iControl)
 {
-
 	//
-
 }
 
 

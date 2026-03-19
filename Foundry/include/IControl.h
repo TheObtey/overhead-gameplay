@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 
-enum class EventInput;
+enum class EventInput; // forward depuis Ore ?
 class Action;
 
 
