@@ -21,7 +21,7 @@ struct Light
 class LightPass final : public Pass
 {
 public:
-    LightPass(Shader const& shader, std::vector<Light> const& lights, Camera const& camera);
+    LightPass(Shader const& shader, std::vector<Light> const& lights, sptr<Camera> pCamera);
     ~LightPass();
 
     void SetLights(std::vector<Light> const& lights);

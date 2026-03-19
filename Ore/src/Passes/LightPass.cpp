@@ -2,7 +2,7 @@
 #include "TextureObject.h"
 #include "Logger.hpp"
 
-LightPass::LightPass(Shader const& shader, std::vector<Light> const& lights, Camera const& camera) : Pass(shader, camera)
+LightPass::LightPass(Shader const& shader, std::vector<Light> const& lights, sptr<Camera> pCamera) : Pass(shader, pCamera)
 {
     m_quadVAOId = 0;
     m_quadVBOId = 0;

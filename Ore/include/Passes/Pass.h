@@ -9,8 +9,8 @@ class TextureObject;
 class Pass : public IPass
 {
 public:
-    Pass(Shader const& shader, Camera const& camera);
-    Pass(Pass& other) {m_pShader = other.m_pShader;}
+    Pass(Shader const& shader, sptr<Camera> camera);
+    Pass(Pass& other) { m_pShader = other.m_pShader; }
     ~Pass() override;
 
 protected:

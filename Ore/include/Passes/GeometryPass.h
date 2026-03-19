@@ -7,14 +7,14 @@ class Mesh;
 class GeometryPass final : public Pass
 {
 public:
-    GeometryPass(Shader const& shader, std::vector<Mesh> const& meshes, Camera const& camera);
+    GeometryPass(Shader const& shader, std::vector<Mesh*> const& meshes, sptr<Camera> camera);
     ~GeometryPass() override;
 
-    void SetMeshes(std::vector<Mesh> meshes);
+    void SetMeshes(std::vector<Mesh*> const& meshes) {m_meshes = meshes;}
     void Execute() override;
     
 private:
-    std::vector<sptr<Mesh>> m_meshes;
+    std::vector<Mesh*> m_meshes;
 
 };
 #endif

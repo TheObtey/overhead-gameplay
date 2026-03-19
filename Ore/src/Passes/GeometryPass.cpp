@@ -5,14 +5,9 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-GeometryPass::GeometryPass(Shader const& shader, std::vector<Mesh> const& meshes, Camera const& camera) : Pass(shader, camera)
+GeometryPass::GeometryPass(Shader const& shader, std::vector<Mesh*> const& meshes, sptr<Camera> pCamera) : Pass(shader, pCamera)
 {
-    for(int i = 0; i<meshes.size(); ++i)
-    {
-        m_meshes.push_back(std::make_shared<Mesh>(meshes[i]));
-    }
-
-    m_pCamera = std::make_shared<Camera>(camera);
+    m_meshes = meshes;
 }
 
 GeometryPass::~GeometryPass()

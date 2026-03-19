@@ -1,9 +1,9 @@
 #include "Passes/Pass.h"
 
-Pass::Pass(Shader const& shader, Camera const& camera)
+Pass::Pass(Shader const& shader, sptr<Camera> pCamera)
 {
     m_pShader = std::make_shared<Shader>(shader);
-    m_pCamera = std::make_shared<Camera>(camera);
+    m_pCamera = pCamera;
 }
 
 Pass::~Pass()
