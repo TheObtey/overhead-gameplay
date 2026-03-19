@@ -6,7 +6,6 @@ find_package(lua REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 #find_package(raylib REQUIRED)
 find_package(glm CONFIG REQUIRED)
-
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 if (MSVC)
@@ -25,6 +24,19 @@ target_include_directories(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/include/
         ${SOL2_INCLUDE_DIRS}
 )
+
+
+include(FetchContent)
+
+FetchContent_Declare(
+    assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp.git
+    GIT_TAG v5.3.1
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_MakeAvailable(assimp)
+
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ReactPhysics3D::ReactPhysics3D)
 target_link_libraries(${PROJECT_NAME} PUBLIC unofficial::enet::enet)
