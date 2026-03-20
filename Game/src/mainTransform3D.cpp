@@ -138,9 +138,12 @@ int main() {
 	//auto ref_player = static_cast<NodeCollider*>(&player->FindChild<NodeCollider>()->get());
 
 	//auto ref_collider = static_cast<NodeCollider*>(&RB_player->FindChild<NodeCollider>()->get());
-	//auto ref_collider = static_cast<NodeCollider*>(&RB_player->GetChild(0));
+	auto ref_collider = static_cast<NodeCollider*>(&RB_player->GetChild(0));
+
 	//if (ref_collider)
 	//	ref_collider->init();
+
+	PhysicsServer::FlushCommands();
 
 	//  Mur statique 
 	const Vector3   WALL_POS = { 3.0f, 1.0f, 0.0f };
@@ -215,9 +218,8 @@ int main() {
 	EngineServer::FlushCommands();
 	PhysicsServer::FlushCommands();
 
-	auto ref_collider = static_cast<NodeCollider*>(&RB_player->GetChild(0));
-	if (ref_collider)
-		//ref_collider->init();
+	auto ref_wallCollider = static_cast<NodeCollider*>(&RB_wall->GetChild(0));
+	auto ref_floorCollider = static_cast<NodeCollider*>(&RB_floor->GetChild(0));
 
 	int d = 0;
 	bool test = false;
@@ -265,8 +267,18 @@ int main() {
 		}
 
 
-		PhysicsServer::FlushCommands();
 
+		PhysicsServer::FlushCommands();
+		RB_player->Update(dt);
+		player->Update(dt);
+		ref_collider->Update(dt);
+		RB_wall->Update(dt);
+		wall->Update(dt);
+		ref_wallCollider->Update(dt);
+		RB_floor->Update(dt);
+		floor->Update(dt);
+		ref_floorCollider->Update(dt);
+		PhysicsServer::FlushCommands();
 		// --- update physics ---
 		accumulator += dt;
 		while (accumulator >= FIXED_DT) {
@@ -274,16 +286,10 @@ int main() {
 			PhysicsServer::UpdatePhysicsWorld(FIXED_DT);
 			accumulator -= FIXED_DT;
 		}
-		RB_player->Update(dt);
-		player->Update(dt);
-
-		//RB_wall->Update(dt);
-		//wall->Update(dt);
-		//RB_floor->Update(dt);
-		//floor->Update(dt);
-
 
 		PhysicsServer::FlushCommands();
+
+
 		//rp3d::Vector3 p = playerBody->getTransform().getPosition();
 		rp3d::Vector3 p = { RB_player->GetPosition().x, RB_player->GetPosition().y, RB_player->GetPosition().z };
 		pos = { p.x, p.y, p.z };
