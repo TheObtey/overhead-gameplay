@@ -35,7 +35,7 @@ public:
 	virtual void OnUpdate(double delta) override;
 
 	void SetNode3DParent(Node3D* owner);
-	rp3d::RigidBody& GetRigidBody() { return *m_pRigidBody; }
+	rp3d::RigidBody* GetRigidBody() { return m_pRigidBody; }
 	void SetRigidBody(rp3d::RigidBody* rb) { m_pRigidBody = rb; }
 
 	operator rp3d::Transform();

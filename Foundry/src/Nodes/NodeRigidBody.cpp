@@ -21,13 +21,13 @@ NodeRigidBody::NodeRigidBody(std::string const& name) : Node(name)
 	//				AttachToRigidBody(&rigidBody->GetRigidBody());
 	//	});
 
-	OnSceneLeave.Subscribe([this](Node& self)
-		{
-			PhysicsServer::DestroyRigidBody(*this);
-			//PhysicsServer::GetPhysicsWorld().destroyRigidBody(m_pRigidBody);
-			m_pRigidBody = nullptr;
-			m_pNode3D = nullptr;
-		});
+	//OnSceneLeave.Subscribe([this](Node& self)
+	//	{
+	//		//PhysicsServer::DestroyRigidBody(*this);
+	//		//PhysicsServer::GetPhysicsWorld().destroyRigidBody(m_pRigidBody);
+	//		m_pRigidBody = nullptr;
+	//		m_pNode3D = nullptr;
+	//	});
 }
 
 NodeRigidBody::NodeRigidBody(std::string const& name, Node3D* owner) : Node(name)

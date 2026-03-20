@@ -20,9 +20,6 @@
 #include <Debug.h>
 
 
-//#include "raymath.h"
-//#include "rlgl.h"
-
 class OverlapCB : public rp3d::OverlapCallback {
 public:
 	bool hit = false;
@@ -94,31 +91,18 @@ int main() {
 	PhysicsServer::Initialize();
 
 	//// cube
-	Vector3 pos = { 0.0f, 1.0f, 0.0f };
-	Vector3 pSize = { 1.0f, 1.0f, 1.0f };
+	glm::vec3 pos = { 0.0f, 1.0f, 0.0f };
+	glm::vec3 pSize = { 1.0f, 1.0f, 1.0f };
 	float   rotY = 0.0f;
 	float   rotX = 0.0f;
 
-	//auto RB_player = Node::CreateNode<NodeRigidBody>("rb_player");
-	//auto player = Node::CreateNode<Node3D>("player");
-	//player.get()->SetLocalPosition({ pos.x,pos.y,pos.z });
-	//player->AddLocalPitch(20);
-	////player->Update(0.016);
-	//RB_player->SetNode3DParent(player.get());
-	//RB_player->GetRigidBody().setType(rp3d::BodyType::DYNAMIC);
-	//RB_player->AddBoxCollider({ pSize.x, pSize.y, pSize.z });
-	//RB_player->GetRigidBody().enableGravity(false);
-	//RB_player->GetRigidBody().setMass(1.0f);
 	auto player = Node::CreateNode<Node3D>("player");
 	auto RB_player = Node::CreateNode<NodeRigidBody>("rb_player");
 	auto C_player = Node::CreateNode<NodeCollider>("c_player");
 
-	player->SetLocalPosition({ 0.0f, 1.0f, 0.0f });
+	player->SetLocalPosition(pos);
 
-	C_player->SetBoxShape({ 1.0f, 1.0f, 1.0f });
-
-	EngineServer::FlushCommands();
-	PhysicsServer::FlushCommands();
+	C_player->SetBoxShape(pSize);
 
 	RB_player->SetNode3DParent(player.get());
 	RB_player->SetBodyType(RigidBodyType::DYNAMIC);
@@ -126,77 +110,44 @@ int main() {
 	RB_player->SetMass(1.0f);
 	RB_player->SetAngularDamping(2.0f);
 	RB_player->SetLinearDamping(1.0f);
-	//RB_player->GetRigidBody().setAngularLockAxisFactor(rp3d::Vector3(1.0, 1.0, 1.0));
 
-	//RB_player->AddChild(std::move(C_player));
+	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
 	RB_player->AddChild(std::move(C_player));
-	//C_player->Reparent(*RB_player.get());
 
-	EngineServer::FlushCommands();
-	PhysicsServer::FlushCommands();
-
-	//auto ref_player = static_cast<NodeCollider*>(&player->FindChild<NodeCollider>()->get());
-
-	//auto ref_collider = static_cast<NodeCollider*>(&RB_player->FindChild<NodeCollider>()->get());
-	auto ref_collider = static_cast<NodeCollider*>(&RB_player->GetChild(0));
-
-	//if (ref_collider)
-	//	ref_collider->init();
-
-	PhysicsServer::FlushCommands();
 
 	//  Mur statique 
-	const Vector3   WALL_POS = { 3.0f, 1.0f, 0.0f };
-	const float     WALL_W = 1.0f;
-	const float     WALL_H = 4.0f;
-	const float     WALL_D = 6.0f;
-
-	//auto RB_wall = Node::CreateNode<NodeRigidBody>("rb_wall");
-	//auto wall = Node::CreateNode<Node3D>("wall");
-	//wall.get()->SetLocalPosition({ WALL_POS.x,WALL_POS.y,WALL_POS.z });
-	//RB_wall->SetNode3DParent(wall.get());
-	//RB_wall->GetRigidBody().setType(rp3d::BodyType::STATIC);
-	//RB_wall->AddBoxCollider({ WALL_W / 2, WALL_H / 2, WALL_D / 2 });
-	//RB_wall->GetRigidBody().enableGravity(false);
-	//RB_wall->GetRigidBody().setMass(1.0f);
-
-	auto wall = Node::CreateNode<Node3D>("wall");
-	auto RB_wall = Node::CreateNode<NodeRigidBody>("rb_wall");
-	auto C_wall = Node::CreateNode<NodeCollider>("c_wall");
+	const Vector3   WALL_POS= { 3.0f, 1.0f, 0.0f };
+	const float     WALL_W	= 1.0f, WALL_H = 4.0f, WALL_D = 6.0f;
+	auto			wall	= Node::CreateNode<Node3D>("wall");
+	auto			RB_wall = Node::CreateNode<NodeRigidBody>("rb_wall");
+	auto			C_wall	= Node::CreateNode<NodeCollider>("c_wall");
 
 	wall->SetLocalPosition({ 3.0f, 1.0f, 0.0f });
-	C_wall->SetBoxShape({ 0.5f, 2.0f, 3.0f });
 
 	RB_wall->SetNode3DParent(wall.get());
 	RB_wall->SetBodyType(RigidBodyType::STATIC);
 
+	C_wall->SetBoxShape({ 0.5f, 2.0f, 3.0f });
+
+	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
 	RB_wall->AddChild(std::move(C_wall));
 
 
 	//  Sol statique 
 	const Vector3   FLOOR_POS = { 0.0f, -1.0f, 0.0f };
-	const float     FLOOR_W = 100.0f;
-	const float     FLOOR_H = 2.0f;
-	const float     FLOOR_D = 100.0f;
-
-	//auto RB_floor = Node::CreateNode<NodeRigidBody>("rb_floor");
-	//auto floor = Node::CreateNode<Node3D>("floor");
-	//floor.get()->SetLocalPosition({ FLOOR_POS.x,FLOOR_POS.y,FLOOR_POS.z });
-	//RB_floor->SetNode3DParent(floor.get());
-	//RB_floor->GetRigidBody().setType(rp3d::BodyType::STATIC);
-	//RB_floor->AddBoxCollider({ FLOOR_W / 2, FLOOR_H / 2, FLOOR_D / 2 });
-	auto floor = Node::CreateNode<Node3D>("floor");
-	auto RB_floor = Node::CreateNode<NodeRigidBody>("rb_floor");
-	auto C_floor = Node::CreateNode<NodeCollider>("c_floor");
+	const float     FLOOR_W = 100.0f, FLOOR_H = 2.0f, FLOOR_D = 100.0f;
+	auto			floor	= Node::CreateNode<Node3D>("floor");
+	auto			RB_floor= Node::CreateNode<NodeRigidBody>("rb_floor");
+	auto			C_floor = Node::CreateNode<NodeCollider>("c_floor");
 
 	floor->SetLocalPosition({ 0.0f, -1.0f, 0.0f });
-	C_floor->SetBoxShape({ 50.0f, 10.0f, 50.0f });
+	C_floor->SetBoxShape({ 50.0f, 1.0f, 50.0f });
 
 	RB_floor->SetNode3DParent(floor.get());
 	RB_floor->SetBodyType(RigidBodyType::STATIC);
 
+	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
 	RB_floor->AddChild(std::move(C_floor));
-
 
 
 	// params
@@ -206,26 +157,20 @@ int main() {
 	float accumulator = 0.0f;
 	bool  isColliding = false;
 
-	//RB_player->LockAngularAxis(1.0, 1.0, 1.0);
-	//RB_player->LockLinearAxis(0.0, 0.0, 0.0);
-	//RB_player->GetRigidBody().setLinearLockAxisFactor(rp3d::Vector3(1.0, 0.0, 0.0));
-	//playerBody->setLinearLockAxisFactor
-	//RB_player->GetRigidBody().setLinearDamping(8.0f);
-
 	Mesh cubeMesh = GenMeshCube(2.0f, 2.0f, 2.0f);
 	Material cubeMaterial = LoadMaterialDefault();
 
-	EngineServer::FlushCommands();
-	PhysicsServer::FlushCommands();
+	EngineServer::FlushCommands(); // Important pour que les RB soient tous cree avant de faire le cast des colliders
 
+	auto ref_collider = static_cast<NodeCollider*>(&RB_player->GetChild(0));
 	auto ref_wallCollider = static_cast<NodeCollider*>(&RB_wall->GetChild(0));
 	auto ref_floorCollider = static_cast<NodeCollider*>(&RB_floor->GetChild(0));
+	
+	player->AddScale({ 1.0f, 3.0f, 0.0f });
+	ref_collider->SetBoxShape(player->GetScale());
 
-	int d = 0;
 	bool test = false;
 	bool t = false;
-
-
 	while (!WindowShouldClose())
 	{
 		float dt = GetFrameTime();
@@ -266,19 +211,9 @@ int main() {
 			DEBUG(b);
 		}
 
-
-
-		PhysicsServer::FlushCommands();
-		RB_player->Update(dt);
 		player->Update(dt);
-		ref_collider->Update(dt);
-		RB_wall->Update(dt);
-		wall->Update(dt);
-		ref_wallCollider->Update(dt);
-		RB_floor->Update(dt);
-		floor->Update(dt);
-		ref_floorCollider->Update(dt);
-		PhysicsServer::FlushCommands();
+		RB_player->Update(dt);
+
 		// --- update physics ---
 		accumulator += dt;
 		while (accumulator >= FIXED_DT) {
@@ -289,14 +224,9 @@ int main() {
 
 		PhysicsServer::FlushCommands();
 
-
-		//rp3d::Vector3 p = playerBody->getTransform().getPosition();
-		rp3d::Vector3 p = { RB_player->GetPosition().x, RB_player->GetPosition().y, RB_player->GetPosition().z };
-		pos = { p.x, p.y, p.z };
-
 		// --- test overlap ---
 		OverlapCB cb;
-		PhysicsServer::GetPhysicsWorld().testOverlap(&RB_player->GetRigidBody(), cb);
+		PhysicsServer::GetPhysicsWorld().testOverlap(RB_player->GetRigidBody(), cb);
 		isColliding = cb.hit;
 
 		// --- draw ---
@@ -351,9 +281,8 @@ int main() {
 		else
 			DrawText("Aucune collision", 20, 118, 20, GREEN);
 
-		//DrawText(TextFormat("RB_Pos: (%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z),
 		DrawText(TextFormat("C_Pos: (%.1f, %.1f, %.1f)", ref_collider->GetLocalPosition().x, ref_collider->GetLocalPosition().y, ref_collider->GetLocalPosition().z),
-			10, GetScreenHeight() - 58, 16, BLACK);
+			10, GetScreenHeight() - 70, 16, BLACK);
 		DrawText(TextFormat("RB_Pos: (%.1f, %.1f, %.1f)", RB_player->GetPosition().x, RB_player->GetPosition().y, RB_player->GetPosition().z),
 			10, GetScreenHeight() - 48, 16, BLACK);
 		DrawText(TextFormat("PlayerPos: (%.1f, %.1f, %.1f)", player->GetPosition().x, player->GetPosition().y, player->GetPosition().z),

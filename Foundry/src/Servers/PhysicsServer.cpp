@@ -3,8 +3,8 @@
 #include "Nodes/NodeCollider.h"
 #include "Debug.h"
 
-reactphysics3d::PhysicsWorld* PhysicsServer::m_pPhysicsWorld = nullptr;
-reactphysics3d::PhysicsCommon PhysicsServer::m_physicsCommon;
+//reactphysics3d::PhysicsWorld* PhysicsServer::m_pPhysicsWorld = nullptr;
+//reactphysics3d::PhysicsCommon PhysicsServer::m_physicsCommon;
 
 
 PhysicsServer::PhysicsServer() : Server()
@@ -13,22 +13,15 @@ PhysicsServer::PhysicsServer() : Server()
 
 PhysicsServer::~PhysicsServer()
 {
-	PhysicsServer::GetPhysicsCommon().destroyPhysicsWorld(m_pPhysicsWorld);
 }
 
 void PhysicsServer::OnInitialize()
 {
-	rp3d::PhysicsWorld::WorldSettings settings;
-	settings.isSleepingEnabled = true;
-	settings.gravity = rp3d::Vector3(0, -9.81, 0);
-	m_pPhysicsWorld = m_physicsCommon.createPhysicsWorld(settings);
 }
 
 void PhysicsServer::OnUnInitialize()
 {
 	if (m_pPhysicsWorld == nullptr) return;
-
-	PhysicsServer::GetPhysicsCommon().destroyPhysicsWorld(m_pPhysicsWorld);
 	m_pPhysicsWorld = nullptr;
 }
 
@@ -49,21 +42,9 @@ void PhysicsServer::Initialize() // ajouter tous les params ?
 	settings.defaultBounciness = 0.5f;                      // Default is 0.5f
 	settings.persistentContactDistanceThreshold = 0.03;     // Default is 0.03
 
-	m_pPhysicsWorld = m_physicsCommon.createPhysicsWorld(settings);
+	Instance().m_pPhysicsWorld = Instance().m_physicsCommon.createPhysicsWorld(settings);
 	//m_pPhysicsWorld = m_physicsCommon.createPhysicsWorld();
 }
-//rp3d::RigidBody* PhysicsServer::CreateRigidBody2(const rp3d::Transform& transform, Node* const To)
-//{
-	//Command<PhysicsServer> cmd;
-	//cmd.Type = CommandTyp::LOCK_ANGULAR_AXIS;
-	//cmd.To = &rb;
-	//cmd.lockAxis[0] = lockAxis[0];
-	//cmd.lockAxis[1] = lockAxis[1];
-	//cmd.lockAxis[2] = lockAxis[2];
-	//Instance().m_commands.push(cmd);
-
-	//return m_pPhysicsWorld->createRigidBody(transform);
-//}
 void PhysicsServer::CreateRigidBody(NodeRigidBody& rigidBody)
 {
 	Command<PhysicsServer> cmd;
@@ -81,11 +62,11 @@ void PhysicsServer::DestroyRigidBody(NodeRigidBody& rigidBody)
 
 void PhysicsServer::S_CreateRigidBody(NodeRigidBody& rigidBody)
 {
-	rigidBody.m_pRigidBody = m_pPhysicsWorld->createRigidBody(rigidBody);
+	rigidBody.m_pRigidBody = Instance().m_pPhysicsWorld->createRigidBody(rigidBody);
 }
 void PhysicsServer::S_DestroyRigidBody(NodeRigidBody& rigidBody)
 {
-	m_pPhysicsWorld->destroyRigidBody(rigidBody.m_pRigidBody);
+	//Instance().m_pPhysicsWorld->destroyRigidBody(rigidBody.m_pRigidBody);
 }
 
 void PhysicsServer::FlushCommandsImpl()
@@ -706,44 +687,44 @@ void PhysicsServer::S_AttachToRigidBody(rp3d::RigidBody* rigidBody, NodeCollider
 void PhysicsServer::S_Detach(NodeCollider& c)
 {
 }
+
 void PhysicsServer::S_DestroyShape(NodeCollider& c)
 {
 	if (!c.m_pShape) return;
-
 	
-	if (auto* s = dynamic_cast<rp3d::BoxShape*>(c.m_pShape))
-		m_physicsCommon.destroyBoxShape(s);
-	else if (auto* s = dynamic_cast<rp3d::SphereShape*>(c.m_pShape))
-		m_physicsCommon.destroySphereShape(s);
-	else if (auto* s = dynamic_cast<rp3d::CapsuleShape*>(c.m_pShape))
-		m_physicsCommon.destroyCapsuleShape(s);
+	//if (auto* s = dynamic_cast<rp3d::BoxShape*>(c.m_pShape))
+	//	m_physicsCommon.destroyBoxShape(s);
+	//else if (auto* s = dynamic_cast<rp3d::SphereShape*>(c.m_pShape))
+	//	m_physicsCommon.destroySphereShape(s);
+	//else if (auto* s = dynamic_cast<rp3d::CapsuleShape*>(c.m_pShape))
+	//	m_physicsCommon.destroyCapsuleShape(s);
 
 	c.m_pShape = nullptr;
 }
 void PhysicsServer::S_SetBoxShape(const glm::vec3& halfExtents, NodeCollider& c)
 {
-	Detach(c);
-	DestroyShape(c);
+	S_Detach(c);
+	S_DestroyShape(c);
 	c.m_pShape = PhysicsServer::GetPhysicsCommon().createBoxShape({ halfExtents.x, halfExtents.y, halfExtents.z });
 
 	if (c.m_pRigidBody)
-		AttachToRigidBody(c.m_pRigidBody, c);
+		S_AttachToRigidBody(c.m_pRigidBody, c);
 }
 
 void PhysicsServer::S_SetSphereShape(float radius, NodeCollider& c)
 {
-	Detach(c);
-	DestroyShape(c);
+	S_Detach(c);
+	S_DestroyShape(c);
 	c.m_pShape = PhysicsServer::GetPhysicsCommon().createSphereShape(radius);
-	if (c.m_pRigidBody) AttachToRigidBody(c.m_pRigidBody, c);
+	if (c.m_pRigidBody) S_AttachToRigidBody(c.m_pRigidBody, c);
 }
 
 void PhysicsServer::S_SetCapsuleShape(float radius, float height, NodeCollider& c)
 {
-	Detach(c);
-	DestroyShape(c);
+	S_Detach(c);
+	S_DestroyShape(c);
 	c.m_pShape = PhysicsServer::GetPhysicsCommon().createCapsuleShape(radius, height);
-	if (c.m_pRigidBody) AttachToRigidBody(c.m_pRigidBody, c);
+	if (c.m_pRigidBody) S_AttachToRigidBody(c.m_pRigidBody, c);
 }
 
 void PhysicsServer::S_SetLocalPosition(const glm::vec3& pos, NodeCollider& c)

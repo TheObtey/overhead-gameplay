@@ -7,30 +7,30 @@ NodeCollider::NodeCollider(std::string const& name) : Node(name)
 	OnSceneEnter.Subscribe([this](Node& self)
 		{
 			if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-				AttachToRigidBody(&rigidBody->GetRigidBody());
+				AttachToRigidBody(rigidBody->GetRigidBody());
 		});
 	OnParentChange.Subscribe([this](Node& self)
 		{
 			if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-				AttachToRigidBody(&rigidBody->GetRigidBody());
+				AttachToRigidBody(rigidBody->GetRigidBody());
 		});
 
-	OnSceneLeave.Subscribe([this](Node& self)
-		{
-			Detach();
-		});
+	//OnSceneLeave.Subscribe([this](Node& self)
+	//	{
+	//		Detach();
+	//	});
 
 }
 void NodeCollider::init()
 {
-	if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-		AttachToRigidBody(&rigidBody->GetRigidBody());
+	//if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
+	//	AttachToRigidBody(rigidBody->GetRigidBody());
 }
 
 NodeCollider::~NodeCollider()
 {
-	Detach();
-	DestroyShape();
+	//Detach();
+	//DestroyShape();
 }
 
 void NodeCollider::DestroyShape()
@@ -52,26 +52,17 @@ void NodeCollider::DestroyShape()
 
 void NodeCollider::SetBoxShape(const glm::vec3& halfExtents)
 {
-	Detach();
-	DestroyShape();
-	if (m_pCollider)
-		PhysicsServer::SetBoxShape(halfExtents, *this);
+	PhysicsServer::SetBoxShape(halfExtents, *this);
 }
 
 void NodeCollider::SetSphereShape(float radius)
 {
-	Detach();
-	DestroyShape();
-	if (m_pCollider)
-		PhysicsServer::SetSphereShape(radius, *this);
+	PhysicsServer::SetSphereShape(radius, *this);
 }
 
 void NodeCollider::SetCapsuleShape(float radius, float height)
 {
-	Detach();
-	DestroyShape();
-	if (m_pCollider)
-		PhysicsServer::SetCapsuleShape(radius, height, *this);
+	PhysicsServer::SetCapsuleShape(radius, height, *this);
 }
 
 rp3d::Transform NodeCollider::GetLocalRp3dTransform() const
@@ -91,16 +82,15 @@ void NodeCollider::SetLocalPosition(const glm::vec3& pos)
 void NodeCollider::SetLocalRotation(const glm::quat& rot)
 {
 	if (m_pCollider)
-		PhysicsServer::SetLocalRotation(rot, *this);		
+		PhysicsServer::SetLocalRotation(rot, *this);
 }
 
 
 void NodeCollider::AttachToRigidBody(rp3d::RigidBody* rigidBody)
 {
-	if (!m_pShape) return;
 	PhysicsServer::AttachToRigidBody(rigidBody, *this);
-	
-	
+
+
 	//Command<PhysicsServer> cmd;
 	//cmd.Type = CommandTyp::ATTACH_TO_RIGID_BODY;
 	////cmd.To = &c;
@@ -182,7 +172,7 @@ uint16_t NodeCollider::GetCollisionCategoryBits() const
 {
 	return m_pCollider ? m_pCollider->getCollisionCategoryBits() : 0x0001;
 }
-void NodeCollider::SetCollideWithMaskBits(uint16_t v) 
+void NodeCollider::SetCollideWithMaskBits(uint16_t v)
 {
 	if (m_pCollider) PhysicsServer::SetCollideWithMaskBits(v, *this);
 }

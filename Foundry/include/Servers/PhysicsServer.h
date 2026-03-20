@@ -207,30 +207,27 @@ public:
 		//Instance().m_commands.push({ CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS, &rb, .force(force)}, target);
 		Instance().m_commands.push(cmd);
 	};
-	//Instance().m_commands.push(cmd);
 
 
 	static void Initialize();
 
-	//static rp3d::RigidBody* CreateRigidBody2(const rp3d::Transform& transform, NodeRigidBody* const To);
 	static void CreateRigidBody(NodeRigidBody& rigidBody);
 	static void DestroyRigidBody(NodeRigidBody& rigidBody);
-	//static void S_CreateRigidBody(const rp3d::Transform& transform, NodeRigidBody* const To);
 	static void S_CreateRigidBody(NodeRigidBody& rigidBody);
 	static void S_DestroyRigidBody(NodeRigidBody& rigidBody);
 
-	//static void Update(double dt)                       { Instance().m_pPhysicsWorld->update(dt); }
+	static void UpdatePhysicsWorld(double dt)                       { Instance().m_pPhysicsWorld->update(dt); }
 
-	//static rp3d::PhysicsCommon& GetPhysicsCommon()      { return Instance().m_physicsCommon; }
-	//static rp3d::PhysicsWorld& GetPhysicsWorld()        { return *Instance().m_pPhysicsWorld; }
-	static rp3d::PhysicsCommon& GetPhysicsCommon() { return m_physicsCommon; }
-	static rp3d::PhysicsWorld& GetPhysicsWorld() { return *m_pPhysicsWorld; }
-	static void UpdatePhysicsWorld(double dt) { m_pPhysicsWorld->update(dt); }
+	static rp3d::PhysicsCommon& GetPhysicsCommon()      { return Instance().m_physicsCommon; }
+	static rp3d::PhysicsWorld& GetPhysicsWorld()        { return *Instance().m_pPhysicsWorld; }
+	//static rp3d::PhysicsCommon& GetPhysicsCommon() { return m_physicsCommon; }
+	//static rp3d::PhysicsWorld& GetPhysicsWorld() { return *m_pPhysicsWorld; }
+	//static void UpdatePhysicsWorld(double dt) { m_pPhysicsWorld->update(dt); }
 
-	//static void SetGravity(const glm::vec3& gravity)    { Instance().m_pPhysicsWorld->setGravity(glmToRp3d(gravity)); }
-	//static glm::vec3 GetGravity()                       { return rp3dToGlm(Instance().m_pPhysicsWorld->getGravity()); }
-	static void SetGravity(const glm::vec3& gravity) { m_pPhysicsWorld->setGravity(glmToRp3d(gravity)); }
-	static glm::vec3 GetGravity() { return rp3dToGlm(m_pPhysicsWorld->getGravity()); }
+	static void SetGravity(const glm::vec3& gravity)    { Instance().m_pPhysicsWorld->setGravity(glmToRp3d(gravity)); }
+	static glm::vec3 GetGravity()                       { return rp3dToGlm(Instance().m_pPhysicsWorld->getGravity()); }
+	//static void SetGravity(const glm::vec3& gravity) { m_pPhysicsWorld->setGravity(glmToRp3d(gravity)); }
+	//static glm::vec3 GetGravity() { return rp3dToGlm(m_pPhysicsWorld->getGravity()); }
 
 	//static void EnableSleeping(bool enabled)            { Instance().m_pPhysicsWorld->enableSleeping(enabled); }
 
@@ -361,10 +358,10 @@ private:
 
 
 private:
-	static rp3d::PhysicsCommon m_physicsCommon;
-	static rp3d::PhysicsWorld* m_pPhysicsWorld;
-	//rp3d::PhysicsCommon m_physicsCommon;
-	//rp3d::PhysicsWorld* m_pPhysicsWorld;
+	//static rp3d::PhysicsCommon m_physicsCommon;
+	//static rp3d::PhysicsWorld* m_pPhysicsWorld;
+	rp3d::PhysicsCommon m_physicsCommon;
+	rp3d::PhysicsWorld* m_pPhysicsWorld;
 
 	friend Server<PhysicsServer>;
 };
