@@ -13,6 +13,8 @@ class AudioEngine
 public:
 	AudioEngine();
 	~AudioEngine();
+	void Data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
+	void PlayAudio(char filePath);
 
 private:
 
