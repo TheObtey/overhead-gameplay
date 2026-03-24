@@ -1,32 +1,25 @@
 #include "Nodes/NodeRigidBody.h"
 
 #include "Servers/PhysicsServer.h"
+#include "Nodes/NodeCollider.h"
 #include <Debug.h>
 
 NodeRigidBody::~NodeRigidBody()
 {
-	//PhysicsServer::GetPhysicsWorld().destroyRigidBody(m_pRigidBody);
+	m_colliders.clear();
 }
 
 NodeRigidBody::NodeRigidBody(std::string const& name) : Node(name)
 {
 	//OnSceneEnter.Subscribe([this](Node& self)
 	//	{
-	//		if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-	//			PhysicsServer::AttachToRigidBody(&rigidBody->GetRigidBody(), this);
 	//	});
 	//OnParentChange.Subscribe([this](Node& self)
 	//	{
-	//			if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-	//				AttachToRigidBody(&rigidBody->GetRigidBody());
 	//	});
 
 	//OnSceneLeave.Subscribe([this](Node& self)
 	//	{
-	//		//PhysicsServer::DestroyRigidBody(*this);
-	//		//PhysicsServer::GetPhysicsWorld().destroyRigidBody(m_pRigidBody);
-	//		m_pRigidBody = nullptr;
-	//		m_pNode3D = nullptr;
 	//	});
 }
 
@@ -48,30 +41,15 @@ void NodeRigidBody::SetNode3DParent(Node3D* owner)
 {
 	m_pNode3D = owner;
 	m_pNode3D->Update(0.016);
-	//m_pRigidBody = PhysicsServer::CreateRigidBody(*owner, this);
 
-	reactphysics3d::Transform reactTr;
-	auto pos = owner->GetWorldPosition();
-	auto rot = owner->GetWorldRotationQuaternion();
-	reactTr.setPosition({ pos.x, pos.y, pos.z });
-	reactTr.setOrientation({ rot.x, rot.y, rot.z, rot.w });
-	//m_pRigidBody = PhysicsServer::CreateRigidBody(reactTr, this);
 	PhysicsServer::CreateRigidBody(*this);
-
-	//m_pRigidBody->setType(rp3d::BodyType::STATIC);
-	//m_pRigidBody->enableGravity(true);
-	//m_pRigidBody->setLinearDamping(0.5f);
-	//m_pRigidBody->setAngularDamping(0.5f);
-	//m_pRigidBody->setMass(1.0f);
-	//m_pRigidBody->setIsAllowedToSleep(true);
 }
 void NodeRigidBody::OnUpdate(double delta)
 {
 	Node::OnUpdate(delta);
 	if (m_pNode3D == nullptr) return;
 
-	auto type = m_pRigidBody->getType();
-	if (type == rp3d::BodyType::DYNAMIC)
+	if (m_pRigidBody->getType() == rp3d::BodyType::DYNAMIC)
 	{
 		auto& pos = m_pRigidBody->getTransform().getPosition();
 		auto& rot = m_pRigidBody->getTransform().getOrientation();
@@ -88,7 +66,6 @@ void NodeRigidBody::OnUpdate(double delta)
 		m_pRigidBody->setTransform(t);
 		return;
 	}
-	//m_pOwner->Update(delta);
 }
 
 NodeRigidBody::operator reactphysics3d::Transform()
@@ -113,6 +90,76 @@ NodeRigidBody::operator reactphysics3d::Transform*()
 	return reactTr;
 }
 
+void NodeRigidBody::AddCollider(NodeCollider& collider)
+{
+	PhysicsServer::AddCollider(collider, *this);
+}
+
+void NodeRigidBody::SetBounciness(float v)
+{
+	//if (m_colliders.size() > 0)
+	//	PhysicsServer::SetBounciness(v, *this);
+
+	if (m_colliders.empty()) return;
+	for (auto c : m_colliders)
+		c->SetBounciness(v);
+}
+float NodeRigidBody::GetBounciness() const
+{
+	return m_colliders.empty() ? -1.0f : m_colliders[0]->GetBounciness();
+}
+void NodeRigidBody::SetFrictionCoefficient(float v)
+{
+	if (m_colliders.empty()) return;
+	for (auto c : m_colliders)
+		c->SetFrictionCoefficient(v);
+}
+float NodeRigidBody::GetFrictionCoefficient() const
+{
+	return m_colliders.empty() ? -1.0f : m_colliders[0]->GetFrictionCoefficient();
+}
+void NodeRigidBody::SetMassDensity(float v)
+{
+	if (m_colliders.empty()) return;
+	for (auto c : m_colliders)
+		c->SetMassDensity(v);
+}
+float NodeRigidBody::GetMassDensity() const
+{
+	return m_colliders.empty() ? -1.0f : m_colliders[0]->GetMassDensity();
+}
+
+
+void NodeRigidBody::SetBounciness(int colliderIndex, float v)
+{
+	if (m_colliders.empty() || colliderIndex > m_colliders.size()) return;
+	
+	m_colliders[colliderIndex]->SetBounciness(v);
+}
+float NodeRigidBody::GetBounciness(int colliderIndex) const
+{
+	return m_colliders.empty() ? -1.0f : m_colliders[colliderIndex]->GetBounciness();
+}
+void NodeRigidBody::SetFrictionCoefficient(int colliderIndex, float v)
+{
+	if (m_colliders.empty() || colliderIndex > m_colliders.size()) return;
+
+	m_colliders[colliderIndex]->SetFrictionCoefficient(v);
+}
+float NodeRigidBody::GetFrictionCoefficient(int colliderIndex) const
+{
+	return m_colliders.empty() ? -1.0f : m_colliders[colliderIndex]->GetFrictionCoefficient();
+}
+void NodeRigidBody::SetMassDensity(int colliderIndex, float v)
+{
+	if (m_colliders.empty() || colliderIndex > m_colliders.size()) return;
+
+	m_colliders[colliderIndex]->SetMassDensity(v);
+}
+float NodeRigidBody::GetMassDensity(int colliderIndex) const
+{
+	return m_colliders.empty() ? -1.0f : m_colliders[colliderIndex]->GetMassDensity();
+}
 
 void NodeRigidBody::ApplyLocalForceAtCenterOfMass(const glm::vec3& force)
 {

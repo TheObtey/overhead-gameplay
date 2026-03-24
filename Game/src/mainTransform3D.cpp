@@ -98,11 +98,12 @@ int main() {
 
 	auto player = Node::CreateNode<Node3D>("player");
 	auto RB_player = Node::CreateNode<NodeRigidBody>("rb_player");
-	auto C_player = Node::CreateNode<NodeCollider>("c_player");
+	auto C_player = Node::CreateNode<NodeBoxCollider>("c_player");
 
 	player->SetLocalPosition(pos);
 
-	C_player->SetBoxShape(pSize);
+	//C_player->SetBoxShape(pSize);
+	C_player->SetShape(pSize);
 
 	RB_player->SetNode3DParent(player.get());
 	RB_player->SetBodyType(RigidBodyType::DYNAMIC);
@@ -116,18 +117,19 @@ int main() {
 
 
 	//  Mur statique 
-	const Vector3   WALL_POS= { 3.0f, 1.0f, 0.0f };
-	const float     WALL_W	= 1.0f, WALL_H = 4.0f, WALL_D = 6.0f;
-	auto			wall	= Node::CreateNode<Node3D>("wall");
+	const Vector3   WALL_POS = { 3.0f, 1.0f, 0.0f };
+	const float     WALL_W = 1.0f, WALL_H = 4.0f, WALL_D = 6.0f;
+	auto			wall = Node::CreateNode<Node3D>("wall");
 	auto			RB_wall = Node::CreateNode<NodeRigidBody>("rb_wall");
-	auto			C_wall	= Node::CreateNode<NodeCollider>("c_wall");
+	auto			C_wall = Node::CreateNode<NodeBoxCollider>("c_wall");
 
 	wall->SetLocalPosition({ 3.0f, 1.0f, 0.0f });
 
 	RB_wall->SetNode3DParent(wall.get());
 	RB_wall->SetBodyType(RigidBodyType::STATIC);
 
-	C_wall->SetBoxShape({ 0.5f, 2.0f, 3.0f });
+	//C_wall->SetBoxShape({ 0.5f, 2.0f, 3.0f });
+	C_wall->SetShape({ 0.5f, 2.0f, 3.0f });
 
 	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
 	RB_wall->AddChild(std::move(C_wall));
@@ -136,12 +138,13 @@ int main() {
 	//  Sol statique 
 	const Vector3   FLOOR_POS = { 0.0f, -1.0f, 0.0f };
 	const float     FLOOR_W = 100.0f, FLOOR_H = 2.0f, FLOOR_D = 100.0f;
-	auto			floor	= Node::CreateNode<Node3D>("floor");
-	auto			RB_floor= Node::CreateNode<NodeRigidBody>("rb_floor");
-	auto			C_floor = Node::CreateNode<NodeCollider>("c_floor");
+	auto			floor = Node::CreateNode<Node3D>("floor");
+	auto			RB_floor = Node::CreateNode<NodeRigidBody>("rb_floor");
+	auto			C_floor = Node::CreateNode<NodeBoxCollider>("c_floor");
 
 	floor->SetLocalPosition({ 0.0f, -1.0f, 0.0f });
-	C_floor->SetBoxShape({ 50.0f, 1.0f, 50.0f });
+	//C_floor->SetBoxShape({ 50.0f, 1.0f, 50.0f });
+	C_floor->SetShape({ 50.0f, 1.0f, 50.0f });
 
 	RB_floor->SetNode3DParent(floor.get());
 	RB_floor->SetBodyType(RigidBodyType::STATIC);
@@ -162,12 +165,18 @@ int main() {
 
 	EngineServer::FlushCommands(); // Important pour que les RB soient tous cree avant de faire le cast des colliders
 
-	auto ref_collider = static_cast<NodeCollider*>(&RB_player->GetChild(0));
-	auto ref_wallCollider = static_cast<NodeCollider*>(&RB_wall->GetChild(0));
-	auto ref_floorCollider = static_cast<NodeCollider*>(&RB_floor->GetChild(0));
-	
+	auto ref_collider = static_cast<NodeBoxCollider*>(&RB_player->GetChild(0));
+	auto ref_wallCollider = static_cast<NodeBoxCollider*>(&RB_wall->GetChild(0));
+	auto ref_floorCollider = static_cast<NodeBoxCollider*>(&RB_floor->GetChild(0));
+
 	player->AddScale({ 1.0f, 3.0f, 0.0f });
-	ref_collider->SetBoxShape(player->GetScale());
+	//ref_collider->SetBoxShape(player->GetScale());
+	ref_collider->SetShape(player->GetScale());
+
+	PhysicsServer::FlushCommands();
+	RB_player->GetColliders()[0]->SetMassDensity(1.0f);
+	RB_player->GetColliders()[0]->SetBounciness(0.0f);
+	RB_player->GetColliders()[0]->SetIsTrigger(false);
 
 	bool test = false;
 	bool t = false;
@@ -176,15 +185,13 @@ int main() {
 		float dt = GetFrameTime();
 		if (dt <= 0.0f || dt > 0.1f) dt = FIXED_DT;
 
-		if (IsKeyDown(KEY_W)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 0, 50 }); // Z
-		if (IsKeyDown(KEY_S)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 0, -50 }); // S
-		if (IsKeyDown(KEY_D)) RB_player->ApplyWorldForceAtCenterOfMass({ -50, 0, 0 }); // D
-		if (IsKeyDown(KEY_A))
-		{
-			RB_player->ApplyWorldForceAtCenterOfMass({ 50, 0, 0 }); // Q
-		}
-		if (IsKeyDown(KEY_Q)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 100, 0 }); // A
-		if (IsKeyDown(KEY_E)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, -100, 0 });	// E
+		if (IsKeyDown(KEY_W)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 0, 50 });	// Forward = Z
+		if (IsKeyDown(KEY_S)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 0, -50 });	// Backward = S
+		if (IsKeyDown(KEY_D)) RB_player->ApplyWorldForceAtCenterOfMass({ -50, 0, 0 });	// Right = D
+		if (IsKeyDown(KEY_A)) RB_player->ApplyWorldForceAtCenterOfMass({ 50, 0, 0 });	// Left = Q
+
+		if (IsKeyDown(KEY_Q)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 100, 0 });	// Up = A
+		if (IsKeyDown(KEY_E)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, -100, 0 });	// Down = E
 
 
 

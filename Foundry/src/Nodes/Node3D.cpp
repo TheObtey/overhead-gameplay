@@ -132,11 +132,7 @@ void Node3D::SetWorldScale(glm::vec3 const& worldScale)
 }
 void Node3D::SetWorldRotation(glm::vec3 const& worldRot)
 {
-	float pitch = worldRot.x * pi_t<long double> / 180;
-	float yaw = worldRot.y * pi_t<long double> / 180;
-	float roll = worldRot.z * pi_t<long double> / 180;
-
-	m_worldRotation = glm::quat(glm::vec3(pitch, yaw, roll));
+	m_worldRotation = glm::quat(glm::radians(worldRot));
 	m_worldDirty = true;
 	UpdateLocalTransform();
 }

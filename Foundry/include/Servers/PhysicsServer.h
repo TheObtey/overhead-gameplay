@@ -18,8 +18,10 @@ template <>
 struct Command<class PhysicsServer>
 {
 
-	Command() : To(nullptr), 
+	Command() : 
 		Type(CmdType::NONE), 
+		To(nullptr), 
+		collider(nullptr),
 		transform(nullptr), 
 		rigidBody(nullptr), 
 		position({ 0.0f, 0.0f, 0.0f }), 
@@ -27,27 +29,13 @@ struct Command<class PhysicsServer>
 		bodyType(RigidBodyType::NONE),
 		mass(0.0f),
 		sleepingEnabled(false),
-		//lockAxis({}),
+		lockAxis({}),
 		rotation({ 0.0f, 0.0f, 0.0f, 1.0f }),
 		radius(0.0f),
 		mask(0)
 	{
 		
 	};
-
-	~Command()
-	{
-		if (transform)
-		{
-			//delete transform;
-			transform = nullptr;
-		}
-		if (rigidBody)
-		{
-			//delete rigidBody;
-			rigidBody = nullptr;
-		}
-	}
 
 	enum class CmdType : uint16
 	{
@@ -57,6 +45,7 @@ struct Command<class PhysicsServer>
 		CREATE_RIGID_BODY,
 		DESTROY_RIGID_BODY,
 
+		ADD_COLLIDER,
 		APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS,
 		APPLY_LOCAL_FORCE_AT_LOCAL_POSITION,
 		APPLY_LOCAL_FORCE_AT_WORLD_POSITION,
@@ -113,21 +102,23 @@ struct Command<class PhysicsServer>
 
 	} Type;
 
+	Node* To = nullptr;
 
 	// Rigid body command parameters
+	NodeCollider* collider;
 	glm::vec3 position;
 	RigidBodyType bodyType;
 	rp3d::Transform* transform;
 	bool lockAxis[3];
 
 	// Collider command parameters
-	rp3d::RigidBody* rigidBody;
+	//rp3d::RigidBody* rigidBody;
+	NodeRigidBody* rigidBody;
 	glm::quat rotation;
 	union { uint16_t category, mask; };
 	float radius;
 
 	// Both
-	Node* To = nullptr;
 	union {
 		// RigidBody
 		bool gravityEnabled, sleepingEnabled, isSleeping;
@@ -148,41 +139,6 @@ struct Command<class PhysicsServer>
 	};
 };
 
-//struct Cmd_RigidBody : public Command<class PhysicsServer>
-//{
-//	Cmd_RigidBody() : Command<class PhysicsServer>(), position(0, 0, 0), bodyType(RigidBodyType::NONE), transform(nullptr), lockAxis(false)
-//	{
-//
-//	};
-//	Cmd_RigidBody(glm::vec3 _position = { 0, 0, 0 }, RigidBodyType _bodyType = RigidBodyType::NONE, rp3d::Transform* _transform = nullptr, bool _lockAxis[3] = {}) :
-//		position(_position), bodyType(_bodyType), transform(_transform), lockAxis(_lockAxis)
-//	{
-//
-//	};
-//
-//
-//	glm::vec3 position;
-//	RigidBodyType bodyType;
-//	rp3d::Transform* transform;
-//	bool lockAxis[3];
-//};
-//struct Cmd_Collider : public Command<class PhysicsServer>
-//{
-//	Cmd_Collider() : Command<class PhysicsServer>(), rigidBody(nullptr), rotation(0, 0, 0, 1), category(0)
-//	{
-//
-//	};
-//	Cmd_Collider(rp3d::RigidBody* _rigidBody, glm::quat _rotation = {0,0,0,1}, uint16_t _category = 0)
-//		: Command<class PhysicsServer>(), rigidBody(_rigidBody), rotation(_rotation), category(0)		
-//	{
-//
-//	};
-//
-//	// Collider command parameters
-//	rp3d::RigidBody* rigidBody;
-//	glm::quat rotation;
-//	union {	uint16_t category, mask; };
-//};
 using CommandTyp = Command<PhysicsServer>::CmdType;
 
 class PhysicsServer : public Server<PhysicsServer>
@@ -192,29 +148,9 @@ public:
 	PhysicsServer();
 	~PhysicsServer();
 
-	static void PushCommand(Command<PhysicsServer> cmd, Node* target)
-	{
-		//glm::vec3 force = { 0.0f, 10.0f, 0.0f };
-		//Command<PhysicsServer> cmd
-		//{
-		//	CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS,
-		//	.To = &rb,
-		//	.force = force
-		//}
-		//cmd.Type = ;
-		//cmd.To = &rb;
-		//cmd.force = force;
-		//Instance().m_commands.push({ CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS, &rb, .force(force)}, target);
-		Instance().m_commands.push(cmd);
-	};
-
 
 	static void Initialize();
 
-	static void CreateRigidBody(NodeRigidBody& rigidBody);
-	static void DestroyRigidBody(NodeRigidBody& rigidBody);
-	static void S_CreateRigidBody(NodeRigidBody& rigidBody);
-	static void S_DestroyRigidBody(NodeRigidBody& rigidBody);
 
 	static void UpdatePhysicsWorld(double dt)                       { Instance().m_pPhysicsWorld->update(dt); }
 
@@ -233,6 +169,11 @@ public:
 
 
 	// =========== Rigid Body intermediate functions ===========
+
+	static void CreateRigidBody(NodeRigidBody& rigidBody);
+	static void DestroyRigidBody(NodeRigidBody& rigidBody);
+
+	static void AddCollider(NodeCollider& collider, NodeRigidBody& rigidBody);
 
 	static void ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb);
 	static void ApplyLocalForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
@@ -268,7 +209,7 @@ public:
 
 	// =========== Collider intermediate functions ===========
 
-	static void AttachToRigidBody(rp3d::RigidBody* rigidBody, NodeCollider& c);
+	static void AttachToRigidBody(NodeRigidBody* rigidBody, NodeCollider& c);
 	static void Detach(NodeCollider& c);
 	static void DestroyShape(NodeCollider& c);
 
@@ -298,6 +239,11 @@ private:
 
 
 	// =========== Rigid Body functions ===========
+
+	static void S_CreateRigidBody(NodeRigidBody& rigidBody);
+	static void S_DestroyRigidBody(NodeRigidBody& rigidBody);
+
+	static void S_AddCollider(NodeCollider& collider, NodeRigidBody& rigidBody);
 
 	void S_ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb);
 	void S_ApplyLocalForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb);
@@ -333,7 +279,7 @@ private:
 
 	// =========== Collider functions ===========
 
-	void S_AttachToRigidBody(rp3d::RigidBody* rigidBody, NodeCollider& c);
+	void S_AttachToRigidBody(NodeRigidBody* rigidBody, NodeCollider& c);
 	void S_Detach(NodeCollider& c);
 	void S_DestroyShape(NodeCollider& c);
 

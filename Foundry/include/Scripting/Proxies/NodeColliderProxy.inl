@@ -9,9 +9,9 @@ public:
 
     // =========== Shapes ===========
 
-    void SetBoxShape(const glm::vec3& halfExtents)          { m_pNode->SetBoxShape(halfExtents); }
-    void SetSphereShape(float radius)                       { m_pNode->SetSphereShape(radius); }
-    void SetCapsuleShape(float radius, float height)        { m_pNode->SetCapsuleShape(radius, height); }
+    //void SetBoxShape(const glm::vec3& halfExtents)          { m_pNode->SetBoxShape(halfExtents); }
+    //void SetSphereShape(float radius)                       { m_pNode->SetSphereShape(radius); }
+    //void SetCapsuleShape(float radius, float height)        { m_pNode->SetCapsuleShape(radius, height); }
 
     // =========== Local transform (offset from RigidBody) ===========
 
@@ -50,11 +50,11 @@ private:
 	NodeCollider* m_pNode;
 };
 
+		//"SetBoxShape", BIND(SetBoxShape),
+		//"SetSphereShape", BIND(SetSphereShape),
+		//"SetCapsuleShape", BIND(SetCapsuleShape),
 BindProxy(NodeCollider::Proxy,
 	return binder.BindClass<NodeCollider::Proxy>("nodecollider",
-		"SetBoxShape", BIND(SetBoxShape),
-		"SetSphereShape", BIND(SetSphereShape),
-		"SetCapsuleShape", BIND(SetCapsuleShape),
 		"SetLocalPosition", BIND(SetLocalPosition),
 		"SetLocalRotation", BIND(SetLocalRotation),
 		"GetLocalPosition", BIND(GetLocalPosition),

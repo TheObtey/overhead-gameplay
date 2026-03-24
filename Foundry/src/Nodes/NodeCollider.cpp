@@ -4,27 +4,22 @@
 
 NodeCollider::NodeCollider(std::string const& name) : Node(name)
 {
-	OnSceneEnter.Subscribe([this](Node& self)
-		{
-			if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-				AttachToRigidBody(rigidBody->GetRigidBody());
-		});
+	//OnSceneEnter.Subscribe([this](Node& self)
+	//	{
+	//		
+	//		
+	//	});
 	OnParentChange.Subscribe([this](Node& self)
 		{
 			if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-				AttachToRigidBody(rigidBody->GetRigidBody());
+				AttachToRigidBody(rigidBody);
 		});
 
 	//OnSceneLeave.Subscribe([this](Node& self)
 	//	{
-	//		Detach();
+	//		
 	//	});
 
-}
-void NodeCollider::init()
-{
-	//if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-	//	AttachToRigidBody(rigidBody->GetRigidBody());
 }
 
 NodeCollider::~NodeCollider()
@@ -32,38 +27,11 @@ NodeCollider::~NodeCollider()
 	//Detach();
 	//DestroyShape();
 }
-
-void NodeCollider::DestroyShape()
-{
-	//if (!m_pShape) return;
-
-	//auto& pc = PhysicsServer::GetPhysicsCommon(); // A REFAIRE POUR SUIVRE LOGIQUE SERVEUR
-
-	//if (auto* s = dynamic_cast<rp3d::BoxShape*>(m_pShape))
-	//	pc.destroyBoxShape(s);
-	//else if (auto* s = dynamic_cast<rp3d::SphereShape*>(m_pShape))
-	//	pc.destroySphereShape(s);
-	//else if (auto* s = dynamic_cast<rp3d::CapsuleShape*>(m_pShape))
-	//	pc.destroyCapsuleShape(s);
-
-	//m_pShape = nullptr;
-	PhysicsServer::DestroyShape(*this);
-}
-
-void NodeCollider::SetBoxShape(const glm::vec3& halfExtents)
-{
-	PhysicsServer::SetBoxShape(halfExtents, *this);
-}
-
-void NodeCollider::SetSphereShape(float radius)
-{
-	PhysicsServer::SetSphereShape(radius, *this);
-}
-
-void NodeCollider::SetCapsuleShape(float radius, float height)
-{
-	PhysicsServer::SetCapsuleShape(radius, height, *this);
-}
+//
+//void NodeCollider::DestroyShape()
+//{
+//	PhysicsServer::DestroyShape(*this);
+//}
 
 rp3d::Transform NodeCollider::GetLocalRp3dTransform() const
 {
@@ -86,35 +54,17 @@ void NodeCollider::SetLocalRotation(const glm::quat& rot)
 }
 
 
-void NodeCollider::AttachToRigidBody(rp3d::RigidBody* rigidBody)
+void NodeCollider::AttachToRigidBody(NodeRigidBody* rigidBody)
 {
 	PhysicsServer::AttachToRigidBody(rigidBody, *this);
-
-
-	//Command<PhysicsServer> cmd;
-	//cmd.Type = CommandTyp::ATTACH_TO_RIGID_BODY;
-	////cmd.To = &c;
-	//cmd.rigidBody = rigidBody; 
-	//PhysicsServer::PushCommand(Command<PhysicsServer>{
-	//	.Type = CmdType::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS,
-	//		.rigidBody = &rb,
-	//		.force = force,
-	//		.To = target
-	//}, this);
-
-	//PhysicsServer::Instance().m_commands.push(cmd);
-	//PhysicsServer::Instance().m_commands.push({}, *this);
 }
 
 void NodeCollider::Detach()
 {
 	PhysicsServer::Detach(*this);
-	//if (m_pCollider && m_pRigidBody)
-	//	m_pRigidBody->removeCollider(m_pCollider);
-	//m_pCollider = nullptr;
 }
 
-void  NodeCollider::SetBounciness(float v)
+void NodeCollider::SetBounciness(float v)
 {
 	if (m_pCollider) PhysicsServer::SetBounciness(v, *this);
 }
@@ -122,7 +72,7 @@ float NodeCollider::GetBounciness() const
 {
 	return m_pCollider ? m_pCollider->getMaterial().getBounciness() : 0.0f;
 }
-void  NodeCollider::SetFrictionCoefficient(float v)
+void NodeCollider::SetFrictionCoefficient(float v)
 {
 	if (m_pCollider) PhysicsServer::SetFrictionCoefficient(v, *this);
 }
@@ -130,7 +80,7 @@ float NodeCollider::GetFrictionCoefficient() const
 {
 	return m_pCollider ? m_pCollider->getMaterial().getFrictionCoefficient() : 0.0f;
 }
-void  NodeCollider::SetMassDensity(float v)
+void NodeCollider::SetMassDensity(float v)
 {
 	if (m_pCollider) PhysicsServer::SetMassDensity(v, *this);
 }
@@ -179,4 +129,33 @@ void NodeCollider::SetCollideWithMaskBits(uint16_t v)
 uint16_t NodeCollider::GetCollisionBitsMask() const
 {
 	return m_pCollider ? m_pCollider->getCollideWithMaskBits() : 0xFFFF;
+}
+
+
+
+void NodeBoxCollider::SetShape(const glm::vec3& halfExtents)
+{
+	PhysicsServer::SetBoxShape(halfExtents, *this);
+}
+void NodeBoxCollider::DestroyShape()
+{
+	PhysicsServer::GetPhysicsCommon().destroyBoxShape(static_cast<rp3d::BoxShape*>(m_pShape));
+}
+
+void NodeSphereCollider::SetShape(float radius)
+{
+	PhysicsServer::SetSphereShape(radius, *this);
+}
+void NodeSphereCollider::DestroyShape()
+{
+	PhysicsServer::GetPhysicsCommon().destroySphereShape(static_cast<rp3d::SphereShape*>(m_pShape));
+}
+
+void NodeCapsuleCollider::SetShape(float radius, float height)
+{
+	PhysicsServer::SetCapsuleShape(radius, height, *this);
+}
+void NodeCapsuleCollider::DestroyShape()
+{
+	PhysicsServer::GetPhysicsCommon().destroyCapsuleShape(static_cast<rp3d::CapsuleShape*>(m_pShape));
 }

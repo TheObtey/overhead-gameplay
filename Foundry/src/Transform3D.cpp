@@ -163,11 +163,7 @@ void Transform3D::SetZ(float z)
 
 void Transform3D::SetRotationDeg(float x, float y, float z)
 {
-	float pitch = x * pi_t<long double> / 180;
-	float yaw = y * pi_t<long double> / 180;
-	float roll = z * pi_t<long double> / 180;
-
-	m_rotationQuat = glm::quat(glm::vec3(pitch, yaw, roll));
+	m_rotationQuat = glm::quat(glm::vec3(glm::radians(x), glm::radians(y), glm::radians(z)));
 	m_isDirty = m_isInvDirty = m_isRotationDirty = true;
 }
 

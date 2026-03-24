@@ -21,8 +21,6 @@ void PhysicsServer::OnInitialize()
 
 void PhysicsServer::OnUnInitialize()
 {
-	if (m_pPhysicsWorld == nullptr) return;
-	m_pPhysicsWorld = nullptr;
 }
 
 void PhysicsServer::Initialize() // ajouter tous les params ?
@@ -43,7 +41,6 @@ void PhysicsServer::Initialize() // ajouter tous les params ?
 	settings.persistentContactDistanceThreshold = 0.03;     // Default is 0.03
 
 	Instance().m_pPhysicsWorld = Instance().m_physicsCommon.createPhysicsWorld(settings);
-	//m_pPhysicsWorld = m_physicsCommon.createPhysicsWorld();
 }
 void PhysicsServer::CreateRigidBody(NodeRigidBody& rigidBody)
 {
@@ -63,6 +60,13 @@ void PhysicsServer::DestroyRigidBody(NodeRigidBody& rigidBody)
 void PhysicsServer::S_CreateRigidBody(NodeRigidBody& rigidBody)
 {
 	rigidBody.m_pRigidBody = Instance().m_pPhysicsWorld->createRigidBody(rigidBody);
+
+	rigidBody.m_pRigidBody->setType(rp3d::BodyType::STATIC);
+	rigidBody.m_pRigidBody->enableGravity(true);
+	rigidBody.m_pRigidBody->setLinearDamping(0.5f);
+	rigidBody.m_pRigidBody->setAngularDamping(0.5f);
+	rigidBody.m_pRigidBody->setMass(1.0f);
+	rigidBody.m_pRigidBody->setIsAllowedToSleep(true);
 }
 void PhysicsServer::S_DestroyRigidBody(NodeRigidBody& rigidBody)
 {
@@ -85,9 +89,11 @@ void PhysicsServer::FlushCommandsImpl()
 			//S_CreateRigidBody(*command.transform, command.To);
 			S_CreateRigidBody(static_cast<NodeRigidBody&>(*command.To));
 			break;
-
 		case CommandTyp::DESTROY_RIGID_BODY:
 			S_DestroyRigidBody(static_cast<NodeRigidBody&>(*command.To));
+			break;
+		case CommandTyp::ADD_COLLIDER:
+			S_AddCollider(static_cast<NodeCollider&>(*command.collider), static_cast<NodeRigidBody&>(*command.To));
 			break;
 		case CommandTyp::APPLY_LOCAL_FORCE_AT_CENTER_OF_MASS:
 			S_ApplyLocalForceAtCenterOfMass(command.force, static_cast<NodeRigidBody&>(*command.To));
@@ -216,6 +222,15 @@ void PhysicsServer::FlushCommandsImpl()
 
 
 // =========== Rigid Body intermediate function definitions ===========
+
+void PhysicsServer::AddCollider(NodeCollider& collider, NodeRigidBody& rigidBody)
+{
+	Command<PhysicsServer> cmd;
+	cmd.Type = CommandTyp::ADD_COLLIDER;
+	cmd.To = &rigidBody;
+	cmd.collider = &collider;
+	Instance().m_commands.push(cmd);
+}
 
 void PhysicsServer::ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
@@ -403,7 +418,7 @@ void PhysicsServer::SetIsGravityEnabled(bool enabled, NodeRigidBody& rb)
 
 // =========== Collider intermediate function definitions ===========
 
-void PhysicsServer::AttachToRigidBody(rp3d::RigidBody* _rigidBody, NodeCollider& c)
+void PhysicsServer::AttachToRigidBody(NodeRigidBody* _rigidBody, NodeCollider& c)
 {
 	Command<PhysicsServer> cmd;
 	cmd.Type = CommandTyp::ATTACH_TO_RIGID_BODY;
@@ -544,6 +559,16 @@ void PhysicsServer::SetCollideWithMaskBits(uint16_t mask, NodeCollider& c)
 
 // =========== Rigid Body function definitions ===========
 
+void PhysicsServer::S_AddCollider(NodeCollider& collider, NodeRigidBody& rigidBody)
+{
+	if (!collider.m_pShape) return;
+	collider.m_pRigidBody = rigidBody.m_pRigidBody;
+	collider.m_pAttachedRigidBody = &rigidBody;
+	collider.m_indexInRigidBody = rigidBody.m_colliders.size();
+	collider.m_pCollider = rigidBody.m_pRigidBody->addCollider(collider.m_pShape, collider.GetLocalRp3dTransform());
+	rigidBody.m_colliders.push_back(&collider);
+}
+
 void PhysicsServer::S_ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
 	if (rb.m_pNode3D)
@@ -678,26 +703,41 @@ void PhysicsServer::S_SetIsGravityEnabled(bool enabled, NodeRigidBody& rb)
 
 // =========== Collider function definitions ===========
 
-void PhysicsServer::S_AttachToRigidBody(rp3d::RigidBody* rigidBody, NodeCollider& c)
+void PhysicsServer::S_AttachToRigidBody(NodeRigidBody* rigidBody, NodeCollider& c)
 {
 	if (!c.m_pShape) return;
-	c.m_pRigidBody = rigidBody;
-	c.m_pCollider = rigidBody->addCollider(c.m_pShape, c.GetLocalRp3dTransform());
+
+	auto rb = rigidBody->GetRigidBody();
+	c.m_pCollider = rb->addCollider(c.m_pShape, c.GetLocalRp3dTransform());
+	c.m_pRigidBody = rb;
+	c.m_pAttachedRigidBody = rigidBody;
+	c.m_indexInRigidBody = rigidBody->m_colliders.size();
+	rigidBody->m_colliders.push_back(&c);
+
 }
 void PhysicsServer::S_Detach(NodeCollider& c)
 {
+	if (c.m_pAttachedRigidBody == nullptr) return;
+
+	auto& colliders = c.m_pAttachedRigidBody->m_colliders;
+	colliders[c.m_indexInRigidBody] = nullptr;	
+	colliders.erase(colliders.begin() + c.m_indexInRigidBody);
+
+	c.m_pAttachedRigidBody->m_pRigidBody->removeCollider(c.m_pCollider);
+	c.m_indexInRigidBody = -1;
+
+
+	for (int i = 0; i < colliders.size(); i++)
+	{
+		colliders[i]->m_indexInRigidBody = i;
+	}
 }
 
 void PhysicsServer::S_DestroyShape(NodeCollider& c)
 {
 	if (!c.m_pShape) return;
-	
-	//if (auto* s = dynamic_cast<rp3d::BoxShape*>(c.m_pShape))
-	//	m_physicsCommon.destroyBoxShape(s);
-	//else if (auto* s = dynamic_cast<rp3d::SphereShape*>(c.m_pShape))
-	//	m_physicsCommon.destroySphereShape(s);
-	//else if (auto* s = dynamic_cast<rp3d::CapsuleShape*>(c.m_pShape))
-	//	m_physicsCommon.destroyCapsuleShape(s);
+
+	c.DestroyShape();
 
 	c.m_pShape = nullptr;
 }
@@ -708,7 +748,7 @@ void PhysicsServer::S_SetBoxShape(const glm::vec3& halfExtents, NodeCollider& c)
 	c.m_pShape = PhysicsServer::GetPhysicsCommon().createBoxShape({ halfExtents.x, halfExtents.y, halfExtents.z });
 
 	if (c.m_pRigidBody)
-		S_AttachToRigidBody(c.m_pRigidBody, c);
+		S_AttachToRigidBody(c.m_pAttachedRigidBody, c);
 }
 
 void PhysicsServer::S_SetSphereShape(float radius, NodeCollider& c)
@@ -716,7 +756,8 @@ void PhysicsServer::S_SetSphereShape(float radius, NodeCollider& c)
 	S_Detach(c);
 	S_DestroyShape(c);
 	c.m_pShape = PhysicsServer::GetPhysicsCommon().createSphereShape(radius);
-	if (c.m_pRigidBody) S_AttachToRigidBody(c.m_pRigidBody, c);
+	if (c.m_pRigidBody)
+		S_AttachToRigidBody(c.m_pAttachedRigidBody, c);
 }
 
 void PhysicsServer::S_SetCapsuleShape(float radius, float height, NodeCollider& c)
@@ -724,7 +765,8 @@ void PhysicsServer::S_SetCapsuleShape(float radius, float height, NodeCollider& 
 	S_Detach(c);
 	S_DestroyShape(c);
 	c.m_pShape = PhysicsServer::GetPhysicsCommon().createCapsuleShape(radius, height);
-	if (c.m_pRigidBody) S_AttachToRigidBody(c.m_pRigidBody, c);
+	if (c.m_pRigidBody)
+		S_AttachToRigidBody(c.m_pAttachedRigidBody, c);
 }
 
 void PhysicsServer::S_SetLocalPosition(const glm::vec3& pos, NodeCollider& c)

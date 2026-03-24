@@ -9,9 +9,6 @@
 static glm::vec3 rp3dToGlm(const rp3d::Vector3& vec) { return glm::vec3(vec.x, vec.y, vec.z); }
 static rp3d::Vector3 glmToRp3d(const glm::vec3& vec) { return rp3d::Vector3(vec.x, vec.y, vec.z); }
 
-enum class CollisionShape { SPHERE, CAPSULE, CONVEX_POLYHEDRON, CONCAVE_SHAPE };
-enum class CollisionShapeName { TRIANGLE, SPHERE, CAPSULE, BOX, CONVEX_MESH, TRIANGLE_MESH, HEIGHTFIELD };
-
 enum class RigidBodyType { STATIC, KINEMATIC, DYNAMIC, NONE };
 
 class NodeCollider;
@@ -22,7 +19,7 @@ public:
 
 	////////////////////////////////////////////////////////////
 	// Engine
-	
+
 	class Proxy;
 
 	NodeRigidBody(std::string const& name);
@@ -38,13 +35,35 @@ public:
 	rp3d::RigidBody* GetRigidBody() { return m_pRigidBody; }
 	void SetRigidBody(rp3d::RigidBody* rb) { m_pRigidBody = rb; }
 
+
+
 	operator rp3d::Transform();
-	operator rp3d::Transform*();
+	operator rp3d::Transform* ();
 
 	// Engine
 	////////////////////////////////////////////////////////////
 
 
+
+
+	// =========== Material ===========
+
+	void AddCollider(NodeCollider& collider);
+	std::vector<NodeCollider*> GetColliders() const { return m_colliders; }
+
+	void  SetBounciness(float bounciness);
+	float GetBounciness() const;
+	void  SetFrictionCoefficient(float friction);
+	float GetFrictionCoefficient() const;
+	void  SetMassDensity(float density);
+	float GetMassDensity() const;
+
+	void  SetBounciness(int colliderIndex, float bounciness);
+	float GetBounciness(int colliderIndex) const;
+	void  SetFrictionCoefficient(int colliderIndex, float friction);
+	float GetFrictionCoefficient(int colliderIndex) const;
+	void  SetMassDensity(int colliderIndex, float density);
+	float GetMassDensity(int colliderIndex) const;
 
 	// =========== Forces and Torques ===========
 
@@ -101,12 +120,12 @@ public:
 	void SetIsGravityEnabled(bool enabled);
 
 
-	// fonction temporaire debug
-	glm::vec3 GetPosition() const 
-	{ 
+#ifdef DEBUG_BUILD
+	glm::vec3 GetPosition() const
+	{
 		return rp3dToGlm(m_pRigidBody->getTransform().getPosition());
 	}
-
+#endif
 
 protected:
 
@@ -114,6 +133,8 @@ private:
 
 	Node3D* m_pNode3D;
 	rp3d::RigidBody* m_pRigidBody;
+	std::vector<NodeCollider*> m_colliders;
+	//std::vector<uptr<NodeCollider>> m_colliders;
 
 	friend class PhysicsServer;
 };
