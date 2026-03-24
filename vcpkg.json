@@ -6,9 +6,9 @@
     "glad",
     "glfw3",
     "raylib",
+    "imgui",
     "glm",
     "reactphysics3d",
-    "raylib",
-    "imgui"
+    "bigsimp"
   ]
 }

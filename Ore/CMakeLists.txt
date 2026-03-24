@@ -6,7 +6,7 @@ find_package(glm CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
-add_library(${PROJECT_NAME} STATIC
+add_library(${PROJECT_NAME} SHARED
     ${SOURCES}
 )
 

@@ -10,6 +10,7 @@ using json = nlohmann::json;
 
 void EditorSerializer::Save(std::string outPath, uptr<Node>& root)
 {
+
 	EngineServer::FlushCommands();
 
 	json jsonRoot;
