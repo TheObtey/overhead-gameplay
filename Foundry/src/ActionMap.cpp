@@ -1,5 +1,6 @@
 #include "ActionMap.h"
 #include "Action.h"
+#include "Event.hpp"
 
 ActionMap::ActionMap() : m_actions(std::unordered_map<std::string, std::vector<Action*>>()) {}
 
@@ -54,7 +55,18 @@ void ActionMap::ExecuteAction(std::string_view const& name)
 	if (m_actions.find(std::string(name)) == m_actions.end())
 		return;
 
-	// ...
+	std::vector<Action*>& vector = m_actions[std::string(name)];
+
+	for (int i = 0; i < vector.size(); i++)
+	{
+		for (int j = 0; j < vector[i]->m_controls.size(); j++)
+		{
+			vector[i]->GetEvent().Invoke(vector[j]->GetControls())
+		}
+
+
+	}
+	
 }
 
 

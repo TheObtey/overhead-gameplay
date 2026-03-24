@@ -28,7 +28,7 @@ public:
 	bool			EraseLastAction(std::string_view const& name);
 	bool			EraseAction(std::string_view const& name, uint32 const& index);
 
-	template <typename RV, typename... Args>
+	template		<typename RV, typename... Args>
 	bool			SetAction(std::string_view const& name, Event<RV(Args...)>* pAction);
 	void			ExecuteAction(std::string_view const& name);
 	

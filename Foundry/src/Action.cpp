@@ -27,12 +27,11 @@ void Action::SetEvent(Event<RV(Args...)> const& event)
 {
 	for (int i = 0; i < m_controls.size(); i++)
 	{
-
+		//
 	}
 }
 
-template <typename RV, typename... Args>
-Event<RV(Args...)>& Action::GetEvent() const
+Event<void(IControl&)> Action::GetEvent() const
 {
 	return m_event;
 }
@@ -54,7 +53,10 @@ uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
 	return m_controls.size() - 1;
 }
 
-
+std::vector<IControl*>& Action::GetControls()
+{
+	return m_controls;
+}
 
 
 
