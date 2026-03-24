@@ -6,6 +6,9 @@
 #include <memory>
 #include <numbers>
 
+#include <string>
+#include <vector>
+
 using char8 = std::int8_t;
 using int8  = std::int8_t;
 using int16 = std::int16_t;

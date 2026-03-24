@@ -1,6 +1,5 @@
 #include "Scripting/Lua/LuaScriptInstance.hpp"
 #include "Scripting/ScriptingEngine.h"
-#include "Registries/AutomaticRegisterProxy.hpp"
 #include "Logger.hpp"
 
 
@@ -11,6 +10,9 @@ LuaScriptInstance::LuaScriptInstance(std::string const& scriptPath) :
 	m_enviro = {m_state, sol::create};
 	m_enviro["print"] = m_state["print"];
 	m_enviro["os"] = m_state["os"];
+	m_enviro["hook"] = m_state["hook"];
+	m_enviro["timer"] = m_state["timer"];
+	m_enviro["assert"] = m_state["assert"];
 
 	for (std::string const& name : ScriptingEngine::GetRegisteredTypesName())
 		m_enviro[name] = m_state[name];
@@ -38,6 +40,8 @@ void LuaScriptInstance::CallScriptOnUpdate(double dt)
 		sol::error err = result;
 		Logger::LogWithLevel(LogLevel::ERROR, "Lua script error : ", err.what());
 	}
+
+	m_timerUpdateFunc(dt);
 }
 
 void LuaScriptInstance::CallScriptOnPhysicsUpdate(double dt)

@@ -1,0 +1,105 @@
+#include "EventManager.h"
+#include "Logger.hpp"
+
+Event<void(GamepadId)> EventManager::gamepadConnected = Event<void(GamepadId)>();
+Event<void(GamepadId)> EventManager::gamepadDisconnected = Event<void(GamepadId)>();
+Event<void(EventInput key, EventAction action)> EventManager::getKey = Event<void(EventInput key, EventAction action)>();
+Event<void(EventInput mouse, EventAction action)> EventManager::getMouse = Event<void(EventInput mouse, EventAction action)>();
+Event<void(int32 posX, int32 posY)> EventManager::getCursorPos = Event<void(int32 posX, int32 posY)>();
+
+bool EventManager::CheckGamepad(GamepadId id)
+{
+	uint32 present = glfwJoystickPresent((uint32)id);
+
+    if(present == GLFW_NOT_INITIALIZED)
+    {
+        Logger::LogWithLevel(LogLevel::ERROR, "GLFW is not initialized, did you create a window before calling the function ?");
+        return false;
+    }
+
+    if(present == GLFW_INVALID_ENUM)
+    {
+        Logger::LogWithLevel(LogLevel::ERROR, "The value does not correspond to the enum");
+        return false;
+    }
+
+	Logger::LogWithLevel(LogLevel::DEBUG, present);
+	return present;
+}
+
+void EventManager::JoystickCallback(int jId, int event)
+{
+	if (event == GLFW_CONNECTED)
+		EventManager::gamepadConnected((GamepadId)jId);
+	if (event == GLFW_DISCONNECTED)
+		EventManager::gamepadDisconnected((GamepadId)jId);
+}
+
+std::string_view EventManager::GetGamepadName(GamepadId id)
+{
+	const char* pName = glfwGetGamepadName((uint32)id);
+
+    if(pName == NULL)
+    {
+        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get gamepad's name at id :", (uint32)id, "use CheckGamepad first to check if it is present");
+        return "";
+    }
+
+	std::string_view gamepadName(pName);
+	Logger::LogWithLevel(LogLevel::DEBUG, gamepadName);
+	return gamepadName;
+}
+
+float EventManager::GetGamepadAxes(GamepadId id, EventInput key)
+{
+	int axesCount;
+	const float* pAxes = glfwGetJoystickAxes((uint32)id, &axesCount);
+
+    if(pAxes == NULL)
+    {
+        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get joytick's axes at id :", (int)id, "use CheckGamepad first to check if it is present");
+        return {};
+    }
+
+	Logger::LogWithLevel(LogLevel::DEBUG, pAxes[(int)key]);
+	return pAxes[(int)key];
+}
+
+bool EventManager::GetButton(GamepadId id, EventInput button)
+{
+	GLFWgamepadstate state;
+    int error = glfwGetGamepadState((int)id, &state);
+
+    if(error == GLFW_FALSE)
+    {
+        Logger::LogWithLevel(LogLevel::ERROR, "Couldn't get gamepad's button at id :", (int)id, "use CheckGamepad first to check if it is present");
+        return false;
+    }
+
+	if (state.buttons[(int)button])
+	{
+        Logger::LogWithLevel(LogLevel::DEBUG, (int)button);
+		return true;
+	}
+    return false;
+}
+
+void EventManager::GetKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+	const char* ch = glfwGetKeyName(key, scancode);
+	
+	uint32 val = 0;
+    ch != nullptr ? val = (int)toupper(ch[0]) : val=key;
+
+    EventManager::getKey((EventInput)val, (EventAction)action);
+}
+
+void EventManager::GetMouseButtonCallBack(GLFWwindow *window, int button, int action, int mods)
+{
+    EventManager::getMouse((EventInput) button, (EventAction) action);
+}
+
+void EventManager::GetCursorPosCallBack(GLFWwindow *window, double xpos, double ypos)
+{
+    getCursorPos(xpos, ypos);
+}

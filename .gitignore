@@ -9,5 +9,6 @@ compile_commands.json
 .ccls-cache/
 .cache/
 .vs/
+CMakeSettings.json
 .idea/
 CMakeSettings.json
