@@ -1,13 +1,13 @@
-#include "AudioEngine.h" // need to make node and server instead
+#include "Nodes/NodeAudioEmitter.h"
 #include "Define.h" //temp
-
 
 int main(int argc, char** argv)
 {
+    auto audioEm = Node::CreateNode<NodeAudioEmitter>("AudioEmitter");
+
     if (argc > 1) 
     {
-        AudioEngine newAudioEngine;
-        newAudioEngine.PlayAudio(argv[1]);
+        audioEm->PlayAudio(argv[1]);
     }
     else
     {

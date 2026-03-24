@@ -6,10 +6,6 @@ AudioEngine::AudioEngine()
 {
 }
 
-AudioEngine::~AudioEngine()
-{
-}
-
 void AudioEngine::Data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
     ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
@@ -43,13 +39,15 @@ void AudioEngine::PlayAudio(const char* filePath)
     deviceConfig.dataCallback = AudioEngine::Data_callback;
     deviceConfig.pUserData = &decoder;
 
-    if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
+    if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) 
+    {
         printf("Failed to open playback device.\n");
         ma_decoder_uninit(&decoder);
         return;
     }
 
-    if (ma_device_start(&device) != MA_SUCCESS) {
+    if (ma_device_start(&device) != MA_SUCCESS)
+    {
         printf("Failed to start playback device.\n");
         ma_device_uninit(&device);
         ma_decoder_uninit(&decoder);
