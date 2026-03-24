@@ -1,12 +1,16 @@
-#ifndef FOUNDRY_ICONTROL__H_
-#define FOUNDRY_ICONTROL__H_
+#ifndef FOUNDRY_ICONTROL_H__
+#define FOUNDRY_ICONTROL_H__
+
 
 #include "Define.h"
+#include "EventManager.h"
+
 
 #include <glm/glm.hpp>
 
-enum class EventInput; // forward depuis Ore ?
+
 class Action;
+enum class EventInput;
 
 
 enum class ControlType : byte
@@ -18,10 +22,17 @@ enum class ControlType : byte
 	UNDEFINED = 0
 };
 
-class IControl
+enum class ButtonState : bool
+{
+	UP = false,
+	DOWN = true
+};
+
+
+class IControl /*: public ISerializable*/
 {
 public:
-	IControl(ControlType const& type, EventInput const& eventInput);
+	IControl(ControlType const& type, EventInput const& eventInput, Action* pAction = nullptr);
 	virtual ~IControl();
 
 	ControlType GetControlType() const;
@@ -29,13 +40,12 @@ public:
 	template <typename T>
 	static T Read(IControl& iControl);
 
-	template <typename T>
-	T Read();
+	void SetAction(Action* pAction);
 
-protected:
+private:
 	ControlType m_type;
 	EventInput m_eventInput;
-	Action* m_action; // ptr car sinon pas d'init de la l value
+	Action* m_pAction; 
 };
 
 class ButtonControl : public IControl
@@ -43,46 +53,41 @@ class ButtonControl : public IControl
 public:
 	enum class ButtonState : bool;
 
-	ButtonControl(EventInput const& eventInput);
+	ButtonControl(EventInput const& eventInput, Action* pAction);
 	~ButtonControl() = default;
 
 	ButtonState GetState();
 
 private:
-	enum class ButtonState : bool
-	{
-		UP = false,
-		DOWN = true
-	} m_state; // UP
+	ButtonState m_state;
 };
 
 
 class SliderControl : public IControl
 {
 public:
-	SliderControl(EventInput const& eventInput);
+	SliderControl(EventInput const& eventInput, Action* pAction);
 	~SliderControl() = default;
 
 	float GetPos() const;
 
 private:
-	float m_pos; // [-1;1]
+	float m_pos;
 };
 
 
 class StickControl : public IControl
 {
 public:
-	StickControl(EventInput const& eventInput);
+	StickControl(EventInput const& eventInput, Action* pAction);
 	~StickControl() = default;
 
 	bool IsFlicked() const;
 	glm::vec2 GetPos() const;
 
 private:
-	glm::vec2 m_pos; // [(-1; -1), (1; 1)]
+	glm::vec2 m_pos;
 };
-
 
 
 #endif

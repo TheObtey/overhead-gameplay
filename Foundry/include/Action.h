@@ -1,12 +1,15 @@
-#ifndef FOUNDRY_ACTION__H_
-#define FOUNDRY_ACTION__H_
+#ifndef FOUNDRY_ACTION_H__
+#define FOUNDRY_ACTION_H__
+
 
 #include "Define.h"
 #include "Serialization/ISerializable.h"
 #include "Event.hpp"
 
+
 #include <glm/glm.hpp>
 #include <vector>
+
 
 class IControl;
 class ActionMap;
@@ -24,31 +27,28 @@ public:
 		std::string name, 
 		ControlType type, 
 		Event<RV, Args...> event,
-		EventInput eventInput = NULL
+		EventInput eventInput
 	);
 
-	virtual ~Action();
-
+	~Action();
 	
 	template <typename RV, typename... Args>
 	void SetEvent(Event<RV(Args...)> const& event);
-
 	Event<void(IControl&)> GetEvent() const;
 
 	uint32 AddControl(ControlType const& type, EventInput const& eventInput);
+	IControl* GetControl(uint32& index);
 
-	//bool RemoveControl(uint32 const& index);
-
-protected:
-	std::vector<IControl*>& GetControls();
+	void SetName(std::string const& name);
+	std::string_view GetName() const;
 
 private:
-	std::string m_name;
+	std::string_view m_name;
 	std::vector<IControl*> m_controls; 
-
 	Event<void(IControl&)> m_event;
 
 	friend ActionMap;
 };
+
 
 #endif

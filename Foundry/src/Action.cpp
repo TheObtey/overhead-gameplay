@@ -1,7 +1,25 @@
 #include "Action.h"
 #include "IControl.h"
 
-Action::Action(std::string name) : m_name(name), m_controls() {}
+Action::Action(std::string name) : m_controls(), m_event() {}
+
+template <typename RV, typename... Args>
+Action::Action(std::string name, ControlType type, Event<RV, Args...> event, EventInput eventInput) :
+	m_name(name), m_event(event)
+{
+	switch (type)
+	{
+	case ControlType::BUTTON : 
+		m_controls.push_back(new ButtonControl(eventInput, this));
+		break;
+	case ControlType::SLIDER: 
+		m_controls.push_back(new SliderControl(eventInput, this));
+		break;
+	case ControlType::STICK : 
+		m_controls.push_back(new StickControl(eventInput, this));
+		break;
+	}
+}
 
 template <typename RV, typename... Args>
 Action::Action(std::string name, ControlType type, Event<RV, Args...> event, EventInput eventInput) : m_name(name), m_controls()
@@ -25,10 +43,7 @@ Action::Action(std::string name, ControlType type, Event<RV, Args...> event, Eve
 template <typename RV, typename... Args>
 void Action::SetEvent(Event<RV(Args...)> const& event)
 {
-	for (int i = 0; i < m_controls.size(); i++)
-	{
-		//
-	}
+	m_event = event;
 }
 
 Event<void(IControl&)> Action::GetEvent() const
@@ -50,14 +65,26 @@ uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
 		m_controls.push_back(new StickControl(eventInput));
 		break;
 	}
+
+	m_controls.back()->SetAction(this);
+
 	return m_controls.size() - 1;
 }
 
-std::vector<IControl*>& Action::GetControls()
+IControl* Action::GetControl(uint32& index)
 {
-	return m_controls;
+	if (index > m_controls.size())
+		return nullptr;
+
+	return m_controls[index];
 }
 
+void Action::SetName(std::string const& name)
+{
+	m_name = name;
+}
 
-
-
+std::string_view Action::GetName() const
+{
+	return m_name;
+}

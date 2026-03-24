@@ -1,15 +1,19 @@
-#ifndef FOUNDRY_ACTIONMAP__H_
-#define FOUNDRY_ACTIONMAP__H_
+#ifndef FOUNDRY_ACTIONMAP_H__
+#define FOUNDRY_ACTIONMAP_H__
+
 
 #include "Event.hpp"
 #include "IControl.h"
+
 
 #include <string_view>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+
 class Action;
+
 
 class ActionMap /*: public ISerializable*/
 {
@@ -24,25 +28,19 @@ public:
 	void operator=(ActionMap&& other) = delete;
 
 
-	bool			AddAction(std::string_view const& name, Action* pAction);
-	bool			EraseLastAction(std::string_view const& name);
-	bool			EraseAction(std::string_view const& name, uint32 const& index);
-
-	template		<typename RV, typename... Args>
-	bool			SetAction(std::string_view const& name, Event<RV(Args...)>* pAction);
-	void			ExecuteAction(std::string_view const& name);
-	
-	ButtonControl&  GetActionButton(std::string_view const& name) const;
-	SliderControl&  GetActionSlider(std::string_view const& name) const;
-	StickControl&   GetActionStick(std::string_view const& name) const;
-	
-
-	int64			Length() const { return m_actions.size(); }
-	void			Pop(std::string_view const& name);
-	void			Replace(std::string_view const& old, std::string_view const& name);
+	bool		Emplace(std::string_view const& name, Action* pAction);
+	void		Erase(std::string_view const& name);
+				
+	template	<typename RV, typename... Args>
+	bool		SetAction(std::string_view const& name, Event<RV(Args...)>* pAction);
+	Action*		GetAction(std::string_view const& name);
+	Action*		operator[](std::string const& name);
+				
+	uint32		Length() const;
+	void		Rename(std::string_view const& old, std::string_view const& name);
 
 private:
-	std::unordered_map<std::string, std::vector<Action*>> m_actions;
+	std::unordered_map<std::string, Action*> m_actions;
 };
 
 
