@@ -19,9 +19,13 @@ FetchContent_MakeAvailable(rlgizmo)
 find_package(imgui CONFIG REQUIRED)
 find_package(raylib CONFIG REQUIRED)
 
-file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp" "${PROJECT_BINARY_DIR}/../_deps/rlimgui-src/*.cpp" "${PROJECT_BINARY_DIR}/../_deps/rlgizmo-src/src/*.c")
+file(GLOB_RECURSE SOURCES 
+    "${PROJECT_SOURCE_DIR}/src/*.cpp"
+    "${PROJECT_BINARY_DIR}/../_deps/rlimgui-src/*.cpp"
+    "${PROJECT_BINARY_DIR}/../_deps/rlgizmo-src/src/*.c"
+)
 
-add_library(${PROJECT_NAME} STATIC
+add_library(${PROJECT_NAME} SHARED
     ${SOURCES}
 )
 

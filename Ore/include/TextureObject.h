@@ -22,7 +22,7 @@ class TextureObject final : public ITextureObject
 {
 public:
     TextureObject(uint32 id, TextureType type);
-    ~TextureObject() override;
+    ~TextureObject() override {};
 
     void Bind() override;
 
