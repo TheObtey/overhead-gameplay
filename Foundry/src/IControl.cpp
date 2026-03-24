@@ -23,7 +23,7 @@ void IControl::SetAction(Action* pAction)
 
 ButtonControl::ButtonControl(EventInput const& eventInput, Action* pAction) : IControl(ControlType::BUTTON, eventInput, pAction), m_state(ButtonState::UP) {}
 
-ButtonControl::ButtonState ButtonControl::GetState()
+ButtonState ButtonControl::GetState()
 {
 	return m_state;
 }

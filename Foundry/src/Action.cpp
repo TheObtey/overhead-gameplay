@@ -7,37 +7,7 @@ template <typename RV, typename... Args>
 Action::Action(std::string name, ControlType type, Event<RV, Args...> event, EventInput eventInput) :
 	m_name(name), m_event(event)
 {
-	switch (type)
-	{
-	case ControlType::BUTTON : 
-		m_controls.push_back(new ButtonControl(eventInput, this));
-		break;
-	case ControlType::SLIDER: 
-		m_controls.push_back(new SliderControl(eventInput, this));
-		break;
-	case ControlType::STICK : 
-		m_controls.push_back(new StickControl(eventInput, this));
-		break;
-	}
-}
-
-template <typename RV, typename... Args>
-Action::Action(std::string name, ControlType type, Event<RV, Args...> event, EventInput eventInput) : m_name(name), m_controls()
-{
-	AddControl(eventInput);
-	
-	switch (type)
-	{
-	case ControlType::BUTTON:
-		SetEvent<void, bool>(event);
-		break;
-	case ControlType::SLIDER:
-		SetEvent<void, float>(event);
-		break;
-	case ControlType::STICK:
-		SetEvent<void, glm::vec2>(event);
-		break;
-	}
+	AddControl(type, eventInput);
 }
 
 template <typename RV, typename... Args>
@@ -56,13 +26,13 @@ uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
 	switch (type)
 	{
 	case ControlType::BUTTON:
-		m_controls.push_back(new ButtonControl(eventInput));
+		m_controls.push_back(new ButtonControl(eventInput, this));
 		break;
 	case ControlType::SLIDER:
-		m_controls.push_back(new SliderControl(eventInput));
+		m_controls.push_back(new SliderControl(eventInput, this));
 		break;
 	case ControlType::STICK:
-		m_controls.push_back(new StickControl(eventInput));
+		m_controls.push_back(new StickControl(eventInput, this));
 		break;
 	}
 

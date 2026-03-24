@@ -29,7 +29,7 @@ public:
 
 
 	bool		Emplace(std::string_view const& name, Action* pAction);
-	void		Erase(std::string_view const& name);
+	bool		Erase(std::string_view const& name);
 				
 	template	<typename RV, typename... Args>
 	bool		SetAction(std::string_view const& name, Event<RV(Args...)>* pAction);

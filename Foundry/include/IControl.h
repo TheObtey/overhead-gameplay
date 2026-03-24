@@ -51,8 +51,6 @@ private:
 class ButtonControl : public IControl
 {
 public:
-	enum class ButtonState : bool;
-
 	ButtonControl(EventInput const& eventInput, Action* pAction);
 	~ButtonControl() = default;
 

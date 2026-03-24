@@ -2,7 +2,7 @@
 #include "Action.h"
 #include "Event.hpp"
 
-ActionMap::ActionMap() : m_actions(std::unordered_map<std::string, std::vector<Action*>>()) {}
+ActionMap::ActionMap() : m_actions(std::unordered_map<std::string, Action*>()) {}
 
 bool ActionMap::Emplace(std::string_view const& name, Action* pAction)
 {
@@ -12,7 +12,7 @@ bool ActionMap::Emplace(std::string_view const& name, Action* pAction)
 	if (m_actions.find(std::string(name)) != m_actions.end())
 		return false;
 
-	m_actions[std::string(name)].push_back(pAction);
+	m_actions[std::string(name)] = pAction;
 	
 	return true;
 }
