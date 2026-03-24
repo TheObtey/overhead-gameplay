@@ -30,7 +30,7 @@ public:
 
 	template <typename RV, typename... Args>
 	bool			SetAction(std::string_view const& name, Event<RV(Args...)>* pAction);
-	void			ExecuteAction(std::string_view const& name) const;
+	void			ExecuteAction(std::string_view const& name);
 	
 	ButtonControl&  GetActionButton(std::string_view const& name) const;
 	SliderControl&  GetActionSlider(std::string_view const& name) const;

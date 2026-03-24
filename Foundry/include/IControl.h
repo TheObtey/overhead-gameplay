@@ -25,8 +25,12 @@ public:
 	virtual ~IControl();
 
 	ControlType GetControlType() const;
+	
+	template <typename T>
+	static T Read(IControl& iControl);
 
-	virtual void Read(IControl& iControl) = 0;
+	template <typename T>
+	T Read();
 
 protected:
 	ControlType m_type;
@@ -43,8 +47,6 @@ public:
 	~ButtonControl() = default;
 
 	ButtonState GetState();
-
-	virtual void Read(IControl& iControl) override;
 
 private:
 	enum class ButtonState : bool
@@ -63,8 +65,6 @@ public:
 
 	float GetPos() const;
 
-	virtual void Read(IControl& iControl) override;
-
 private:
 	float m_pos; // [-1;1]
 };
@@ -78,8 +78,6 @@ public:
 
 	bool IsFlicked() const;
 	glm::vec2 GetPos() const;
-
-	virtual void Read(IControl& iControl) override;
 
 private:
 	glm::vec2 m_pos; // [(-1; -1), (1; 1)]

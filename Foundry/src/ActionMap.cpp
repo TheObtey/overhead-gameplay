@@ -1,4 +1,5 @@
 #include "ActionMap.h"
+#include "Action.h"
 
 ActionMap::ActionMap() : m_actions(std::unordered_map<std::string, std::vector<Action*>>()) {}
 
@@ -48,18 +49,12 @@ bool ActionMap::SetAction(std::string_view const& name, Event<RV(Args...)>* pAct
 	return true;
 }
 
-void ActionMap::ExecuteAction(std::string_view const& name) const
+void ActionMap::ExecuteAction(std::string_view const& name)
 {
 	if (m_actions.find(std::string(name)) == m_actions.end())
 		return;
 
-	/*std::vector<Action*>& vector = m_actions[std::string(name)];
-
-	for (int i = 0; i < vector.size(); i++)
-	{
-		vector[i]->GetEvent();
-	}
-	return true;*/
+	// ...
 }
 
 
