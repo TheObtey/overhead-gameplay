@@ -50,7 +50,7 @@ private:
 	ScriptPathMap CopyScriptIntoGame(std::filesystem::path const& scenePath, std::filesystem::path const& gameExePath);
 	bool WritePlayScene(std::filesystem::path const& outputScenePath, ScriptPathMap const& scriptMap);
 	void UpdateScriptPathsInJson(json& nodeJson, ScriptPathMap const& scriptMap);
-	void RemoveStringClone(Node* node);
+	void RemoveStringClone(Node* pNode);
 private:
 	// Editor Parts
 	EditorRaylib3D m_editorRaylib;
