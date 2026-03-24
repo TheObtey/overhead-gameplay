@@ -6,6 +6,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <GLFW/glfw3.h>
+
 #define KEY_MODE_AZERTY
 
 enum class GamepadId

@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(FoundryProject)
 
-add_compile_definitions(_X86_)
+add_compile_definitions(GLFW_INCLUDE_NONE)
 
 # Indication to the code that this is a debug build
 if (${IS_DEBUG_BUILD})

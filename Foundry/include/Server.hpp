@@ -20,11 +20,7 @@ template <typename Derived> // The Curiously Recurring Template Pattern (CRTP)
 class Server
 {
 private:
-    Server() 
-	{ 
-		static_assert(std::derived_from<Derived, Server>, "Derived must inherit from Server<Derived>"); 
-	}
-
+    Server() { static_assert(std::derived_from<Derived, Server>, "Derived must inherit from Server<Derived>"); }
 
 public:
     static void FlushCommands() { static_cast<Server<Derived>&>(Instance()).FlushCommandsImpl(); }

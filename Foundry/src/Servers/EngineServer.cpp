@@ -45,11 +45,10 @@ void EngineServer::FlushCommandsImpl()
         {
         case CommandType::ATTACH:
             command.To->AttachChildImmediate(command.Child);
-            m_commands.pop();
             break;
         case CommandType::FREE:
-            m_commands.pop();
             break;
         }
+        m_commands.pop();
     }
 }

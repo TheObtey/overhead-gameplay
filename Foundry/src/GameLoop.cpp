@@ -1,23 +1,34 @@
 #include "GameLoop.h"
 
 #include "Clock.hpp"
-#include "Node.h"
+#include "Logger.hpp"
 #include "Multithreading/TaskGraph.h"
+#include "Nodes/NodeWindow.h"
 #include "Servers/EngineServer.h"
+#include "Servers/GraphicServer.h"
 
 void GameLoop::StartGame(SceneTree& defaultTree)
 {
+    try { dynamic_cast<NodeWindow&>(defaultTree.GetRoot()); }
+    catch (std::bad_cast ex)
+    {
+        Logger::LogWithLevel(LogLevel::ERROR, "No window in default SceneTree");
+        std::exit(-1);
+    }
+
     m_pDefaultTree = &defaultTree;
     m_pDefaultTree->OnGameStarted();
     m_pDefaultTree->OnSceneChanged();
+    UpdateServers();
     LoopGame();
 }
 
 void GameLoop::LoopGame()
 {
     Clock<> clock;
-    //while (m_defaultTree->GetRoot().isOpen());
-    while (true)
+    //while ();
+    auto const&  window = static_cast<NodeWindow const&>(m_pDefaultTree->GetRoot());
+    while (window.IsOpen())
     {
         TaskGraph graph;
         double const dt = clock.Reset();
@@ -26,16 +37,16 @@ void GameLoop::LoopGame()
         m_accumulator += dt;
         do
         {
-            m_accumulator -= dt;
+            m_accumulator -= PHYSICS_DT;
             root.PhysicsUpdate(PHYSICS_DT);
         }
-        while (m_accumulator > dt);
+        while (m_accumulator > PHYSICS_DT);
 
         root.Update(dt);
         UpdateServers();
         BuildTasksGraph(graph);
 
-        graph.Execute();
+        //graph.Execute();
     }
 
     EndGame();
@@ -49,11 +60,13 @@ void GameLoop::EndGame()
 void GameLoop::UpdateServers()
 {
     EngineServer::FlushCommands();
+    GraphicServer::FlushCommands();
 }
 
 void GameLoop::BuildTasksGraph(TaskGraph& graph)
 {
     EngineServer::BuildTasks(graph);
+    GraphicServer::BuildTasks(graph);
 }
 
 
