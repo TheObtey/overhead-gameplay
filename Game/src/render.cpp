@@ -29,12 +29,12 @@ int main()
 
     Geometry cube(vertices, indices);
     Texture diffuse("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
-    //Texture specular("../res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+    Texture specular("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     Texture normal("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
 
     std::vector<Texture*> textures;
     textures.push_back(&diffuse);
-    //textures.push_back(&specular); 
+    textures.push_back(&specular); 
     textures.push_back(&normal);
 
     Mesh mesh(cube, textures, glm::mat4(1.0f));

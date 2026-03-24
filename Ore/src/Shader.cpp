@@ -70,6 +70,10 @@ Shader::Shader(std::string const& vertBinaryPath, std::string const& fragBinaryP
     if(isLinked == GL_FALSE)
     {
         Logger::LogWithLevel(LogLevel::ERROR, "Program is not linked");
+        std::string log;
+        log.resize(512);
+        glGetProgramInfoLog(m_programId, 512, nullptr, log.data());
+        Logger::LogWithLevel(LogLevel::ERROR, log);
     }
 
     //glDetachShader(m_programId, vertex);

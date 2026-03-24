@@ -1,8 +1,7 @@
 #version 450 core
+out vec4 FragColor;
 
-layout(location = 0) out vec4 FragColor;
-
-layout(location = 1) in vec2 TexCoords;
+in vec2 TexCoords;
 
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
@@ -16,9 +15,9 @@ struct Light {
     float Quadratic;
     float Radius;
 };
-const int NR_LIGHTS = 32;
-layout(location = 0) uniform vec3 viewPos;
-layout(location = 1) uniform Light lights[NR_LIGHTS];
+const int NR_LIGHTS = 512;
+uniform Light lights[NR_LIGHTS];
+uniform vec3 viewPos;
 
 void main()
 {             
@@ -53,5 +52,3 @@ void main()
     }    
     FragColor = vec4(lighting, 1.0);
 }
-
-
