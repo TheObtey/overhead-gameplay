@@ -3,7 +3,6 @@
 // https://github.com/AlexandreGlatz/cmake-generator
 ////////////////////////////////////////////////////
 
-#include <SerializeObject.h>
 #include <Servers/EngineServer.h>
 #include <iostream>
 
@@ -18,9 +17,9 @@ int main() {
     //node.get()->AddChild(node4);
 
 
-    EditorSerializer json;
-    uptr<Node> rootNode = json.LoadFromJson("test.json");
+    //EditorSerializer json;
+    //uptr<Node> rootNode = json.LoadFromJson("test.json");
 
-    EngineServer::FlushCommands();
+    //EngineServer::FlushCommands();
 
 }

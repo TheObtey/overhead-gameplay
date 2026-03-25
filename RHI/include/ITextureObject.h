@@ -16,4 +16,5 @@ public:
     virtual void AttachToFrameBuffer(uint32 frameBuffer, uint32 attachment) = 0;
 };
 
+inline ITextureObject::~ITextureObject() {};
 #endif //!RHI_ITEXTURE_OBJECT__H_

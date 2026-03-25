@@ -1,13 +1,9 @@
 #ifndef RHI_IPASS__H_
 #define RHI_IPASS__H_
 
-#include "IShader.h"
-#include "ITexture.h"
-#include "IGeometry.h"
 #include "Define.h"
 
 #include <variant>
-#include <vector>
 
 
 class IPass 
@@ -15,13 +11,8 @@ class IPass
 public:
     virtual ~IPass() = 0;
 
-    virtual void AddShader(IShader const& shader) = 0;
-
-    template <typename ... Args>
-    void AddInput(Args ... args); 
-    
-    //virtual uptr<ITexture> Execute() = 0;
-protected:
-
+    virtual void Execute() = 0;
+    virtual void SetGBuffer(uint32 gbuffer) = 0;
 };
+inline IPass::~IPass() {};
 #endif //!RHI_IPASS__H_

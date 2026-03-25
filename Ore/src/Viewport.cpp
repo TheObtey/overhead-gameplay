@@ -1,7 +1,9 @@
 #include "Viewport.h"
 #include "Logger.hpp"
+#include "Window.h"
+#include "Passes/Pass.h"
 
-#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 Viewport::Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const& backgroundColor)
 {
@@ -10,10 +12,18 @@ Viewport::Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const&
     m_width = width;
     m_height = height;
     m_backgroundColor = backgroundColor;
+    m_pRenderGraph = std::make_unique<RenderGraph>(width, height);
+
+    Setup();
 }
 
 Viewport::~Viewport()
 {
+}
+
+void Viewport::AddPass(Pass* pPass)
+{
+    m_pRenderGraph->AddPass(pPass);
 }
 
 void Viewport::SetSize(uint16 width, uint16 height)
@@ -38,4 +48,5 @@ void Viewport::Clear() const
 
 void Viewport::Present() const
 {
+    m_pRenderGraph->Execute();
 }

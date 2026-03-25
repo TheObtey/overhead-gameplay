@@ -2,11 +2,10 @@
 #define ORE_EVENT_MANAGER__H_
 
 #include "Define.h"
-#include "Window.h"
+#include "Event.hpp"
 
 #include <GLFW/glfw3.h>
 
-#define KEY_MODE_AZERTY
 
 enum class GamepadId
 {
@@ -211,11 +210,13 @@ public:
     static float GetGamepadAxes(GamepadId id, EventInput button);
     static bool GetButton(GamepadId id, EventInput button);
 
-    static Event<void(GamepadId)> gamepadConnected;
-    static Event<void(GamepadId)> gamepadDisconnected;
+    inline static Event<void(GamepadId)> gamepadConnected = Event<void(GamepadId)>();
+    inline static Event<void(GamepadId)> gamepadDisconnected = Event<void(GamepadId)>();
 
-    static Event<void(EventInput key, EventAction action)> getKey;
-    static Event<void(EventInput mouse, EventAction action)> getMouse;
-    static Event<void(int32 posX, int32 posY)> getCursorPos;
+    inline static Event<void(EventInput, EventAction)> getKey = Event<void(EventInput, EventAction)>();
+    inline static Event<void(EventInput, EventAction)> getMouse = Event<void(EventInput, EventAction)>();
+    inline static Event<void(int32, int32)> getCursorPos = Event<void(int32, int32)>();
 };
+
+
 #endif // !ORE_EVENT_MANAGER__H_

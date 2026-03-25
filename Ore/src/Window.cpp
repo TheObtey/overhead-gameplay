@@ -4,7 +4,7 @@
 #include "EventManager.h"
 #include "Ore.h"
 
-#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 std::unordered_map<GLFWwindow*, Window*> Window::s_windows = {};
 Window::Window(int width, int height, std::string name, bool enableTransparency)
@@ -59,15 +59,15 @@ void Window::Open()
     glfwSetMouseButtonCallback(m_pWindow, EventManager::GetMouseButtonCallBack);
     glfwSetCursorPosCallback(m_pWindow, EventManager::GetCursorPosCallBack);
 
-
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		Logger::LogWithLevel(LogLevel::ERROR, "Failed to initialize GLAD");
 		return;
 	}
 
-	Logger::LogWithLevel(LogLevel::WARNING, "OpenGL Version : ", glGetString(GL_VERSION));
+    Logger::LogWithLevel(LogLevel::WARNING, "OpenGL Version : ", glGetString(GL_VERSION));
 
+    glEnable(GL_DEPTH_TEST);
 #ifdef DEBUG_BUILD
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(Ore::MessageCallback, 0);

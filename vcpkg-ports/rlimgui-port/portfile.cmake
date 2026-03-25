@@ -1,0 +1,14 @@
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO SafenM/rlImGui-CMake
+    REF  e3a45d1d14b44f0d1be15390633261e4012348c3
+    SHA512 5c14577a1461ce433092ec833f30e09a06a8e56d5fe58753c0a2ec2b7ee4d1a97ae11d7e004c8650a2266b776b45b051fe3e96a6c244f0e8f50e03825d28fab4
+)
+
+vcpkg_cmake_configure(
+    SOURCE_PATH ${SOURCE_PATH}
+    OPTIONS
+        -DFETCHCONTENT_FULLY_DISCONNECTED=OFF
+)
+
+vcpkg_cmake_install()

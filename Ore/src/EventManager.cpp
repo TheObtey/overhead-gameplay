@@ -1,11 +1,8 @@
 #include "EventManager.h"
-#include "Logger.hpp"
 
-Event<void(GamepadId)> EventManager::gamepadConnected = Event<void(GamepadId)>();
-Event<void(GamepadId)> EventManager::gamepadDisconnected = Event<void(GamepadId)>();
-Event<void(EventInput key, EventAction action)> EventManager::getKey = Event<void(EventInput key, EventAction action)>();
-Event<void(EventInput mouse, EventAction action)> EventManager::getMouse = Event<void(EventInput mouse, EventAction action)>();
-Event<void(int32 posX, int32 posY)> EventManager::getCursorPos = Event<void(int32 posX, int32 posY)>();
+#include <Logger.hpp>
+#include <cctype>
+
 
 bool EventManager::CheckGamepad(GamepadId id)
 {
@@ -89,17 +86,17 @@ void EventManager::GetKeyCallback(GLFWwindow *window, int key, int scancode, int
 	const char* ch = glfwGetKeyName(key, scancode);
 	
 	uint32 val = 0;
-    ch != nullptr ? val = (int)toupper(ch[0]) : val=key;
+    ch != nullptr ? val = static_cast<uint32>(std::toupper(ch[0])) : val = key;
 
-    EventManager::getKey((EventInput)val, (EventAction)action);
+    EventManager::getKey(static_cast<EventInput>(val), static_cast<EventAction>(action));
 }
 
 void EventManager::GetMouseButtonCallBack(GLFWwindow *window, int button, int action, int mods)
 {
-    EventManager::getMouse((EventInput) button, (EventAction) action);
+    EventManager::getMouse(static_cast<EventInput>(button), static_cast<EventAction>(action));
 }
 
 void EventManager::GetCursorPosCallBack(GLFWwindow *window, double xpos, double ypos)
 {
-    getCursorPos(xpos, ypos);
+    EventManager::getCursorPos(static_cast<int32>(xpos), static_cast<int32>(ypos));
 }

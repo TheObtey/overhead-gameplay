@@ -3,8 +3,6 @@
 
 #include "ITextureObject.h"
 
-#include <glad/glad.h>
-
 enum class DataType
 {
     UBYTE = GL_UNSIGNED_BYTE,
@@ -22,11 +20,14 @@ class TextureObject final : public ITextureObject
 {
 public:
     TextureObject(uint32 id, TextureType type);
+    TextureObject() = default;
+
     ~TextureObject() override;
 
     void Bind() override;
 
-    void GenerateTextureImage(DataType type, uint32& width, uint32& height, std::string imagePath = "");
+    void GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::string imagePath = "");
+    void GenerateTexture(DataType type, uint32 const& width, uint32 const& height, uint32 rgbType);
     void AddParameters(uint32 parameter, uint32 value) override;
     void AttachToFrameBuffer(uint32 frameBuffer, uint32 attachment) override;
     void InitializeTextureView(uint32 origTexture, TextureType format, uint32 minLevels, uint32 numlevels, uint32 minLayer, uint32 numLayers);

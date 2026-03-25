@@ -5,8 +5,9 @@
 #include "Viewport.h"
 
 #include <map>
+#include <vector>
+#include <GLFW/glfw3.h>
 
-class GLFWwindow;
 class Window : public IWindow
 {
 public:

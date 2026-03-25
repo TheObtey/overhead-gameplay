@@ -1,7 +1,8 @@
 #ifndef ORE_ORE__H_
 #define ORE_ORE__H_
 
-#include <glad/glad.h>
+#include "Define.h"
+
 namespace Ore
 {
     void GLAPIENTRY MessageCallback(GLenum source,

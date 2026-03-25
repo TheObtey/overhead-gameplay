@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    }
+  ],
+  "name": "bigsimp",
+  "version": "6.0.4"
+}

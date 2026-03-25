@@ -31,7 +31,6 @@ void GraphicServer::FlushCommandsImpl()
         {
             case CommandType::OPENWINDOW:
                 pWindow->Open();
-                pWindow->GetWiewport(0)->Setup();
                 break;
             case CommandType::CLEAR:
                 pWindow->Clear();

@@ -3,8 +3,10 @@
 
 #include "IViewport.h"
 #include "Passes/Pass.h"
+#include "RenderGraph.h"
 
 class Window;
+class Pass;
 class Viewport : public IViewport
 {
 public:
@@ -21,9 +23,13 @@ public:
     void Clear() const override;
     void Present() const override;
     
-    void AddPass(sptr<Pass> pPass);
-    void Setup() override; 
+    void AddPass(Pass* pPass);
 
+protected:
+    void Setup() override;
+
+private:
+    uptr<RenderGraph> m_pRenderGraph;
 };
 
 #endif
