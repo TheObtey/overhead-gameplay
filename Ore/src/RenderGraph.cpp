@@ -6,11 +6,17 @@
 
 RenderGraph::RenderGraph(uint32 screenWidth, uint32 screenHeight)
 {
-    CreateGBuffer(screenWidth, screenHeight);
+    RenderGraph::CreateGBuffer(screenWidth, screenHeight);
 }
 
 RenderGraph::~RenderGraph()
 {
+}
+
+void RenderGraph::SetSize(uint32 width, uint32 height)
+{
+    for (Pass* pPass : m_passes)
+        pPass->SetSize(width, height);
 }
 
 void RenderGraph::CreateGBuffer(uint32 screenWidth, uint32 screenHeight)

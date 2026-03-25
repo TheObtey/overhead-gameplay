@@ -13,6 +13,8 @@ public:
     Pass(Pass& other) { m_pProgram = other.m_pProgram; }
     ~Pass() override;
 
+    void SetSize(uint32 width, uint32 height) {m_screenWidth = width, m_screenHeight = height;}
+
 private:
     virtual void Execute() override {};
     virtual void SetGBuffer(uint32 gbuffer) override {m_gBuffer = gbuffer;}

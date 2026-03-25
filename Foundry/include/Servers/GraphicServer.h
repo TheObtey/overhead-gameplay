@@ -4,13 +4,14 @@
 #include "Server.hpp"
 
 class Window;
+class NodeWindow;
 class Viewport;
 
 template <>
 struct Command<class GraphicServer>
 {
     enum class CmdType { OPENWINDOW, CLEAR, PRESENT } Type;
-    Window* pWindow = nullptr;
+    NodeWindow* pNodeWindow = nullptr;
 };
 
 class GraphicServer : public Server<GraphicServer>
@@ -18,9 +19,9 @@ class GraphicServer : public Server<GraphicServer>
 public:
     using CommandType = Command<GraphicServer>::CmdType;
 
-    static void OpenWindow(Window* pWindow);
-    static void Present(Window* pWindow);
-    static void Clear(Window* pWindow);
+    static void OpenWindow(NodeWindow* pWindow);
+    static void Present(NodeWindow* pWindow);
+    static void Clear(NodeWindow* pWindow);
 
 private:
     void FlushCommandsImpl() override;

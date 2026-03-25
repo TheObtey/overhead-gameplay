@@ -19,7 +19,6 @@ public:
 
     virtual void Clear() const = 0;
     virtual void Present() const = 0;
-    virtual void Setup() = 0;
 
 protected:
     uint16 m_width = 0;

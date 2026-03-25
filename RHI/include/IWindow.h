@@ -27,8 +27,8 @@ public:
     virtual void Open() = 0;
 
 protected:
-    int m_width = 0;
-    int m_height = 0;
+    uint32 m_width = 0;
+    uint32 m_height = 0;
     std::string m_name = "";
 };
 

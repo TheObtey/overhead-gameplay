@@ -78,10 +78,10 @@ private:
 	bool m_isStatic = false;
 	bool m_isDirty;
 
-	glm::vec3 m_scale;
-	glm::vec3 m_shear;
+	glm::vec2 m_scale;
+	glm::vec2 m_shear;
 	float	  m_theta;
-	glm::vec3 m_position;
+	glm::vec2 m_position;
 	
 	glm::mat3 m_transformationMatrix;
 };
