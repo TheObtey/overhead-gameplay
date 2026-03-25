@@ -1,6 +1,7 @@
 #include "Mesh.h"
-#include "Shader.h"
-#include "Logger.hpp"
+#include "IProgram.h"
+
+#include <Logger.hpp>
 
 Mesh::Mesh(Geometry const& geometry, std::vector<Texture*> const& textures, glm::mat4 const& transform)
 {
@@ -15,7 +16,7 @@ Mesh::~Mesh()
 {
 }
 
-void Mesh::Draw(sptr<IShader> const shader)
+void Mesh::Draw(IProgram const* pProgram)
 {
     Logger::Log("Start Draw Mesh");
     uint32 diffuseNr = 1;
@@ -23,7 +24,6 @@ void Mesh::Draw(sptr<IShader> const shader)
     uint32 normalNr = 1;
     uint32 heightNr = 1;
 
-    sptr<Shader> pShader = std::dynamic_pointer_cast<Shader>(shader);
     for(uint32 i = 0; i<m_textures.size(); ++i)
     {
         glActiveTexture(GL_TEXTURE0 + i); 
@@ -46,10 +46,10 @@ void Mesh::Draw(sptr<IShader> const shader)
         }
 
         Logger::Log(name);
-        glUniform1i(glGetUniformLocation(pShader->GetProgramId(), name.c_str()), i);
+        glUniform1i(glGetUniformLocation(pProgram->GetProgramId(), name.c_str()), i);
         m_textures[i]->GetTextureObject().Bind();
     }
 
-    m_pGeometry->Draw(pShader);
+    m_pGeometry->Draw();
     glActiveTexture(GL_TEXTURE0);
 }

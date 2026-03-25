@@ -13,7 +13,7 @@ public:
     Mesh(Geometry const& geometry, std::vector<Texture*> const& textures, glm::mat4 const& transform);
     ~Mesh() override;
 
-    void Draw(sptr<IShader> const shader) override;
+    void Draw(IProgram const* program) override;
     void SetTransform(glm::mat4 const& transform) { m_transform = transform;}
     glm::mat4 const& GetTransform() const { return m_transform; }
 

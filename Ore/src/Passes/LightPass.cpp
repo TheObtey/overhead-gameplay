@@ -2,7 +2,7 @@
 #include "TextureObject.h"
 #include "Logger.hpp"
 
-LightPass::LightPass(Shader const& shader, std::vector<Light> const& lights, sptr<Camera> pCamera) : Pass(shader, pCamera)
+LightPass::LightPass(Program const& program, std::vector<Light> const& lights, sptr<Camera> pCamera) : Pass(program, pCamera)
 {
     m_quadVAOId = 0;
     m_quadVBOId = 0;
@@ -52,7 +52,7 @@ void LightPass::Execute()
 {
     Logger::Log("Start Light Pass");
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_pShader->Use();
+    m_pProgram->Use();
 
     glActiveTexture(GL_TEXTURE0);
     m_pGPosition->Bind();
@@ -66,19 +66,19 @@ void LightPass::Execute()
         std::string const indexStr = std::to_string(i);
         sptr<Light> light = m_lights[i];
 
-        m_pShader->SetVec3("lights[" + indexStr + "].Position", light->position);
-        m_pShader->SetVec3("lights[" + indexStr + "].Color", {light->color.r, light->color.g, light->color.b});
+        m_pProgram->SetUniform("lights[" + indexStr + "].Position", light->position);
+        m_pProgram->SetUniform("lights[" + indexStr + "].Color", glm::vec3{light->color.r, light->color.g, light->color.b});
 
-        m_pShader->SetFloat("lights[" + indexStr + "].Linear", light->linear);
-        m_pShader->SetFloat("lights[" + indexStr + "].Quadratic", light->quadratic);
+        m_pProgram->SetUniform("lights[" + indexStr + "].Linear", light->linear);
+        m_pProgram->SetUniform("lights[" + indexStr + "].Quadratic", light->quadratic);
 
         float const maxBrightness = std::fmaxf(std::fmaxf(light->color.r, light->color.g), light->color.b);
         float radius = (-m_lights[i]->linear + std::sqrt(light->linear * light->linear - 4 * light->quadratic * (light->constant - (256.0f / 5.0f) * maxBrightness))) 
             / (2.0f * light->quadratic);
-        m_pShader->SetFloat("lights[" + indexStr + "].Radius", radius);
+        m_pProgram->SetUniform("lights[" + indexStr + "].Radius", radius);
     }
 
-    m_pShader->SetVec3("viewPos", m_pCamera->GetPosition());
+    m_pProgram->SetUniform("viewPos", m_pCamera->GetPosition());
     RenderQuad();
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_gBuffer);

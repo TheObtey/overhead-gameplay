@@ -39,8 +39,6 @@ glm::mat4 Camera::GetProjectionMatrix(ProjectionType type, uint16 screenWidth, u
 
 glm::mat4 Camera::GetViewMatrix() const
 {
-    std::cout<< m_forward.x <<m_forward.y<<m_forward.z<<std::endl;
-    std::cout << m_position.x + m_forward.x <<  m_position.y + m_forward.y<< m_position.z + m_forward.z<<std::endl;
     return glm::lookAt(m_position, m_position + m_forward, m_up);
 }
 
@@ -51,7 +49,6 @@ void Camera::UpdateVectors()
     front.y = sin(glm::radians(m_pitch));
     front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
     m_forward = glm::normalize(front);
-    std::cout<<m_forward.x<<" "<<m_forward.y<<" "<<m_forward.z<<" "<<std::endl;
 
     glm::vec3 right = glm::normalize(glm::cross(m_forward, m_worldUp));
 
