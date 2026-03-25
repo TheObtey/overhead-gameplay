@@ -1,4 +1,3 @@
-include(FetchContent)
 project(Editor)
 
 find_package(imgui CONFIG REQUIRED)
