@@ -7,28 +7,28 @@ NodeAudioEmitter::NodeAudioEmitter(std::string const& name) : Node(name)
 
 void NodeAudioEmitter::AudioSetFile(const char* filePath)
 {
-	m_audio.SetAudioFile(filePath);
+	AudioServer::SetAudioFile(filePath);
 }
 
 void NodeAudioEmitter::AudioPlay()
 {
-	m_audio.Play();
+	AudioServer::Play();
 }
 
 void NodeAudioEmitter::AudioStop()
 {
-	m_audio.Stop();
+	AudioServer::Stop();
 }
 
 void NodeAudioEmitter::AudioSetLoop(bool value)
 {
-	m_audio.SetLoop(value);
+	AudioServer::SetLoop(value);
 }
 
 void NodeAudioEmitter::OnUpdate(double delta)
 {
 	Node::OnUpdate(delta);
-	m_audio.Update();
+	AudioServer::Update();
 }
 
 ISerializable* NodeAudioEmitter::CreateInstance()

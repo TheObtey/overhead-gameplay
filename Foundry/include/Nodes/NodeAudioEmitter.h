@@ -2,7 +2,7 @@
 #define FOUNDRY_NODEAUDIOEMITTER__H_
 
 #include "Node.h"
-#include "AudioEngine.h"
+#include "Servers/AudioServer.h"
 
 class NodeAudioEmitter : public Node
 {
@@ -21,7 +21,6 @@ public:
 	static ISerializable* CreateInstance();
 
 protected:
-	AudioEngine m_audio;
 
 private:
 
