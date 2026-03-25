@@ -54,7 +54,7 @@ public:
 
 	void SetSceneRoot(Node* pRoot);
 	void SetScreenSize(int width, int height);
-	void ShowSaveAs() { m_showSaveAsPopup = true; }
+	void ShowSaveAs(bool node) { m_showSaveAsPopup = true; m_saveAsNode = node; }
 
 	void ResetViewRoot();
 	void ResetSelectedNode();
@@ -62,6 +62,8 @@ public:
 	EditorCommand& GetCommand() { return m_command; }
 	void SetCommand(EditorCommand const& command) { m_command = command; }
 	bool HasCommand() const { return m_command.type != EditorCommand::Type::NONE; }
+	Node* GetSelectedNode() { return m_pSelectedNode; }
+	Node* GetSceneRoot() { return m_pSceneRoot; }
 
 private:
 	void DrawMenuBar();
@@ -81,6 +83,8 @@ private:
 		PARENT,
 		SIBLING
 	};
+
+	std::string NormalizeScenePath(std::string path, bool saveAsNode);
 
 	void CreateNodePopup(Node* from, NodeCreationFlag flag, bool& open);
 
@@ -103,6 +107,7 @@ private:
 private:
 	EditorRaylib3D* m_pRaylibEditor;
 	Editor* m_pEditor;
+
 	uptr<Node> m_newNodeTypeSelector = nullptr;
 
 	bool m_showCreatePopup = false;
@@ -122,6 +127,7 @@ private:
 
 	bool m_haveFileSelected = false;
 	std::string m_scenePathBuffer;
+	std::string m_nodeSavePathBuffer;
 
 	Node* m_pSelectedNode = nullptr;
 
@@ -140,6 +146,9 @@ private:
 
 	int m_screenWidth = 1900;
 	int m_screenHeight = 900;
+
+	bool m_saveAsNode = false;
+
 
 	bool m_play = false;
 

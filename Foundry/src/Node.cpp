@@ -220,11 +220,14 @@ void Node::Deserialize(SerializedObject const& datas)
 {
 	// Call baseClass::Deserialize(datas) : Example Node::Deserialize(datas)
 	std::string t = datas.GetType();
-	datas.GetPublicElement("Name",&m_name);
+	std::string newname;
+	datas.GetPublicElement("Name",&newname);
+	SetName(newname);
+
 	datas.GetPublicElement("m_scriptPath", &m_scriptPath);
 	if (m_scriptPath != "" && !s_IsInEditor )
 	{
-		DEBUG("ATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH " << m_scriptPath << std::endl);
+		DEBUG("ATTACH " << m_scriptPath << std::endl);
 		uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>(m_scriptPath);
 		Node::AttachScript(script, *this);
 	}
@@ -241,10 +244,47 @@ ISerializable* Node::CreateInstance()
 {
 	return CreateNode<Node>("Node").release();
 }
+void Node::SetName(const std::string& newName)
+{
+	if (m_name == newName)
+		return;
 
+	if (m_pOwner)
+	{
+		if (m_pOwner->m_children.contains(newName))
+		{
+			DEBUG("[Node] Name already exists: " << newName << std::endl);
+			return;
+		}
 
+		std::string oldName = m_name;
+
+		auto it = m_pOwner->m_children.find(oldName);
+		if (it != m_pOwner->m_children.end())
+		{
+			auto nodePtr = std::move(it->second);
+			m_pOwner->m_children.erase(it);
+
+			m_name = newName;
+
+			m_pOwner->m_children[newName] = std::move(nodePtr);
+		}
+
+		for (std::string& name : m_pOwner->m_childrenOrder)
+		{
+			if (name == oldName)
+			{
+				name = newName;
+				break;
+			}
+		}
+	}
+	else
+	{
+		m_name = newName;
+	}
+}
 std::string Node::GetName() { return m_name; }
-void Node::SetName(std::string const& name) { m_name = name; }
 void Node::SetScriptPath(std::string const& path) { m_scriptPath = path;}
 Node* Node::GetParent() { return m_pOwner; }
 SceneTree* Node::GetSceneTree() { return m_pSceneTree; }
