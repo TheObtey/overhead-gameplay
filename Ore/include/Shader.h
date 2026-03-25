@@ -4,29 +4,25 @@
 #include "IShader.h"
 #include "Define.h"
 
+enum class ShaderType
+{
+    TYPE_VERTEX = GL_VERTEX_SHADER,
+    TYPE_FRAGMENT = GL_FRAGMENT_SHADER,
+    TYPE_COMPUTE = GL_COMPUTE_SHADER
+};
+
 class Shader : public IShader
 {
 public:
-    Shader(std::string const& vertPath, std::string const& fragPath);
-    ~Shader() override;
+    Shader(ShaderType type);
+    ~Shader();
 
-    void Use() override;
-    uint32 GetProgramId() { return m_programId; }
-
-    void SetBool(std::string const& name, bool value) override;
-    void SetInt(std::string const& name, int value) override;
-    void SetFloat(std::string const& name, float value) override;
-
-    void SetVec2(std::string const& name, glm::vec2 const& value) override;
-    void SetVec3(std::string const& name, glm::vec3 const& value) override;
-    void SetVec4(std::string const& name, glm::vec4 const& value) override;
-
-    void SetMat2(std::string const& name, glm::mat2 const& value) override;
-    void SetMat3(std::string const& name, glm::mat3 const& value) override;
-    void SetMat4(std::string const& name, glm::mat4 const& value) override;
+    void Load(std::filesystem::path const& path) override;
+    void Unload() override;
+    uint32 GetId() const override {return m_id;}
 
 private:
-    uint32 m_programId;
-
+    GLuint m_id;
+    ShaderType m_type;
 };
 #endif

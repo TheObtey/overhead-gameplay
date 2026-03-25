@@ -3,13 +3,13 @@
 
 #include "Define.h" 
 
-class IShader;
+class IProgram;
 class IMesh 
 {
 public:
     virtual ~IMesh() = 0;
 
-    virtual void Draw(sptr<IShader> const shader) = 0;
+    virtual void Draw(IProgram const* pProgram) = 0;
 };
 
 inline IMesh::~IMesh() {};

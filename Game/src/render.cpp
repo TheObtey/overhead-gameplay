@@ -4,6 +4,8 @@
 #include "Mesh.h"
 #include "Window.h"
 #include "Logger.hpp"
+#include "Program.h"
+#include "Shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -67,16 +69,41 @@ int main()
         lights.push_back(light);
     }
 
-    Shader shader("res/shaders/GBuffer.vert", "res/shaders/GBuffer.frag");
-    Shader shaderLight("res/shaders/LightPass.vert", "res/shaders/LightPass.frag");
+    Program geometryProgram;
+    Program lightProgram;
 
-    shaderLight.Use();
-    shaderLight.SetInt("gPosition", 0);
-    shaderLight.SetInt("gNormal", 1);
-    shaderLight.SetInt("gAlbedoSpec", 2);
+    Shader geoFrag(ShaderType::TYPE_FRAGMENT);
+    geoFrag.Load("../res/shaders/GBuffer.frag");
+    Shader geoVert(ShaderType::TYPE_VERTEX);
+    geoVert.Load("../res/shaders/GBuffer.vert");
 
-    GeometryPass geoPass(shader, meshes, camera);
-    LightPass lightPass(shaderLight, lights, camera);
+    geometryProgram.AddShader(&geoFrag);
+    geometryProgram.AddShader(&geoVert);
+    geometryProgram.Load();
+
+    geoFrag.Unload();
+    geoVert.Unload();
+
+
+    Shader lightFrag(ShaderType::TYPE_FRAGMENT);
+    lightFrag.Load("../res/shaders/LightPass.frag");
+    Shader lightVert(ShaderType::TYPE_VERTEX);
+    lightVert.Load("../res/shaders/LightPass.vert");
+
+    lightProgram.AddShader(&lightFrag);
+    lightProgram.AddShader(&lightVert);
+    lightProgram.Load();
+
+    lightFrag.Unload();
+    lightVert.Unload();
+
+    lightProgram.Use();
+    lightProgram.SetUniform("gPosition", 0);
+    lightProgram.SetUniform("gNormal", 1);
+    lightProgram.SetUniform("gAlbedoSpec", 2);
+
+    GeometryPass geoPass(geometryProgram, meshes, camera);
+    LightPass lightPass(lightProgram, lights, camera);
 
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
@@ -95,5 +122,9 @@ int main()
         window.Present();
     }
 
-    window.Close();
+    geometryProgram.Unload();
+    lightProgram.Unload();
+
+	window.Close();
 }
+

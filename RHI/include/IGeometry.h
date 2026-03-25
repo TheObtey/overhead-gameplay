@@ -6,9 +6,7 @@
 class IGeometry 
 {
 public:
-    virtual ~IGeometry() = 0;
-
+    virtual void Draw() = 0;
 };
 
-inline IGeometry::~IGeometry() {};
 #endif //!RHI_IGEOMETRY__H_

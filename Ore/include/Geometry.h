@@ -1,11 +1,10 @@
 #ifndef ORE_GEOMETRY__H_
 #define ORE_GEOMETRY__H_
 
-#include "Define.h"
 #include "IGeometry.h"
 #include "Buffer.h"
-#include "Shader.h"
 
+#include <Define.h>
 #include <glm/glm.hpp>
 
 struct Vertex 
@@ -21,9 +20,9 @@ class Geometry final : public IGeometry
 public:
     Geometry(std::vector<Vertex> const& points, std::vector<uint32> const& indices);
     Geometry(Geometry const& other);
-    ~Geometry() override;
+    ~Geometry();
 
-    void Draw(sptr<Shader> shader);
+    void Draw() override;
 
 protected:
     void AddPoints(std::vector<Vertex> const& vertices);

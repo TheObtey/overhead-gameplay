@@ -26,11 +26,12 @@ Geometry::Geometry(Geometry const& other)
     m_pIndexBuffer = std::make_unique<Buffer<uint32>>(*other.m_pIndexBuffer);
     m_pVertexBuffer = std::make_unique<Buffer<Vertex>>(*other.m_pVertexBuffer);
 }
+
 Geometry::~Geometry()
 {
 }
 
-void Geometry::Draw(sptr<Shader> shader)
+void Geometry::Draw()
 {
 
     Logger::Log("Start Draw Geometry");

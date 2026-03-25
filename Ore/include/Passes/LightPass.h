@@ -21,7 +21,7 @@ struct Light
 class LightPass final : public Pass
 {
 public:
-    LightPass(Shader const& shader, std::vector<Light> const& lights, sptr<Camera> pCamera);
+    LightPass(Program const& Program, std::vector<Light> const& lights, sptr<Camera> pCamera);
     ~LightPass();
 
     void SetLights(std::vector<Light> const& lights);
@@ -35,8 +35,8 @@ private:
     std::vector<sptr<Light>> m_lights;
     uptr<VertexArrayObject> m_quadVAO;
     uptr<Buffer<float>> m_quadVBO;
-    uint32 m_quadVAOId;
-    uint32 m_quadVBOId;
+    GLuint m_quadVAOId;
+    GLuint m_quadVBOId;
 };
 #endif
  

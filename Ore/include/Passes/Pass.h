@@ -2,15 +2,15 @@
 #define ORE_PASS__H_
 
 #include "IPass.h"
-#include "Shader.h"
+#include "Program.h"
 #include "Camera.h"
 
 class TextureObject;
 class Pass : public IPass
 {
 public:
-    Pass(Shader const& shader, sptr<Camera> camera);
-    Pass(Pass& other) { m_pShader = other.m_pShader; }
+    Pass(Program const& shader, sptr<Camera> camera);
+    Pass(Pass& other) { m_pProgram = other.m_pProgram; }
     ~Pass() override;
 
 private:
@@ -25,7 +25,7 @@ protected:
     uint32 m_screenWidth;
     uint32 m_screenHeight;
 
-    sptr<Shader> m_pShader;
+    sptr<Program> m_pProgram;
     sptr<Camera> m_pCamera;
 
     sptr<TextureObject> m_pGPosition;

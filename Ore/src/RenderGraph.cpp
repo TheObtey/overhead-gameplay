@@ -1,7 +1,8 @@
 #include "RenderGraph.h"
 #include "TextureObject.h"
-#include "Logger.hpp"
 #include "Passes/Pass.h"
+
+#include <Logger.hpp>
 
 RenderGraph::RenderGraph(uint32 screenWidth, uint32 screenHeight)
 {
