@@ -9,9 +9,10 @@
 #include <Texture.h>
 #include <Geometry.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
-class aiNode;
-class aiScene;
 class FBXLoader
 {
 public:

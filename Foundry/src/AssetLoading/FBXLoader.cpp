@@ -1,17 +1,9 @@
 #include "AssetLoading/FBXLoader.h"
 
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/mesh.h>
-#include <assimp/material.h>
-#include <assimp/postprocess.h>
-#include <assimp/types.h>
-
 #include <fstream>
 #include <Mesh.h>
 
-//#include <Logger.hpp>
+#include <Logger.hpp>
 
 
 glm::mat4x4 AIMatrixToGLMMatrix(aiMatrix4x4 const& matrix)
@@ -25,17 +17,16 @@ glm::mat4x4 AIMatrixToGLMMatrix(aiMatrix4x4 const& matrix)
 uptr<FBXLoader::SceneData> FBXLoader::LoadFile(std::string const& path)
 {
     Assimp::Importer importer = Assimp::Importer();
-    uint32 importFlags = aiProcess_CalcTangentSpace |
+    int importFlags = aiProcess_CalcTangentSpace |
                          aiProcess_Triangulate |
                          aiProcess_JoinIdenticalVertices |
                          aiProcess_SortByPType;
 
     aiScene const* pAScene = importer.ReadFile(path.c_str(), importFlags);
-    //aiScene const* pAScene = nullptr;
 
     if (pAScene == nullptr)
     {
-        //Logger::LogWithLevel(LogLevel::ERROR, "Failed Loading " + path + " file");
+        Logger::LogWithLevel(LogLevel::ERROR, "Failed Loading " + path + " file");
         return nullptr;
     }
     
@@ -48,8 +39,9 @@ uptr<FBXLoader::SceneData> FBXLoader::LoadFile(std::string const& path)
     m_loadedFiles[path] = uScene;
 
     return std::make_unique<FBXLoader::SceneData>(uScene);
-
 }
+
+
 uint32 FBXLoader::BuildNodes(aiNode const* pNode, int32 parentIndex, FBXLoader::SceneData& outData)
 {
     Node node;
@@ -136,14 +128,14 @@ void FBXLoader::BuildMaterials(aiScene const* pScene, SceneData& outData)
                     
                     if (pText->mHeight != 0)
                     {
-                        //Logger::LogWithLevel(LogLevel::WARNING, "Unable to Load Texture : " + path + " from FBX file : " + pScene->mName.C_Str());
+                        Logger::LogWithLevel(LogLevel::WARNING, "Unable to Load Texture : " + path + " from FBX file : " + pScene->mName.C_Str());
                         continue;
                     }
 
                     std::string ext = pText->achFormatHint;
                     if (ext.empty())
                     {
-                        //Logger::LogWithLevel(LogLevel::WARNING, "Unable to Load Texture : " + path + " from FBX file : " + pScene->mName.C_Str() + " Extension Incorrect");
+                        Logger::LogWithLevel(LogLevel::WARNING, "Unable to Load Texture : " + path + " from FBX file : " + pScene->mName.C_Str() + " Extension Incorrect");
                         continue;
                     }
 

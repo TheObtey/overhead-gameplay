@@ -13,7 +13,7 @@ public:
 	{
 		FBX,
 	};
-	static std::vector<Mesh*> LoadMeshFromFile(std::string const& path, FileType type);
+	static std::vector<Mesh*> LoadMeshFromFile(std::string const& path, AssetLoader::FileType type);
 	
 private:
 	static std::vector<Mesh*> LoadMeshFromFBX(std::string const& path);

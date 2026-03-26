@@ -13,9 +13,10 @@
 
 int main()
 {
-    Window window(800, 600, "ORE ORE OREORE ORE ORE OREORE OREORE");
+
+    Window window(1920, 1080, "ORE ORE OREORE ORE ORE OREORE OREORE");
     window.Open();
-    Viewport viewport(0, 0, 800, 600, Color::SKY_BLUE);
+    Viewport viewport(0, 0, 1920, 1080, Color::SKY_BLUE);
     //Viewport viewport(0, 0, 800, 600, Color::BLACK); 
     window.AddViewport(viewport);
 
@@ -32,12 +33,12 @@ int main()
 
     Geometry cube(vertices, indices);
     Texture diffuse("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
-    Texture specular("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+    //Texture specular("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     Texture normal("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
 
     std::vector<Texture*> textures;
     textures.push_back(&diffuse);
-    textures.push_back(&specular); 
+    //textures.push_back(&specular); 
     textures.push_back(&normal);
 
     Mesh mesh(cube, textures, glm::mat4(1.0f));
@@ -53,7 +54,7 @@ int main()
     float fov = 45.0f;
 
     sptr<Camera> camera = std::make_shared<Camera>(position, up, yaw, pitch, roll, fov);
-    std::vector<Mesh*> meshes = AssetLoader::LoadMeshFromFile("res/Test.fbx",AssetLoader::FileType::FBX);
+    std::vector<Mesh*> meshes = AssetLoader::LoadMeshFromFile("res/Test.fbx", AssetLoader::FileType::FBX);
     std::vector<Light> lights;
 
     for (int i = 0; i < 1; ++i)
@@ -110,6 +111,7 @@ int main()
     {
         window.Clear();
 
+        meshes[0]->SetTransform(glm::rotate(meshes[0]->GetTransform(), 0.016f, glm::vec3(0.0016f, 0.0f, 0.0f)));
         //glm::vec3 camPos = camera->GetPosition() + glm::vec3(0.016f,0.0f,0.0f);
         //glm::mat4 meshTransform = glm::translate(mesh.GetTransform(), glm::vec3(0.0016f, 0.0f, 0.0f));
         //mesh.SetTransform(meshTransform);
