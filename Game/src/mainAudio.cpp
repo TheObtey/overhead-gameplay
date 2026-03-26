@@ -11,7 +11,7 @@ int main()
 
     auto audioEm = Node::CreateNode<NodeAudioEmitter>("AudioEmitter");
 
-    audioEm->Load("res/bass-wiggle.mp3", *music); // TEST ONLY (replace with your file)
+    audioEm->Load("res/bass-wiggle.mp3", music); // TEST ONLY (replace with your file)
 
     audioEm->Play();
 
@@ -19,27 +19,25 @@ int main()
     {
         if (GetAsyncKeyState(VK_ADD) & 0x8000)
         {
-            std::cout << "test1";
-            printf("test");
-            AudioServer::SetMasterVolume((AudioServer::GetMasterVolume()+0.2f));
-            Sleep(10);
+            float next = AudioServer::GetMasterVolume() + 0.05f;
+            AudioServer::SetMasterVolume(next);
+            printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
         }
-        if (GetAsyncKeyState(VK_SUBTRACT) & 0x8000)
+        else if (GetAsyncKeyState(VK_SUBTRACT) & 0x8000)
         {
-            AudioServer::SetMasterVolume((AudioServer::GetMasterVolume()-0.2f));
-            Sleep(10);
+            float next = AudioServer::GetMasterVolume() - 0.05f;
+            AudioServer::SetMasterVolume(next);
+            printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
         }
-        if (GetAsyncKeyState('P') & 0x8000)
+        else if (GetAsyncKeyState('P') & 0x8000)
         {
             audioEm->Play();
             std::cout << "testplay";
-            Sleep(10);
         }
-        if (GetAsyncKeyState('S') & 0x8000)
+        else if (GetAsyncKeyState('S') & 0x8000)
         {
             audioEm->Stop();
             std::cout << "teststop";
-            Sleep(10);
         }
         Sleep(1);
     }

@@ -28,10 +28,10 @@ public:
 	static AudioChannel* CreateChannel(const std::string& name);
 
 	static void SetMasterVolume(float volume);
-	static void SetGroupVolume(AudioChannel channel, float volume);
+	static void SetGroupVolume(AudioChannel* channel, float volume);
 
-	static float GetMasterVolume() { return ma_engine_get_volume(&Instance().m_soundEngine); };
-	//static float GetGroupVolume(AudioChannel channel) { return ma_sound_group_get_volume(&channel.soundGroup); };
+	static float GetMasterVolume() { return Instance().m_masterVolume; };
+	static float GetGroupVolume(AudioChannel channel) { return ma_sound_group_get_volume(&channel.soundGroup); };
 
 	static ma_engine& GetSoundEngine() { return Instance().m_soundEngine; };
 	static std::vector<AudioChannel*>& GetChannels() { return Instance().m_channels; };
@@ -40,6 +40,7 @@ protected:
 	ma_engine m_soundEngine{};
 	std::vector<AudioChannel*> m_channels;
 
+	float m_masterVolume = 1.f;
 private:
 	void FlushCommandsImpl() override {};
 	void BuildTasksImpl(TaskGraph& graph) override {};
