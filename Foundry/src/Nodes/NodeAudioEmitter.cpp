@@ -19,12 +19,20 @@ bool NodeAudioEmitter::Load(const char* filePath, AudioChannel channel)
 
 void NodeAudioEmitter::Play()
 {
-    ma_sound_start(&m_sound);
+    if (!m_isPlaying) 
+    {
+        ma_sound_start(&m_sound);
+        m_isPlaying = true;
+    } 
 }
 
 void NodeAudioEmitter::Stop()
 {
-    ma_sound_stop(&m_sound);
+    if (m_isPlaying)
+    {
+        ma_sound_stop(&m_sound);
+        m_isPlaying = false;
+    }
 }
 
 void NodeAudioEmitter::AudioSetLoop(bool value)

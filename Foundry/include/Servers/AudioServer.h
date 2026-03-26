@@ -34,11 +34,11 @@ public:
 	//static float GetGroupVolume(AudioChannel channel) { return ma_sound_group_get_volume(&channel.soundGroup); };
 
 	static ma_engine& GetSoundEngine() { return Instance().m_soundEngine; };
-	static std::vector<AudioChannel>& GetChannels() { return Instance().m_channels; };
+	static std::vector<AudioChannel*>& GetChannels() { return Instance().m_channels; };
 
 protected:
 	ma_engine m_soundEngine{};
-	std::vector<AudioChannel> m_channels;
+	std::vector<AudioChannel*> m_channels;
 
 private:
 	void FlushCommandsImpl() override {};

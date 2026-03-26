@@ -36,7 +36,7 @@ AudioChannel* AudioServer::CreateChannel(const std::string& name)
 {
     if (GetChannel(name) != nullptr) { return GetChannel(name); }
 
-    AudioChannel* newChannel;
+    AudioChannel* newChannel = new AudioChannel;
     newChannel->name = name;
     if (ma_sound_group_init(&Instance().m_soundEngine, 0, NULL, &newChannel->soundGroup) != MA_SUCCESS)
     {
@@ -44,7 +44,7 @@ AudioChannel* AudioServer::CreateChannel(const std::string& name)
         return nullptr;
     }
 
-    GetChannels().push_back(*newChannel);
+    GetChannels().push_back(newChannel);
 
     return newChannel;
 }
