@@ -3,8 +3,6 @@
 
 #include "IBuffer.h"
 
-#include <glad/glad.h>
-
 enum class BufferType
 {
     BUFFER = GL_ARRAY_BUFFER, 
@@ -16,6 +14,8 @@ class Buffer final : public IBuffer<T>
 {
 public:
     Buffer(std::vector<T> const& data, uint32 id, BufferType type, bool isDataPersistant);
+    Buffer(Buffer<T> const& other);
+
     ~Buffer() override;
 
     void Bind() override;

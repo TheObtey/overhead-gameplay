@@ -10,10 +10,10 @@ Transform2D::Transform2D(
 	float _scaleX,	     float _scaleY,
 	bool _statism) :
 	m_isStatic(_statism),
-	m_scale({ _scaleX, _scaleY, 1.0f }),
-	m_shear({ 0.0f, 0.0f, 0.0f }),
+	m_scale({ _scaleX, _scaleY }),
+	m_shear({ 0.0f, 0.0f }),
 	m_theta(0.0f),
-	m_position(_x, _y, 0.0f),
+	m_position(_x, _y ),
 	m_isDirty(false)
 {
 	m_transformationMatrix = glm::mat3(
@@ -177,13 +177,13 @@ Transform2D& Transform2D::operator/=(Transform2D const& _other)
 
 void Transform2D::SetShearing(glm::vec2 const& _shear)
 {
-	m_shear = { _shear.x, _shear.y, 1.0f };
+	m_shear = { _shear.x, _shear.y };
 
 	m_isDirty = true;
 }
 void Transform2D::SetShearing(float const _shearX, float const _shearY)
 {
-	m_shear = { _shearX, _shearY, 1.0f };
+	m_shear = { _shearX, _shearY };
 
 	m_isDirty = true;
 }
@@ -211,7 +211,6 @@ void Transform2D::SetScale(glm::vec2 const& _scale)
 
 	m_scale.x = _scale.x;
 	m_scale.y = _scale.y;
-	m_scale.z = 1.0f;
 
 	m_isDirty = true;
 }
@@ -224,7 +223,6 @@ void Transform2D::SetScale(float _x, float _y)
 
 	m_scale.x = _x;
 	m_scale.y = _y;
-	m_scale.z = 1.0f;
 
 	m_isDirty = true;
 }
@@ -252,7 +250,6 @@ void Transform2D::SetPosition(float const _u, float const _v)
 
 	m_position.x = _u;
 	m_position.y = _v;
-	m_position.z = 1.0f;
 
 	m_isDirty = true;
 }
@@ -262,7 +259,6 @@ void Transform2D::SetPosition(glm::vec2 const& _position)
 
 	m_position.x = _position.x;
 	m_position.y = _position.y;
-	m_position.z = 1.0f;
 
 	m_isDirty = true;
 }

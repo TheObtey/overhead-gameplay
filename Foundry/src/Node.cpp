@@ -13,7 +13,8 @@
 #include <utility>
 #include <vector>
 
-Node::Node(std::string const& name) : m_name(name)
+
+Node::Node(std::string const& name) : m_name(name) , m_scriptPath("")
 {
     DEBUG("Node : " << m_name << " has been " << ANSI_GREEN << "created !" << ANSI_RESET << std::endl);
 }
@@ -190,22 +191,47 @@ std::unique_ptr<Node> Node::Clone()
 void Node::Serialize(SerializedObject& datas) const
 {
 	// Call baseClass::Serialize(datas) : Example Node::Serialize(datas)
-	datas.SetType<Node>();
-	datas.AddElement("m_name", m_name);
-	datas.AddArray("Children");
+	datas.SetType("Node");
+	datas.AddPublicElement("Name", &m_name);
+	datas.AddPrivateArray("Children");
+	std::string parent = "";
+	if (m_pOwner != nullptr)
+		parent = m_pOwner->GetName();
+
+	datas.AddPrivateElement("m_pOwner", &parent);
+
+	std::string scriptPath = m_scriptPath;
+	if (m_pScriptInstance.get() != nullptr)
+		scriptPath = m_pScriptInstance->GetPath();
+
+	datas.AddPublicElement("m_scriptPath", &scriptPath);
+
 	for (uint32 i = 0; i < m_children.size(); i++)
 	{
-		datas.AddElementInArray("Children", static_cast<ISerializable const&>(*m_children.at(m_childrenOrder[i])));
+		datas.AddPrivateElementInArray("Children", static_cast<ISerializable const*>(m_children.at(m_childrenOrder[i]).get()));
 	}
+
 }
+
+
 
 void Node::Deserialize(SerializedObject const& datas)
 {
 	// Call baseClass::Deserialize(datas) : Example Node::Deserialize(datas)
-	std::string t;
-	datas.GetType(t);
-	datas.GetElement("m_name",m_name);
-	std::vector<ISerializable*> tempList = datas.GetArray<ISerializable*>("Children");
+	std::string t = datas.GetType();
+	std::string newname;
+	datas.GetPublicElement("Name",&newname);
+	SetName(newname);
+
+	datas.GetPublicElement("m_scriptPath", &m_scriptPath);
+	if (m_scriptPath != "" && !s_IsInEditor )
+	{
+		DEBUG("ATTACH " << m_scriptPath << std::endl);
+		uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>(m_scriptPath);
+		Node::AttachScript(script, *this);
+	}
+
+	std::vector<ISerializable*> tempList = datas.GetPrivateArray<ISerializable*>("Children");
 	for (uint32 i = 0; i < tempList.size(); i++)
 	{
 		uptr<Node> pNode = uptr<Node>((Node*)tempList[i]);
@@ -217,8 +243,47 @@ ISerializable* Node::CreateInstance()
 {
 	return CreateNode<Node>("Node").release();
 }
+void Node::SetName(const std::string& newName)
+{
+	if (m_name == newName)
+		return;
 
+	if (m_pOwner)
+	{
+		if (m_pOwner->m_children.contains(newName))
+		{
+			DEBUG("[Node] Name already exists: " << newName << std::endl);
+			return;
+		}
 
+		std::string oldName = m_name;
+
+		auto it = m_pOwner->m_children.find(oldName);
+		if (it != m_pOwner->m_children.end())
+		{
+			auto nodePtr = std::move(it->second);
+			m_pOwner->m_children.erase(it);
+
+			m_name = newName;
+
+			m_pOwner->m_children[newName] = std::move(nodePtr);
+		}
+
+		for (std::string& name : m_pOwner->m_childrenOrder)
+		{
+			if (name == oldName)
+			{
+				name = newName;
+				break;
+			}
+		}
+	}
+	else
+	{
+		m_name = newName;
+	}
+}
 std::string Node::GetName() { return m_name; }
+void Node::SetScriptPath(std::string const& path) { m_scriptPath = path;}
 Node* Node::GetParent() { return m_pOwner; }
 SceneTree* Node::GetSceneTree() { return m_pSceneTree; }

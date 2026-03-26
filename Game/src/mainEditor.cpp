@@ -3,24 +3,63 @@
 // https://github.com/AlexandreGlatz/cmake-generator
 ////////////////////////////////////////////////////
 
-#include <SerializeObject.h>
-#include <Servers/EngineServer.h>
+#include "Define.h"
+#include "Node.h"
+#include "Nodes/Node3D.h"
+#include "Scripting/Lua/LuaBindings.h"
+#include "Servers/EngineServer.h"
+#include "Serialization/SerializeObject.hpp"
+
+#include <EditorSerializer.h>
+#include <GameLoop.h>
+#include <Registries/AutomaticRegister.hpp>
+#include <memory>
 #include <iostream>
+#include <string>
+#include <filesystem>
 
-int main() {
-    //std::cout << "MAIN EDITOR" << std::endl;
-    //uptr<Node> node = Node::CreateNode<Node>("grand parent");
-    //uptr<Node> node2 = Node::CreateNode<Node>("Enfant1");
-    //uptr<Node> node4 = Node::CreateNode<Node>("Enfant2");
-    //uptr<Node> node3 = Node::CreateNode<Node>("enfant1 d'enfant1");
-    //node2.get()->AddChild(node3);
-    //node.get()->AddChild(node2);
-    //node.get()->AddChild(node4);
+int main(int argc, char* argv[])
+{
+	std::cout << "[Game] Starting Foundry..." << std::endl;
 
+	if (argc > 1)
+	{
+		std::string scenePath = argv[1];
+		std::cout << "[Game] Loading scene from: " << scenePath << "\n";
 
-    EditorSerializer json;
-    uptr<Node> rootNode = json.LoadFromJson("test.json");
+		if (!std::filesystem::exists(scenePath))
+		{
+			std::cerr << "[Game] ERROR: Scene file not found: " << scenePath << "\n";
+			std::cerr << "[Game] Press Enter to exit..." << std::endl;
+			std::cin.get();
+			return 1;
+		}
 
-    EngineServer::FlushCommands();
+		try
+		{
+			Node::SetStatusEditor(false);
 
+			uptr<Node> sceneRoot = std::move(EditorSerializer::LoadFromJson(scenePath).uptrNode);
+
+			std::cout << "[Game] Scene loaded successfully: " << sceneRoot->GetName() << "\n";
+			std::cout << "[Game] Number of children: " << sceneRoot->GetChildCount() << "\n";
+
+			SceneTree defaultSceneTree(sceneRoot);
+			GameLoop loop;
+			loop.StartGame(defaultSceneTree);
+
+			std::cout << "[Game] Scene executed successfully" << "\n";
+			std::cout << "[Game] Press Enter to exit..." << std::endl;
+			std::cin.get();
+		}
+
+		catch (std::exception const& e)
+		{
+			std::cerr << "[Game] ERROR: Failed to load scene: " << e.what() << "\n";
+			std::cerr << "[Game] Press Enter to exit..." << std::endl;
+			std::cin.get();
+			return 1;
+		}
+	}
+	return 0;
 }

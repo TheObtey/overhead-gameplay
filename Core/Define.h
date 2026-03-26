@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <glad/glad.h>
 
 using char8 = std::int8_t;
 using int8  = std::int8_t;
@@ -67,6 +68,26 @@ inline constexpr int32 operator""_kg(unsigned long long val) { return val * 1000
 #define STRINGIFY2(X) STRINGIFY(X)
 #define STRINGIFY(X) #X
 
+//====================
+// OS Macros
+//====================
+
+#define OPERATING_SYSTEM_OTHER    0
+#define OPERATING_SYSTEM_LINUX    1
+#define OPERATING_SYSTEM_WINDOWS  2
+#define OPERATING_SYSTEM_MACOS    3
+
+#if defined(_WIN32) || defined(_WIN64)
+    #define OPERATING_SYSTEM OPERATING_SYSTEM_WINDOWS
+#elif defined(__APPLE__) && defined(__MACH__)
+    #define OPERATING_SYSTEM OPERATING_SYSTEM_MACOS
+#elif defined(__linux__)
+    #define OPERATING_SYSTEM OPERATING_SYSTEM_LINUX
+#else
+    #define OPERATING_SYSTEM OPERATING_SYSTEM_OTHER
+    #error "Unsupported operating system for this project."
+#endif
+
 
 #define ENUM_CLASS_FLAGS(EnumType)                                                \
 using T = std::underlying_type_t<EnumType>;                                       \
@@ -84,12 +105,16 @@ inline constexpr EnumType& operator&=(EnumType& lhs, EnumType rhs) {            
     lhs = lhs & rhs;                                                              \
     return lhs;                                                                   \
 }                                                                                 \
+inline constexpr EnumType operator~(EnumType rhs) {                               \
+    return static_cast<EnumType>(~static_cast<T>(rhs));                           \
+}                                                                                 \
 inline constexpr bool Any(EnumType value) {                                       \
     return static_cast<T>(value) != 0;                                            \
 }                                                                                 \
 inline constexpr T cast(EnumType value)                                           \
 {                                                                                 \
     return static_cast<T>(value);                                                 \
-}                                                                                 
+} 
+
 
 #endif

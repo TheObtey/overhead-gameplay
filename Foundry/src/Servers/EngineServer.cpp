@@ -6,6 +6,7 @@
 void EngineServer::QueueAttach(std::unique_ptr<Node>& node, Node* const To)
 {
     Instance().m_commands.push({CommandType::ATTACH, std::move(node), To});
+    Instance().m_initialized = true;
 }
 
 void EngineServer::QueueFree(std::unique_ptr<Node>& node)

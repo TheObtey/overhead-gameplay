@@ -11,4 +11,5 @@ public:
     virtual void Bind() override = 0;
 };    
 
+inline IVertexArrayObject::~IVertexArrayObject() {}
 #endif //!RHI_IVERTEX_ARRAY_OBJECT__H_

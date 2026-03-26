@@ -29,7 +29,7 @@ public:
 
     static uptr<Node>& GetUnattachedNode(Node* ptr);
 
-    void TestFunct() { std::cout << "Im a dummy function \n"; }
+    void TestFunct() { std::cout << ""; }
 
 private:
     void FlushCommandsImpl() override;

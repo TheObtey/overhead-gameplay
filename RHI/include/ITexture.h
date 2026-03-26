@@ -8,9 +8,6 @@ class ITexture
 public:
     virtual ~ITexture() = 0;
     
-protected:
-    int width;
-    int height;
 };
-
+inline ITexture::~ITexture() {};
 #endif //!RHI_ITEXTURE_H__

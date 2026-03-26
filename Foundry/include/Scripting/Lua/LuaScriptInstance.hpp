@@ -14,6 +14,8 @@ public:
 	template <typename T>
 	void AttachToProxy(T* const proxy);
 
+	std::string& GetPath() { return m_stringPath; }
+
 private:
 	void CallScriptOnInit() override;
 	void CallScriptOnUpdate(double dt) override;

@@ -13,10 +13,12 @@
 int main()
 {
 	uptr<Node> node = Node::CreateNode<Node>("C++Node");
+	uptr<Node> child = Node::CreateNode<Node>("child");
 
-	uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/test.lua");
-	Node::AttachScript(script, *node);
+	//uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/test.lua");
+	//Node::AttachScript(script, *node);
 
+	node->AddChild(child);
 	node->Update(10.0f);
 
 	EngineServer::FlushCommands();

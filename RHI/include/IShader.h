@@ -1,15 +1,15 @@
 #ifndef RHI_ISHADER__H_
 #define RHI_ISHADER__H_
 
-#include <string>
-class IShader 
+#include <filesystem>
+#include "Define.h"
+class IShader
 {
 public:
-    IShader(std::string_view vertBuffer, std::string_view fragBuffer);
-    ~IShader();
+    virtual void Load(std::filesystem::path const& path) = 0;
+    virtual void Unload() = 0;
 
-protected:
-    virtual void Compile() = 0;
-
+    virtual uint32 GetId() const = 0;
 };
-#endif //!RHI_ISHADER__H_
+
+#endif

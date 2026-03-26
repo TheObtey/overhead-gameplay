@@ -1,18 +1,19 @@
 #include "Servers/GraphicServer.h"
 
 #include "Window.h"
+#include "Nodes/NodeWindow.h"
 
-void GraphicServer::OpenWindow(Window *pWindow)
+void GraphicServer::OpenWindow(NodeWindow* pWindow)
 {
     Instance().m_commands.push({CommandType::OPENWINDOW, pWindow});
 }
 
-void GraphicServer::Present(Window *pWindow)
+void GraphicServer::Present(NodeWindow* pWindow)
 {
     Instance().m_commands.push({CommandType::PRESENT, pWindow});
 }
 
-void GraphicServer::Clear(Window *pWindow)
+void GraphicServer::Clear(NodeWindow* pWindow)
 {
     Instance().m_commands.push({CommandType::CLEAR, pWindow});
 }
@@ -30,14 +31,13 @@ void GraphicServer::FlushCommandsImpl()
         switch (type)
         {
             case CommandType::OPENWINDOW:
-                pWindow->Open();
-                pWindow->GetWiewport(0)->Setup();
+                pWindow->OpenWindow();
                 break;
             case CommandType::CLEAR:
-                pWindow->Clear();
+                pWindow->ClearWindow();
                 break;
             case CommandType::PRESENT:
-                pWindow->Present();
+                pWindow->PresentWindow();
                 break;
         }
         m_commands.pop();

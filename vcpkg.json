@@ -6,9 +6,15 @@
     "glad",
     "glfw3",
     "raylib",
+    "imgui",
     "glm",
     "reactphysics3d",
-    "raylib",
-    "imgui"
+    "bigsimp"
+  ],
+  "overrides": [
+    {
+      "name": "imgui",
+      "version": "1.92.6"
+    }
   ]
 }

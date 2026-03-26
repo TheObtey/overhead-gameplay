@@ -1,0 +1,547 @@
+#include "Editor.h"
+#include "EditorSerializer.h"
+
+
+#include "Debug.h"
+
+#include <Servers/EngineServer.h>
+#include <Serialization/SerializeObject.hpp>
+#include <iostream>
+#include <filesystem>
+#include <unordered_set>
+#include <fstream>
+
+#include <rlImGui.h>
+#include <rlImGuiColors.h>
+#include <Nodes/Node3D.h>
+
+#if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
+
+extern "C" __declspec(dllimport)
+int __stdcall SetFileAttributesW(const wchar_t* lpFileName, unsigned long dwFileAttributes);
+constexpr unsigned long FILE_ATTRIBUTE_HIDDEN = 0x2;
+
+#endif
+
+
+Editor::Editor() : m_editorRaylib() ,m_editorImgui(this,&m_editorRaylib)
+{}
+
+Editor::~Editor()
+{
+	Shutdown();
+}
+
+void Editor::Init() 
+{
+	m_editorRaylib.Init(m_screenWidth, m_screenHeight);
+	m_sceneRoot = Node::CreateNode<Node>("SceneRoot");
+
+	rlImGuiSetup(true);
+
+	m_editorImgui.Init();
+	m_editorImgui.SetSceneRoot(m_sceneRoot.get());
+	m_editorImgui.SetScreenSize(m_screenWidth, m_screenHeight);
+
+	std::filesystem::path ScriptStock = "ScriptStock/.foundry";
+	std::filesystem::create_directories(ScriptStock);
+
+	std::filesystem::path source = "../Game/res/foundry.d.lua";
+	std::filesystem::path dest = ScriptStock / "foundry.d.lua";
+
+	{
+		std::error_code ec;
+		if (std::filesystem::exists(source, ec))
+		{
+			std::filesystem::copy_file(source, dest, ec);
+			if (ec)
+			{
+				DEBUG("[Editor] WARNING: Couldn't copy foundry.d.lua"
+					<< dest.string() << " : " << ec.message() << std::endl);
+			}
+		}
+	}
+
+	#if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
+		::SetFileAttributesW(ScriptStock.wstring().c_str(), FILE_ATTRIBUTE_HIDDEN);
+	#endif
+
+	m_running = true;
+	DEBUG("[Editor] Initialized successfully!" << std::endl);
+}
+
+void Editor::Run()
+{
+	while (m_running && !WindowShouldClose())
+	{
+		float deltaTime = GetFrameTime();
+		Update(deltaTime);
+		
+		BeginDrawing();
+		ClearBackground(DARKGRAY);
+
+		Render3D();
+		RenderUI();
+		m_sceneRoot;
+		
+		EndDrawing();
+	}
+}
+
+void Editor::Shutdown()
+{
+	if (m_running)
+	{
+		rlImGuiShutdown();
+		CloseWindow();
+		m_running = false;
+		DEBUG( "[Editor] Shutdown successfully!" << std::endl);
+	}
+}
+
+void Editor::Update(float deltaTime)
+{
+	m_sceneRoot->Update(deltaTime);
+	m_editorRaylib.Update(deltaTime);
+	m_editorRaylib.UpdateDisplay(m_sceneRoot.get());
+
+	// Keyboard shortcuts
+	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
+	{
+		if (IsKeyDown(KEY_LEFT_SHIFT))
+		{
+			//m_editorImgui.ShowSaveAs();
+		}
+		else
+		{
+			SaveSceneNoSpe();
+		}
+	}
+
+	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_N))
+	{
+		CreateNewScene();
+	}
+
+	ProcessUICommands();
+
+	EngineServer::FlushCommands();
+}
+
+
+void Editor::ProcessUICommands()
+{
+	if (!m_editorImgui.HasCommand())
+		return;
+
+	EditorCommand& cmd = m_editorImgui.GetCommand();
+
+	switch (cmd.type)
+	{
+	case EditorCommand::Type::CREATE_NODE:
+		CreateNode(cmd.stringParam1, cmd.stringParam2, cmd.pNodeParam);
+		break;
+
+	case EditorCommand::Type::DELETE_NODE:
+		DeleteNode(cmd.pNodeParam);
+		break;
+
+	case EditorCommand::Type::CREATE_NEW_SCENE:
+		CreateNewScene();
+		break;
+
+	case EditorCommand::Type::SAVE_SCENE:
+		SaveScene(cmd.stringParam1);
+		break;
+
+	case EditorCommand::Type::LOAD_SCENE:
+		LoadScene(cmd.stringParam1);
+		break;
+
+	case EditorCommand::Type::LUNCH_GAME:
+		StartFoundry(cmd.stringParam1);
+		break;
+
+	case EditorCommand::Type::EXIT_EDITOR:
+		m_running = false;
+		break;
+
+	default:
+		break;
+	}
+
+	cmd.Reset();
+}
+
+void Editor::Render3D()
+{
+	// switch 2d/32
+	m_editorRaylib.Render();
+}
+
+void Editor::RenderUI()
+{
+	rlImGuiBegin();
+	m_editorImgui.Render();
+	rlImGuiEnd();
+}
+
+void Editor::CreateNewScene() 
+{
+	m_sceneRoot = Node::CreateNode<Node>("SceneRoot");
+	m_editorRaylib.ClearWindow();
+	m_editorImgui.SetSceneRoot(m_sceneRoot.get());
+	m_editorImgui.ResetViewRoot();
+	m_editorImgui.ResetSelectedNode();
+	
+	m_scenePathBuffer = "";
+	DEBUG( "[Editor] New scene created" << std::endl);
+}
+
+void Editor::CreateNode(std::string const& type, std::string const& name, Node* pParent)
+{
+	if (!m_sceneRoot) 
+	{
+		std::cerr << "[Editor] Cannot create node: no scene root" << std::endl;
+		return;
+	}
+
+	ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(type);
+	uptr<Node> newNode = uptr<Node>(static_cast<Node*>(outObject));
+	newNode.get()->SetName(name);
+
+
+	if (pParent)
+	{
+		pParent->AddChild(newNode);
+		DEBUG( "[Editor] Node '" << name << "' added as child of '" 
+		          << pParent->GetName() << "'" << std::endl);
+	}
+	else
+	{
+		m_sceneRoot->AddChild(newNode);
+		DEBUG( "[Editor] Node '" << name << "' added to scene root" << std::endl);
+	}
+
+	m_editorRaylib.AddDrawableObject(name, static_cast<Node*>(outObject));
+}
+
+void Editor::DeleteNode(Node* pNode)
+{
+	if (!pNode) return;
+
+	std::string nodeName = pNode->GetName();
+	m_editorRaylib.RemoveDrawableElement(nodeName);
+	if (pNode && pNode->GetParent())
+	{
+		pNode->Destroy();
+		DEBUG( "[Editor] Node '" << nodeName << "' deleted" << std::endl);
+	}
+}
+
+void Editor::LoadScene(std::string const& path)
+{
+	try
+	{
+		Node::SetStatusEditor(true);
+		LoadReturn tmp = EditorSerializer::LoadFromJson(path);
+		Node::SetStatusEditor(false);
+		if (tmp.IsRoot) {
+			m_sceneRoot = std::move(tmp.uptrNode);
+			m_editorImgui.SetSceneRoot(m_sceneRoot.get());
+			m_editorImgui.ResetViewRoot();
+			m_editorImgui.ResetSelectedNode();
+			m_scenePathBuffer = path;
+			// Update NodeList
+			LoadDrawableObject(m_sceneRoot.get());
+			DEBUG( "[Editor] Scene Root loaded: " << path << std::endl);
+		}
+		else if (tmp.IsRoot == false) {
+			EngineServer::FlushCommands();
+			m_sceneRoot.get()->AddChild(tmp.uptrNode);
+			EngineServer::FlushCommands();
+
+			m_editorImgui.ResetViewRoot();
+			m_editorImgui.ResetSelectedNode();
+			m_nodePathBuffer = path;
+
+			LoadDrawableObject(m_sceneRoot.get());
+			DEBUG("[Editor] Node loaded: " << path << std::endl);
+		}
+	}
+	catch (std::exception const& e)
+	{
+		std::cerr << "[Editor] Failed to load scene: " << e.what() << std::endl;
+	}
+}
+
+void Editor::LoadDrawableObject(Node* pNode)
+{
+	m_editorRaylib.AddDrawableObject(pNode->GetName(), pNode);
+	for (uint32 i = 0; i < pNode->GetChildCount(); i++)
+	{
+		LoadDrawableObject(&pNode->GetChild(i));
+	}
+}
+
+
+void Editor::StartFoundry(std::string const& scenePath)
+{
+	if (!std::filesystem::exists(scenePath))
+	{
+		std::cerr << "[Editor] Scene file not found: " << scenePath << std::endl;
+		return;
+	}
+
+	std::filesystem::path absoluteScenePath = std::filesystem::absolute(scenePath);
+	std::filesystem::path gameExePath;
+
+#if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
+	gameExePath = "../Game/Game.exe";
+#elif OPERATING_SYSTEM == OPERATING_SYSTEM_LINUX
+	gameExePath = "../Game/Game";
+#elif OPERATING_SYSTEM == OPERATING_SYSTEM_MACOS
+	gameExePath = "../Game/Game.app/Contents/MacOS/Game";
+    if (!std::filesystem::exists(gameExePath))
+    {
+        gameExePath = "../Game/Game";
+    }
+#else
+    #error "Unsupported platform for launching the game."
+#endif
+
+	if (!std::filesystem::exists(gameExePath))
+	{
+		std::cerr << "[Editor] Game executable not found: " << gameExePath << std::endl;
+		std::cerr << "[Editor] Make sure to build the Game project first!" << std::endl;
+		return;
+	}
+
+	std::filesystem::path absoluteGamePath = std::filesystem::absolute(gameExePath);
+
+	ScriptPathMap scriptMap = CopyScriptIntoGame(absoluteScenePath, absoluteGamePath);
+
+	std::filesystem::path playSceneDir = absoluteGamePath.parent_path() / "Overhead" / "SceneTrees";
+	std::filesystem::create_directories(playSceneDir);
+
+	std::filesystem::path playScenePath = playSceneDir / absoluteScenePath.filename();
+	if (!WritePlayScene(playScenePath, scriptMap))
+	{
+		return;
+	}
+
+	std::string command;
+
+#if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
+	command = "start \"Foundry Game\" \"" + absoluteGamePath.string() + "\" \"" + playScenePath.string() + "\"";
+#elif OPERATING_SYSTEM == OPERATING_SYSTEM_LINUX || OPERATING_SYSTEM == OPERATING_SYSTEM_MACOS
+	command = "\"" + absoluteGamePath.string() + "\" \"" + playScenePath.string() + "\" &";
+#else
+    #error "Unsupported platform for launching the game."
+#endif
+
+	DEBUG( "[Editor] Executing: " << command << std::endl);
+	int result = std::system(command.c_str());
+
+	if (result == 0)
+		DEBUG( "[Editor] Game launched successfully" << std::endl);
+	else
+		std::cerr << "[Editor] Failed to launch game (error code: " << result << ")" << std::endl;
+}
+
+void Editor::CollectLuaScripts(Node* pNode, std::vector<std::filesystem::path>& outScripts)
+{
+	if (!pNode) return;
+
+	SerializedObject object;
+	pNode->Serialize(object);
+
+	auto const& data = object.GetJson();
+	if (data.contains("PUBLIC_DATAS") && data["PUBLIC_DATAS"].contains("m_scriptPath"))
+	{
+		std::string scriptPath = data["PUBLIC_DATAS"]["m_scriptPath"];
+		if (!scriptPath.empty())
+		{
+			outScripts.emplace_back(scriptPath);
+		}
+	}
+
+	for (uint32 i = 0; i < pNode->GetChildCount(); ++i)
+	{
+		CollectLuaScripts(&pNode->GetChild(i), outScripts);
+	}
+}
+
+Editor::ScriptPathMap Editor::CopyScriptIntoGame(std::filesystem::path const& scenePath, std::filesystem::path const& gameExePath)
+{
+	ScriptPathMap scriptMap;
+
+	if (!m_sceneRoot) return scriptMap;
+
+	std::filesystem::path scriptsDir = gameExePath.parent_path() / "Overhead" / "Scripts";
+	std::filesystem::create_directories(scriptsDir);
+
+	std::vector<std::filesystem::path> scripts;
+	CollectLuaScripts(m_sceneRoot.get(), scripts);
+
+	std::unordered_set<std::string> uniqueScripts;
+
+	for (std::filesystem::path const& scriptPath : scripts)
+	{
+		std::filesystem::path resolvedPath = scriptPath;
+		if (resolvedPath.is_relative())
+		{
+			resolvedPath = std::filesystem::absolute(scenePath.parent_path() / resolvedPath);
+		}
+
+		if (!std::filesystem::exists(resolvedPath))
+		{
+			std::cerr << "[Editor] Lua script not found: " << resolvedPath << std::endl;
+			continue;
+		}
+
+		if (!uniqueScripts.insert(resolvedPath.string()).second)
+			continue;
+
+		std::filesystem::path targetPath = scriptsDir / resolvedPath.filename();
+		std::filesystem::copy_file(resolvedPath, targetPath, std::filesystem::copy_options::overwrite_existing);
+
+		scriptMap[scriptPath.string()] = targetPath.string();
+		scriptMap[resolvedPath.string()] = targetPath.string();
+	}
+
+	return scriptMap;
+}
+
+bool Editor::WritePlayScene(std::filesystem::path const& outputScenePath, ScriptPathMap const& scriptMap)
+{
+	try
+	{
+		if (!m_sceneRoot)
+		{
+			std::cerr << "[Editor] Cannot write play scene: no scene loaded" << std::endl;
+			return false;
+		}
+
+		SerializedObject object;
+		m_sceneRoot->Serialize(object);
+
+		json jsonRoot = json::array();
+		jsonRoot[0]["Root"] = object.GetJson();
+
+		UpdateScriptPathsInJson(jsonRoot[0]["Root"], scriptMap);
+
+		std::filesystem::create_directories(outputScenePath.parent_path());
+		std::ofstream file(outputScenePath, std::ios::out | std::ios::trunc);
+		file << jsonRoot;
+		file.close();
+
+		DEBUG( "[Editor] Play scene exported: " << outputScenePath << std::endl);
+		return true;
+	}
+	catch (std::exception const& e)
+	{
+		std::cerr << "[Editor] Failed to write play scene: " << e.what() << std::endl;
+		return false;
+	}
+}
+
+void Editor::UpdateScriptPathsInJson(json& nodeJson, ScriptPathMap const& scriptMap)
+{
+	if (nodeJson.contains("PUBLIC_DATAS") && nodeJson["PUBLIC_DATAS"].contains("m_scriptPath"))
+	{
+		std::string scriptPath = nodeJson["PUBLIC_DATAS"]["m_scriptPath"];
+		if (!scriptPath.empty())
+		{
+			auto it = scriptMap.find(scriptPath);
+			if (it != scriptMap.end())
+			{
+				nodeJson["PUBLIC_DATAS"]["m_scriptPath"] = it->second;
+			}
+		}
+	}
+
+	if (nodeJson.contains("PRIVATE_DATAS") && nodeJson["PRIVATE_DATAS"].contains("Children"))
+	{
+		for (auto& child : nodeJson["PRIVATE_DATAS"]["Children"])
+		{
+			UpdateScriptPathsInJson(child, scriptMap);
+		}
+	}
+}
+
+void Editor::RemoveStringClone(Node* pNode) {
+	std::string thisnodeName = pNode->GetName();
+	if (thisnodeName.size() >= 4 && thisnodeName.substr(thisnodeName.size() - 4) == "Copy") {
+		pNode->SetName(thisnodeName.substr(0, 4));
+	}
+	for (uint32 i = 0; i < pNode->GetChildCount(); i++)
+	{
+		RemoveStringClone(&pNode->GetChild(i));
+	}
+}
+
+void Editor::SaveScene(std::string const& path)
+{
+	try
+	{
+		std::string tmp = path;
+
+		bool isScene = false;
+		if (path.size() >= 3 && path.substr(path.size() - 3) == ".sc")
+		{
+			isScene = true;
+		}
+
+		if (isScene)
+		{
+			if (m_sceneRoot)
+			{
+				EditorSerializer::SaveScene(tmp, m_sceneRoot);
+				m_scenePathBuffer = tmp;
+				DEBUG("[Editor] Scene saved: " << m_scenePathBuffer << ".json" << std::endl);
+			}
+			else
+			{
+				std::cerr << "[Editor] Cannot save scene: no scene loaded" << std::endl;
+			}
+		}
+		else if (isScene == false || m_editorImgui.GetSelectedNode())
+		{
+			Node* selected = m_editorImgui.GetSelectedNode();
+			if (!selected)
+			{
+				std::cerr << "[Editor] Cannot save node: no node selected" << std::endl;
+				return;
+			}
+
+			uptr<Node> clone = selected->Clone();
+
+			EngineServer::FlushCommands();
+			RemoveStringClone(clone.get());
+			/*TODO Enlever le Copy derriere en recursive pour les enfants*/
+			std::string test = clone.get()->GetName();
+			EditorSerializer::SaveNode(tmp, clone);
+			m_nodePathBuffer = tmp;
+			DEBUG("[Editor] Node saved: " << m_nodePathBuffer << ".json" << std::endl);
+		}
+		else
+		{
+			std::cerr << "[Editor] Cannot save: unknown type or no node selected" << std::endl;
+		}
+	}
+	catch (std::exception const& e)
+	{
+		std::cerr << "[Editor] Failed to save: " << e.what() << std::endl;
+	}
+}
+
+void Editor::SaveSceneNoSpe()
+{
+
+	if (!m_scenePathBuffer.empty())
+		SaveScene(m_scenePathBuffer);
+	else
+		m_editorImgui.ShowSaveAs(false);
+	
+}

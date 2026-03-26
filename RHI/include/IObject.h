@@ -11,4 +11,5 @@ public:
     virtual void Bind() = 0;
 };
 
+inline IObject::~IObject() {};
 #endif //!RHI_IOBJECT__H_

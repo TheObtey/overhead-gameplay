@@ -28,10 +28,16 @@ public:
 
 private:
     void UpdateWindow() const;
+    void OpenWindow() const;
+    void ClearWindow() const;
+    void PresentWindow() const;
 
 private:
     uptr<Window> m_pWindow;
     std::string m_windowTitle;
+    Color m_clearColor {Color::SKY_BLUE};
+
+    friend class GraphicServer;
 };
 
 REGISTER_ISERIALIZABLE(NodeWindow, NodeWindow::CreateInstance);

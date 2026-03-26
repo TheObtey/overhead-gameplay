@@ -1,10 +1,10 @@
 #ifndef RHI_IVIEWPORT__H_
 #define RHI_IVIEWPORT__H_
 
-#include "IRenderGraph.h"
-#include "IWindow.h"
+#include "Define.h"
 #include "Color.h"
 
+class IPass;
 class IViewport
 {
 public:
@@ -19,7 +19,6 @@ public:
 
     virtual void Clear() const = 0;
     virtual void Present() const = 0;
-    virtual void Setup() = 0;
 
 protected:
     uint16 m_width = 0;
