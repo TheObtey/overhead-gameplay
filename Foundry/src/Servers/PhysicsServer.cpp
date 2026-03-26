@@ -67,6 +67,7 @@ void PhysicsServer::S_CreateRigidBody(NodeRigidBody& rigidBody)
 	rigidBody.m_pRigidBody->setAngularDamping(0.5f);
 	rigidBody.m_pRigidBody->setMass(1.0f);
 	rigidBody.m_pRigidBody->setIsAllowedToSleep(true);
+	rigidBody.m_rigidBodyCreated = true;
 }
 void PhysicsServer::S_DestroyRigidBody(NodeRigidBody& rigidBody)
 {
@@ -571,90 +572,90 @@ void PhysicsServer::S_AddCollider(NodeCollider& collider, NodeRigidBody& rigidBo
 
 void PhysicsServer::S_ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->applyLocalForceAtCenterOfMass(glmToRp3d(force));
 }
 void PhysicsServer::S_ApplyLocalForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->applyLocalForceAtLocalPosition(glmToRp3d(force), glmToRp3d(point));
 }
 void PhysicsServer::S_ApplyLocalForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->applyLocalForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
 }
 
 void PhysicsServer::S_ApplyWorldForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->applyWorldForceAtCenterOfMass(glmToRp3d(force));
 }
 void PhysicsServer::S_ApplyWorldForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->applyWorldForceAtLocalPosition(glmToRp3d(force), glmToRp3d(point));
 }
 void PhysicsServer::S_ApplyWorldForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->applyWorldForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
 }
 
 void PhysicsServer::S_ApplyLocalTorque(const glm::vec3& torque, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->applyLocalTorque(glmToRp3d(torque));
 }
 void PhysicsServer::S_ApplyWorldTorque(const glm::vec3& torque, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->applyWorldTorque(glmToRp3d(torque));
 }
 
 void PhysicsServer::S_SetLinearVelocity(const glm::vec3& velocity, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setLinearVelocity(glmToRp3d(velocity));
 }
 void PhysicsServer::S_SetAngularVelocity(const glm::vec3& velocity, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setAngularVelocity(glmToRp3d(velocity));
 }
 /// Set the linear decelerating factor
 void  PhysicsServer::S_SetLinearDamping(float linearDamping, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setLinearDamping(linearDamping);
 }
 /// Set the angular decelerating factor
 void  PhysicsServer::S_SetAngularDamping(float angularDamping, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setAngularDamping(angularDamping);
 }
 
 void PhysicsServer::S_ResetForces(NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->resetForce();
 }
 void PhysicsServer::S_ResetTorque(NodeRigidBody& rb)
 {
 
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->resetTorque();
 }
 
 void  PhysicsServer::S_SetMass(float mass, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setMass(mass);
 }
 void PhysicsServer::S_SetBodyType(RigidBodyType type, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D == nullptr) return;
+	if (rb.m_pOwner == nullptr) return;
 	switch (type)
 	{
 	case RigidBodyType::STATIC:
@@ -674,27 +675,27 @@ void PhysicsServer::S_SetBodyType(RigidBodyType type, NodeRigidBody& rb)
 
 void PhysicsServer::S_LockLinearAxis(bool lockAxis[], NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setLinearLockAxisFactor(rp3d::Vector3{ lockAxis[0] == true ? 0.0f : 1.0f, lockAxis[1] == true ? 0.0f : 1.0f, lockAxis[2] == true ? 0.0f : 1.0f });
 }
 void PhysicsServer::S_LockAngularAxis(bool lockAxis[], NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setAngularLockAxisFactor(rp3d::Vector3{ lockAxis[0] == true ? 0.0f : 1.0f, lockAxis[1] == true ? 0.0f : 1.0f, lockAxis[2] == true ? 0.0f : 1.0f });
 }
 void PhysicsServer::S_SetSleepingEnabled(bool enabled, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setIsAllowedToSleep(enabled);
 }
 void PhysicsServer::S_SetSleepingState(bool isSleeping, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->setIsSleeping(isSleeping);
 }
 void PhysicsServer::S_SetIsGravityEnabled(bool enabled, NodeRigidBody& rb)
 {
-	if (rb.m_pNode3D)
+	if (rb.m_pOwner)
 		rb.m_pRigidBody->enableGravity(enabled);
 }
 

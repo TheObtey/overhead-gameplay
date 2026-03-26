@@ -207,18 +207,23 @@ int main() {
 	auto C_player = Node::CreateNode<NodeBoxCollider>("c_player");
 
 	player->SetLocalPosition(pos);
+	PhysicsServer::FlushCommands(); 
+	player->AddChild(std::move(RB_player));
+	EngineServer::FlushCommands(); 
+
+	auto ref_playerRB = static_cast<NodeRigidBody*>(&player->GetChild(0));
 
 	C_player->SetShape(pSize);
 
-	RB_player->SetNode3DParent(player.get());
-	RB_player->SetBodyType(RigidBodyType::DYNAMIC);
-	RB_player->SetIsGravityEnabled(true);
-	RB_player->SetMass(30.0f);
-	RB_player->SetAngularDamping(2.0f);
-	RB_player->SetLinearDamping(2.0f);
+	//ref_playerRB->SetNode3DParent(player.get());
+	ref_playerRB->SetBodyType(RigidBodyType::DYNAMIC);
+	ref_playerRB->SetIsGravityEnabled(true);
+	ref_playerRB->SetMass(3.0f);
+	ref_playerRB->SetAngularDamping(2.0f);
+	ref_playerRB->SetLinearDamping(2.0f);
 
 	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
-	RB_player->AddChild(std::move(C_player));
+	ref_playerRB->AddChild(std::move(C_player));
 
 
 	//  Mur statique 
@@ -229,14 +234,18 @@ int main() {
 	auto			C_wall = Node::CreateNode<NodeBoxCollider>("c_wall");
 
 	wall->SetLocalPosition({ 3.0f, 1.0f, 0.0f });
+	PhysicsServer::FlushCommands(); 
+	wall->AddChild(std::move(RB_wall));
+	EngineServer::FlushCommands(); 
+	auto ref_wallRB = static_cast<NodeRigidBody*>(&wall->GetChild(0));
 
-	RB_wall->SetNode3DParent(wall.get());
-	RB_wall->SetBodyType(RigidBodyType::STATIC);
+	//RB_wall->SetNode3DParent(wall.get());
+	ref_wallRB->SetBodyType(RigidBodyType::STATIC);
 
 	C_wall->SetShape({ 0.5f, 2.0f, 3.0f });
 
 	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
-	RB_wall->AddChild(std::move(C_wall));
+	ref_wallRB->AddChild(std::move(C_wall));
 
 	//  Zone Trigger statique 
 	const Vector3   TRIGGER_POS = { -3.0f, -1.0f, 0.0f };
@@ -246,14 +255,18 @@ int main() {
 	auto			C_trigger = Node::CreateNode<NodeBoxCollider>("c_trigger");
 
 	trigger->SetLocalPosition({ -3.0f, -1.0f, 0.0f });
+	PhysicsServer::FlushCommands(); 
+	trigger->AddChild(std::move(RB_trigger));
+	EngineServer::FlushCommands(); 
+	auto ref_triggerRB = static_cast<NodeRigidBody*>(&trigger->GetChild(0));
 
-	RB_trigger->SetNode3DParent(trigger.get());
-	RB_trigger->SetBodyType(RigidBodyType::STATIC);
+	//RB_trigger->SetNode3DParent(trigger.get());
+	ref_triggerRB->SetBodyType(RigidBodyType::STATIC);
 
 	C_trigger->SetShape({ 0.5f, 2.0f, 3.0f });
 
 	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
-	RB_trigger->AddChild(std::move(C_trigger));
+	ref_triggerRB->AddChild(std::move(C_trigger));
 
 
 	//  Sol statique 
@@ -264,14 +277,22 @@ int main() {
 	auto			C_floor = Node::CreateNode<NodeBoxCollider>("c_floor");
 
 	floor->SetLocalPosition({ 0.0f, -1.0f, 0.0f });
-	C_floor->SetShape({ 50.0f, 1.0f, 50.0f });
-	RB_floor->SetBounciness(0.0f);
+	PhysicsServer::FlushCommands(); 
+	floor->AddChild(std::move(RB_floor));
+	EngineServer::FlushCommands(); 
 
-	RB_floor->SetNode3DParent(floor.get());
-	RB_floor->SetBodyType(RigidBodyType::STATIC);
+	auto ref_floorRB = static_cast<NodeRigidBody*>(&floor->GetChild(0));
+
+
+	C_floor->SetShape({ 50.0f, 1.0f, 50.0f });
+	ref_floorRB->SetBounciness(0.0f);
+
+	//ref_floorRB->SetNode3DParent(floor.get());
+	ref_floorRB->SetBodyType(RigidBodyType::STATIC);
 
 	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
-	RB_floor->AddChild(std::move(C_floor));
+	ref_floorRB->AddChild(std::move(C_floor));
+	PhysicsServer::FlushCommands(); // Important pour que le RB soit cree avant d'ajouter le collider
 
 
 	// params
@@ -286,10 +307,10 @@ int main() {
 
 	EngineServer::FlushCommands(); // Important pour que les RB soient tous cree avant de faire le cast des colliders
 
-	auto ref_playerCollider = static_cast<NodeBoxCollider*>(&RB_player->GetChild(0));
-	auto ref_triggerCollider = static_cast<NodeBoxCollider*>(&RB_trigger->GetChild(0));
-	auto ref_wallCollider = static_cast<NodeBoxCollider*>(&RB_wall->GetChild(0));
-	auto ref_floorCollider = static_cast<NodeBoxCollider*>(&RB_floor->GetChild(0));
+	auto ref_playerCollider = static_cast<NodeBoxCollider*>(&ref_playerRB->GetChild(0));
+	auto ref_triggerCollider = static_cast<NodeBoxCollider*>(&ref_triggerRB->GetChild(0));
+	auto ref_wallCollider = static_cast<NodeBoxCollider*>(&ref_wallRB->GetChild(0));
+	auto ref_floorCollider = static_cast<NodeBoxCollider*>(&ref_floorRB->GetChild(0));
 
 	PhysicsServer::FlushCommands();
 
@@ -319,7 +340,7 @@ int main() {
 
 	//// -- Joint test --
 	//const rp3d::Vector3 anchorPointWorldSpace(5.0f, 10.0f, 0.0f);
-	//rp3d::BallAndSocketJointInfo ballInfo(RB_player->GetRigidBody(),RB_wall->GetRigidBody(), anchorPointWorldSpace);
+	//rp3d::BallAndSocketJointInfo ballInfo(ref_playerRB->GetRigidBody(),ref_wallRB->GetRigidBody(), anchorPointWorldSpace);
 	//ballInfo.isCollisionEnabled = false; // collisions between the two bodies connected by the joint 
 	//rp3d::BallAndSocketJoint* joint;
 	//joint = static_cast<rp3d::BallAndSocketJoint*>(PhysicsServer::GetPhysicsWorld().createJoint(ballInfo));
@@ -340,13 +361,13 @@ int main() {
 		float dt = GetFrameTime();
 		if (dt <= 0.0f || dt > 0.1f) dt = FIXED_DT;
 																						// AZERTY KEAYBOARD
-		if (IsKeyDown(KEY_W)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 0, 500 });	// Forward = Z
-		if (IsKeyDown(KEY_S)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 0, -500 });	// Backward = S
-		if (IsKeyDown(KEY_D)) RB_player->ApplyWorldForceAtCenterOfMass({ -500, 0, 0 });	// Right = D
-		if (IsKeyDown(KEY_A)) RB_player->ApplyWorldForceAtCenterOfMass({ 500, 0, 0 });	// Left = Q
+		if (IsKeyDown(KEY_W)) ref_playerRB->ApplyWorldForceAtCenterOfMass({ 0, 0, 500 });	// Forward = Z
+		if (IsKeyDown(KEY_S)) ref_playerRB->ApplyWorldForceAtCenterOfMass({ 0, 0, -500 });	// Backward = S
+		if (IsKeyDown(KEY_D)) ref_playerRB->ApplyWorldForceAtCenterOfMass({ -500, 0, 0 });	// Right = D
+		if (IsKeyDown(KEY_A)) ref_playerRB->ApplyWorldForceAtCenterOfMass({ 500, 0, 0 });	// Left = Q
 
-		if (IsKeyDown(KEY_Q)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, 500, 0 });	// Up = A
-		if (IsKeyDown(KEY_E)) RB_player->ApplyWorldForceAtCenterOfMass({ 0, -500, 0 });	// Down = E
+		if (IsKeyDown(KEY_Q)) ref_playerRB->ApplyWorldForceAtCenterOfMass({ 0, 500, 0 });	// Up = A
+		if (IsKeyDown(KEY_E)) ref_playerRB->ApplyWorldForceAtCenterOfMass({ 0, -500, 0 });	// Down = E
 
 		//if(ref_triggerCollider->IsTrigger())
 		//	DEBUG("Trigger is on\n");
@@ -354,16 +375,16 @@ int main() {
 		//	DEBUG("Trigger is off\n");
 
 
-		if (IsKeyDown(KEY_V))  RB_player->ApplyLocalTorque({ 500,0,0 });
-		if (IsKeyDown(KEY_B)) RB_player->ApplyLocalTorque({ 0,500,0 });
-		if (IsKeyDown(KEY_N))  RB_player->ApplyLocalTorque({ 0,0,500 });
+		if (IsKeyDown(KEY_V))  ref_playerRB->ApplyLocalTorque({ 500,0,0 });
+		if (IsKeyDown(KEY_B)) ref_playerRB->ApplyLocalTorque({ 0,500,0 });
+		if (IsKeyDown(KEY_N))  ref_playerRB->ApplyLocalTorque({ 0,0,500 });
 
-		if (IsKeyDown(KEY_C))  RB_player->ResetTorque();
+		if (IsKeyDown(KEY_C))  ref_playerRB->ResetTorque();
 
 		if (IsKeyPressed(KEY_G))
 		{
 			test = !test;
-			RB_player->LockAngularAxis(test, test, test);
+			ref_playerRB->LockAngularAxis(test, test, test);
 			std::string a = test == true ? "true" : "false";
 			std::string b = "\n Linear lock = " + a + "\n";
 			DEBUG(b);
@@ -371,7 +392,7 @@ int main() {
 		if (IsKeyPressed(KEY_H))
 		{
 			t = !t;
-			RB_player->LockLinearAxis(t, t, t);
+			ref_playerRB->LockLinearAxis(t, t, t);
 			std::string a = t == true ? "true" : "false";
 			std::string b = "\n Angular lock = " + a + "\n";
 			DEBUG(b);
@@ -393,9 +414,9 @@ int main() {
 		}
 
 		player->Update(dt);
-		RB_player->Update(dt);
+		ref_playerRB->Update(dt);
 		wall->Update(dt);
-		RB_wall->Update(dt);
+		ref_wallRB->Update(dt);
 		PhysicsServer::FlushCommands();
 
 		eventListener.Reset();
@@ -414,7 +435,7 @@ int main() {
 
 		// --- test overlap ---
 		// GENERAL OVERLAP
-		//if(PhysicsServer::GetPhysicsWorld().testOverlap(RB_player->GetRigidBody(), RB_trigger->GetRigidBody()))
+		//if(PhysicsServer::GetPhysicsWorld().testOverlap(ref_playerRB->GetRigidBody(), ref_triggerRB->GetRigidBody()))
 		//	DEBUG("Overlap test\n");
 
 		// --- draw ---
@@ -474,7 +495,7 @@ int main() {
 
 		DrawText(TextFormat("C_Pos: (%.1f, %.1f, %.1f)", ref_playerCollider->GetLocalPosition().x, ref_playerCollider->GetLocalPosition().y, ref_playerCollider->GetLocalPosition().z),
 			10, GetScreenHeight() - 70, 16, BLACK);
-		DrawText(TextFormat("RB_Pos: (%.1f, %.1f, %.1f)", RB_player->GetPosition().x, RB_player->GetPosition().y, RB_player->GetPosition().z),
+		DrawText(TextFormat("RB_Pos: (%.1f, %.1f, %.1f)", ref_playerRB->GetPosition().x, ref_playerRB->GetPosition().y, ref_playerRB->GetPosition().z),
 			10, GetScreenHeight() - 48, 16, BLACK);
 		DrawText(TextFormat("PlayerPos: (%.1f, %.1f, %.1f)", player->GetPosition().x, player->GetPosition().y, player->GetPosition().z),
 			10, GetScreenHeight() - 26, 16, BLACK);

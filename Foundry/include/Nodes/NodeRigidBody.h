@@ -131,9 +131,10 @@ protected:
 
 private:
 
-	Node3D* m_pNode3D;
+	//Node3D* m_pNode3D;
 	rp3d::RigidBody* m_pRigidBody;
 	std::vector<NodeCollider*> m_colliders;
+	bool m_rigidBodyCreated = false;
 	//std::vector<uptr<NodeCollider>> m_colliders;
 
 	friend class PhysicsServer;
