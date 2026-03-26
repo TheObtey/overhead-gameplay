@@ -20,6 +20,6 @@ target_include_directories(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/../RHI/include/)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm-header-only)
-target_link_libraries(${PROJECT_NAME} PRIVATE glad::glad)
+target_link_libraries(${PROJECT_NAME} PUBLIC glad::glad)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
 

@@ -8,6 +8,7 @@
 #include "Shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <AssetLoading/AssetLoader.h>
 
 
 int main()
@@ -52,10 +53,7 @@ int main()
     float fov = 45.0f;
 
     sptr<Camera> camera = std::make_shared<Camera>(position, up, yaw, pitch, roll, fov);
-    std::vector<Mesh*> meshes;
-    meshes.push_back(&mesh);
-    meshes.push_back(&mesh1);
-
+    std::vector<Mesh*> meshes = AssetLoader::LoadMeshFromFile("res/Test.fbx",AssetLoader::FileType::FBX);
     std::vector<Light> lights;
 
     for (int i = 0; i < 1; ++i)
@@ -73,9 +71,9 @@ int main()
     Program lightProgram;
 
     Shader geoFrag(ShaderType::TYPE_FRAGMENT);
-    geoFrag.Load("../res/shaders/GBuffer.frag");
+    geoFrag.Load("res/shaders/GBuffer.frag");
     Shader geoVert(ShaderType::TYPE_VERTEX);
-    geoVert.Load("../res/shaders/GBuffer.vert");
+    geoVert.Load("res/shaders/GBuffer.vert");
 
     geometryProgram.AddShader(&geoFrag);
     geometryProgram.AddShader(&geoVert);
@@ -86,9 +84,9 @@ int main()
 
 
     Shader lightFrag(ShaderType::TYPE_FRAGMENT);
-    lightFrag.Load("../res/shaders/LightPass.frag");
+    lightFrag.Load("res/shaders/LightPass.frag");
     Shader lightVert(ShaderType::TYPE_VERTEX);
-    lightVert.Load("../res/shaders/LightPass.vert");
+    lightVert.Load("res/shaders/LightPass.vert");
 
     lightProgram.AddShader(&lightFrag);
     lightProgram.AddShader(&lightVert);
