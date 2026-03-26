@@ -10,10 +10,10 @@ public:
 	NodeAudioEmitter(std::string const& name);
 	~NodeAudioEmitter() override = default;
 
-	void AudioSetFile(const char* filePath);
+	bool Load(const char* filePath, AudioChannel channel);
 
-	void AudioPlay();
-	void AudioStop();
+	void Play();
+	void Stop();
 	void AudioSetLoop(bool value);
 
 	virtual void OnUpdate(double delta) override;
@@ -21,6 +21,7 @@ public:
 	static ISerializable* CreateInstance();
 
 protected:
+	ma_sound m_sound{};
 
 private:
 

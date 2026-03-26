@@ -9,35 +9,38 @@
 
 #include <iostream>
 
+struct AudioChannel 
+{
+	std::string name;
+	ma_sound_group soundGroup;
+};
+
 class AudioServer : public Server<AudioServer>
 {
 public:
 	AudioServer() = default;
 	~AudioServer() = default;
 	
-	static void SetAudioFile(const char* filePath);
+	static bool Init();
+	static void Shutdown();
 
-	static void Play();
-	static void Stop();
+	static AudioChannel* GetChannel(const std::string& name);
+	static AudioChannel* CreateChannel(const std::string& name);
 
-	static void Update();
+	static void SetMasterVolume(float volume);
+	static void SetGroupVolume(AudioChannel channel, float volume);
 
-	static void SetLoop(bool value);
+	static float GetMasterVolume() { return ma_engine_get_volume(&Instance().m_soundEngine); };
+	//static float GetGroupVolume(AudioChannel channel) { return ma_sound_group_get_volume(&channel.soundGroup); };
+
+	static ma_engine& GetSoundEngine() { return Instance().m_soundEngine; };
+	static std::vector<AudioChannel>& GetChannels() { return Instance().m_channels; };
 
 protected:
-	bool m_isPlaying = false;
-	bool m_loop = false;
-	float m_volume = 1.f;
-
-	const char* m_filePath = nullptr; // TODO : Make an audio file class instead
-
-	ma_decoder m_decoder;
-	ma_device m_device;
-	ma_uint32 m_channelsCount = 0;
+	ma_engine m_soundEngine{};
+	std::vector<AudioChannel> m_channels;
 
 private:
-	static void Data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
-
 	void FlushCommandsImpl() override {};
 	void BuildTasksImpl(TaskGraph& graph) override {};
 	void OnInitialize() override {}

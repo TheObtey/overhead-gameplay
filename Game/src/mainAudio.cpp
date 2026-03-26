@@ -3,18 +3,22 @@
 
 int main()
 {
-    auto audioEm = Node::CreateNode<NodeAudioEmitter>("AudioEmitter");
-    audioEm->AudioSetFile("res/bass-wiggle.mp3"); // TEST ONLY (replace with your file)
-    audioEm->AudioSetLoop(true);
+    AudioServer::Init();
 
-    audioEm->AudioPlay();
+    AudioChannel* music = AudioServer::CreateChannel("Music");
+
+    auto audioEm = Node::CreateNode<NodeAudioEmitter>("AudioEmitter");
+
+    audioEm->Load("res/bass-wiggle.mp3", *music); // TEST ONLY (replace with your file)
+
+    audioEm->Play();
 
     while (true)
     {
         
     }
 
-    audioEm->AudioStop();
+    AudioServer::Shutdown();
 
     return 0;
 }

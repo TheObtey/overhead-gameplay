@@ -2,83 +2,59 @@
 
 #include "Servers/AudioServer.h"
 
-void AudioServer::Data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
+bool AudioServer::Init()
 {
-    ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
-    if (pDecoder == NULL) {
-        return;
-    }
-
-    ma_data_source_read_pcm_frames(pDecoder, pOutput, frameCount, NULL);
-
-    (void)pInput;
-}
-
-void AudioServer::SetAudioFile(const char* filePath)
-{
-    Instance().m_filePath = filePath;
-}
-
-void AudioServer::Play()
-{
-    ma_result result;
-    //ma_decoder decoder;
-    ma_device_config deviceConfig;
-    //ma_device device;
-
-    result = ma_decoder_init_file(Instance().m_filePath, NULL, &Instance().m_decoder);
-    if (result != MA_SUCCESS)
+    if (ma_engine_init(NULL, &Instance().m_soundEngine) != MA_SUCCESS)
     {
-        printf("Could not load file: %s\n", Instance().m_filePath);
-        return;
+        printf("Failed to init audio engine\n");
+        return false;
     }
-
-    if (Instance().m_loop) ma_data_source_set_looping(&Instance().m_decoder, MA_TRUE);
-
-    deviceConfig = ma_device_config_init(ma_device_type_playback);
-    deviceConfig.playback.format = Instance().m_decoder.outputFormat;
-    deviceConfig.playback.channels = Instance().m_decoder.outputChannels;
-    deviceConfig.sampleRate = Instance().m_decoder.outputSampleRate;
-    deviceConfig.dataCallback = Data_callback;
-    deviceConfig.pUserData = &Instance().m_decoder;
-
-    //ma_sound_set_volume();
-
-    if (ma_device_init(NULL, &deviceConfig, &Instance().m_device) != MA_SUCCESS)
-    {
-        printf("Failed to open playback device.\n");
-        ma_decoder_uninit(&Instance().m_decoder);
-        return;
-    }
-
-    if (ma_device_start(&Instance().m_device) != MA_SUCCESS)
-    {
-        printf("Failed to start playback device.\n");
-        ma_device_uninit(&Instance().m_device);
-        ma_decoder_uninit(&Instance().m_decoder);
-        return;
-    }
-
-    Instance().m_isPlaying = true;
+    return true;
 }
 
-void AudioServer::Stop()
+void AudioServer::Shutdown()
 {
-    ma_device_uninit(&Instance().m_device);
-    ma_decoder_uninit(&Instance().m_decoder);
-
-    Instance().m_isPlaying = false;
-}
-
-void AudioServer::Update()
-{
-    if (Instance().m_isPlaying)
+    for (auto& channel : Instance().m_channels)
     {
-
+        ma_sound_group_uninit(&channel.soundGroup);
     }
+
+    ma_engine_uninit(&Instance().m_soundEngine);
 }
 
-void AudioServer::SetLoop(bool value)
+AudioChannel* AudioServer::GetChannel(const std::string& name)
 {
-    Instance().m_loop = value;
+    for (auto& channel : Instance().m_channels)
+    {
+        if (channel.name == name) return &channel;
+    }
+
+    return nullptr;
+}
+
+AudioChannel* AudioServer::CreateChannel(const std::string& name) 
+{
+    if (GetChannel(name) != nullptr) { return GetChannel(name); }
+
+    AudioChannel* newChannel;
+    newChannel->name = name;
+    if (ma_sound_group_init(&Instance().m_soundEngine, 0, NULL, &newChannel->soundGroup) != MA_SUCCESS)
+    {
+        printf("Failed to create sound group: %s\n", name.c_str());
+        return nullptr;
+    }
+
+    GetChannels().push_back(*newChannel);
+
+    return newChannel;
+}
+
+void AudioServer::SetMasterVolume(float volume)
+{
+    ma_engine_set_volume(&Instance().m_soundEngine, volume);
+}
+
+void AudioServer::SetGroupVolume(AudioChannel channel,float volume)
+{
+    ma_sound_group_set_volume(&channel.soundGroup, volume);
 }
