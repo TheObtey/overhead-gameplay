@@ -2,6 +2,8 @@
 #define GRAPHIC_SERVER__H_
 
 #include "Server.hpp"
+#include "Passes/GeometryPass.h"
+#include "Passes/LightPass.h"
 
 class Window;
 class NodeWindow;
@@ -26,7 +28,11 @@ public:
 private:
     void FlushCommandsImpl() override;
     void BuildTasksImpl(TaskGraph& graph) override;
-	void OnInitialize() override {}
+	void OnInitialize() override;
+
+private:
+    uptr<GeometryPass> m_pGeometryPass;
+    uptr<LightPass> m_pLightPass;
 };
 
 #endif

@@ -4,6 +4,11 @@ self = Node3D
 
 test = 0;
 
+
+function OnInitalize()
+
+end
+
 function OnUpdate(dt)
     local node = CreateNode("Created from lua")
     print(node:GetName())

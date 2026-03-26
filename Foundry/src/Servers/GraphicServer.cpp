@@ -23,6 +23,10 @@ void GraphicServer::BuildTasksImpl(TaskGraph &graph)
 
 }
 
+void GraphicServer::OnInitialize() {
+    Server<GraphicServer>::OnInitialize();
+}
+
 void GraphicServer::FlushCommandsImpl()
 {
     while (m_commands.empty() == false)
