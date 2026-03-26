@@ -31,17 +31,6 @@ bool ActionMap::Erase(std::string_view const& name)
 	return true;
 }
 
-template <typename RV, typename... Args>
-bool ActionMap::SetAction(std::string_view const& name, Event<RV(Args...)>* pAction)
-{
-	if (m_actions.find(std::string(name)) == m_actions.end())
-		return false;
-
-	m_actions[std::string(name)] = pAction;
-
-	return true;
-}
-
 Action* ActionMap::GetAction(std::string_view const& name)
 {
 	if (m_actions.find(std::string(name)) == m_actions.end())

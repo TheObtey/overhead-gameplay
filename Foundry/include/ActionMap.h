@@ -15,7 +15,10 @@
 class Action;
 
 
-class ActionMap /*: public ISerializable*/
+/// <summary>
+/// ActionMap is a custom container made to store Action objects, with each Action representing a Callback specified to a group of inputs
+/// </summary>
+class ActionMap
 {
 public:
 	ActionMap();
@@ -28,30 +31,19 @@ public:
 	void operator=(ActionMap&& other) = delete;
 
 
-	bool		Emplace(std::string_view const& name, Action* pAction);
-	bool		Erase(std::string_view const& name);
-				
-	template	<typename RV, typename... Args>
-	bool		SetAction(std::string_view const& name, Event<RV(Args...)>* pAction);
-	Action*		GetAction(std::string_view const& name);
-	Action*		operator[](std::string const& name);
-				
-	uint32		Length() const;
-	void		Rename(std::string_view const& old, std::string_view const& name);
+	bool	Emplace(std::string_view const& name, Action* pAction);
+	bool	Erase(std::string_view const& name);
+			
+	Action*	GetAction(std::string_view const& name);
+	Action*	operator[](std::string const& name);
+			
+	uint32	Length() const;
+	void	Rename(std::string_view const& old, std::string_view const& name);
 
-	/*void Update(GLFWwindow* pWindow)
-	{
-		EventManager::GetKeyCallback(
-			pWindow, 
-			(int)EventInput::KEY_Z, 
-			(int)EventInput::KEY_Z, 
-			(int)EventAction::PRESS, 0
-		);
-		if (EventManager::GetButton())
-	}*/
-
-private:
+protected:
 	std::unordered_map<std::string, Action*> m_actions;
+
+	friend struct ActionMapProxyBinding;
 };
 
 
