@@ -15,6 +15,11 @@ ControlType IControl::GetControlType() const
 	return m_type;
 }
 
+EventInput IControl::GetEventInput() const
+{
+	return m_eventInput;
+}
+
 void IControl::SetAction(Action* pAction)
 {
 	m_pAction = pAction;

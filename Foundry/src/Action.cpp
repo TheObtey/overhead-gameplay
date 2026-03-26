@@ -1,20 +1,18 @@
 #include "Action.h"
 #include "IControl.h"
 
-Action::Action(std::string name) : m_controls(), m_event() {}
-
-template <typename RV, typename... Args>
-Action::Action(std::string name, ControlType type, Event<RV, Args...> event, EventInput eventInput) :
-	m_name(name), m_event(event)
-{
-	AddControl(type, eventInput);
+Action::Action() : m_controls(), m_event() {
+	EventManager::getKey += [&](EventInput in, EventAction ac)
+		{
+			for (int i = 0; i < m_controls.size(); i++)
+			{
+				if (in == m_controls[i]->GetEventInput())
+					m_event.Invoke(*m_controls[i]);
+			}
+		};
 }
 
-template <typename RV, typename... Args>
-void Action::SetEvent(Event<RV(Args...)> const& event)
-{
-	m_event = event;
-}
+Action::~Action() {}
 
 Event<void(IControl&)> Action::GetEvent() const
 {
@@ -41,20 +39,10 @@ uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
 	return m_controls.size() - 1;
 }
 
-IControl* Action::GetControl(uint32& index)
+IControl* Action::GetControl(uint32 index)
 {
 	if (index > m_controls.size())
 		return nullptr;
 
 	return m_controls[index];
-}
-
-void Action::SetName(std::string const& name)
-{
-	m_name = name;
-}
-
-std::string_view Action::GetName() const
-{
-	return m_name;
 }

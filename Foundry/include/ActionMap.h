@@ -39,6 +39,17 @@ public:
 	uint32		Length() const;
 	void		Rename(std::string_view const& old, std::string_view const& name);
 
+	/*void Update(GLFWwindow* pWindow)
+	{
+		EventManager::GetKeyCallback(
+			pWindow, 
+			(int)EventInput::KEY_Z, 
+			(int)EventInput::KEY_Z, 
+			(int)EventAction::PRESS, 0
+		);
+		if (EventManager::GetButton())
+	}*/
+
 private:
 	std::unordered_map<std::string, Action*> m_actions;
 };

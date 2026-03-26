@@ -36,6 +36,7 @@ public:
 	virtual ~IControl();
 
 	ControlType GetControlType() const;
+	EventInput GetEventInput() const;
 	
 	template <typename T>
 	static T Read(IControl& iControl);

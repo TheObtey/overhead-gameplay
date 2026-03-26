@@ -4,6 +4,8 @@
 
 ActionMap::ActionMap() : m_actions(std::unordered_map<std::string, Action*>()) {}
 
+ActionMap::~ActionMap() {}
+
 bool ActionMap::Emplace(std::string_view const& name, Action* pAction)
 {
 	if (pAction == nullptr)
@@ -35,12 +37,8 @@ bool ActionMap::SetAction(std::string_view const& name, Event<RV(Args...)>* pAct
 	if (m_actions.find(std::string(name)) == m_actions.end())
 		return false;
 
-	std::vector<Action*>& vector = m_actions[std::string(name)];
+	m_actions[std::string(name)] = pAction;
 
-	for (int i = 0; i < vector.size(); i++)
-	{
-		vector[i]->SetEvent(pAction);
-	}
 	return true;
 }
 
