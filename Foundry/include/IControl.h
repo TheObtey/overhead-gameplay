@@ -88,5 +88,7 @@ private:
 	glm::vec2 m_pos;
 };
 
+ENUM_CLASS_FLAGS(ControlType);
+ENUM_CLASS_FLAGS(ButtonState);
 
 #endif

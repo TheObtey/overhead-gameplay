@@ -54,13 +54,14 @@ public:
 
 	uint32 AddControl(ControlType const& type, EventInput const& eventInput);
 	IControl* GetControl(uint32 index);
-
 private:
 	std::vector<IControl*> m_controls; 
 	Event<void(IControl&)> m_event;
 
 	friend ActionMap;
 };
+
+
 
 
 #endif
