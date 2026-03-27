@@ -5,6 +5,7 @@
 
 #include <imgui.h>
 #include <imfilebrowser.h>
+#include <imguiAssetBrowser.h>
 #include <string>
 #include <Define.h>
 #include <Serialization/SerializeObject.hpp>
@@ -122,6 +123,7 @@ private:
 	bool m_showLoadPopup = false;
 	ImGui::FileBrowser m_saveBrowser;
 	ImGui::FileBrowser m_loadBrowser;
+	ImGui::AssetBrowser m_assetBrowser;
 	int m_fileBrowsingSizeX = 800;
 	int m_fileBrowsingSizeY = 450;
 

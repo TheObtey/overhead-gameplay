@@ -1,5 +1,4 @@
-﻿
-#include "EditorImGui.h"
+﻿#include "EditorImGui.h"
 #include "Editor.h"
 #include "EditorRaylib3D.h"
 #include "Debug.h"
@@ -56,6 +55,10 @@ void EditorImGui::Init()
 	m_loadBrowser = LoadBrowseWindow;
 	m_saveBrowser.SetDirectory("../Game/res");
 	m_loadBrowser.SetDirectory("../Game/res");
+	m_assetBrowser.SetRoot("../");
+	m_assetBrowser.SetThumbnailSize(64.0f);
+	m_assetBrowser.SetTypeFilters({ ".png", ".jpg", ".fbx", ".obj", ".lua", ".json" });
+	m_assetBrowser.SetFlags(ImGui::AssetBrowserFlags_MultiSelect | ImGui::AssetBrowserFlags_AutoRefresh);
 
 	m_inspector.SetWindow(m_screenWidth, m_screenHeight);
 }
@@ -88,6 +91,7 @@ void EditorImGui::Render()
 
 	ShowSaveAsSceneBrowsing();
 	ShowLoadSceneBrowsing();
+	m_assetBrowser.Display();
 
 	ImGui::SetNextWindowPos(ImVec2(m_screenWidth - 120.0f, m_screenHeight - 40.0f));
 	ImGui::SetNextWindowSize(ImVec2(110, 30));
