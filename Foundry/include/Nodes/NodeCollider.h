@@ -4,7 +4,9 @@
 #include "Node.h"
 #include "NodeRigidBody.h"
 
-class NodeCollider : public Node3D
+#include <functional>
+
+class NodeCollider : public Node3D, public rp3d::EventListener
 {
 public:
 	////////////////////////////////////////////////////////////
@@ -60,6 +62,14 @@ public:
 	void     SetCollideWithMaskBits(uint16_t mask);
 	uint16_t GetCollisionBitsMask() const;
 
+	// =========== RP3D Events ===========
+
+	virtual void onContact(const rp3d::CollisionCallback::CallbackData& data) override;
+
+	virtual void onTrigger(const rp3d::OverlapCallback::CallbackData& data) override;
+
+	Event<void(NodeCollider&, const NodeRigidBody& data)> OnContact;
+	Event<void(NodeCollider&, const NodeRigidBody& data)> OnTrigger;
 
 protected:
 	virtual void      DestroyShape() = 0;
@@ -70,6 +80,7 @@ protected:
 	rp3d::RigidBody* m_pRigidBodyRP3D = nullptr;
 
 	NodeRigidBody* m_pNodeRigidBody = nullptr;
+
 
 	glm::vec3 m_localPosition{ 0.0f, 0.0f, 0.0f };
 	glm::quat m_localRotation{ 1.0f, 0.0f, 0.0f, 0.0f };

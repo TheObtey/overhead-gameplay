@@ -35,8 +35,6 @@ public:
 	rp3d::RigidBody* GetRigidBody() { return m_pRigidBodyRP3D; }
 	void SetRigidBody(rp3d::RigidBody* rb) { m_pRigidBodyRP3D = rb; }
 
-
-
 	operator rp3d::Transform();
 	operator rp3d::Transform* ();
 

@@ -68,18 +68,6 @@
 //	}
 //};
  
-class RaycastCB : public rp3d::RaycastCallback
-{
-public:
-	rp3d::decimal notifyRaycastHit(const rp3d::RaycastInfo& raycastInfo) override
-	{
-		DEBUG("Ray hit at point: (%f, %f, %f)\n", raycastInfo.worldPoint.x, raycastInfo.worldPoint.y, raycastInfo.worldPoint.z);
-		return 1.0f; 
-		// return = next Max fraction to test, 1.0f to test all the ray, 0.0f to stop testing, or raycastInfo.hitFraction to test up to the first hit point
-	}
-};
-
-
 // Class events to redefine for custom collision and trigger events
 class PhysicsEvents : public rp3d::EventListener
 {
@@ -379,12 +367,6 @@ int main() {
 
 		if (IsKeyDown(KEY_Q)) ref_playerRB->ApplyWorldForceAtCenterOfMass({ 0, 500, 0 });	// Up = A
 		if (IsKeyDown(KEY_E)) ref_playerRB->ApplyWorldForceAtCenterOfMass({ 0, -500, 0 });	// Down = E
-
-		//if(ref_triggerCollider->IsTrigger())
-		//	DEBUG("Trigger is on\n");
-		//else
-		//	DEBUG("Trigger is off\n");
-
 
 		if (IsKeyDown(KEY_V))  ref_playerRB->ApplyLocalTorque({ 500,0,0 });
 		if (IsKeyDown(KEY_B)) ref_playerRB->ApplyLocalTorque({ 0,500,0 });

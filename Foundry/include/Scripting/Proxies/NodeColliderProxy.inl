@@ -39,6 +39,11 @@ public:
     void     SetCollideWithMaskBits(uint16_t mask)          { m_pNode->SetCollideWithMaskBits(mask); }
     uint16_t GetCollisionBitsMask() const                   { return m_pNode->GetCollisionBitsMask(); }
 
+	// =========== RP3D Events ===========
+
+	void AddContactReaction(std::function<void(const rp3d::CollisionCallback::CallbackData& data)> _func)	{ m_pNode->AddContactReaction(_func); }
+	void AddTriggerReaction(std::function<void(const rp3d::OverlapCallback::CallbackData& data)> _func)		{ m_pNode->AddTriggerReaction(_func); }
+
 private:
 	NodeCollider* m_pNode;
 };
@@ -67,7 +72,10 @@ BindProxy(NodeCollider::Proxy,
 		"SetCollisionCategoryBits", BIND(SetCollisionCategoryBits),
 		"GetCollisionCategoryBits", BIND(GetCollisionCategoryBits),
 		"SetCollideWithMaskBits", BIND(SetCollideWithMaskBits),
-		"GetCollisionBitsMask", BIND(GetCollisionBitsMask)
+		"GetCollisionBitsMask", BIND(GetCollisionBitsMask),
+
+		"AddContactReaction", BIND(AddContactReaction),
+		"AddTriggerReaction", BIND(AddTriggerReaction)
 	);
 )
 

@@ -140,6 +140,18 @@ uint16_t NodeCollider::GetCollisionBitsMask() const
 }
 
 
+void NodeCollider::onContact(const rp3d::CollisionCallback::CallbackData& data)
+{
+	OnContact(*this, data.getOverlappingPair().getBody1()->getUserData());
+}
+
+void NodeCollider::onTrigger(const rp3d::OverlapCallback::CallbackData& data)
+{
+	OnTrigger(*this, data.getOverlappingPair().getBody1()->getUserData());
+
+}
+
+
 
 void NodeBoxCollider::SetShape(const glm::vec3& halfExtents)
 {
