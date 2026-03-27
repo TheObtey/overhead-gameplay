@@ -44,7 +44,8 @@ struct ActionMapProxyBinding
 
 		
 		binder.BindClass<Action>("action",
-			sol::constructors<Action(ControlType, Event<void* (void*)>, EventInput)>(),
+			sol::constructors<Action()>(),
+			sol::constructors<Action(ControlType, EventInput)>(),
 			"GetEvent", &Action::GetEvent,
 			"AddControl", &Action::AddControl,
 			"GetControl", &Action::GetControl

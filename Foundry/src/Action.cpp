@@ -1,7 +1,8 @@
 #include "Action.h"
 #include "IControl.h"
 
-Action::Action() : m_controls(), m_event() {
+Action::Action() : m_controls(), m_event() 
+{
 	EventManager::getKey += [&](EventInput in, EventAction ac)
 		{
 			for (int i = 0; i < m_controls.size(); i++)
@@ -12,7 +13,28 @@ Action::Action() : m_controls(), m_event() {
 		};
 }
 
+Action::Action(ControlType controlType, EventInput eventInput)
+{
+	AddControl(controlType, eventInput);
+	EventManager::getKey += [&](EventInput in, EventAction ac)
+		{
+			for (int i = 0; i < m_controls.size(); i++)
+			{
+				switch (m_controls[i]->GetControlType())
+				{
+				case(ControlType::BUTTON):
+					if (in == m_controls[i]->GetEventInput() && ac == EventAction::PRESS)
+						m_event.Invoke(*m_controls[i]);
+					break;
+
+					// other input cases
+				}
+			}
+		};
+}
+
 Action::~Action() {}
+
 
 Event<void(IControl&)> Action::GetEvent() const
 {

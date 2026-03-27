@@ -22,31 +22,7 @@ class Action /*: public ISerializable*/
 {
 public:
 	Action();
-	
-	template <typename RV, typename... Args>
-	Action(
-		ControlType type, 
-		Event<RV, Args...> event,
-		EventInput eventInput
-	) : m_event(event)
-	{
-		AddControl(type, eventInput);
-		EventManager::getKey += [&](EventInput in, EventAction ac)
-			{
-				for (int i = 0; i < m_controls.size(); i++)
-				{
-					switch (m_controls[i]->GetControlType())
-					{
-					case(ControlType::BUTTON):
-						if (in == m_controls[i]->GetEventInput() && ac == EventAction::PRESS)
-							m_event.Invoke(*m_controls[i]);
-						break;
-					
-					// other input cases
-					}
-				}
-			};
-	}
+	Action(ControlType controlType, EventInput eventInput);
 
 	~Action();
 	
@@ -55,13 +31,11 @@ public:
 	uint32 AddControl(ControlType const& type, EventInput const& eventInput);
 	IControl* GetControl(uint32 index);
 private:
-	std::vector<IControl*> m_controls; 
-	Event<void(IControl&)> m_event;
+	std::vector<IControl*> m_controls;
+	Event<void(IControl&)> m_event {};
 
 	friend ActionMap;
 };
-
-
 
 
 #endif
