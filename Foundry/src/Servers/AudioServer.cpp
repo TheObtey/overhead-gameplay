@@ -55,7 +55,7 @@ AudioChannel* AudioServer::CreateChannel(const std::string& name)
 
 void AudioServer::SetMasterVolume(float volume)
 {
-    volume = std::clamp(volume, 0.0f, 5.0f);
+    volume = std::clamp(volume, 0.0f, 1.0f);
 
     AudioServer& self = Instance();
     self.m_masterVolume = volume;
@@ -64,7 +64,7 @@ void AudioServer::SetMasterVolume(float volume)
 
 void AudioServer::SetGroupVolume(AudioChannel* channel,float volume)
 {
-    volume = std::clamp(volume, 0.0f, 5.0f);
+    volume = std::clamp(volume, 0.0f, 1.0f);
 
     ma_sound_group_set_volume(&channel->soundGroup, volume);
 }

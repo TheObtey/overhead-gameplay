@@ -5,44 +5,65 @@
 
 int main()
 {
-    AudioServer::Init();
+	AudioServer::Init();
 
-    AudioChannel* music = AudioServer::CreateChannel("Music");
+	AudioChannel* music = AudioServer::CreateChannel("Music");
+	AudioChannel* sfx = AudioServer::CreateChannel("Sfx");
 
-    auto audioEm = Node::CreateNode<NodeAudioEmitter>("AudioEmitter");
+	auto audioEm = Node::CreateNode<NodeAudioEmitter>("AudioEmitter");
+	auto audioEm2 = Node::CreateNode<NodeAudioEmitter>("AudioEmitter2");
 
-    audioEm->Load("res/bass-wiggle.mp3", music); // TEST ONLY (replace with your file)
+	audioEm->Load("res/bass-wiggle.mp3", music);
+	audioEm2->Load("res/applause.mp3", sfx);
 
-    audioEm->Play();
+	audioEm->SetLoop(true);
+	audioEm2->SetLoop(true);
 
-    while (true)
-    {
-        if (GetAsyncKeyState(VK_ADD) & 0x8000)
-        {
-            float next = AudioServer::GetMasterVolume() + 0.05f;
-            AudioServer::SetMasterVolume(next);
-            printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
-        }
-        else if (GetAsyncKeyState(VK_SUBTRACT) & 0x8000)
-        {
-            float next = AudioServer::GetMasterVolume() - 0.05f;
-            AudioServer::SetMasterVolume(next);
-            printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
-        }
-        else if (GetAsyncKeyState('P') & 0x8000)
-        {
-            audioEm->Play();
-            std::cout << "testplay";
-        }
-        else if (GetAsyncKeyState('S') & 0x8000)
-        {
-            audioEm->Stop();
-            std::cout << "teststop";
-        }
-        Sleep(1);
-    }
+	audioEm->Play();
+	audioEm2->Play();
 
-    AudioServer::Shutdown();
+	while (true)
+	{
+		if (GetAsyncKeyState('P') & 0x8000)
+		{
+			audioEm->Play();
+			std::cout << "testplay";
+		}
+		else if (GetAsyncKeyState('S') & 0x8000)
+		{
+			audioEm->Stop();
+			std::cout << "teststop";
+		}
+		else if (GetAsyncKeyState(VK_ADD) & 0x8000)
+		{
+			//group volume
+			float next = AudioServer::GetGroupVolume(*sfx) + 0.01f;
+			AudioServer::SetGroupVolume(sfx, next);
+			printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
+		}
+		else if (GetAsyncKeyState(VK_SUBTRACT) & 0x8000)
+		{
+			//group volume
+			float next = AudioServer::GetGroupVolume(*sfx) - 0.01f;
+			AudioServer::SetGroupVolume(sfx, next);
+			printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
+		}
+		else if (GetAsyncKeyState('T') & 0x8000)
+		{
+			float next = AudioServer::GetMasterVolume() + 0.05f;
+			AudioServer::SetMasterVolume(next);
+			printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
+		}
+		else if (GetAsyncKeyState('Y') & 0x8000)
+		{
+			float next = AudioServer::GetMasterVolume() - 0.05f;
+			AudioServer::SetMasterVolume(next);
+			printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
+		}
+		Sleep(1);
+	}
 
-    return 0;
+	AudioServer::Shutdown();
+
+	return 0;
 }

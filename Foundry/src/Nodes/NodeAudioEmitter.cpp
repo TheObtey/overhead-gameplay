@@ -35,9 +35,9 @@ void NodeAudioEmitter::Stop()
     }
 }
 
-void NodeAudioEmitter::AudioSetLoop(bool value)
+void NodeAudioEmitter::SetLoop(bool value)
 {
-	//AudioServer::SetLoop(value);
+    ma_sound_set_looping(&m_sound, value);
 }
 
 void NodeAudioEmitter::OnUpdate(double delta)

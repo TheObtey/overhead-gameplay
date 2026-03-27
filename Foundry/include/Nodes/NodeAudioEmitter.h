@@ -14,7 +14,7 @@ public:
 
 	void Play();
 	void Stop();
-	void AudioSetLoop(bool value);
+	void SetLoop(bool value);
 
 	virtual void OnUpdate(double delta) override;
 
