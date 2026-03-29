@@ -21,11 +21,10 @@ int main()
     window.AddViewport(viewport);
 
 
-    const GeoInfo& tmpcube = GeometryFactory::GetGeometry(PrimitivesType::CUBE);
-    const GeoInfo& tmpcube1 = GeometryFactory::GetGeometry(PrimitivesType::CUBE);
-    const GeoInfo& tmpcube2 = GeometryFactory::GetGeometry(PrimitivesType::CUBE);
-    const GeoInfo& tmpcube3 = GeometryFactory::GetGeometry(PrimitivesType::CUBE);
-
+    const GeoInfo& tmpcube = GeometryFactory::GetGeometry(PrimitivesType::SPHERE);
+    const GeoInfo& tmpcube1 = GeometryFactory::GetGeometry(PrimitivesType::SPHERE);
+    const GeoInfo& tmpcube2 = GeometryFactory::GetGeometry(PrimitivesType::SPHERE);
+    const GeoInfo& tmpcube3 = GeometryFactory::GetGeometry(PrimitivesType::SPHERE);
 
     Geometry cube(tmpcube.m_vertices, tmpcube.m_indices);
     Geometry cube1(tmpcube1.m_vertices, tmpcube1.m_indices);
@@ -40,6 +39,12 @@ int main()
     textures.push_back(&diffuse);
     textures.push_back(&specular);
     textures.push_back(&normal);
+
+    const glm::mat4 centerTransform = glm::mat4(1.0f);
+    const glm::mat4 downTransform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    const glm::mat4 rightTransform = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    const glm::mat4 upTransform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    const glm::mat4 leftTransform = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
 
     Mesh mesh(cube, textures, glm::mat4(1.0f));
     Mesh mesh1(cube, textures, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
@@ -63,6 +68,15 @@ int main()
     meshes.push_back(&mesh3);
     meshes.push_back(&mesh4);
     meshes.push_back(&mesh1);
+
+    std::vector<glm::mat4> baseTransforms;
+    baseTransforms.reserve(meshes.size());
+    baseTransforms.push_back(centerTransform);
+    baseTransforms.push_back(rightTransform);
+    baseTransforms.push_back(upTransform);
+    baseTransforms.push_back(leftTransform);
+    baseTransforms.push_back(downTransform);
+
 
     std::vector<Light> lights;
 
@@ -116,20 +130,23 @@ int main()
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
 
+    float rotationAngle = 0.0f;
+    const glm::vec3 rotationAxis = glm::normalize(glm::vec3(0.45f, 1.0f, 0.2f));
+    constexpr float rotationSpeed = 0.01f;
+
     while (window.IsOpen())
     {
         window.Clear();
 
-        //glm::vec3 camPos = camera->GetPosition() + glm::vec3(0.016f,0.0f,0.0f);
-        //glm::mat4 meshTransform = glm::translate(mesh.GetTransform(), glm::vec3(0.0016f, 0.0f, 0.0f));
-        //mesh.SetTransform(meshTransform);
-        //camera->SetRoll(roll ++);
-        //Logger::LogWithLevel(LogLevel::ERROR, yaw);
-        //camera->SetPosition(camPos);
+        rotationAngle += rotationSpeed;
+        glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), rotationAngle, rotationAxis);
+        for (size_t i = 0; i < meshes.size(); ++i)
+        {
+            meshes[i]->SetTransform(rotation * baseTransforms[i]);
+        }
 
         window.Present();
     }
-
     geometryProgram.Unload();
     lightProgram.Unload();
 

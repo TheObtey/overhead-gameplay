@@ -38,15 +38,15 @@ public:
 
 	static void MakeCube(float width,float height,float depth);
 
-	//void MakeSphere(float r);
+	static void MakeSphere(float radius, uint32 subdivisions = 3u);
+
 	//void MakeCylinder(float r, float height);
 	//void MakeCapsule(float r, float height);
 private:
 	static std::vector<Vertex> CreateCubeVertices(float width, float height, float depth);
 	static std::vector<uint32> CreateCubeIndices();
+	static GeoInfo CreateSphere(float radius, uint32 subdivisions);
 
-	//std::vector<Vertex> CreateSphereVertices(float r);
-	//std::vector<uint32> CreateSphereIndices();
 
 	//std::vector<Vertex> CreateCylinderVertices(float r, float height);
 	//std::vector<uint32> CreateCylinderIndices();
