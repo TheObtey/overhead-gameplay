@@ -69,7 +69,7 @@
 //};
  
 // Class events to redefine for custom collision and trigger events
-class PhysicsEvents : public rp3d::EventListener
+class PhysicsEventz : public rp3d::EventListener
 {
 public:
 	virtual void onContact(const rp3d::CollisionCallback::CallbackData& data) = 0;
@@ -77,7 +77,7 @@ public:
 };
 
 
-class Events : public PhysicsEvents
+class Events : public PhysicsEventz
 {
 public:
 	bool hit = false;

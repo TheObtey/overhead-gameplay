@@ -3,9 +3,12 @@
 
 #include "Server.hpp"
 #include "Node.h"
-#include "Nodes/NodeRigidBody.h"
-//class NodeRigidBody;
-class NodeCollider;
+#include "Nodes/NodeCollider.h"
+//#include "Nodes/NodeRigidBody.h"
+//class NodeRigidBodyProxy;
+//class NodeCollider;
+
+//#include "Scripting/Proxies/NodeRigidBodyProxy.inl"
 
 #include <iostream>
 #include <memory>
@@ -22,7 +25,6 @@ struct Command<class PhysicsServer>
 		To(nullptr), 
 		collider(nullptr),
 		transform(nullptr), 
-		rigidBody(nullptr), 
 		position({ 0.0f, 0.0f, 0.0f }), 
 		force({ 0.0f, 0.0f, 0.0f }),	
 		bodyType(RigidBodyType::NONE),
@@ -104,15 +106,12 @@ struct Command<class PhysicsServer>
 	Node* To = nullptr;
 
 	// Rigid body command parameters
-	NodeCollider* collider;
 	glm::vec3 position;
 	RigidBodyType bodyType;
 	rp3d::Transform* transform;
 	bool lockAxis[3];
 
 	// Collider command parameters
-	//rp3d::RigidBody* rigidBody;
-	NodeRigidBody* rigidBody;
 	glm::quat rotation;
 	union { uint16_t category, mask; };
 	float radius;
@@ -136,7 +135,63 @@ struct Command<class PhysicsServer>
 		// Collider
 		glm::vec3 halfExtents, pos;
 	};
+	union {
+		// RigidBody
+		NodeCollider* collider;
+		// Collider
+		NodeRigidBody* rigidBody;
+	};
 };
+
+enum class EventType
+{
+	Start,
+	Stay,
+	Exit
+};
+
+class PhysicsEvents : public rp3d::EventListener
+{
+public:
+	PhysicsEvents() = default;
+	~PhysicsEvents() = default;
+
+	virtual void onContact(const rp3d::CollisionCallback::CallbackData& data) override
+	{
+		uint32 nbPairs = data.getNbContactPairs();
+		for (int i = 0; i < nbPairs; i++)
+		{
+			ContactPair pair = data.getContactPair(i);
+			auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
+			auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
+			b1->ContactEvent(*b2);
+			b2->ContactEvent(*b1);
+
+			//auto eventType = pair.getEventType();
+			//if (eventType == ContactPair::EventType::ContactStart)
+			//	DEBUG("Start Contact\n");
+			//else if (eventType == ContactPair::EventType::ContactStay)
+			//	DEBUG("In Contact\n");
+			//else if (eventType == ContactPair::EventType::ContactExit)
+			//	DEBUG("Got out of Contact\n");
+		}
+	}
+
+
+	virtual void onTrigger(const rp3d::OverlapCallback::CallbackData& data) override
+	{
+		uint32 nbPairs = data.getNbOverlappingPairs();
+		for (int i = 0; i < nbPairs; i++)
+		{
+			rp3d::OverlapCallback::OverlapPair pair = data.getOverlappingPair(i);
+			auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
+			auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
+			b1->TriggerEvent(*b2);
+			b2->TriggerEvent(*b1);
+		}
+	}
+};
+
 
 using CommandTyp = Command<PhysicsServer>::CmdType;
 
@@ -149,7 +204,7 @@ public:
 
 	static void Initialize();
 
-	static void UpdatePhysicsWorld(double dt)                       { Instance().m_pPhysicsWorld->update(dt); }
+	static void UpdatePhysicsWorld(double dt)           { Instance().m_pPhysicsWorld->update(dt); }
 
 	static rp3d::PhysicsCommon& GetPhysicsCommon()      { return Instance().m_physicsCommon; }
 	static rp3d::PhysicsWorld& GetPhysicsWorld()        { return *Instance().m_pPhysicsWorld; }
@@ -297,6 +352,8 @@ private:
 
 	rp3d::PhysicsCommon m_physicsCommon;
 	rp3d::PhysicsWorld* m_pPhysicsWorld;
+
+	//PhysicsEvents m_physicsEvents;
 
 	friend Server<PhysicsServer>;
 };

@@ -139,18 +139,14 @@ uint16_t NodeCollider::GetCollisionBitsMask() const
 	return m_pCollider ? m_pCollider->getCollideWithMaskBits() : 0xFFFF;
 }
 
-
-void NodeCollider::onContact(const rp3d::CollisionCallback::CallbackData& data)
+void NodeCollider::ContactEvent(NodeCollider& other)
 {
-	OnContact(*this, data.getOverlappingPair().getBody1()->getUserData());
+	OnContact(*this, *other.m_pNodeRigidBody);
 }
-
-void NodeCollider::onTrigger(const rp3d::OverlapCallback::CallbackData& data)
+void NodeCollider::TriggerEvent(NodeCollider& other)
 {
-	OnTrigger(*this, data.getOverlappingPair().getBody1()->getUserData());
-
+	OnTrigger(*this, *other.m_pNodeRigidBody);
 }
-
 
 
 void NodeBoxCollider::SetShape(const glm::vec3& halfExtents)

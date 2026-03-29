@@ -6,7 +6,7 @@
 
 #include <functional>
 
-class NodeCollider : public Node3D, public rp3d::EventListener
+class NodeCollider : public Node3D
 {
 public:
 	////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ public:
 	void Detach();
 	bool IsAttached() const { return m_pCollider != nullptr; }
 
-	//rp3d::Collider* GetCollider() const { return m_pCollider; }
+
 
 	// Engine
 	////////////////////////////////////////////////////////////
@@ -64,9 +64,9 @@ public:
 
 	// =========== RP3D Events ===========
 
-	virtual void onContact(const rp3d::CollisionCallback::CallbackData& data) override;
 
-	virtual void onTrigger(const rp3d::OverlapCallback::CallbackData& data) override;
+	void ContactEvent(NodeCollider& other);
+	void TriggerEvent(NodeCollider& other);
 
 	Event<void(NodeCollider&, const NodeRigidBody& data)> OnContact;
 	Event<void(NodeCollider&, const NodeRigidBody& data)> OnTrigger;

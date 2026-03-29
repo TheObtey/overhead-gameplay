@@ -9,6 +9,8 @@
 #include <functional>
 #include <optional>
 
+#include "NodeRigidBodyProxy.inl"
+#include "Debug.h"
 
 class Node3DProxy;
 
@@ -35,7 +37,6 @@ namespace HelperCallBack
 	//{
 	//public:
 	//	std::function<void(/* return type */)> func;
-
 	//	virtual void onContact(const rp3d::CollisionCallback::CallbackData& data) override
 	//	{
 	//		func(data);
@@ -46,29 +47,14 @@ namespace HelperCallBack
 	//{
 	//public:
 	//	std::function<void(/* return type */)> func;
-
 	//	virtual void onTrigger(const rp3d::OverlapCallback::CallbackData& data) override
 	//	{
 	//		func(data);
 	//	};
 	//};
-	//class PhysicsEvents : public rp3d::EventListener
-	//{
-	//public:
-	//	std::function<void(/* return type */)> collisionFunc;
-	//	std::function<void(/* return type */)> triggerFunc;
-
-	//	virtual void onContact(const rp3d::CollisionCallback::CallbackData& data) override
-	//	{
-	//		collisionFunc(data);
-	//	};
+	
 
 
-	//	virtual void onTrigger(const rp3d::OverlapCallback::CallbackData& data) override
-	//	{
-	//		triggerFunc(data);
-	//	};
-	//};
 };
 
 namespace PhysicsProxy
@@ -78,7 +64,7 @@ namespace PhysicsProxy
 		glm::vec3 impactPos;
 		glm::vec3 normal;
 		float dist;
-		Node3DProxy* node; 
+		Node3DProxy* node; // plutot NodeRigidBodyProxy* ?
 	};
 
 	//using cbData = rp3d::CollisionCallback::CallbackData;
@@ -97,7 +83,6 @@ namespace PhysicsProxy
 	//	{
 	//		HelperCallBack::PhysicsTriggerEvents ev;
 	//		ev.func = _func;
-
 	//	};
 
 	//inline auto AllEvents = sol::overload(
@@ -105,7 +90,6 @@ namespace PhysicsProxy
 	//	{
 	//		HelperCallBack::PhysicsTriggerEvents ev;
 	//		ev.func = _func;
-
 	//	};
 
 	std::optionnal<RaycastHit> RaycastClosest(const glm::vec3& origin, const glm::vec3& direction, float maxDist = 1000, uint16 mask = 0xFFFF);
