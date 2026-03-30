@@ -77,6 +77,13 @@ inline constexpr int32 operator""_kg(unsigned long long val) { return val * 1000
 #define OPERATING_SYSTEM_WINDOWS  2
 #define OPERATING_SYSTEM_MACOS    3
 
+//====================
+// SIMD GLM
+//====================
+
+#define GLM_FORCE_INTRINSICS
+
+
 #if defined(_WIN32) || defined(_WIN64)
     #define OPERATING_SYSTEM OPERATING_SYSTEM_WINDOWS
 #elif defined(__APPLE__) && defined(__MACH__)

@@ -1,3 +1,5 @@
+#ifndef MATHSUTILS__H_
+#define MATHSUTILS__H_
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -53,7 +55,7 @@ namespace Maths
 		float d = glm::dot(q1, q2);
 		if (d < 0)
 		{
-			q2 = -q2; 
+			q2 = -q2;
 			d = -d;
 		}
 
@@ -61,7 +63,9 @@ namespace Maths
 
 		float theta = std::acos(d);
 		float s = std::sin(theta);
-		
+
 		return (std::sin((1.f - ratio) * theta) / s) * q1 + (std::sin(ratio * theta) / s) * q2;
 	}
 }
+
+#endif MATHSUTILS__H_
