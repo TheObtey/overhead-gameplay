@@ -15,7 +15,7 @@ public:
 
     void SetActive(bool isActive) {m_isActive = isActive;}
     bool GetIsActive() const {return m_isActive;}
-    void Draw(IProgram const& program) override;
+    void Draw(IProgram const& program) const override;
     void SetTransform(glm::mat4 const& transform) { m_transform = transform;}
     glm::mat4 const& GetTransform() const { return m_transform; }
 

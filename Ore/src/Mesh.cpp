@@ -17,7 +17,7 @@ Mesh::~Mesh()
 {
 }
 
-void Mesh::Draw(IProgram const& pProgram)
+void Mesh::Draw(IProgram const& pProgram) const
 {
     Logger::Log("Start Draw Mesh");
     uint32 diffuseNr = 1;
@@ -47,7 +47,7 @@ void Mesh::Draw(IProgram const& pProgram)
         }
 
         Logger::Log(name);
-        glUniform1i(glGetUniformLocation(pProgram->GetProgramId(), name.c_str()), i);
+        glUniform1i(glGetUniformLocation(pProgram.GetProgramId(), name.c_str()), i);
         m_textures[i]->GetTextureObject().Bind();
     }
 

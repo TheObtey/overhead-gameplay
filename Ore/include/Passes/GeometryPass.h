@@ -2,19 +2,20 @@
 #define ORE_GEOMETRY_PASS__H_
 
 #include "Pass.h"
-#include <span>
+#include <vector>
 
 class Mesh;
 class GeometryPass final : public Pass
 {
 public:
-    GeometryPass(Program const& shader, std::span<Mesh const> meshes, sptr<Camera> camera);
+    GeometryPass(Program const& shader, sptr<Camera> camera);
     ~GeometryPass() override;
 
     void Execute() override;
+    void AddMesh(Mesh const& mesh);
     
 private:
-    std::span<Mesh const> m_meshes;
+    std::vector<std::reference_wrapper<Mesh const>> m_meshes;
 
 };
 #endif
