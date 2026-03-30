@@ -33,27 +33,13 @@ struct Animation
 	std::vector<AnimationChannel> animationTransform;
 };
 
-
-struct SceneBone
-{
-	struct VertexWeight
-	{
-		int32 vertexIndex;
-		float vertexWieght;
-	};
-
-	glm::mat4x4 positionInMesh;
-	std::vector<VertexWeight> vertexWeight;
-};
-
 struct SceneMeshs
 {
 	sptr<Mesh> mesh;
 	std::vector<sptr<Texture>> textureOfMeshes;
-	std::vector<sptr<SceneBone>> meshBones;
 };
 
-struct Scene
+struct SceneData
 {
 	std::vector<SceneMeshs> meshes;
 	std::vector<Light> lights;

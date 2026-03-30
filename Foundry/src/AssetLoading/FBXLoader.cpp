@@ -23,8 +23,61 @@ glm::mat4x4 AIMatrixToGLMMatrix(aiMatrix4x4 const& matrix)
     return glm::transpose(out);
 }
 
+void FBXLoader::LoadTextures(FBXSceneData& outData, std::vector<sptr<Texture>>& vect, std::vector<Texture*>& tempVect, uint32 matIndex)
+{
+    FBXLoader::Material meshMat = {};
+    if (outData.textures.size() != 0)
+    {
+        meshMat = outData.textures[matIndex];
+        for (std::map<TextureMaterialType, std::string>::iterator it = meshMat.textures.begin(); it != meshMat.textures.end(); ++it)
+        {
+            sptr<Texture> text = std::make_shared<Texture>(Texture(it->second, TextureType::TYPE_2D, it->first));
+            vect.push_back(text);
+            tempVect.push_back(text.get());
+        }
+    }
+    if (meshMat.textures.size() == 0 || outData.textures.size() == 0)
+    {
+        sptr<Texture> text = std::make_shared<Texture>("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+        vect.push_back(text);
+        tempVect.push_back(text.get());
+        sptr<Texture> text2 = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
+        vect.push_back(text2);
+        tempVect.push_back(text2.get());
+        sptr<Texture> text3 = std::make_shared<Texture>("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+        vect.push_back(text3);
+        tempVect.push_back(text3.get());
+    }
+}
 
-sptr<FBXLoader::SceneData> FBXLoader::LoadFile(std::string const& path)
+sptr<SceneData> FBXLoader::ConvertInGlobalSceneData(FBXSceneData& outData)
+{
+    SceneData outScene = {};
+    outScene.animations = outData.animations;
+    outScene.lights = outData.lights;
+    outScene.meshes.reserve(outData.meshs.size());
+    for (uint32 i = 0; i < outData.nodes.size(); ++i)
+    {
+        for (uint32 meshCount = 0; meshCount < outData.nodes[i]->meshesIndex.size(); ++meshCount)
+        {
+            FBXLoader::FBXMesh mesh = *outData.meshs[outData.nodes[i]->meshesIndex[meshCount]];
+            std::vector<sptr<Texture>> texts = {};
+            std::vector<Texture*> meshcreationTexts = {};
+            LoadTextures(outData, texts, meshcreationTexts, mesh.matIndex);
+            Geometry geo = Geometry(mesh.vertices, mesh.indices);
+            glm::mat4x4 mat = outData.nodes[i]->transform;
+            SceneMeshs outMesh = {};
+            outMesh.mesh = std::make_shared<Mesh>(geo, meshcreationTexts, mat);
+            outMesh.mesh->SetBones(mesh.bones);
+            outMesh.textureOfMeshes = texts;
+            outScene.meshes.push_back(outMesh);
+            meshcreationTexts.clear();
+        }
+    }
+    return std::make_shared<SceneData>(outScene);
+}
+
+sptr<SceneData> FBXLoader::LoadFile(std::string const& path)
 {
     if (m_loadedFiles.contains(path))
         return m_loadedFiles[path];
@@ -44,7 +97,7 @@ sptr<FBXLoader::SceneData> FBXLoader::LoadFile(std::string const& path)
         return nullptr;
     }
     
-    FBXLoader::SceneData uScene = {};
+    FBXLoader::FBXSceneData uScene = {};
 
     BuildNodes(pAScene, pAScene->mRootNode, -1, uScene);
     BuildMeshs(pAScene, uScene);
@@ -52,13 +105,15 @@ sptr<FBXLoader::SceneData> FBXLoader::LoadFile(std::string const& path)
     BuildLights(pAScene, uScene);
     BuildAnimations(pAScene, uScene);
 
-    m_loadedFiles[path] = std::make_shared<SceneData>(uScene);
+    sptr<SceneData> outScene = ConvertInGlobalSceneData(uScene);
 
-    return m_loadedFiles[path];
+    m_loadedFiles[path] = outScene;
+
+    return outScene;
 }
 
 
-uint32 FBXLoader::BuildNodes(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, SceneData& outData)
+uint32 FBXLoader::BuildNodes(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, FBXSceneData& outData)
 {
     Node node;
     node.name = pNode->mName.C_Str();
@@ -80,13 +135,13 @@ uint32 FBXLoader::BuildNodes(aiScene const* pScene, aiNode const* pNode, int32 p
     return selfIndex;
 }
 
-void FBXLoader::BuildMeshs(aiScene const* pScene, FBXLoader::SceneData& outData)
+void FBXLoader::BuildMeshs(aiScene const* pScene, FBXSceneData& outData)
 {
     for (uint32 i = 0; i < pScene->mNumMeshes; ++i)
     {
         // Load Vertices
         aiMesh* pMesh = pScene->mMeshes[i];
-        FBXLoader::Mesh mesh = {};
+        FBXLoader::FBXMesh mesh = {};
         mesh.vertices.reserve(pMesh->mNumVertices);
         mesh.indices.reserve(pMesh->mNumFaces * 3);
 
@@ -117,11 +172,11 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, FBXLoader::SceneData& outData)
         if (pMesh->HasBones())
             BuildBones(pMesh, mesh);
 
-        outData.meshs.push_back(std::make_shared<Mesh>(mesh));
+        outData.meshs.push_back(std::make_shared<FBXMesh>(mesh));
     }
 }
 
-void FBXLoader::BuildMaterials(aiScene const* pScene, SceneData& outData)
+void FBXLoader::BuildMaterials(aiScene const* pScene, FBXSceneData& outData)
 {
 
     for (uint32 i = 0; i < pScene->mNumMaterials; ++i)
@@ -175,7 +230,7 @@ void FBXLoader::BuildMaterials(aiScene const* pScene, SceneData& outData)
 }
 
 
-void FBXLoader::BuildLights(aiScene const* pScene, SceneData& outData)
+void FBXLoader::BuildLights(aiScene const* pScene, FBXSceneData& outData)
 {
     if (pScene->HasLights() == false)
         return;
@@ -193,28 +248,29 @@ void FBXLoader::BuildLights(aiScene const* pScene, SceneData& outData)
     }
 }
 
-void FBXLoader::BuildBones(aiMesh const* pMesh, Mesh& outMesh)
+void FBXLoader::BuildBones(aiMesh const* pMesh, FBXMesh& outMesh)
 {
-
+    outMesh.bones.reserve(pMesh->mNumBones);
     for (uint32 i = 0; i < pMesh->mNumBones; ++i)
     {
         aiBone* pBone = pMesh->mBones[i];
-        SceneBone bone = {};
-        bone.positionInMesh = AIMatrixToGLMMatrix(pBone->mOffsetMatrix);
-        bone.vertexWeight.reserve(pBone->mNumWeights);
+        outMesh.bones.push_back(AIMatrixToGLMMatrix(pBone->mOffsetMatrix));
         for (uint32 wIndex = 0; wIndex < pBone->mNumWeights; ++wIndex)
         {
-            SceneBone::VertexWeight v = {};
-            v.vertexIndex = pBone->mWeights[wIndex].mVertexId;
-            v.vertexWieght = pBone->mWeights[wIndex].mWeight;
-            bone.vertexWeight.push_back(v);
+            int index = 0;
+            for (uint32 n = 0; n < 4; ++n)
+            {
+                if (outMesh.vertices[pBone->mWeights[wIndex].mVertexId].boneIDS[n] == -1)
+                    index = n;
+            }
+            outMesh.vertices[pBone->mWeights[wIndex].mVertexId].weights[index] = pBone->mWeights[wIndex].mWeight;
+            outMesh.vertices[pBone->mWeights[wIndex].mVertexId].boneIDS[index] = i;
         }
-        outMesh.bones.push_back(std::make_shared<SceneBone>(bone));
     }
 }
 
 
-void FBXLoader::BuildAnimations(aiScene const* pScene, SceneData& outData)
+void FBXLoader::BuildAnimations(aiScene const* pScene, FBXSceneData& outData)
 {
     if (pScene->HasAnimations() == false)
         return;

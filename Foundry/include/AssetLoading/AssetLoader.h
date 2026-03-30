@@ -12,10 +12,8 @@ public:
 	{
 		FBX,
 	};
-	static uptr<Scene> LoadSceneFromFile(std::string const& path, AssetLoader::FileType type);
+	static sptr<SceneData> LoadSceneFromFile(std::string const& path, AssetLoader::FileType type);
 	
-private:
-	static uptr<Scene> LoadFBXScene(std::string const& path);
 };
 
 

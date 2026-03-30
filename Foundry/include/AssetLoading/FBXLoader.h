@@ -30,11 +30,11 @@ public:
 		std::vector<uint32> meshesIndex;
 	};
 
-	struct Mesh
+	struct FBXMesh
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32> indices;
-		std::vector<sptr<SceneBone>> bones;
+		std::vector<glm::mat4> bones;
 		int32 matIndex = -1;
 	};
 
@@ -43,10 +43,10 @@ public:
 		std::map<TextureMaterialType,std::string> textures;
 	};
 
-	struct SceneData
+	struct FBXSceneData
 	{
 		std::vector<sptr<Node>> nodes;
-		std::vector<sptr<Mesh>> meshs;
+		std::vector<sptr<FBXMesh>> meshs;
 		std::vector<Material> textures;
 		std::vector<Light> lights;
 		std::vector<Animation> animations;
@@ -54,13 +54,16 @@ public:
 
 	static sptr<SceneData> LoadFile(std::string const& path);
 private:
-	static uint32 BuildNodes(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, SceneData& outData);
-	static void BuildMeshs(aiScene const* pScene, SceneData& outData);
-	static void BuildMaterials(aiScene const* pScene, SceneData& outData);
-	static void BuildLights(aiScene const* pScene, SceneData& outData);
-	static void BuildBones(aiMesh const* pScene, Mesh& outData);
-	static void BuildAnimations(aiScene const* pScene, SceneData& outData);
+	static uint32 BuildNodes(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, FBXSceneData& outData);
+	static void BuildMeshs(aiScene const* pScene, FBXSceneData& outData);
+	static void BuildMaterials(aiScene const* pScene, FBXSceneData& outData);
+	static void BuildLights(aiScene const* pScene, FBXSceneData& outData);
+	static void BuildBones(aiMesh const* pScene, FBXMesh& outData);
+	static void BuildAnimations(aiScene const* pScene, FBXSceneData& outData);
 	static void BuildAnimationsChannles(aiAnimation const* pAnim, Animation& outAnim, uint32 channelID);
+
+	static void LoadTextures(FBXSceneData& outData,std::vector<sptr<Texture>>& vect, std::vector<Texture*>& tempVect, uint32 matIndex);
+	static sptr<SceneData> ConvertInGlobalSceneData(FBXSceneData& outData);
 
 private:
 	static uint8 m_sTexTypes[];

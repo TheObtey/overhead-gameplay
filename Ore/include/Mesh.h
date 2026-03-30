@@ -16,10 +16,12 @@ public:
     void Draw(IProgram const* program) override;
     void SetTransform(glm::mat4 const& transform) { m_transform = transform;}
     glm::mat4 const& GetTransform() const { return m_transform; }
+    void SetBones(std::vector<glm::mat4> const& bones);
 
 private:
     sptr<Geometry> m_pGeometry;
     std::vector<Texture*> m_textures;
+    std::vector<glm::mat4> m_bonesTransform;
     glm::mat4 m_transform;
 };
 

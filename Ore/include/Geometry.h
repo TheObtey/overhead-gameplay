@@ -6,12 +6,16 @@
 
 #include <Define.h>
 #include <glm/glm.hpp>
+#include <array>
 
 struct Vertex 
 {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoords;
+
+    std::array<int32, 4> boneIDS = { -1,-1,-1,-1 }; // in mesh
+    std::array<float,4> weights;
 };
 
 class VertexArrayObject;

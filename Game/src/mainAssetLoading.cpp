@@ -32,12 +32,13 @@ int main()
     float fov = 45.0f;
 
     sptr<Camera> camera = std::make_shared<Camera>(position, up, yaw, pitch, roll, fov);
-    sptr<Scene> loadedMesh = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_3.fbx", AssetLoader::FileType::FBX);
+    sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_3.fbx", AssetLoader::FileType::FBX);
+    sptr<SceneData> Scene2 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim.fbx", AssetLoader::FileType::FBX);
     std::vector<Mesh*> meshes = {};
 
-    for (uint32 i = 0; i < loadedMesh->meshes.size(); ++i)
+    for (uint32 i = 0; i < Scene1->meshes.size(); ++i)
     {
-        meshes.push_back(loadedMesh->meshes[i].mesh.get());
+        meshes.push_back(Scene1->meshes[i].mesh.get());
     }
 
 
