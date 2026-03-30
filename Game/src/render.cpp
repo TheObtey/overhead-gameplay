@@ -12,7 +12,7 @@
 
 int main()
 {
-    Window window(800, 600, "ORE ORE OREORE ORE ORE OREORE OREORE");
+    Window window(800, 600, "ORE ORE OREORE ORE ORE OREORE OREORE", false, false);
     window.Open();
     Viewport viewport(0, 0, 800, 600, Color::SKY_BLUE);
     //Viewport viewport(0, 0, 800, 600, Color::BLACK); 
@@ -73,9 +73,9 @@ int main()
     Program lightProgram;
 
     Shader geoFrag(ShaderType::TYPE_FRAGMENT);
-    geoFrag.Load("../res/shaders/GBuffer.frag");
+    geoFrag.Load("res/shaders/GBuffer.frag");
     Shader geoVert(ShaderType::TYPE_VERTEX);
-    geoVert.Load("../res/shaders/GBuffer.vert");
+    geoVert.Load("res/shaders/GBuffer.vert");
 
     geometryProgram.AddShader(&geoFrag);
     geometryProgram.AddShader(&geoVert);
@@ -86,9 +86,9 @@ int main()
 
 
     Shader lightFrag(ShaderType::TYPE_FRAGMENT);
-    lightFrag.Load("../res/shaders/LightPass.frag");
+    lightFrag.Load("res/shaders/LightPass.frag");
     Shader lightVert(ShaderType::TYPE_VERTEX);
-    lightVert.Load("../res/shaders/LightPass.vert");
+    lightVert.Load("res/shaders/LightPass.vert");
 
     lightProgram.AddShader(&lightFrag);
     lightProgram.AddShader(&lightVert);

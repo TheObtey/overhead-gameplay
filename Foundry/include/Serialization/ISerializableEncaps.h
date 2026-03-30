@@ -20,7 +20,7 @@ public:
 
 	float x, y;
 };
-inline REGISTER_ISERIALIZABLE(SVec2, SVec2::CreateInstance);
+REGISTER_ISERIALIZABLE(SVec2, SVec2::CreateInstance);
 
 class SVec3 : public ISerializable
 {
@@ -34,7 +34,7 @@ public:
 
 	float x, y, z;
 };
-inline REGISTER_ISERIALIZABLE(SVec3, SVec3::CreateInstance);
+REGISTER_ISERIALIZABLE(SVec3, SVec3::CreateInstance);
 
 class SVec4 : public ISerializable
 {
@@ -48,6 +48,6 @@ public:
 
 	float x, y, z, w;
 };
-inline REGISTER_ISERIALIZABLE(SVec4, SVec4::CreateInstance);
+REGISTER_ISERIALIZABLE(SVec4, SVec4::CreateInstance);
 
 #endif // !_ISERIALIZABLE_ENCAPS_H__

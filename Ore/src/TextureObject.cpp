@@ -1,5 +1,4 @@
 #include "TextureObject.h"
-#define STB_IMAGE_IMPLEMENTATION
 #include "Logger.hpp"
 
 #include <dependencies/stb_image.h>

@@ -99,7 +99,7 @@ private:
 	void UpdateInvTransform();
 };
 
-inline REGISTER_ISERIALIZABLE(Transform3D, Transform3D::CreateInstance);
+REGISTER_ISERIALIZABLE(Transform3D, Transform3D::CreateInstance);
 
 
 #endif //FOUNDRY_TRANSFORM3D__H_
