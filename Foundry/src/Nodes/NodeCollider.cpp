@@ -140,12 +140,6 @@ uint16_t NodeCollider::GetCollisionBitsMask() const
 	return m_pCollider ? m_pCollider->getCollideWithMaskBits() : 0xFFFF;
 }
 
-//TODO
-ISerializable* NodeCollider::CreateInstance()
-{
-	return CreateNode<NodeCollider>("NodeCollider").release();
-}
-
 void NodeCollider::Serialize(SerializedObject& datas) const
 {
 	Node3D::Serialize(datas);
