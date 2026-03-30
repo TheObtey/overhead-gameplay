@@ -8,15 +8,13 @@
 #include "Shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <AssetLoading/AssetLoader.h>
 
 
 int main()
 {
-
-    Window window(1920, 1080, "ORE ORE OREORE ORE ORE OREORE OREORE");
+    Window window(800, 600, "ORE ORE OREORE ORE ORE OREORE OREORE", false, false);
     window.Open();
-    Viewport viewport(0, 0, 1920, 1080, Color::SKY_BLUE);
+    Viewport viewport(0, 0, 800, 600, Color::SKY_BLUE);
     //Viewport viewport(0, 0, 800, 600, Color::BLACK); 
     window.AddViewport(viewport);
 
@@ -33,14 +31,13 @@ int main()
 
     Geometry cube(vertices, indices);
     Texture diffuse("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
-    //Texture specular("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+    Texture specular("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     Texture normal("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
 
     std::vector<Texture*> textures;
     textures.push_back(&diffuse);
-    //textures.push_back(&specular); 
+    textures.push_back(&specular); 
     textures.push_back(&normal);
-
 
     Mesh mesh(cube, textures, glm::mat4(1.0f));
     Mesh mesh1(cube, textures, glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
@@ -55,21 +52,17 @@ int main()
     float fov = 45.0f;
 
     sptr<Camera> camera = std::make_shared<Camera>(position, up, yaw, pitch, roll, fov);
-    uptr<Scene> loadedMesh = AssetLoader::LoadSceneFromFile("res/SuzanneLight.fbx", AssetLoader::FileType::FBX);
-    std::vector<Mesh*> meshes = {};
+    std::vector<Mesh*> meshes;
+    meshes.push_back(&mesh);
+    meshes.push_back(&mesh1);
 
-    for (uint32 i = 0; i < loadedMesh->meshes.size(); ++i)
-    {
-        meshes.push_back(loadedMesh->meshes[i].mesh.get());
-    }
     std::vector<Light> lights;
-    lights.push_back(loadedMesh->lights[0]);
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         float xPos = 0.0f;
         float yPos = 0.0f;
-        float zPos = -5.0f + i;
+        float zPos = 1.0f;
         Light light;
         //light.color = Color::BLUE;
         light.position = { xPos, yPos, zPos };
@@ -105,19 +98,20 @@ int main()
     lightVert.Unload();
 
     lightProgram.Use();
-
+    lightProgram.SetUniform("gPosition", 0);
+    lightProgram.SetUniform("gNormal", 1);
+    lightProgram.SetUniform("gAlbedoSpec", 2);
 
     GeometryPass geoPass(geometryProgram, meshes, camera);
     LightPass lightPass(lightProgram, lights, camera);
 
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
-    meshes[0]->SetTransform(glm::rotate(meshes[0]->GetTransform(), 3.14f*1.5f, glm::vec3(0.0016f, 0.00f, 0.00f)));
+
     while (window.IsOpen())
     {
         window.Clear();
 
-        meshes[0]->SetTransform(glm::rotate(meshes[0]->GetTransform(), 0.016f, glm::vec3(0.00f, 0.0016f, 0.00f)));
         //glm::vec3 camPos = camera->GetPosition() + glm::vec3(0.016f,0.0f,0.0f);
         //glm::mat4 meshTransform = glm::translate(mesh.GetTransform(), glm::vec3(0.0016f, 0.0f, 0.0f));
         //mesh.SetTransform(meshTransform);
