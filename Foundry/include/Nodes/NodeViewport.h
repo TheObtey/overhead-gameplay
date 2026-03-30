@@ -19,7 +19,7 @@ public:
 	void Setup() const;
 
 	virtual void OnUpdate(double delta) override;
-	void SetBackgroundColor(Color const& color) const;
+	void SetBackgroundColor(Color const& color);
 
 	static ISerializable* CreateInstance();
 private:
@@ -27,8 +27,6 @@ private:
 
 protected:
 	uptr<Viewport> m_pViewPort;
-
-	std::vector<Mesh*> m_visibleMeshes;
 	std::vector<Light*> m_visibleLights;
 
 	uptr<GeometryPass> m_pGeometryPass;

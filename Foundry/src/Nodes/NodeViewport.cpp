@@ -31,9 +31,10 @@ void NodeViewport::OnUpdate(double const delta)
 	if (dirty) UpdateViewport();
 }
 
-void NodeViewport::SetBackgroundColor(Color const &color) const
+void NodeViewport::SetBackgroundColor(Color const &color)
 {
-	if (m_pViewPort) m_pViewPort->SetBackgroundColor(color);
+	m_clearColor = color;
+	m_pViewPort->SetBackgroundColor(color);
 }
 
 void NodeViewport::UpdateViewport() const
