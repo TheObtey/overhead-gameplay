@@ -1,25 +1,25 @@
-#include "PhysicsProxy.hpp"
+#include "Scripting/Proxies/PhysicsProxy.hpp"
 
-namespace PhysicsProxy
+namespace Physics
 {
-	std::optionnal<RaycastHit> RaycastClosest(const glm::vec3& origin, const glm::vec3& direction, float maxDist = 1000, uint16 mask = 0xFFFF)
+	std::optional<RaycastHit> RaycastClosest(const glm::vec3& origin, const glm::vec3& direction, float maxDist, uint16 mask)
 	{
-		rp3d::Ray ray(origin, origin + dir * maxDist);
+		rp3d::Ray ray(glmToRp3d(origin), glmToRp3d(origin + direction * maxDist));
 		HelperCallBack::RaycastCB cb;
 
-		PhysicsServer::GetPhysicsWorld().raycast(ray, cb, mask);
+		PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, mask);
 
 		if (cb.hits.empty())
-			return nullopt;
+			return std::nullopt;
 
 		// Can't simply get the first hit returned because the lib doesn't guarantee the order of the hits
 		float minDist = maxDist;
 		int closest = 0;
 		for (int i = 0; i < cb.hits.size(); i++)
 		{
-			if (hit.dist < minDist)
+			if (cb.hits[i].dist < minDist)
 			{
-				minDist = hit.dist;
+				minDist = cb.hits[i].dist;
 				closest = i;
 			}
 		}
@@ -27,12 +27,12 @@ namespace PhysicsProxy
 	}
 
 
-	std::vector<RaycastHit> RaycastAll(const glm::vec3& origin, const glm::vec3& direction, float maxDist = 1000, uint16 mask = 0xFFFF)
+	std::vector<RaycastHit> Physics::RaycastAll(const glm::vec3& origin, const glm::vec3& direction, float maxDist, uint16 mask)
 	{
-		rp3d::Ray ray(origin, origin + dir * maxDist);
+		rp3d::Ray ray(glmToRp3d(origin), glmToRp3d(origin + direction * maxDist));
 		HelperCallBack::RaycastCB cb;
 
-		PhysicsServer::GetPhysicsWorld().raycast(ray, cb, mask);
+		PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, mask);
 
 		return cb.hits;
 	}

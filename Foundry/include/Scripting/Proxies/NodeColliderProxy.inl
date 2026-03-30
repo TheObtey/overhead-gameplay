@@ -71,7 +71,6 @@ BindProxy(NodeCollider::Proxy,
 		"GetCollisionCategoryBits", BIND(GetCollisionCategoryBits),
 		"SetCollideWithMaskBits", BIND(SetCollideWithMaskBits),
 		"GetCollisionBitsMask", BIND(GetCollisionBitsMask)
-
 	);
 )
 

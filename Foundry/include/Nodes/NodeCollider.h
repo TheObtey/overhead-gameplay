@@ -89,6 +89,11 @@ protected:
 
 	friend class PhysicsServer;
 };
+
+
+
+// =========== Specific colliders ===========
+
 class NodeBoxCollider : public NodeCollider
 {
 public:
@@ -98,6 +103,7 @@ public:
 private:
 	virtual void DestroyShape() override;
 };
+
 class NodeSphereCollider : public NodeCollider
 {
 public:
@@ -107,6 +113,7 @@ public:
 private:
 	virtual void DestroyShape() override;
 };
+
 class NodeCapsuleCollider : public NodeCollider
 {
 public:

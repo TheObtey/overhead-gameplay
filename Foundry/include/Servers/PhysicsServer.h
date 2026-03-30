@@ -4,11 +4,6 @@
 #include "Server.hpp"
 #include "Node.h"
 #include "Nodes/NodeCollider.h"
-//#include "Nodes/NodeRigidBody.h"
-//class NodeRigidBodyProxy;
-//class NodeCollider;
-
-//#include "Scripting/Proxies/NodeRigidBodyProxy.inl"
 
 #include <iostream>
 #include <memory>
