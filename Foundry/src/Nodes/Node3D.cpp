@@ -10,6 +10,7 @@ Node3D::Node3D(std::string const& name) : Node(name), m_isParentNode3D(false)
 {
 	OnParentChange.Subscribe([&](Node& n) { CheckParentTransform(); });
 	UpdateWorldTransform();
+	
 }
 
 void Node3D::OnUpdate(double delta)
@@ -93,6 +94,7 @@ void Node3D::UpdateLocalTransform()
 	m_worldDirty = false;
 }
 
+
 glm::mat4x4 const& Node3D::GetWorldMatrix() const
 {
 	return m_worldTransform;
@@ -112,8 +114,7 @@ glm::vec3 Node3D::GetWorldRotation() const
 {
 	return glm::eulerAngles(m_worldRotation);
 }
-
-glm::quat Node3D::GetWorldRotationQuat() const
+ glm::quat const& Node3D::GetWorldRotationQuaternion() const
 {
 	return m_worldRotation;
 }
@@ -132,14 +133,13 @@ void Node3D::SetWorldScale(glm::vec3 const& worldScale)
 }
 void Node3D::SetWorldRotation(glm::vec3 const& worldRot)
 {
-	m_worldRotation = glm::quat(worldRot);
+	m_worldRotation = glm::quat(glm::radians(worldRot));
 	m_worldDirty = true;
 	UpdateLocalTransform();
 }
-
-void Node3D::SetWorldRotationQuat(glm::quat const& worldRot)
+void Node3D::SetWorldRotationQuaternion(glm::quat const& worldRotQuat)
 {
-	m_worldRotation = worldRot;
+	m_worldRotation = worldRotQuat;
 	m_worldDirty = true;
 	UpdateLocalTransform();
 }

@@ -30,7 +30,7 @@ bool AreTransform3DMAtrixEqual(Transform3D const* m1, Node3D const* m2)
 {
 	bool step = glm::vec3{ m1->GetPosition() } == m2->GetPosition();
 	step = step && glm::vec3{m1->GetScale()} == m2->GetScale();
-	step = step && m1->GetRotationQuat() == m2->GetRotationQuat();
+	step = step && m1->GetRotationQuat() == m2->GetWorldRotationQuaternion();
 	return step;	
 }
 
@@ -169,14 +169,14 @@ void EditorRaylib3D::UpdateDrawableElement(Node* pNode)
 		{
 			m_loadedMeshs[name]->gizmoTransform.translation = Vector3{ pNode3D->GetWorldPosition().x,pNode3D->GetWorldPosition().y,pNode3D->GetWorldPosition().z};
 			m_loadedMeshs[name]->gizmoTransform.scale = Vector3{ pNode3D->GetWorldScale().x,pNode3D->GetWorldScale().y,pNode3D->GetWorldScale().z};
-			m_loadedMeshs[name]->gizmoTransform.rotation = Quaternion{ pNode3D->GetWorldRotationQuat().x,pNode3D->GetWorldRotationQuat().y,pNode3D->GetWorldRotationQuat().z,pNode3D->GetWorldRotationQuat().w };
+			m_loadedMeshs[name]->gizmoTransform.rotation = Quaternion{ pNode3D->GetWorldRotationQuaternion().x,pNode3D->GetWorldRotationQuaternion().y,pNode3D->GetWorldRotationQuaternion().z,pNode3D->GetWorldRotationQuaternion().w };
 		}
 		else if (m_loadedMeshs[name]->gizmoUpdated)
 		{
 			m_loadedMeshs[name]->gizmoUpdated = false;
 			pNode3D->SetWorldPosition({ m_loadedMeshs[name]->gizmoTransform.translation.x,m_loadedMeshs[name]->gizmoTransform.translation.y,m_loadedMeshs[name]->gizmoTransform.translation.z });
 			pNode3D->SetWorldScale({ m_loadedMeshs[name]->gizmoTransform.scale.x,m_loadedMeshs[name]->gizmoTransform.scale.y,m_loadedMeshs[name]->gizmoTransform.scale.z });
-			pNode3D->SetWorldRotationQuat(glm::quat{ m_loadedMeshs[name]->gizmoTransform.rotation.w,m_loadedMeshs[name]->gizmoTransform.rotation.x,m_loadedMeshs[name]->gizmoTransform.rotation.y,m_loadedMeshs[name]->gizmoTransform.rotation.z });
+			pNode3D->SetWorldRotationQuaternion(glm::quat{ m_loadedMeshs[name]->gizmoTransform.rotation.w,m_loadedMeshs[name]->gizmoTransform.rotation.x,m_loadedMeshs[name]->gizmoTransform.rotation.y,m_loadedMeshs[name]->gizmoTransform.rotation.z });
 			m_gizmoDirty = true;
 		}
 		m_loadedMeshs[name]->worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
@@ -228,7 +228,7 @@ void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3
 		{
 			m_loadedMeshs[name]->gizmoTransform.translation = Vector3{ pNode3D->GetWorldPosition().x,pNode3D->GetWorldPosition().y,pNode3D->GetWorldPosition().z };
 			m_loadedMeshs[name]->gizmoTransform.scale = Vector3{ pNode3D->GetWorldScale().x,pNode3D->GetWorldScale().y,pNode3D->GetWorldScale().z };
-			m_loadedMeshs[name]->gizmoTransform.rotation = Quaternion{ pNode3D->GetWorldRotationQuat().x,pNode3D->GetWorldRotationQuat().y,pNode3D->GetWorldRotationQuat().z,pNode3D->GetWorldRotationQuat().w };
+			m_loadedMeshs[name]->gizmoTransform.rotation = Quaternion{ pNode3D->GetWorldRotationQuaternion().x,pNode3D->GetWorldRotationQuaternion().y,pNode3D->GetWorldRotationQuaternion().z,pNode3D->GetWorldRotationQuaternion().w };
 		}
 
 	}

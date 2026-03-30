@@ -5,43 +5,81 @@ public:
 	struct ProxyBinding;
 
 	Proxy(Node& node) : Node::Proxy(node) {}
-	
-	glm::vec3 GetPosition() const				{ return m_pNode->GetPosition(); }
-	float GetX() const							{ return m_pNode->GetX(); }
-	float GetY() const							{ return m_pNode->GetY(); }
-	float GetZ() const							{ return m_pNode->GetZ(); }
-	glm::mat4 GetMatrixRotation() const			{ return m_pNode->GetMatrixRotation(); }
-	//const glm::mat4& GetInverseMatrixRotation() { return m_pNode->GetInverseMatrixRotation(); }
-	glm::vec3 GetRotation() const				{ return m_pNode->GetRotation(); }
-	float GetYaw() const						{ return m_pNode->GetYaw(); }
-	float GetPitch() const						{ return m_pNode->GetPitch(); }
-	float GetRoll() const						{ return m_pNode->GetRoll(); }
-	float GetMaxScale() const					{ return m_pNode->GetMaxScale(); }
-	float GetMinScale() const					{ return m_pNode->GetMinScale(); }
-	glm::vec3 GetScale() const					{ return m_pNode->GetScale(); }
-	glm::vec3 GetRight() const					{ return m_pNode->GetRight(); }
-	glm::vec3 GetUp() const						{ return m_pNode->GetUp(); }
-	glm::vec3 GetForward() const				{ return m_pNode->GetForward(); }
 
-	void SetPosition(glm::vec3 const pos)		{ m_pNode->SetPosition(pos); }
-	void SetX(float const x)					{ m_pNode->SetX(x); }
-	void SetY(float const y)					{ m_pNode->SetY(y); }
-	void SetZ(float const z)					{ m_pNode->SetZ(z); }
-	void SetRotation(glm::vec3 const rot)		{ m_pNode->SetRotation(rot); }
-	void SetYaw(float const yaw)				{ m_pNode->SetYaw(yaw); }
-	void SetPitch(float const pitch)			{ m_pNode->SetPitch(pitch); }
-	void SetRoll(float const roll)				{ m_pNode->SetRoll(roll); }
-	void SetScale(glm::vec3 const scale)		{ m_pNode->SetScale(scale); }
+	// =========== Getters ===========
 
-	void AddPosition(glm::vec3 const pos)		{ m_pNode->AddPosition(pos); }
-	void AddX(float const x)					{ m_pNode->AddX(x); }
-	void AddY(float const y)					{ m_pNode->AddY(y); }
-	void AddZ(float const z)					{ m_pNode->AddZ(z); }
-	void AddRotation(glm::vec3 const rot)		{ m_pNode->AddRotation(rot); }
-	void AddYaw(float const yaw)				{ m_pNode->AddYaw(yaw); }
-	void AddPitch(float const pitch)			{ m_pNode->AddPitch(pitch); }
-	void AddRoll(float const roll)				{ m_pNode->AddRoll(roll); }
-	void AddScale(glm::vec3 const scale)		{ m_pNode->AddScale(scale); }
+	glm::vec3 GetPosition() const									{ return m_pNode->GetPosition(); }
+	float GetX() const												{ return m_pNode->GetX(); }
+	float GetY() const												{ return m_pNode->GetY(); }
+	float GetZ() const												{ return m_pNode->GetZ(); }
+	glm::mat4 GetMatrixRotation() const								{ return m_pNode->GetMatrixRotation(); }
+	//const glm::mat4& GetInverseMatrixRotation()					{ return m_pNode->GetInverseMatrixRotation(); }
+
+	//Euler angles
+	EulerAngles GetLocalRotationRad() const							{ return m_pNode->GetLocalRotationRad(); }
+	EulerAngles GetLocalRotationDeg() const							{ return m_pNode->GetLocalRotationDeg(); }
+
+	// { w, x, y, z }
+	const glm::quat& GetLocalRotationQuat() const					{ return m_pNode->GetLocalRotationQuat(); }
+	// -- Angle around Y axis in Degrees
+	float GetLocalYaw() const										{ return m_pNode->GetLocalYaw(); }
+	// -- Angle around X axis in Degrees
+	float GetLocalPitch() const										{ return m_pNode->GetLocalPitch(); }
+	// -- Angle around Z axis in Degrees
+	float GetLocalRoll() const										{ return m_pNode->GetLocalRoll(); }
+	float GetMaxScale() const										{ return m_pNode->GetMaxScale(); }
+	float GetMinScale() const										{ return m_pNode->GetMinScale(); }
+	glm::vec3 GetScale() const										{ return m_pNode->GetScale(); }
+	glm::vec3 GetLocalRight() const									{ return m_pNode->GetLocalRight(); }
+	glm::vec3 GetLocalUp() const									{ return m_pNode->GetLocalUp(); }
+	glm::vec3 GetLocalForward() const								{ return m_pNode->GetLocalForward(); }
+
+	glm::mat4x4 const& GetWorldMatrix() const						{ return m_pNode->GetWorldMatrix(); }
+	glm::vec3 GetWorldPosition() const								{ return m_pNode->GetWorldPosition(); }
+	glm::vec3 GetWorldScale() const									{ return m_pNode->GetWorldScale(); }
+	// Pitch, Yaw, Roll  / x, y, z												
+	// -- Angles in Degrees 													
+	glm::vec3 GetWorldRotation() const								{ return m_pNode->GetWorldRotation(); }
+	// { w, x, y, z }													
+	glm::quat const& GetWorldRotationQuaternion() const				{ return m_pNode->GetWorldRotationQuaternion(); }
+
+	// =========== Setters ===========
+
+	void SetLocalPosition(glm::vec3 const pos)						{ m_pNode->SetLocalPosition(glm::vec4(pos, 1.0f)); }
+	void SetLocalX(float const x)									{ m_pNode->SetLocalX(x); }
+	void SetLocalY(float const y)									{ m_pNode->SetLocalY(y); }
+	void SetLocalZ(float const z)									{ m_pNode->SetLocalZ(z); }
+
+	void SetLocalRotationDeg(float x, float y, float z)				{ m_pNode->SetLocalRotationDeg(x, y, z); }
+	void SetLocalRotationRad(float pitch, float yaw, float roll)	{ m_pNode->SetLocalRotationRad(pitch, yaw, roll); }
+	// { w, x, y, z }
+	void SetLocalRotationQuat(glm::quat rot)						{ m_pNode->SetLocalRotationQuat(rot); }
+
+	void SetScale(glm::vec3 const scale)							{ m_pNode->SetScale(glm::vec4(scale, 1.0f)); }
+
+	void SetWorldPosition(glm::vec3 const& worldPos)				{ m_pNode->SetWorldPosition(worldPos); }
+	void SetWorldScale(glm::vec3 const& worldScale)					{ m_pNode->SetWorldScale(worldScale); }
+	// -- Angles in Degrees
+	void SetWorldRotation(glm::vec3 const& worldRot)				{ m_pNode->SetWorldRotation(worldRot); }
+	// { w, x, y, z }
+	// -- Angles in Radians
+	void SetWorldRotationQuaternion(glm::quat const& worldRotQuat)	{ m_pNode->SetWorldRotationQuaternion(worldRotQuat); }
+
+	// =========== Adders ===========
+
+	void AddScale(glm::vec3 const scale)							{ m_pNode->AddScale(glm::vec4(scale, 1.0f)); }
+	void AddLocalPosition(glm::vec3 const pos)						{ m_pNode->AddLocalPosition(glm::vec4(pos, 1.0f)); }
+	void AddLocalX(float const x)									{ m_pNode->AddLocalX(x); }
+	void AddLocalY(float const y)									{ m_pNode->AddLocalY(y); }
+	void AddLocalZ(float const z)									{ m_pNode->AddLocalZ(z); }
+	// -- Angles in Radians											
+	void AddLocalRotation(glm::vec3 const rot)						{ m_pNode->AddLocalRotation(glm::vec4(rot, 1.0f)); }
+	// -- Angles in Radians											
+	void AddLocalYaw(float const yaw)								{ m_pNode->AddLocalYaw(yaw); }
+	// -- Angles in Radians											
+	void AddLocalPitch(float const pitch)							{ m_pNode->AddLocalPitch(pitch); }
+	// -- Angles in Radians											
+	void AddLocalRoll(float const roll)								{ m_pNode->AddLocalRoll(roll); }
 
 private:
 	Node3D* m_pNode;
@@ -49,41 +87,51 @@ private:
 
 BindProxy(Node3D::Proxy,
 	return binder.BindClass<Node3D::Proxy>("node3d",
-	"GetPosition", BIND(GetPosition),
-	"GetX", BIND(GetX),
-	"GetY", BIND(GetY),
-	"GetZ", BIND(GetZ),
-	"GetMatrixRotation", BIND(GetMatrixRotation),
-	//"GetInverseMatrixRotation", BIND(GetInverseMatrixRotation),
-	"GetRotation", BIND(GetRotation),
-	"GetYaw", BIND(GetYaw),
-	"GetPitch", BIND(GetPitch),
-	"GetRoll", BIND(GetRoll),
-	"GetMaxScale", BIND(GetMaxScale),
-	"GetMinScale", BIND(GetMinScale),
-	"GetScale", BIND(GetScale),
-	"GetRight", BIND(GetRight),
-	"GetUp", BIND(GetUp),
-	"GetForward", BIND(GetForward),
+		"GetPosition", BIND(GetPosition),
+		"GetX", BIND(GetX),
+		"GetY", BIND(GetY),
+		"GetZ", BIND(GetZ),
+		"GetMatrixRotation", BIND(GetMatrixRotation),
+		"GetLocalRotationRad", BIND(GetLocalRotationRad),
+		"GetLocalRotationDeg", BIND(GetLocalRotationDeg),
+		"GetLocalRotationQuat", BIND(GetLocalRotationQuat),
+		"GetLocalYaw", BIND(GetLocalYaw),
+		"GetLocalPitch", BIND(GetLocalPitch),
+		"GetLocalRoll", BIND(GetLocalRoll),
+		"GetMaxScale", BIND(GetMaxScale),
+		"GetMinScale", BIND(GetMinScale),
+		"GetScale", BIND(GetScale),
+		"GetLocalRight", BIND(GetLocalRight),
+		"GetLocalUp", BIND(GetLocalUp),
+		"GetLocalForward", BIND(GetLocalForward),
+		"GetWorldMatrix", BIND(GetWorldMatrix),
+		"GetWorldPosition", BIND(GetWorldPosition),
+		"GetWorldScale", BIND(GetWorldScale),
+		"GetWorldRotation", BIND(GetWorldRotation),
+		"GetWorldRotationQuaternion", BIND(GetWorldRotationQuaternion),
+		"SetLocalPosition", BIND(SetLocalPosition),
+		"SetLocalX", BIND(SetLocalX),
+		"SetLocalY", BIND(SetLocalY),
+		"SetLocalZ", BIND(SetLocalZ),
+		"SetLocalRotationDeg", BIND(SetLocalRotationDeg),
+		"SetLocalRotationRad", BIND(SetLocalRotationRad),
+		"SetLocalRotationQuat", BIND(SetLocalRotationQuat),
+		"SetScale", BIND(SetScale),
+		"SetWorldPosition", BIND(SetWorldPosition),
+		"SetWorldScale", BIND(SetWorldScale),
+		"SetWorldRotation", BIND(SetWorldRotation),
+		"SetWorldRotationQuaternion", BIND(SetWorldRotationQuaternion),
 
-	"SetPosition", BIND(SetPosition),
-	"SetX", BIND(SetX),
-	"SetY", BIND(SetY),
-	"SetZ", BIND(SetZ),
-	"SetRotation", BIND(SetRotation),
-	"SetYaw", BIND(SetYaw),
-	"SetPitch", BIND(SetPitch),
-	"SetRoll", BIND(SetRoll),
-	"SetScale", BIND(SetScale),
-	"AddPosition", BIND(AddPosition),
-	"AddX", BIND(AddX),
-	"AddY", BIND(AddY),
-	"AddZ", BIND(AddZ),
-	"AddRotation", BIND(AddRotation),
-	"AddYaw", BIND(AddYaw),
-	"AddPitch", BIND(AddPitch),
-	"AddRoll", BIND(AddRoll),
-	"AddScale", BIND(AddScale));
+		"AddScale", BIND(AddScale),
+		"AddLocalPosition", BIND(AddLocalPosition),
+		"AddLocalX", BIND(AddLocalX),
+		"AddLocalY", BIND(AddLocalY),
+		"AddLocalZ", BIND(AddLocalZ),
+		"AddLocalRotation", BIND(AddLocalRotation),
+		"AddLocalYaw", BIND(AddLocalYaw),
+		"AddLocalPitch", BIND(AddLocalPitch),
+		"AddLocalRoll", BIND(AddLocalRoll)
+		);
 )
 
 REGISTER_PROXY(Node3D::Proxy::ProxyBinding, Node3DProxy);
