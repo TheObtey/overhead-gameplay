@@ -10,6 +10,7 @@ Mesh::Mesh(Geometry const& geometry, std::vector<Texture*> const& textures, glm:
     m_transform = transform;
 
     m_textures = textures;
+    m_isActive = true;
 }
 
 Mesh::~Mesh()

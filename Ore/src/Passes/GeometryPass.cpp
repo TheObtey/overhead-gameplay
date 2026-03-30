@@ -31,6 +31,9 @@ void GeometryPass::Execute()
     Logger::Log("Start geometries");
     for(uint32 i = 0; i<m_meshes.size(); ++i)
     {
+        if(m_meshes[i]->GetIsActive() == false)
+            continue;
+
         Logger::Log("Mesh");
 
         m_pProgram->SetUniform("model", m_meshes[i]->GetTransform());
