@@ -32,6 +32,7 @@ enum class ButtonState : bool
 class IControl /*: public ISerializable*/
 {
 public:
+	IControl() = default;
 	IControl(ControlType const& type, EventInput const& eventInput, Action* pAction = nullptr);
 	virtual ~IControl();
 
@@ -52,10 +53,11 @@ private:
 class ButtonControl : public IControl
 {
 public:
+	ButtonControl() = default;
 	ButtonControl(EventInput const& eventInput, Action* pAction);
 	~ButtonControl() = default;
 
-	ButtonState GetState();
+	ButtonState GetState() const;
 
 private:
 	ButtonState m_state;
@@ -65,6 +67,7 @@ private:
 class SliderControl : public IControl
 {
 public:
+	SliderControl() = default;
 	SliderControl(EventInput const& eventInput, Action* pAction);
 	~SliderControl() = default;
 
@@ -78,17 +81,14 @@ private:
 class StickControl : public IControl
 {
 public:
+	StickControl() = default;
 	StickControl(EventInput const& eventInput, Action* pAction);
 	~StickControl() = default;
 
-	bool IsFlicked() const;
 	glm::vec2 GetPos() const;
 
 private:
 	glm::vec2 m_pos;
 };
-
-ENUM_CLASS_FLAGS(ControlType);
-ENUM_CLASS_FLAGS(ButtonState);
 
 #endif

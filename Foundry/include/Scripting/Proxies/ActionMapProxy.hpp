@@ -1,6 +1,8 @@
 #ifndef FOUNDRY_ACTIONMAPPROXY__H_
 #define FOUNDRY_ACTIONMAPPROXY__H_
 
+#include "IControl.h"
+#include "Action.h"
 #include "ActionMap.h"
 #include "Event.hpp"
 #include "Registries/AutomaticRegisterProxy.hpp"
@@ -16,36 +18,50 @@ struct ActionMapProxyBinding
 {
 	static void Bind(Binder& binder)
 	{
+		binder.BindEnum<ControlType>("ControlType",
+			"Button", ControlType::BUTTON,
+			"Slider", ControlType::SLIDER,
+			"Stick", ControlType::STICK
+		);
+
+		binder.BindEnum<ButtonState>("ButtonState",
+			"Up", ButtonState::UP,
+			"Down", ButtonState::DOWN
+		);
+
+
 		binder.BindClass<IControl>("icontrol",
-			sol::constructors<IControl(ControlType const&, EventInput const&, Action*)>(),
+			sol::constructors<IControl(), IControl(ControlType const&, EventInput const&, Action*)>(),
 			"GetControlType", &IControl::GetControlType,
 			"GetEventInput", &IControl::GetEventInput,
-			"Read", &IControl::Read,
+			"ReadAsBool", &IControl::Read<bool>,
+			"ReadAsFloat", &IControl::Read<float>,
+			"ReadAsVec2", &IControl::Read<glm::vec2>,
 			"SetAction", &IControl::SetAction
 		);
 
 		binder.BindClass<ButtonControl>("buttoncontrol",
-			sol::base_classes, sol::bases<IControl>,
-			sol::constructors<ButtonControl(EventInput const&, Action*)>(),
+			sol::constructors<ButtonControl(), ButtonControl(EventInput const&, Action*)>(),
+			sol::base_classes, sol::bases<IControl>(),
 			"GetState", &ButtonControl::GetState
 		);
 
 		binder.BindClass<SliderControl>("slidercontrol",
-			sol::base_classes, sol::bases<IControl>,
-			sol::constructors<SliderControl(EventInput const&, Action*)>(),
+			sol::constructors<SliderControl(), SliderControl(EventInput const&, Action*)>(),
+			sol::base_classes, sol::bases<IControl>(),
 			"GetPos", &SliderControl::GetPos
 		);
 		
 		binder.BindClass<StickControl>("stickcontrol",
-			sol::base_classes, sol::bases<IControl>,
-			sol::constructors<StickControl(EventInput const&, Action*)>(),
+			sol::constructors<StickControl(), StickControl(EventInput const&, Action*)>(),
+			sol::base_classes, sol::bases<IControl>(),
 			"GetPos", &StickControl::GetPos
 		);
-
+		
+		
 		
 		binder.BindClass<Action>("action",
-			sol::constructors<Action()>(),
-			sol::constructors<Action(ControlType, EventInput)>(),
+			sol::constructors<Action(), Action(ControlType, EventInput)>(),
 			"GetEvent", &Action::GetEvent,
 			"AddControl", &Action::AddControl,
 			"GetControl", &Action::GetControl
@@ -60,7 +76,7 @@ struct ActionMapProxyBinding
 			"GetAction", &ActionMap::GetAction,
 			"Length", &ActionMap::Length,
 			"Rename", &ActionMap::Rename,
-			"Active", &ActionMap::Active)
+			"Active", &ActionMap::Active
 		);
 	}
 };

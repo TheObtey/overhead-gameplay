@@ -20,19 +20,6 @@ EventInput IControl::GetEventInput() const
 	return m_eventInput;
 }
 
-void IControl::SetAction(Action* pAction)
-{
-	m_pAction = pAction;
-}
-
-
-ButtonControl::ButtonControl(EventInput const& eventInput, Action* pAction) : IControl(ControlType::BUTTON, eventInput, pAction), m_state(ButtonState::UP) {}
-
-ButtonState ButtonControl::GetState()
-{
-	return m_state;
-}
-
 template <>
 bool IControl::Read<bool>(IControl& iControl)
 {
@@ -60,6 +47,19 @@ glm::vec2 IControl::Read<glm::vec2>(IControl& iControl)
 	return static_cast<StickControl&>(iControl).GetPos();
 }
 
+void IControl::SetAction(Action* pAction)
+{
+	m_pAction = pAction;
+}
+
+
+ButtonControl::ButtonControl(EventInput const& eventInput, Action* pAction) : IControl(ControlType::BUTTON, eventInput, pAction), m_state(ButtonState::UP) {}
+
+ButtonState ButtonControl::GetState() const
+{
+	return m_state;
+}
+
 
 SliderControl::SliderControl(EventInput const& eventInput, Action* pAction) : IControl(ControlType::SLIDER, eventInput, pAction), m_pos(0.0f) {}
 
@@ -69,14 +69,6 @@ float SliderControl::GetPos() const
 }
 
 StickControl::StickControl(EventInput const& eventInput, Action* pAction) : IControl(ControlType::STICK, eventInput, pAction), m_pos(0.0f) {}
-
-bool StickControl::IsFlicked() const
-{
-	if (m_pos == glm::vec2(0.0f, 0.0f))
-		return false;
-
-	return true;
-}
 
 glm::vec2 StickControl::GetPos() const
 {

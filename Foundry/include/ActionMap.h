@@ -40,6 +40,8 @@ public:
 	uint32	Length() const;
 	void	Rename(std::string_view const& old, std::string_view const& name);
 
+	bool	Active = true;
+
 protected:
 	std::unordered_map<std::string, Action*> m_actions;
 
