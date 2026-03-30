@@ -25,7 +25,6 @@ public:
 	////////////////////////////////////////////////////////////
 	virtual void Serialize(SerializedObject& datas) const override;
 	virtual void Deserialize(SerializedObject const& datas) override;
-	static ISerializable* CreateInstance();
 
 	// =========== Local transform (offset from RigidBody) ===========
 
@@ -123,7 +122,6 @@ private:
 	virtual void DestroyShape() override;
 };
 
-REGISTER_ISERIALIZABLE(NodeCollider, NodeCollider::CreateInstance);
 REGISTER_ISERIALIZABLE(NodeBoxCollider, NodeBoxCollider::CreateInstance);
 REGISTER_ISERIALIZABLE(NodeSphereCollider, NodeSphereCollider::CreateInstance);
 REGISTER_ISERIALIZABLE(NodeCapsuleCollider, NodeCapsuleCollider::CreateInstance);
