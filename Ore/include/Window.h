@@ -11,7 +11,7 @@
 class Window : public IWindow
 {
 public:
-    Window(int width, int height, std::string name, bool enableTransparency = false);
+    Window(int width, int height, std::string name, bool enableTransparency = false, bool visible = true);
     ~Window() override;
 
     void Clear() override;
@@ -27,7 +27,7 @@ public:
     glm::uvec2 GetSize() const { return { m_width, m_height} ; }
 
     void SetDecoration(bool hasDecoration) override;
-    void SetIcon(std::string const& path) override {};
+    void SetIcon(std::string const& path) override; 
     void SetSize(uint16 width, uint16 height) override;
     static void FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height);
     void Open() override;

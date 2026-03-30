@@ -4,26 +4,37 @@
 #include "EventManager.h"
 #include "Ore.h"
 
-#include <GLFW/glfw3.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <dependencies/stb_image.h>
 
 std::unordered_map<GLFWwindow*, Window*> Window::s_windows = {};
-Window::Window(int width, int height, std::string name, bool enableTransparency)
+Window::Window(int width, int height, std::string name, bool enableTransparency, bool visible)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, enableTransparency);
+    glfwWindowHint(GLFW_VISIBLE, visible);
+
+    stbi_set_flip_vertically_on_load(true);
 
 	m_width = width;
 	m_height = height;
 	m_name = name;
-
 }
 
 Window::~Window()
 {
     Close();
+}
+
+void Window::SetIcon(std::string const& path)
+{
+    GLFWimage images[1];
+    images[0].pixels = stbi_load(path.c_str(), &images[0].width, &images[0].height, 0, 4);
+    glfwSetWindowIcon(m_pWindow, 1, images);
+    stbi_image_free(images[0].pixels);
 }
 
 bool Window::IsOpen()
