@@ -4,12 +4,14 @@
 #include "Camera.h"
 #include "Node3D.h"
 
+class NodeViewport;
+
 class NodeCamera : public Node3D
 {
 public:
     class Proxy;
 
-    NodeCamera(std::string const& name) : Node3D(name) {};
+    NodeCamera(std::string const& name);
     ~NodeCamera() override = default;
 
     void SetFOV(float const fov) { m_camera.SetFov(fov); }
@@ -21,8 +23,16 @@ public:
 
     static ISerializable* CreateInstance();
 
+private:
+    void TryAttachToViewport();
+    void UpdateCameraOwner(NodeViewport& newOwner);
+
 protected:
     Camera m_camera;
+    NodeViewport* m_pCurrentViewport = nullptr;
+
+    friend class GraphicServer;
+    friend class NodeViewport;
 };
 
 REGISTER_ISERIALIZABLE(NodeCamera, NodeCamera::CreateInstance);

@@ -1,7 +1,6 @@
 #ifndef FOUNDRY_GAMELOOP__H_
 #define FOUNDRY_GAMELOOP__H_
 
-#include "Define.h"
 #include "SceneTree.h"
 
 //TODO Move in a config file
@@ -17,6 +16,8 @@ public:
     virtual void EndGame();
 
     virtual ~GameLoop() = default;
+
+    std::function<uptr<Node>()> LoadScene;
 
 protected:
     virtual void InitServers();

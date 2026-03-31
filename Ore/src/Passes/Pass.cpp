@@ -1,14 +1,7 @@
 #include "Passes/Pass.h"
 
-Pass::Pass(Program const& program, sptr<Camera> pCamera)
-{
-    m_pProgram = std::make_shared<Program>(program);
-    m_pCamera = pCamera;
-}
-
-Pass::~Pass()
-{
-}
+Pass::Pass(Program& program) : m_program(program) {}
+Pass::Pass(Program& program, Camera *camera) : m_program(program), m_pCamera(camera) {}
 
 void Pass::SetTextures(sptr<TextureObject> gPosition, sptr<TextureObject> gNormal, sptr<TextureObject> gAlbedoSpec)
 {

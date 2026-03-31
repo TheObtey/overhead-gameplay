@@ -41,6 +41,11 @@ void Viewport::Clear() const
     glDisable(GL_SCISSOR_TEST);
 }
 
+void Viewport::AddPass(Pass* pPass)
+{
+    m_pRenderGraph->AddPass(pPass);
+}
+
 void Viewport::Present() const
 {
     m_pRenderGraph->Execute();

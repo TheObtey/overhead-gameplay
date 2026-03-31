@@ -20,7 +20,7 @@ public:
     bool IsOpen() const { return m_pWindow->IsOpen(); }
 
     void AddViewport(NodeViewport& viewport);
-    void RemoveViewport(NodeViewport& viewport);
+    void RemoveViewport(NodeViewport const& viewport);
     void SetDecoration(bool decoration) const;
     void SetIcon(std::string const& path) const;
 

@@ -17,6 +17,7 @@
 Node::Node(std::string const& name) : m_name(name) , m_scriptPath("")
 {
     DEBUG("Node : " << m_name << " has been " << ANSI_GREEN << "created !" << ANSI_RESET << std::endl);
+	OnHierarchyChanged += [&]() { NotifyHierarchyChanged(); };
 }
 
 Node::~Node()
@@ -62,8 +63,15 @@ void Node::AttachChildImmediate(std::unique_ptr<Node>& child)
 
 	m_children[childName]->OnSceneEnter(*m_children[childName]);
 	m_children[childName]->OnParentChange(*this);
+	NotifyHierarchyChanged();
 
 	DEBUG("Node : " << childName << " is now a child of : " << m_name << std::endl);
+}
+
+void Node::NotifyHierarchyChanged()
+{
+	for (auto const& node: m_children | std::views::values)
+		node->OnHierarchyChanged();
 }
 
 void Node::AddChild(std::unique_ptr<Node>& child)
@@ -123,10 +131,9 @@ std::vector<std::reference_wrapper<Node>> Node::GetChildren()
 {
 	std::vector<std::reference_wrapper<Node>> res;
 
-	for (auto&[nodeName, nodePtr] : m_children)
-	{
+	for (auto &nodePtr: m_children | std::views::values)
 		res.emplace_back(*nodePtr.get());
-	}
+
 	return res;
 }
 
@@ -137,14 +144,12 @@ uint32 Node::GetChildCount()
 
 void Node::Destroy()
 {
-	//TODO make that work in all case (maybe ?)
     if (m_pOwner)
-    {
         m_pOwner->RemoveChild(*this);
-        return;
-    }
+	else if (m_pSceneTree)
+		m_pSceneTree->m_root.reset();
 
-	if (m_pSceneTree) m_pSceneTree->m_root.reset();
+	NotifyHierarchyChanged();
 }
 
 void Node::Reparent(Node& newParent, bool keepGlobalTransform)
@@ -153,6 +158,7 @@ void Node::Reparent(Node& newParent, bool keepGlobalTransform)
 	if (newParent.m_name == m_pOwner->m_name)
 	{
 		OnParentChange(newParent);
+		OnHierarchyChanged();
 		return;
 	}
 

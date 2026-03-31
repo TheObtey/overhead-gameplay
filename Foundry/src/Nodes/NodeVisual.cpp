@@ -3,16 +3,7 @@
 
 NodeVisual::NodeVisual(::std::string const &name) : Node3D(name)
 {
-    OnParentChange += [&](Node& node)
-    {
-        if (const auto viewport = FindFirstParentOfType<NodeViewport>())
-            m_pViewport = &viewport->get();
-    };
-}
-
-void NodeVisual::OnUpdate(double delta)
-{
-    Node3D::OnUpdate(delta);
+    OnHierarchyChanged += [&](){ TryAttachToViewport(); };
 }
 
 ISerializable * NodeVisual::CreateInstance()
@@ -20,8 +11,14 @@ ISerializable * NodeVisual::CreateInstance()
     return Node::CreateNode<NodeVisual>("NodeVisual").release();
 }
 
-bool NodeVisual::Visible()
+bool NodeVisual::IsVisible()
 {
     //TODO CAMERA CULLING AND OTHER
     return true;
+}
+
+void NodeVisual::TryAttachToViewport()
+{
+    if (const auto viewport = FindFirstParentOfType<NodeViewport>())
+        m_pViewport = &viewport->get();
 }

@@ -8,6 +8,9 @@
 #include "Passes/GeometryPass.h"
 #include "Passes/LightPass.h"
 
+class NodeMesh;
+class NodeCamera;
+
 class NodeViewport : public Node2D
 {
 public:
@@ -16,14 +19,19 @@ public:
 	explicit NodeViewport(std::string const& name);
 	~NodeViewport() override = default;
 
-	void Setup() const;
+	void Setup();
 
 	virtual void OnUpdate(double delta) override;
 	void SetBackgroundColor(Color const& color);
 
+	//Set to nullptr if no camera is used
+	void SetCamera(NodeCamera *pCamera) const;
+	void AddMesh(NodeMesh const &mesh) const;
+
 	static ISerializable* CreateInstance();
 private:
 	void UpdateViewport() const;
+	void TryAttachToWindow();
 
 protected:
 	uptr<Viewport> m_pViewPort;
@@ -33,6 +41,8 @@ protected:
 	uptr<LightPass> m_pLightPass;
 
 	Color m_clearColor {Color::SKY_BLUE};
+	//TODO REMOVE
+	std::array<Light, 5> dummyLight {};
 
 	friend class GraphicServer;
 	friend class NodeWindow;

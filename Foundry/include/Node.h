@@ -93,6 +93,7 @@ public:
 	Event<void(Node&, double)> OnNodePhysicsUpdated;
 	Event<void(Node&)> OnSceneLeave;
 	Event<void(Node&)> OnParentChange;
+	Event<void()> OnHierarchyChanged;
 
 protected:
 	//private constructor for in-class initialization
@@ -118,7 +119,7 @@ protected:
 
 private:
     void AttachChildImmediate(std::unique_ptr<Node>& child);
-
+	void NotifyHierarchyChanged();
 
 	inline static bool s_IsInEditor = false;
 

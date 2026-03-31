@@ -1,5 +1,7 @@
 #include "Servers/GraphicServer.h"
 
+#include "GeometryFactory.h"
+#include "Nodes/NodeCamera.h"
 #include "Nodes/NodeWindow.h"
 #include "Nodes/NodeViewport.h"
 
@@ -16,6 +18,16 @@ void GraphicServer::Present(NodeWindow* pWindow)
 void GraphicServer::Clear(NodeWindow* pWindow)
 {
     Instance().m_commands.push({CommandType::CLEAR, pWindow});
+}
+
+void GraphicServer::AttachToWindow(NodeViewport *pViewport, NodeWindow *pWindow)
+{
+    Instance().m_commands.push({CommandType::ATTACHVIEWPORT, pWindow, pViewport});
+}
+
+void GraphicServer::AttachToViewport(NodeCamera *pCamera, NodeViewport *pViewport)
+{
+    Instance().m_commands.push({CommandType::ATTACHCAMERA, nullptr, pViewport, pCamera});
 }
 
 void GraphicServer::LoadShaderPrograms(NodeViewport* pViewport)
@@ -55,6 +67,10 @@ void GraphicServer::LoadShader()
     m_lightProgram.AddShader(&m_lightVert);
     m_lightProgram.AddShader(&m_lightFrag);
     m_lightProgram.Load();
+
+    GeoInfo cubeInfo = GeometryFactory::MakeCube(.5f, .5f, .5f);
+    m_defaultCubeGeo = std::make_shared<Geometry>(cubeInfo.m_vertices, cubeInfo.m_indices);
+    m_defaultTexture = std::make_shared<Texture>("res/textures/Default.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
 }
 
 void GraphicServer::BuildTasksImpl(TaskGraph& graph) {}
@@ -68,6 +84,12 @@ void GraphicServer::FlushCommandsImpl()
         {
             case CommandType::SETUPVIEWPORT:
                 cmd.pNodeViewport->Setup();
+                break;
+            case CommandType::ATTACHCAMERA:
+                cmd.pNodeCamera->UpdateCameraOwner(*cmd.pNodeViewport);
+                break;
+            case CommandType::ATTACHVIEWPORT:
+                cmd.pNodeWindow->AddViewport(*cmd.pNodeViewport);
                 break;
             case CommandType::LOADSHADERS:
                 LoadShader();

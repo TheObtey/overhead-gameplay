@@ -112,7 +112,7 @@ protected:
 	bool IsTransformDirty() const { return m_transform.GetDirty() || (m_isParentNode3D && static_cast<Node3D*>(m_pOwner)->m_transform.GetDirty()); }
 
 protected:
-	Transform3D m_transform;
+	Transform3D m_transform {};
 
 	glm::mat4x4 m_worldTransform{ 1.0f };
 	glm::vec4 m_worldPosition{0.0f, 0.0f, 0.0f, 1.0f};

@@ -3,18 +3,12 @@
 
 #include <Logger.hpp>
 
-Mesh::Mesh(Geometry const& geometry, std::vector<Texture*> const& textures, glm::mat4 const& transform)
+Mesh::Mesh(sptr<Geometry> const& geometry, TextureSpan textures, glm::mat4 const& transform)
 {
     Logger::Log("Start Mesh");
-    m_pGeometry = std::make_shared<Geometry>(geometry);
+    m_pGeometry = geometry;
     m_transform = transform;
-
     m_textures = textures;
-    m_isActive = true;
-}
-
-Mesh::~Mesh()
-{
 }
 
 void Mesh::Draw(IProgram const& pProgram) const
@@ -29,7 +23,7 @@ void Mesh::Draw(IProgram const& pProgram) const
     {
         glActiveTexture(GL_TEXTURE0 + i); 
         std::string name;
-        TextureMaterialType matType = m_textures[i]->GetTextureMaterialType();
+        TextureMaterialType matType = m_textures[i].get().GetTextureMaterialType();
         switch(matType)
         {
         case(TextureMaterialType::DIFFUSE):
@@ -48,7 +42,7 @@ void Mesh::Draw(IProgram const& pProgram) const
 
         Logger::Log(name);
         glUniform1i(glGetUniformLocation(pProgram.GetProgramId(), name.c_str()), i);
-        m_textures[i]->GetTextureObject().Bind();
+        m_textures[i].get().GetTextureObject().Bind();
     }
 
     m_pGeometry->Draw();

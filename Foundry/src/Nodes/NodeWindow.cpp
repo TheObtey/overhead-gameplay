@@ -13,7 +13,6 @@ NodeWindow::~NodeWindow()
 {
     m_pWindow->Close();
 }
-
 void NodeWindow::OnUpdate(double const delta)
 {
     bool const dirty = m_transform.GetDirty();
@@ -31,9 +30,9 @@ void NodeWindow::AddViewport(NodeViewport& viewport)
     m_pWindow->AddViewport(*viewport.m_pViewPort);
 }
 
-void NodeWindow::RemoveViewport(NodeViewport &viewport)
+void NodeWindow::RemoveViewport(NodeViewport const& viewport)
 {
-    auto it = std::ranges::find_if(m_nViewports, [&](std::reference_wrapper<NodeViewport> v)
+    const auto it = std::ranges::find_if(m_nViewports, [&](const std::reference_wrapper<NodeViewport const> v)
     {
         return v.get().m_name == viewport.m_name;
     });

@@ -9,11 +9,11 @@ class TextureObject;
 class Pass : public IPass
 {
 public:
-    Pass(Program const& shader, sptr<Camera> camera);
-    Pass(Pass& other) { m_pProgram = other.m_pProgram; }
-    ~Pass() override;
-
+    Pass(Program& program);
+    Pass(Program& program, Camera* camera);
+    ~Pass() override = default;
     void SetSize(uint32 width, uint32 height) {m_screenWidth = width, m_screenHeight = height;}
+    void SetCamera(Camera* pCamera) { m_pCamera = pCamera; }
 
 private:
     virtual void Execute() override {};
@@ -27,8 +27,8 @@ protected:
     uint32 m_screenWidth;
     uint32 m_screenHeight;
 
-    sptr<Program> m_pProgram;
-    sptr<Camera> m_pCamera;
+    Program& m_program;
+    Camera* m_pCamera = nullptr;
 
     sptr<TextureObject> m_pGPosition;
     sptr<TextureObject> m_pGNormal;
