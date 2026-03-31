@@ -2,6 +2,7 @@
 #define FOUNDRY_BINDER__H_
 
 #define OVERLOAD(Class, Ret, ...) static_cast<Ret (Class::*)(__VA_ARGS__)>
+#define OVERLOAD_CONST(Class, Ret, ...) static_cast<Ret (Class::*)(__VA_ARGS__) const>
 
 #include "ScriptingEngine.h"
 

@@ -12,6 +12,15 @@
 /// Classe Transform
 /// /////////////////////////////////////////////////////////////////////////////////
 
+// { pitch, yaw, roll } = { x, y, z }
+struct EulerAngles 
+{
+	union
+	{
+		 struct { float x, y, z; };
+		 struct { float pitch, yaw, roll; };
+	};
+};
 
 class Transform3D : public ISerializable
 {
@@ -20,54 +29,55 @@ public:
 	Transform3D();
 	~Transform3D() = default;
 
-	Transform3D operator*(Transform3D& other);
-	void operator*=(Transform3D& other);
+	Transform3D operator*(const Transform3D& other);
+	void operator*=(const Transform3D& other);
 
-	const glm::vec4& GetPosition() const;
+	glm::vec4 const& GetPosition() const;
 	float GetX() const;
 	float GetY() const;
 	float GetZ() const;
-	const glm::mat4& GetMatrixRotation() const;
-	const glm::mat4& GetInverseMatrixRotation() const;
-	const glm::vec4 GetRotation() const;
-	const glm::quat& GetRotationQuat() const;
+	glm::mat4 const& GetMatrixRotation() const;
+	glm::mat4 const& GetInverseMatrixRotation() const;
+
+	EulerAngles GetRotationRad() const;
+	EulerAngles GetRotationDeg() const;
+	glm::quat const& GetRotationQuat() const;
 	float GetYaw() const;
 	float GetPitch() const;
 	float GetRoll() const;
 	float GetMaxScale() const;
 	float GetMinScale() const;
-	const glm::vec4& GetScale() const;
-	const glm::vec4& GetRight() const;
-	const glm::vec4& GetUp() const;
-	const glm::vec4& GetForward() const;
-
-	glm::mat4& GetMatrix();
-	glm::mat4& GetInvMatrix();
+	glm::vec4 const& GetScale() const;
+	glm::vec4 const& GetRight() const;
+	glm::vec4 const& GetUp() const;
+	glm::vec4 const& GetForward() const;
+				   
+	glm::mat4 const& GetMatrix() const;
+	//glm::mat4& GetInvMatrix();
 
 	bool GetDirty() const { return m_isDirty; }
 
-	void SetPosition(glm::vec4 pos);
+	void SetPosition(const glm::vec4& pos);
 	void SetX(float x);
 	void SetY(float y);
 	void SetZ(float z);
-	void SetRotation(glm::vec4 rot);
-	void SetRotationQuat(glm::quat rot);
-	void SetYaw(float yaw);
-	void SetPitch(float pitch);
-	void SetRoll(float roll);
-	void SetScale(glm::vec4 scale);
+	void SetRotationDeg(float x, float y, float z);
+	void SetRotationRad(float pitch, float yaw, float roll);
+	void SetRotationQuat(const glm::quat& rot);
 
-	void AddPosition(glm::vec4 pos);
+	void SetScale(const glm::vec4& scale);
+
+	void AddPosition(const glm::vec4& pos);
 	void AddX(float x);
 	void AddY(float y);
 	void AddZ(float z);
-	void AddRotation(glm::vec4 rot);
+	void AddRotation(const glm::vec4& rot);
 	void AddYaw(float yaw);
 	void AddPitch(float pitch);
 	void AddRoll(float roll);
-	void AddScale(glm::vec4 scale);
+	void AddScale(const glm::vec4& scale);
 
-	void ApplyTransform(Transform3D& Transform3D); 
+	void ApplyTransform(const Transform3D& Transform3D); 
 
 	void Update();
 
@@ -77,14 +87,13 @@ public:
 
 private:
 	glm::vec4 m_position;
-	glm::vec4 m_rotation;
 	glm::vec4 m_scale;
 
 	glm::vec4 m_right;
 	glm::vec4 m_up;
 	glm::vec4 m_forward;
 
-	glm::quat m_rotationQuat{ 1, 0, 0, 0 };
+	glm::quat m_rotationQuat{ 1, 0, 0, 0 }; // w, x, y, z
 	glm::mat4 m_rotationMatrix;
 	glm::mat4 m_invRotationMatrix;
 	glm::mat4 m_transform{ 1.0f };

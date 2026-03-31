@@ -7,81 +7,101 @@
 /*
 Base class of every 3D object
 */
-
 class Node3D : public Node
 {
 public: 
-	// Gameplay ------------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////
+	// Engine
 
 	class Proxy;
 
 	Node3D(std::string const& name);
 	~Node3D() override = default;
-
-	glm::vec3 GetPosition() const				{ return m_transform.GetPosition(); }
-	float GetX() const							{ return m_transform.GetX(); }
-	float GetY() const							{ return m_transform.GetY(); }
-	float GetZ() const							{ return m_transform.GetZ(); }
-	glm::mat4 GetMatrixRotation() const			{ return m_transform.GetMatrixRotation(); }
 	//const glm::mat4& GetInverseMatrixRotation() { return m_transform.GetInverseMatrixRotation(); }
+												
+	virtual void Reparent(Node& newParent, bool keepGlobalTransform = true) override;
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	virtual void OnUpdate(double delta) override;
+	static ISerializable* CreateInstance();
 
-	//Euler angles
-	glm::vec3 GetRotation() const				{ return m_transform.GetRotation(); }
-	glm::quat GetRotationQuat() const			{ return m_transform.GetRotationQuat(); }
-	float GetYaw() const						{ return m_transform.GetYaw(); }
-	float GetPitch() const						{ return m_transform.GetPitch(); }
-	float GetRoll() const						{ return m_transform.GetRoll(); }
-	float GetMaxScale() const					{ return m_transform.GetMaxScale(); }
-	float GetMinScale() const					{ return m_transform.GetMinScale(); }
-	glm::vec3 GetScale() const					{ return m_transform.GetScale(); }
-	glm::vec3 GetRight() const					{ return m_transform.GetRight(); }
-	glm::vec3 GetUp() const						{ return m_transform.GetUp(); }
-	glm::vec3 GetForward() const				{ return m_transform.GetForward(); }
+	glm::mat4 const& GetMatrix() const				{ return m_transform.GetMatrix(); }
 
-	void SetPosition(glm::vec3 const pos)		{ m_transform.SetPosition(glm::vec4(pos, 1.0f)); }
-	void SetX(float const x)					{ m_transform.SetX(x); }
-	void SetY(float const y)					{ m_transform.SetY(y); }
-	void SetZ(float const z)					{ m_transform.SetZ(z); }
-	void SetRotation(glm::vec3 const rot)		{ m_transform.SetRotation(glm::vec4(rot, 1.0f)); }
-	void SetRotationQuat(glm::quat const rot)	{ m_transform.SetRotationQuat(rot); }
-	void SetYaw(float const yaw)				{ m_transform.SetYaw(yaw); }
-	void SetPitch(float const pitch)			{ m_transform.SetPitch(pitch); }
-	void SetRoll(float const roll)				{ m_transform.SetRoll(roll); }
-	void SetScale(glm::vec3 const scale)		{ m_transform.SetScale(glm::vec4(scale, 1.0f)); }
+	// =========== Getters ===========
+
+	glm::vec3 GetPosition() const					{ return m_transform.GetPosition(); }
+	float GetX() const								{ return m_transform.GetX(); }
+	float GetY() const								{ return m_transform.GetY(); }
+	float GetZ() const								{ return m_transform.GetZ(); }
+	glm::mat4 GetMatrixRotation() const				{ return m_transform.GetMatrixRotation(); }
+	//const glm::mat4& GetInverseMatrixRotation()	{ return m_transform.GetInverseMatrixRotation(); }
+
+	EulerAngles GetLocalRotationRad() const			{ return m_transform.GetRotationRad(); }
+	EulerAngles GetLocalRotationDeg() const			{ return m_transform.GetRotationDeg(); }
+	// { w, x, y, z }
+	const glm::quat& GetLocalRotationQuat() const	{ return m_transform.GetRotationQuat(); }
+	// -- Angle around Y axis in Degrees
+	float GetLocalYaw() const						{ return m_transform.GetYaw(); }
+	// -- Angle around X axis in Degrees
+	float GetLocalPitch() const						{ return m_transform.GetPitch(); }
+	// -- Angle around Z axis in Degrees
+	float GetLocalRoll() const						{ return m_transform.GetRoll(); }
+	float GetMaxScale() const						{ return m_transform.GetMaxScale(); }
+	float GetMinScale() const						{ return m_transform.GetMinScale(); }
+	glm::vec3 GetScale() const						{ return m_transform.GetScale(); }
+	glm::vec3 GetLocalRight() const					{ return m_transform.GetRight(); }
+	glm::vec3 GetLocalUp() const					{ return m_transform.GetUp(); }
+	glm::vec3 GetLocalForward() const				{ return m_transform.GetForward(); }
 
 	glm::mat4x4 const& GetWorldMatrix() const;
 	glm::vec3 GetWorldPosition() const;
 	glm::vec3 GetWorldScale() const;
+	// Pitch, Yaw, Roll  / x, y, z
+	// -- Angles in Degrees 
 	glm::vec3 GetWorldRotation() const;
-	glm::quat GetWorldRotationQuat() const;
+	// { w, x, y, z }
+	glm::quat const& GetWorldRotationQuaternion() const;
+
+
+	// =========== Setters ===========
+
+	void SetLocalPosition(glm::vec3 const pos)		{ m_transform.SetPosition(glm::vec4(pos, 1.0f)); }
+	void SetLocalX(float const x)					{ m_transform.SetX(x); }
+	void SetLocalY(float const y)					{ m_transform.SetY(y); }
+	void SetLocalZ(float const z)					{ m_transform.SetZ(z); }
+
+	void SetLocalRotationDeg(float x, float y, float z)				{ m_transform.SetRotationDeg(x, y, z); }
+	void SetLocalRotationRad(float pitch, float yaw, float roll)	{ m_transform.SetRotationRad(pitch, yaw, roll); }
+	// { w, x, y, z }
+	void SetLocalRotationQuat(glm::quat rot)						{ m_transform.SetRotationQuat(rot); }
+
+	void SetScale(glm::vec3 const scale)			{ m_transform.SetScale(glm::vec4(scale, 1.0f)); }
 
 	void SetWorldPosition(glm::vec3 const& worldPos);
 	void SetWorldScale(glm::vec3 const& worldScale);
+	// -- Angles in Degrees
 	void SetWorldRotation(glm::vec3 const& worldRot);
-	void SetWorldRotationQuat(glm::quat const& worldRot);
-												
-	void AddPosition(glm::vec3 const pos)		{ m_transform.AddPosition(glm::vec4(pos, 1.0f)); }
-	void AddX(float const x)					{ m_transform.AddX(x); }
-	void AddY(float const y)					{ m_transform.AddY(y); }
-	void AddZ(float const z)					{ m_transform.AddZ(z); }
-	void AddRotation(glm::vec3 const rot)		{ m_transform.AddRotation(glm::vec4(rot, 1.0f)); }
-	void AddYaw(float const yaw)				{ m_transform.AddYaw(yaw); }
-	void AddPitch(float const pitch)			{ m_transform.AddPitch(pitch); }
-	void AddRoll(float const roll)				{ m_transform.AddRoll(roll); }
-	void AddScale(glm::vec3 const scale)		{ m_transform.AddScale(glm::vec4(scale, 1.0f)); }
+	// { w, x, y, z }
+	// -- Angles in Radians
+	void SetWorldRotationQuaternion(glm::quat const& worldRotQuat);
 
-	virtual void Reparent(Node& newParent, bool keepGlobalTransform = true) override;
-	virtual void Serialize(SerializedObject& datas) const override;
-	virtual void Deserialize(SerializedObject const& datas) override;
+	// =========== Adders ===========
 
-	// Engine ------------------------------------------------------------------
+	void AddScale(glm::vec3 const scale)			{ m_transform.AddScale(glm::vec4(scale, 1.0f)); }
+	void AddLocalPosition(glm::vec3 const pos)		{ m_transform.AddPosition(glm::vec4(pos, 1.0f)); }
+	void AddLocalX(float const x)					{ m_transform.AddX(x); }
+	void AddLocalY(float const y)					{ m_transform.AddY(y); }
+	void AddLocalZ(float const z)					{ m_transform.AddZ(z); }
+	// -- Angles in Radians							
+	void AddLocalRotation(glm::vec3 const rot)		{ m_transform.AddRotation(glm::vec4(rot, 1.0f)); }
+	// -- Angles in Radians							
+	void AddLocalYaw(float const yaw)				{ m_transform.AddYaw(yaw); }
+	// -- Angles in Radians							
+	void AddLocalPitch(float const pitch)			{ m_transform.AddPitch(pitch); }
+	// -- Angles in Radians							
+	void AddLocalRoll(float const roll)				{ m_transform.AddRoll(roll); }
 
-	glm::mat4& GetMatrix()						{ return m_transform.GetMatrix(); }
-	glm::mat4& GetInvMatrix()					{ return m_transform.GetInvMatrix(); }
-
-	virtual void OnUpdate(double delta) override;
-
-	static ISerializable* CreateInstance();
 
 private:
 	void CheckParentTransform();

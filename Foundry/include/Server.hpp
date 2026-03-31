@@ -22,6 +22,7 @@ class Server
 private:
     Server() { static_assert(std::derived_from<Derived, Server>, "Derived must inherit from Server<Derived>"); }
 
+
 public:
     static void Initialize() { static_cast<Server<Derived>&>(Instance()).OnInitialize(); }
     static void FlushCommands() { static_cast<Server<Derived>&>(Instance()).FlushCommandsImpl(); }
