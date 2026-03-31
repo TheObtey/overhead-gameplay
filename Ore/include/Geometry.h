@@ -14,7 +14,7 @@ struct Vertex
     glm::vec3 normal;
     glm::vec2 texCoords;
 
-    std::array<int32, 4> boneIDS = { -1,-1,-1,-1 }; // in mesh
+    std::array<int32, 4> boneIDS = { -1,-1,-1,-1 };
     std::array<float,4> weights;
 };
 
@@ -40,6 +40,7 @@ private:
     uptr<Buffer<uint32>> m_pIndexBuffer;
     uptr<VertexArrayObject> m_pVao;
     uint32 m_indiceSize;
+    std::vector<glm::mat4> m_bonesTransform;
 
 };
 

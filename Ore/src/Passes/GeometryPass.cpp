@@ -6,13 +6,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-GeometryPass::GeometryPass(Program const& program, std::vector<Mesh*> const& meshes, sptr<Camera> pCamera) : Pass(program, pCamera)
+GeometryPass::GeometryPass(Program const& program, sptr<Camera> pCamera) : Pass(program, pCamera)
 {
-    m_meshes = meshes;
 }
 
 GeometryPass::~GeometryPass()
 {
+}
+
+void GeometryPass::AddMesh(Mesh const& mesh)
+{
+    m_meshes.push_back(mesh);
 }
 
 void GeometryPass::Execute()
@@ -31,11 +35,11 @@ void GeometryPass::Execute()
     Logger::Log("Start geometries");
     for(uint32 i = 0; i<m_meshes.size(); ++i)
     {
-        Logger::Log("Mesh");
-
-        m_pProgram->SetUniform("model", m_meshes[i]->GetTransform());
-        m_meshes[i]->Draw(m_pProgram.get());
+        m_pProgram->SetUniform("model", m_meshes[i].get().GetTransform());
+        m_meshes[i].get().Draw(*m_pProgram);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    m_meshes.clear();
 }

@@ -9,7 +9,7 @@ class IMesh
 public:
     virtual ~IMesh() = 0;
 
-    virtual void Draw(IProgram const* pProgram) = 0;
+    virtual void Draw(IProgram const& pProgram) const = 0;
 };
 
 inline IMesh::~IMesh() {};

@@ -13,16 +13,20 @@ public:
     Mesh(Geometry const& geometry, std::vector<Texture*> const& textures, glm::mat4 const& transform);
     ~Mesh() override;
 
-    void Draw(IProgram const* program) override;
-    void SetTransform(glm::mat4 const& transform) { m_transform = transform;}
+    void SetActive(bool isActive) {m_isActive = isActive;}
+    bool GetIsActive() const {return m_isActive;}
+    void Draw(IProgram const& program) const override;
+    void SetTransform(glm::mat4 const& transform) { m_transform = transform; }
     glm::mat4 const& GetTransform() const { return m_transform; }
     void SetBones(std::vector<glm::mat4> const& bones);
+    std::vector<glm::mat4> GetBonesTransform() const { return m_bonesTransform; }
 
 private:
     sptr<Geometry> m_pGeometry;
     std::vector<Texture*> m_textures;
-    std::vector<glm::mat4> m_bonesTransform;
+    bool m_isActive;
     glm::mat4 m_transform;
+    std::vector<glm::mat4> m_bonesTransform;
 };
 
 #endif
