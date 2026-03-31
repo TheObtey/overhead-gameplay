@@ -12,6 +12,7 @@
 #include <Passes/AnimatedPass.h>
 #include <Logger.hpp>
 #include <Nodes/NodeMeshAnimated3D.h>
+#include <Nodes/Node3D.h>
 #include <Servers/AnimationServer.h>
 
 namespace rl
@@ -30,10 +31,28 @@ int main()
     sptr<SceneData> Scene4 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_2.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene2 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene3 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Bones.fbx", AssetLoader::FileType::FBX);
-
     
-    uptr<NodeMeshAnimated3D> pNode = Node::CreateNode<NodeMeshAnimated3D>("AA");
-    pNode->Instanciate(*Scene4->allMesh[0], *Scene4->animations[0]);
+    std::vector<Vertex> vertices;
+    vertices.push_back({ glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f) });
+    vertices.push_back({ glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f) });
+    vertices.push_back({ glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f) });
+    vertices.push_back({ glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f) });
+
+    std::vector<uint32> indices = {
+        0,1,2,
+        0,2,3
+    };
+
+    Geometry cube(vertices, indices);
+    Texture diffuse("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
+    Texture specular("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+    Texture normal("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+
+    std::vector<Texture*> textures;
+    textures.push_back(&diffuse);
+    textures.push_back(&specular);
+    textures.push_back(&normal);
+    Mesh mesh(cube, textures, glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f)));
 
     glm::vec3 position(0.0f, 0.0f, 15.0f);
     glm::vec3 up(0.0f, 1.0f, 0.0f);
@@ -100,23 +119,35 @@ int main()
     animFrag.Unload();
     animVert.Unload();
 
+    mesh = *Scene4->allMesh[0];
+
     GeometryPass geoPass(geometryProgram, camera);
+    geoPass.AddMesh(mesh);
     AnimatedPass animPass(animateProgram, camera);
     LightPass lightPass(lightProgram, lights, camera);
 
-    //viewport.AddPass(&geoPass);
-    viewport.AddPass(&animPass);
-    viewport.AddPass(&lightPass);
 
     AnimationServer::InitAnimationPass(&animPass);
-    pNode->PlayAnimation("Test Anim 2");
 
+    uptr<Node> pNode3D = Node::CreateNode<Node3D>("3D");
+    //uptr<Node> pNode = Node::CreateNode<NodeMeshAnimated3D>("AA");
+    //NodeMeshAnimated3D* pMesh = dynamic_cast<NodeMeshAnimated3D*>(pNode.get());
+    Node3D* p3D = dynamic_cast<Node3D*>(pNode3D.get());
+    //pMesh->Instanciate(*Scene4->allMesh[0], *Scene4->animations[0]);
+    //pMesh->PlayAnimation("Test Anim 2",true);
+    //pNode3D->AddChild(pNode);
+    //p3D->SetWorldPosition({ 0.0f,0.0f,0.0f });
+
+
+    viewport.AddPass(&geoPass);
+    viewport.AddPass(&animPass);
+    viewport.AddPass(&lightPass);
 	while(true)
     {
-        pNode->OnUpdate(1 / 60.0f);
+        //pNode->Update(1/60.0f);
         AnimationServer::FlushCommands();
         window.Clear();
-
+        camera->SetYaw(yaw++);
         window.Present();
     }
 

@@ -50,6 +50,7 @@ void NodeMeshAnimated3D::PlayAnimation(std::string const& name, bool isLooping)
 {
 	m_isPlaying = true;
 	m_currentAnim = name;
+	m_linkedAnimations[m_currentAnim]->isLooping = isLooping;
 }
 
 void NodeMeshAnimated3D::StopCurrentAnim()
