@@ -16,14 +16,16 @@ public:
     void SetActive(bool isActive) {m_isActive = isActive;}
     bool GetIsActive() const {return m_isActive;}
     void Draw(IProgram const& program) const override;
-    void SetTransform(glm::mat4 const& transform) { m_transform = transform;}
+    void SetTransform(glm::mat4 const& transform) { m_transform = transform; }
     glm::mat4 const& GetTransform() const { return m_transform; }
+    std::vector<glm::mat4> GetBonesTransform() const { return m_bonesTransform; }
 
 private:
     sptr<Geometry> m_pGeometry;
     std::vector<Texture*> m_textures;
     bool m_isActive;
     glm::mat4 m_transform;
+    std::vector<glm::mat4> m_bonesTransform;
 };
 
 #endif
