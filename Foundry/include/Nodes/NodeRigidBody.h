@@ -109,8 +109,8 @@ public:
 
 	// =========== Sleeping and Gravity ===========
 
-	bool IsSleeping() const;
 	bool IsAllowedToSleep() const;
+	bool IsSleeping() const;
 	bool IsGravityEnabled();
 
 	void SetSleepingEnabled(bool enabled);

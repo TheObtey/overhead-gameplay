@@ -293,16 +293,22 @@ void NodeRigidBody::LockAngularAxis(bool x, bool y, bool z)
 	PhysicsServer::LockAngularAxis(new bool[3] { x, y, z }, *this);
 }
 
-bool NodeRigidBody::IsSleeping() const
-{
-	if (m_pOwner == nullptr) return false;
-	return m_pRigidBodyRP3D->isSleeping();
-}
 bool NodeRigidBody::IsAllowedToSleep() const
 {
 	if (m_pOwner == nullptr) return false;
 	return m_pRigidBodyRP3D->isAllowedToSleep();
 }
+bool NodeRigidBody::IsSleeping() const
+{
+	if (m_pOwner == nullptr) return false;
+	return m_pRigidBodyRP3D->isSleeping();
+}
+bool NodeRigidBody::IsGravityEnabled()
+{
+	if (m_pOwner)
+		return m_pRigidBodyRP3D->isGravityEnabled();
+}
+
 void NodeRigidBody::SetSleepingEnabled(bool enabled)
 {
 	PhysicsServer::SetSleepingEnabled(enabled, *this);
@@ -310,12 +316,6 @@ void NodeRigidBody::SetSleepingEnabled(bool enabled)
 void NodeRigidBody::SetSleepingState(bool isSleeping)
 {
 	PhysicsServer::SetSleepingState(isSleeping, *this);
-}
-
-bool NodeRigidBody::IsGravityEnabled()
-{
-	if (m_pOwner)
-		return m_pRigidBodyRP3D->isGravityEnabled();
 }
 void NodeRigidBody::SetIsGravityEnabled(bool enabled)
 {

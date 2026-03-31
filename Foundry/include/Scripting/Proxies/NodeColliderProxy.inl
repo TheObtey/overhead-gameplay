@@ -39,9 +39,6 @@ public:
     void     SetCollideWithMaskBits(uint16_t mask)          { m_pNode->SetCollideWithMaskBits(mask); }
     uint16_t GetCollisionBitsMask() const                   { return m_pNode->GetCollisionBitsMask(); }
 
-	// =========== RP3D Events ===========
-
-
 private:
 	NodeCollider* m_pNode;
 };

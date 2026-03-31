@@ -33,6 +33,7 @@ namespace CameraUtils
 				float length = glm::length(glm::vec3(p));
 				return { glm::vec3(p) / length, p.w / length };
 			};
+
 		f.planes[0] = make_plane(r3 + r0); // left
 		f.planes[1] = make_plane(r3 - r0); // right
 		f.planes[2] = make_plane(r3 + r1); // bottom
@@ -98,6 +99,7 @@ namespace CameraUtils
 		}
 		return false;
 	}
+
 
 	bool IsAABBInFrustum(const Frustum& f, glm::vec3 aabb_min, glm::vec3 aabb_max)
 	{
