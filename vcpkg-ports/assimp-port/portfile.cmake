@@ -11,6 +11,7 @@ vcpkg_cmake_configure(
         -DASSIMP_BUILD_DRACO=OFF
         -DASSIMP_BUILD_TESTS=OFF
         -DBUILD_SHARED_LIBS=ON
+        -DASSIMP_BUILD_ZLIB=ON
 )
 
 vcpkg_cmake_install()
