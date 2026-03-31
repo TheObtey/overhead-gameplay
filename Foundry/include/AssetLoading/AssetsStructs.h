@@ -10,18 +10,30 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+
 enum SceneNodeType
 {
 	GLOBAL,
 	MESH,
 	BONE,
-	ANIMATED,
 };
-ENUM_CLASS_FLAGS(SceneNodeType);
 
+struct SceneNode
+{
+	SceneNodeType type = GLOBAL;
+
+	std::string name;
+	glm::mat4 transform;
+
+	int32 boneIndexInMesh = -1;
+	int32 parent = -1;
+	std::vector<uint32> meshesIndex;
+	std::vector<uint32> children;
+};
 
 struct AnimationChannel
 {
+	uint32 sceneNodeImpacted;
 	struct FrameVec3
 	{
 		float time;
@@ -44,24 +56,13 @@ struct Animation
 	std::vector<AnimationChannel> animationTransform;
 };
 
-struct SceneNode
-{
-	SceneNodeType type = GLOBAL;
-
-	std::string name;
-	glm::mat4 transform;
-
-	int32 boneIndexInMesh = -1;
-	int32 parent = -1;
-	std::vector<uint32> meshesIndex;
-	std::vector<uint32> children;
-};
 
 struct SceneData
 {
 
 	sptr<SceneNode> rootNode;
 
+	bool isAnimated = false;
 	std::vector<sptr<SceneNode>> allNode;
 	std::vector<Animation> animations;
 	std::vector<Light> alllights;

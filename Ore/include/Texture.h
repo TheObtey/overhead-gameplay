@@ -9,7 +9,9 @@ enum class TextureMaterialType
     DIFFUSE,
     SPECULAR,
     NORMAL,
-    HEIGHT
+    HEIGHT,
+
+    COUNT,
 };
 
 class Texture final : public ITexture

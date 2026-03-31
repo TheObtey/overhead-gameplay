@@ -7,6 +7,11 @@ LightPass::LightPass(Program const& program, std::vector<Light> const& lights, s
     m_quadVAOId = 0;
     m_quadVBOId = 0;
 
+    m_pProgram->Use();
+    m_pProgram->SetUniform("gPosition",0);
+    m_pProgram->SetUniform("gNormal",1);
+    m_pProgram->SetUniform("gAlbedoSpec",2);
+
     SetLights(lights);
     GenerateQuad();
 }
