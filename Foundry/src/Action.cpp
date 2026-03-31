@@ -1,20 +1,20 @@
 #include "Action.h"
 #include "IControl.h"
 
-Action::Action() : m_controls(), m_event() 
+Action::Action() : m_controls(), Event()
 {
 	EventManager::getKey += [&](EventInput in, EventAction ac)
 		{
 			for (int i = 0; i < m_controls.size(); i++)
 			{
 				if (in == m_controls[i]->GetEventInput())
-					m_event.Invoke(*m_controls[i]);
+					Event.Invoke(*m_controls[i]);
 			}
 		};
 }
 
-Action::Action(ControlType controlType, Event<void(IControl&)> event, EventInput eventInput) :
-	m_event(event)
+Action::Action(ControlType controlType, EventInput eventInput) :
+	m_controls(), Event()
 {
 	AddControl(controlType, eventInput);
 	EventManager::getKey += [&](EventInput in, EventAction ac)
@@ -22,23 +22,13 @@ Action::Action(ControlType controlType, Event<void(IControl&)> event, EventInput
 			for (int i = 0; i < m_controls.size(); i++)
 			{
 				if (in == m_controls[i]->GetEventInput() && ac == EventAction::PRESS)
-					m_event.Invoke(*m_controls[i]);
+					Event.Invoke(*m_controls[i]);
 			}
 		};
 }
 
 Action::~Action() {}
 
-
-void Action::SetEvent(Event<void(IControl&)> event)
-{
-	m_event = event;
-}
-
-Event<void(IControl&)> Action::GetEvent() const
-{
-	return m_event;
-}
 
 uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
 {

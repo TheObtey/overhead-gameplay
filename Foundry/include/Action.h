@@ -22,18 +22,17 @@ class Action /*: public ISerializable*/
 {
 public:
 	Action();
-	Action(ControlType controlType, Event<void(IControl&)> event, EventInput eventInput);
+	Action(ControlType controlType, EventInput eventInput);
 
 	~Action();
-	
-	void SetEvent(Event<void(IControl&)> event);
-	Event<void(IControl&)> GetEvent() const;
 
 	uint32 AddControl(ControlType const& type, EventInput const& eventInput);
 	IControl* GetControl(uint32 index);
+
+	Event<void(IControl&)> Event {};
+
 private:
 	std::vector<IControl*> m_controls;
-	Event<void(IControl&)> m_event {};
 
 	friend ActionMap;
 };
