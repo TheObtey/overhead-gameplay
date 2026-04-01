@@ -3,6 +3,7 @@
 
 #include <Serialization/json.hpp>
 #include <Define.h>
+#include <Nodes/AllNodes.h>
 #include <raylib.h>
 
 class Node;

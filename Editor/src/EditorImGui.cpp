@@ -43,8 +43,18 @@ EditorImGui::~EditorImGui()
 void EditorImGui::Init()
 {
 	m_newNodeTypeSelector = Node::CreateNode<Node>("Node");
-	auto test = Node::CreateNode<Node>("Node3D");
-	m_newNodeTypeSelector->AddChild(test);
+	auto node3D = Node::CreateNode<Node>("Node3D");
+	auto rigibody = Node::CreateNode<Node>("NodeRigidBody");
+	auto collider = Node::CreateNode<Node>("NodeCollider");
+	auto colliderbox = Node::CreateNode<Node>("NodeBoxCollider");
+	auto collidersphere = Node::CreateNode<Node>("NodeSphereCollider");
+	auto collidercapsule = Node::CreateNode<Node>("NodeCapsuleCollider");
+	collider->AddChild(colliderbox);
+	collider->AddChild(collidersphere);
+	collider->AddChild(collidercapsule);
+	node3D->AddChild(collider);
+	node3D->AddChild(rigibody);
+	m_newNodeTypeSelector->AddChild(node3D);
 	EngineServer::FlushCommands();
 
 	ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;

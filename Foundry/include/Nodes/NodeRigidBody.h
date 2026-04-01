@@ -30,10 +30,6 @@ public:
 	void DestroyRigidBody(NodeRigidBody& rigidBody);
 
 	virtual void OnUpdate(double delta) override;
-	virtual void Serialize(SerializedObject& datas) const override;
-	virtual void Deserialize(SerializedObject const& datas) override;
-	static ISerializable* CreateInstance();
-
 
 	void SetNode3DParent(Node3D* owner);
 	rp3d::RigidBody* GetRigidBody() { return m_pRigidBody; }
@@ -48,6 +44,9 @@ public:
 	////////////////////////////////////////////////////////////
 
 
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	static ISerializable* CreateInstance();
 
 
 	// =========== Material ===========
@@ -136,7 +135,7 @@ protected:
 private:
 
 	//Node3D* m_pNode3D;
-	rp3d::RigidBody* m_pRigidBody;
+	rp3d::RigidBody* m_pRigidBody = nullptr;
 	std::vector<NodeCollider*> m_colliders;
 	bool m_rigidBodyCreated = false;
 	//std::vector<uptr<NodeCollider>> m_colliders;

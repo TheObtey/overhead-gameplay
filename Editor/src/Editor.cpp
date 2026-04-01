@@ -5,6 +5,7 @@
 #include "Debug.h"
 
 #include <Servers/EngineServer.h>
+#include <Servers/PhysicsServer.h>
 #include <Serialization/SerializeObject.hpp>
 #include <iostream>
 #include <filesystem>
@@ -35,6 +36,7 @@ Editor::~Editor()
 void Editor::Init() 
 {
 	m_editorRaylib.Init(m_screenWidth, m_screenHeight);
+	PhysicsServer::Initialize();
 	m_sceneRoot = Node::CreateNode<Node>("SceneRoot");
 
 	rlImGuiSetup(true);
@@ -126,6 +128,7 @@ void Editor::Update(float deltaTime)
 	ProcessUICommands();
 
 	EngineServer::FlushCommands();
+	PhysicsServer::FlushCommands();
 }
 
 
@@ -156,6 +159,7 @@ void Editor::ProcessUICommands()
 
 	case EditorCommand::Type::LOAD_SCENE:
 		LoadScene(cmd.stringParam1);
+		PhysicsServer::FlushCommands();
 		break;
 
 	case EditorCommand::Type::LUNCH_GAME:

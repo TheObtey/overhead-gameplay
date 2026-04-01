@@ -2,7 +2,6 @@
 #include "Editor.h"
 #include "NewGizmo.hpp"
 
-#include <Nodes/AllNodes.h>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <cmath>
