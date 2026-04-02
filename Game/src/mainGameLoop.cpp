@@ -3,7 +3,6 @@
 #include "Nodes/NodeWindow.h"
 
 #include "Scripting/Lua/LuaScriptInstance.hpp"
-#include "Scripting/Proxies/ActionMapProxy.hpp"
 
 int main()
 {
