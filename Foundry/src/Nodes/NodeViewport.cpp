@@ -74,12 +74,12 @@ void NodeViewport::TryAttachToWindow()
 		GraphicServer::AttachToWindow(this, &window->get());
 }
 
-void NodeViewport::Clear()
+void NodeViewport::Clear() const
 {
 	m_pViewPort->Clear();
 }
 
-void NodeViewport::Present()
+void NodeViewport::Present() const
 {
 	m_pViewPort->Present();
 }

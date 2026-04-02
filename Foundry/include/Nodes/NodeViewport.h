@@ -32,8 +32,8 @@ public:
 private:
 	void UpdateViewport() const;
 	void TryAttachToWindow();
-	void Clear();
-	void Present();
+	void Clear() const;
+	void Present() const;
 
 protected:
 	uptr<Viewport> m_pViewPort;
@@ -45,6 +45,7 @@ protected:
 	Color m_clearColor {Color::SKY_BLUE};
 	//TODO REMOVE
 	std::array<Light, 5> dummyLight {};
+
 
 	friend class GraphicServer;
 	friend class NodeWindow;

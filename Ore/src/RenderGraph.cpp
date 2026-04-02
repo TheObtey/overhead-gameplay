@@ -4,7 +4,9 @@
 
 #include <Logger.hpp>
 
-RenderGraph::RenderGraph(uint32 screenWidth, uint32 screenHeight)
+#include "Viewport.h"
+
+RenderGraph::RenderGraph(Viewport& viewport) : m_viewport(viewport)
 {
     glGenFramebuffers(1, &m_gBuffer);
 
@@ -19,19 +21,19 @@ RenderGraph::RenderGraph(uint32 screenWidth, uint32 screenHeight)
     m_pGAlbedoSpec = std::make_shared<TextureObject>(gAlbedoSpec, TextureType::TYPE_2D);
 
     glGenRenderbuffers(1, &m_rboDepth);
-    RenderGraph::CreateGBuffer(screenWidth, screenHeight);
+    RenderGraph::CreateGBuffer(viewport.GetWidth(), viewport.GetHeight());
 }
 
 RenderGraph::~RenderGraph()
 {
 }
 
-void RenderGraph::SetSize(uint32 width, uint32 height)
+void RenderGraph::UpdateGBuffer()
 {
-    CreateGBuffer(width, height);
+    CreateGBuffer(m_viewport.GetWidth(), m_viewport.GetHeight());
     for (Pass* pPass : m_passes)
     {
-        pPass->SetScreenSize(width, height);
+        pPass->SetScreenSize(m_viewport.GetWidth(), m_viewport.GetHeight());
         pPass->SetGBuffer(m_gBuffer);
     }
 }
@@ -39,9 +41,6 @@ void RenderGraph::SetSize(uint32 width, uint32 height)
 void RenderGraph::CreateGBuffer(uint32 screenWidth, uint32 screenHeight)
 {
     Logger::Log("Start G-Buffer");
-    m_screenWidth = screenWidth;
-    m_screenHeight = screenHeight;
-
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
 
     m_pGPosition->Bind();
@@ -82,14 +81,33 @@ void RenderGraph::AddPass(Pass* pPass)
 {
     pPass->SetGBuffer(m_gBuffer);
     pPass->SetTextures(m_pGPosition, m_pGNormal, m_pGAlbedoSpec);
-    pPass->SetScreenSize(m_screenWidth, m_screenHeight);
+    pPass->SetScreenSize(m_viewport.GetWidth(), m_viewport.GetHeight());
     m_passes.push_back(pPass);
 }
 
 void RenderGraph::Execute()
 {
+    //TODO Scissor for background color
+
     for(Pass* pPass : m_passes)
-    {
         pPass->Execute();
-    }
+
+   End();
+}
+
+
+void RenderGraph::End()
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_gBuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+    uint32 width = m_viewport.GetWidth();
+    uint32 height = m_viewport.GetHeight();
+    uint32 y = m_viewport.GetPosY();
+    uint32 x = m_viewport.GetPosX();
+
+
+    glBlitFramebuffer(0,0, m_viewport.GetWidth(), m_viewport.GetHeight(),
+        m_viewport.GetPosX(), m_viewport.GetPosY(), m_viewport.GetPosX() + m_viewport.GetWidth(), m_viewport.GetPosY() + m_viewport.GetHeight(),
+        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }

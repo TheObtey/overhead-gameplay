@@ -60,6 +60,7 @@ void LightPass::Execute()
 
     Logger::Log("Start Light Pass");
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
     m_program.Use();
 
     glActiveTexture(GL_TEXTURE0);
@@ -88,14 +89,6 @@ void LightPass::Execute()
 
     m_program.SetUniform("viewPos", m_pCamera->GetPosition());
     RenderQuad();
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_gBuffer);
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    //glViewport(0 , 0,  m_screenWidth * 2, m_screenHeight);
-
-    //glBlitFramebuffer(0,0, m_screenWidth, m_screenHeight, m_screenWidth, 0, 0, m_screenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void LightPass::RenderQuad()
