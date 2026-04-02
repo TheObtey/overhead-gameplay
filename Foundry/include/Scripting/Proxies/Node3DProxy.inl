@@ -6,6 +6,8 @@ public:
 
 	Proxy(Node& node) : Node::Proxy(node) {}
 
+	static Proxy* CreateNode3DProxy(std::string const& name);
+
 	// =========== Getters ===========
 
 	glm::vec3 GetPosition() const									{ return m_pNode->GetPosition(); }

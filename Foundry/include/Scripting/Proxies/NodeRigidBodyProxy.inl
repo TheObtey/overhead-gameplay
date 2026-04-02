@@ -6,6 +6,8 @@ public:
 
 	Proxy(Node& node) : Node3D::Proxy(node) {}
 
+	static Proxy* CreateNodeRigidBodyProxy(std::string const& name);
+
 	// =========== Forces and Torques ===========
 
 	void ApplyLocalForceAtCenterOfMass(const glm::vec3& force)								{ m_pNode->ApplyLocalForceAtCenterOfMass(force); }
