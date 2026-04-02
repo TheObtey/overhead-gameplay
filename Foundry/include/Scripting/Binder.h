@@ -17,6 +17,9 @@ public:
 	template <typename T>
 	void BindFunction(std::string const& name, T&& function);
 
+	template <typename T, typename ... Args>
+	void BindEnum(std::string const& name, Args&& ... params);
+
 	auto GetOrCreateNamespace(std::string const& name);
 
 	std::vector<std::string>& GetRegisteredTypesName() { return m_registeredTypesName; }

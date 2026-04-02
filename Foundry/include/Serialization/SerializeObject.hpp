@@ -261,7 +261,7 @@ inline std::vector<T> SerializedObject::GetPrivateArray(std::string const& array
 
 	for (uint32 i = 0; i < m_elementsInSerializedObject["PRIVATE_DATAS"][arrayName].size(); i++)
 	{
-		array.push_back(*m_elementsInSerializedObject["PRIVATE_DATAS"][arrayName][i]);
+		array.push_back(m_elementsInSerializedObject["PRIVATE_DATAS"][arrayName][i]);
 	}
 
 	return array;
