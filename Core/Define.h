@@ -81,8 +81,9 @@ inline constexpr int32 operator""_kg(unsigned long long val) { return val * 1000
 // SIMD GLM
 //====================
 
-#define GLM_FORCE_INTRINSICS
-
+#ifdef RELEASE_BUILD
+    #define GLM_FORCE_INTRINSICS
+#endif
 
 #if defined(_WIN32) || defined(_WIN64)
     #define OPERATING_SYSTEM OPERATING_SYSTEM_WINDOWS
