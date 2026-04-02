@@ -4,10 +4,14 @@ self = Node3D
 
 test = 0;
 
-function OnUpdate(dt)
+
+function OnInit()
     local node = CreateNode("Created from lua")
     print(node:GetName())
-    local vec = maths.vec3.new()
+end
+
+function OnUpdate(dt)
+    local vec = fmaths.vec3.new()
     print(vec.x)
 
     print(hook)
