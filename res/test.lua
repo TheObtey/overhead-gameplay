@@ -11,20 +11,20 @@ function OnInit()
 end
 
 function OnUpdate(dt)
-    local vec = fmaths.vec3.new()
-    print(vec.x)
+    -- local vec = fmaths.vec3.new()
+    -- print(vec.x)
 
-    print(hook)
+    -- print(hook)
 
-    hook.Add("MyEvent", "MyFunc", function()
-        print("Hello")
-    end)
+    -- hook.Add("MyEvent", "MyFunc", function()
+    --     print("Hello")
+    -- end)
 
-    hook.Call("MyEvent")
-    print(timer)
+    -- hook.Call("MyEvent")
+    -- print(timer)
 
-    timer.Create("Test" .. test, 0, 1, function()
-        print("executed from timer")
-    end)
-    test = test + 1;
+    -- timer.Create("Test" .. test, 0, 1, function()
+    --     print("executed from timer")
+    -- end)
+    -- test = test + 1;
 end
