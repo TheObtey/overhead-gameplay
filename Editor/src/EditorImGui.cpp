@@ -566,13 +566,24 @@ void EditorImGui::ShowLoadSceneBrowsing()
 
 	if (m_loadBrowser.HasSelected())
 	{
-		std::string tmpbuffer = m_loadBrowser.GetSelected().string();
-		if (tmpbuffer.find(".sc")) {
-			m_scenePathBuffer = tmpbuffer;
+		std::filesystem::path selected = m_loadBrowser.GetSelected();
+
+		if (selected.extension() == ".json")
+		{
+			const std::filesystem::path logical = selected.parent_path() / selected.stem(); // enlève .json
+
+			if (logical.extension() == ".sc")
+			{
+				m_scenePathBuffer = logical.string();     // stocké sans .json
+				m_nodeSavePathBuffer.clear();
+			}
+			else if (logical.extension() == ".nd")
+			{
+				m_nodeSavePathBuffer = logical.string();  // stocké sans .json
+				m_scenePathBuffer.clear();
+			}
 		}
-		else if (tmpbuffer.find(".nd")) {
-			m_nodeSavePathBuffer = tmpbuffer;
-		}
+
 		if (m_scenePathBuffer.length() > 0 || m_nodeSavePathBuffer.length() > 0)
 		{
 			m_haveFileSelected = true;

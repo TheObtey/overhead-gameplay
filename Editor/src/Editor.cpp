@@ -45,28 +45,45 @@ void Editor::Init()
 	m_editorImgui.SetSceneRoot(m_sceneRoot.get());
 	m_editorImgui.SetScreenSize(m_screenWidth, m_screenHeight);
 
-	std::filesystem::path ScriptStock = "ScriptStock/.foundry";
-	std::filesystem::create_directories(ScriptStock);
+	std::filesystem::path scriptStockDir = "ScriptStock";
+	std::filesystem::create_directories(scriptStockDir);
 
 	std::filesystem::path source = "../Game/res/.foundry";
-	std::filesystem::path dest = ScriptStock;
+	std::filesystem::path dest = scriptStockDir / ".foundry";
 
+	std::error_code ec;
+
+	if (!std::filesystem::exists(source, ec) || !std::filesystem::is_directory(source, ec))
 	{
-		std::error_code ec;
-		if (std::filesystem::exists(source, ec))
-		{
-			std::filesystem::copy_file(source, dest, ec);
-			if (ec)
-			{
-				DEBUG("[Editor] WARNING: Couldn't copy"
-					<< dest.string() << " : " << ec.message() << std::endl);
-			}
-		}
+		DEBUG("[Editor] WARNING: Source .foundry directory not found: " << source.string() << std::endl);
 	}
+	else
+	{
+		if (std::filesystem::exists(dest, ec))
+		{
+			std::filesystem::remove_all(dest, ec);
+			ec.clear();
+		}
 
-	#if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
-		::SetFileAttributesW(ScriptStock.wstring().c_str(), FILE_ATTRIBUTE_HIDDEN);
-	#endif
+		std::filesystem::copy(
+			source,
+			dest,
+			std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing,
+			ec);
+
+		if (ec)
+		{
+			DEBUG("[Editor] WARNING: Couldn't copy directory "
+				<< source.string() << " to " << dest.string()
+				<< " : " << ec.message() << std::endl);
+		}
+#if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
+		else
+		{
+			::SetFileAttributesW(dest.wstring().c_str(), FILE_ATTRIBUTE_HIDDEN);
+		}
+#endif
+	}
 
 	m_running = true;
 	DEBUG("[Editor] Initialized successfully!" << std::endl);
@@ -491,11 +508,10 @@ void Editor::SaveScene(std::string const& path)
 	{
 		std::string tmp = path;
 
-		bool isScene = false;
-		if (path.size() >= 3 && path.substr(path.size() - 3) == ".sc")
-		{
-			isScene = true;
-		}
+		if (tmp.size() >= 5 && tmp.ends_with(".json"))
+			tmp = tmp.substr(0, tmp.size() - 5);
+
+		bool isScene = (tmp.size() >= 3 && tmp.ends_with(".sc"));
 
 		if (isScene)
 		{
@@ -510,7 +526,7 @@ void Editor::SaveScene(std::string const& path)
 				std::cerr << "[Editor] Cannot save scene: no scene loaded" << std::endl;
 			}
 		}
-		else if (isScene == false || m_editorImgui.GetSelectedNode())
+		else if (!isScene && m_editorImgui.GetSelectedNode() != nullptr)
 		{
 			Node* selected = m_editorImgui.GetSelectedNode();
 			if (!selected)
