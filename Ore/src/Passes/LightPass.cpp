@@ -59,7 +59,7 @@ void LightPass::Execute()
     if (m_pCamera == nullptr) return;
 
     Logger::Log("Start Light Pass");
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_program.Use();
 
     glActiveTexture(GL_TEXTURE0);
@@ -90,11 +90,12 @@ void LightPass::Execute()
     RenderQuad();
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_gBuffer);
+
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    //glViewport(0 , 0,  m_screenWidth * 2, m_screenHeight);
 
-    glBlitFramebuffer(0,0, m_screenWidth, m_screenHeight, 0, 0, m_screenWidth, m_screenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    //glBlitFramebuffer(0,0, m_screenWidth, m_screenHeight, m_screenWidth, 0, 0, m_screenHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 }
 
 void LightPass::RenderQuad()

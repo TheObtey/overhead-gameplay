@@ -72,6 +72,9 @@ void NodeWindow::UpdateWindow() const
         int const s = ((viewportsC + 1) * 0.5f);
         viewport.m_transform.SetScale(scale.x / viewportsC, scale.y / s);
         viewport.m_transform.SetPosition((scale.x / (viewportsC) - 1) * i,  (s - 1) * i);
+
+        //viewport.m_transform.SetScale(500, 500);
+        //viewport.m_transform.SetPosition(0, 0);
     }
 }
 

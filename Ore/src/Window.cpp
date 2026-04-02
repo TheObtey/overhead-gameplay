@@ -91,6 +91,9 @@ void Window::Open()
 void Window::Clear()
 {
     glfwMakeContextCurrent(m_pWindow);
+	Color blue = Color::BLUE;
+	glClearColor(blue.r, blue.g, blue.b, blue.a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::Present()
@@ -105,6 +108,7 @@ void Window::SetSize(uint16 width, uint16 height)
     m_height = height;
 
     glfwSetWindowSize(m_pWindow, m_width, m_height);
+	glfwSetWindowAspectRatio(m_pWindow, m_width, m_height);
 }
 
 void Window::FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height)

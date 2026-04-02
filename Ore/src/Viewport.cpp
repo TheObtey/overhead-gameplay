@@ -35,8 +35,6 @@ void Viewport::SetSize(uint16 width, uint16 height)
 void Viewport::Clear() const
 {
     glViewport(m_x, m_y, m_width, m_height);
-    glClearColor(m_backgroundColor.r, m_backgroundColor.g, m_backgroundColor.b, m_backgroundColor.a);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Viewport::AddPass(Pass* pPass)

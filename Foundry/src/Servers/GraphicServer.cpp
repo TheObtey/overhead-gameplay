@@ -78,17 +78,8 @@ void GraphicServer::LoadShader()
     m_lightProgram.AddShader(&m_lightFrag);
     m_lightProgram.Load();
 
-    std::vector<Vertex> vertices;
-    vertices.push_back({ glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f) });
-    vertices.push_back({ glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f) });
-    vertices.push_back({ glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f) });
-    vertices.push_back({ glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f) });
-
-    std::vector<uint32> indices = {
-        0,1,2,
-        0,2,3
-    };
-    m_defaultCubeGeo = std::make_shared<Geometry>(vertices, indices);
+    GeoInfo cubeInfo = GeometryFactory::MakeCube(1.0f, 1.0f, 1.0f);
+    m_defaultCubeGeo = std::make_shared<Geometry>(cubeInfo.m_vertices, cubeInfo.m_indices);
     m_defaultTexture = std::make_shared<Texture>("res/textures/Default.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
 }
 

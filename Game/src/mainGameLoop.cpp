@@ -25,9 +25,11 @@ uptr<Node> LoadScene()
 
     uptr<NodeMesh> mesh = Node::CreateNode<NodeMesh>("Cube");
     mesh->AddTextures(normal, specular);
+    //mesh->SetLocalX(1.2);
 
     uptr<NodeMesh> mesh2 = Node::CreateNode<NodeMesh>("Cube2");
     mesh2->AddTextures(normal, specular);
+    //mesh2->SetLocalX(-2);
 
     viewport2->AddChild(std::move(camera));
     viewport2->AddChild(std::move(mesh));
