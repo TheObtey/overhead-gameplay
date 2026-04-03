@@ -34,9 +34,8 @@ void RenderGraph::UpdateGBuffer()
     }
 }
 
-void RenderGraph::CreateGBuffer(uint32 screenWidth, uint32 screenHeight)
+void RenderGraph::CreateGBuffer(uint32 const screenWidth, uint32 const screenHeight)
 {
-    Logger::Log("Start G-Buffer");
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
 
     m_pGPosition->Bind();

@@ -54,7 +54,6 @@ void LightPass::Execute()
 {
     if (m_pCamera == nullptr) return;
 
-    Logger::Log("Start Light Pass");
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
     m_program.Use();
