@@ -26,8 +26,7 @@ namespace Physics
 		return std::optional<RaycastHit>(cb.hits[closest]);
 	}
 
-
-	std::vector<RaycastHit> Physics::RaycastAll(const glm::vec3& origin, const glm::vec3& direction, float maxDist, uint16 mask)
+	std::vector<RaycastHit> RaycastAll(const glm::vec3& origin, const glm::vec3& direction, float maxDist, uint16 mask)
 	{
 		rp3d::Ray ray(glmToRp3d(origin), glmToRp3d(origin + direction * maxDist));
 		HelperCallBack::RaycastCB cb;

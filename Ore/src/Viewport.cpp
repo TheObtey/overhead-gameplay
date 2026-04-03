@@ -8,11 +8,6 @@ Viewport::Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const&
     Setup(x, y, width, height, backgroundColor);
 }
 
-void Viewport::AddPass(Pass* pPass)
-{
-    m_pRenderGraph->AddPass(pPass);
-}
-
 void Viewport::Setup(uint16 x, uint16 y, uint16 width, uint16 height, Color const &backgroundColor)
 {
     m_x = x;
@@ -20,7 +15,9 @@ void Viewport::Setup(uint16 x, uint16 y, uint16 width, uint16 height, Color cons
     m_width = width;
     m_height = height;
     m_backgroundColor = backgroundColor;
-    m_pRenderGraph = std::make_unique<RenderGraph>(width, height);
+
+    m_pRenderGraph = std::make_unique<RenderGraph>(*this);
+    //m_pGeometryPass = std::make_unique<GeometryPass>()
 }
 
 void Viewport::Setup(glm::uvec2 const &pos, glm::uvec2 const &size, Color const &backgroundColor)
@@ -32,16 +29,17 @@ void Viewport::SetSize(uint16 width, uint16 height)
 {
     m_width = width;
     m_height = height;
-    m_pRenderGraph->SetSize(width, height);
+    m_pRenderGraph->UpdateGBuffer();
 }
 
 void Viewport::Clear() const
 {
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(m_x, m_y, m_width, m_height);
-    glClearColor(m_backgroundColor.r, m_backgroundColor.g, m_backgroundColor.b, m_backgroundColor.a);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDisable(GL_SCISSOR_TEST);
+    glViewport(0, 0, m_width, m_height);
+}
+
+void Viewport::AddPass(Pass* pPass)
+{
+    m_pRenderGraph->AddPass(pPass);
 }
 
 void Viewport::Present() const

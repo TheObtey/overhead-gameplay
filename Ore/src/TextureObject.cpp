@@ -9,10 +9,6 @@ TextureObject::TextureObject(uint32 id, TextureType type)
     m_type = type;
 }
 
-TextureObject::~TextureObject()
-{
-}
-
 void TextureObject::Bind()
 {
     glBindTexture(static_cast<uint32>(m_type), m_id);

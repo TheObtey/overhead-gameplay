@@ -41,6 +41,7 @@ private:
 
 BindProxy(Node2D::Proxy,
 	binder.BindClass<Node2D::Proxy>("node2d",
+		sol::base_classes, sol::bases<Node::Proxy>(),
 		"SetScale", OVERLOAD(Proxy, void, glm::vec2 const&)(BIND(SetScale)),
 		"SetScale", OVERLOAD(Proxy, void, float, float)(BIND(SetScale)),
 		"GetScale", BIND(GetScale),

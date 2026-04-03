@@ -16,7 +16,7 @@ public:
 
     ~SceneTree() = default;
 
-    void ChangeSceneToNode(Node& newScene);
+    void ChangeSceneToNode(uptr<Node> newScene);
 
     Node& GetCurrentScene() const { return *m_pCurrentScene; }
     Node& GetRoot() const { return *m_root; }

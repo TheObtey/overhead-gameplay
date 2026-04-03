@@ -26,6 +26,7 @@ if (${IS_DEBUG_BUILD})
     add_compile_definitions(DEBUG_BUILD)
 else()
     add_compile_definitions(RELEASE_BUILD)
+    add_compile_definitions(NO_LOGGER)
 endif()
 
 include_directories("Core/")

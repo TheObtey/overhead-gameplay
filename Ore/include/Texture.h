@@ -2,24 +2,18 @@
 #define ORE_TEXTURE__H_
 
 #include "ITexture.h"
-#include "TextureObject.h"
-
-enum class TextureMaterialType
-{
-    DIFFUSE,
-    SPECULAR,
-    NORMAL,
-    HEIGHT
-};
 
 class Texture final : public ITexture
 {
 public:
-    Texture(std::string const& path, TextureType type, TextureMaterialType meterialType);    
-    ~Texture() override;
+    Texture(std::filesystem::path const& path, TextureType type, TextureMaterialType materialType);
+    ~Texture();
+
+    void Load(std::filesystem::path const& path, TextureType type, TextureMaterialType materialType) override;
+    void Unload() override;
 
     TextureObject& GetTextureObject() { return m_textureObject; }
-    TextureMaterialType GetTextureMaterialType() { return m_materialType; }
+    TextureMaterialType GetTextureMaterialType() const { return m_materialType; }
 
 private:
     TextureObject m_textureObject;

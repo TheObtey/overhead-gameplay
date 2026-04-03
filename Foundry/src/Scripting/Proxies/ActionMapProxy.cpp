@@ -46,7 +46,7 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 
 	binder.BindClass<Action>("action",
 		sol::constructors<Action(), Action(ControlType, EventInput)>(),
-		"Event", &Action::Event,
+		"Event", &Action::OnAction,
 		"AddControl", &Action::AddControl,
 		"GetControl", &Action::GetControl
 	);

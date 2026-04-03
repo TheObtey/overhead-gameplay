@@ -21,12 +21,15 @@ public:
     void SetPos(uint16 x, uint16 y) override {m_x = x, m_y = y;}
     void SetBackgroundColor(Color const& color) override {m_backgroundColor = color;}
 
-    uint16 GetWidth() override {return m_width;} 
+    uint16 GetWidth() override   {return m_width;}
     uint16 GetHeight() override  {return m_height;}
+
+    uint16 GetPosX() override { return m_x; }
+    uint16 GetPosY() override { return m_y; }
 
     void Clear() const override;
     void Present() const override;
-    
+
     void AddPass(Pass* pPass);
 
 private:

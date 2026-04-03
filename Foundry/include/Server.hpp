@@ -24,17 +24,18 @@ private:
 
 
 public:
+    static void Initialize() { static_cast<Server<Derived>&>(Instance()).OnInitialize(); }
     static void FlushCommands() { static_cast<Server<Derived>&>(Instance()).FlushCommandsImpl(); }
     static void BuildTasks(TaskGraph& graph) { static_cast<Server<Derived>&>(Instance()).BuildTasksImpl(graph); }
-
-    virtual void FlushCommandsImpl() = 0;
-    virtual void BuildTasksImpl(TaskGraph& graph) = 0;
 
 protected:
 
     static Derived& Instance();
+
 	virtual void OnInitialize() {} ;
 	virtual void OnUnInitialize() {};
+    virtual void FlushCommandsImpl() = 0;
+    virtual void BuildTasksImpl(TaskGraph& graph) = 0;
 
     friend Derived;
 

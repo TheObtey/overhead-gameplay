@@ -55,6 +55,9 @@ public:
 	template <NodeType T>
 	T& GetNode(std::string const& path);
 
+	template <NodeType T>
+	OptionalRef<T> FindFirstParentOfType();
+
 	//Only destroy the node if it has a parent
 	void Destroy();
 	virtual void Reparent(Node& newParent, bool keepGlobalTransform = true);
@@ -90,6 +93,7 @@ public:
 	Event<void(Node&, double)> OnNodePhysicsUpdated;
 	Event<void(Node&)> OnSceneLeave;
 	Event<void(Node&)> OnParentChange;
+	Event<void()> OnHierarchyChanged;
 
 protected:
 	//private constructor for in-class initialization
@@ -115,7 +119,7 @@ protected:
 
 private:
     void AttachChildImmediate(std::unique_ptr<Node>& child);
-
+	void NotifyHierarchyChanged();
 
 	inline static bool s_IsInEditor = false;
 
@@ -174,6 +178,15 @@ T& Node::GetNode(std::string const& path)
     }
 
     return *static_cast<T*>(pNode);
+}
+
+template<NodeType T>
+OptionalRef<T> Node::FindFirstParentOfType()
+{
+	if (m_pOwner == nullptr) return {};
+	if (dynamic_cast<T*>(m_pOwner)) return *static_cast<T*>(m_pOwner);
+
+	return m_pOwner->FindFirstParentOfType<T>();
 }
 
 #include "Scripting/Proxies/NodeProxy.inl"

@@ -2,55 +2,46 @@
 #define ORE_CAMERA__H_
 
 #include "Define.h"
-
+#include "ICamera.h"
 #include <glm/glm.hpp>
 
-enum class ProjectionType
+enum class ProjectionType : uint8
 {
     PERSPECTIVE,
     ORTHOGRAPHIC,
 };
 
-class Camera 
+class Camera : public ICamera
 {
 public:
-    Camera(
-        glm::vec3 const& position = glm::vec3(0.0f, 0.0f, 3.0f),
-        glm::vec3 const& up = glm::vec3(0.0f, 0.0f, 0.0f),
-        float yaw = 0.0f,
-        float pitch = 0.0f,
-        float roll = 0.0f,
-        float fov = 45.0f
-    );
-    ~Camera();
+    struct PerspectiveSettings
+    {
+        float fov = 90;
+        float aspectRatio = 1;
+        float nearPlane = 0.1f;
+        float farPlane = 100.0f;
+        glm::vec3 up = {0.0f, 1.0f, 0.0f};
+    };
 
-    glm::mat4 GetProjectionMatrix(ProjectionType type, uint16 screenWidth, uint16 screenHeight, float near, float far) const;
-    glm::mat4 GetViewMatrix() const;
-    glm::vec3 GetPosition() const {return m_position;}
-    
-    void UpdateVectors();
+    Camera() = default;
+    Camera(PerspectiveSettings const settings) : Perspective(settings) {}
+    ~Camera() = default;
 
-    void SetPosition(glm::vec3 const& position)    { m_position = position;}
+    std::array<glm::vec3, 8> GetFrustum() const;
+    glm::mat4 const& GetViewProjMatrix() const;
+    glm::vec3 GetPosition() const;
 
-    void SetYaw(float yaw) {m_yaw = yaw; UpdateVectors(); };
-    void SetPitch(float pitch) {m_pitch = pitch; UpdateVectors(); }
-    void SetRoll(float roll) {m_roll = roll; UpdateVectors(); }
-    void SetFov(float fov) {m_fov = fov; }
+    void LookAt(glm::vec3 const& target);
+    void UpdateCamera();
 
-    float GetYaw() const {return m_yaw;}
-    float GetPitch() const {return m_pitch;}
-    float GetRoll() const {return m_roll;}
-    
+    void SetTransform(glm::mat4 const& transform);
+    PerspectiveSettings Perspective = {};
 private:
-    float m_yaw;
-    float m_pitch;
-    float m_roll;
-    float m_fov;
-    
-    glm::vec3 m_position;
-    glm::vec3 m_up;
-    glm::vec3 m_worldUp;
-    glm::vec3 m_forward;
-    glm::vec3 m_right;
+    glm::mat4 m_transform {1.0f};
+    glm::mat4 m_viewMatrix {1.0f};
+    glm::mat4 m_viewProjMat {1.0f};
+
+    ProjectionType m_projectionType = ProjectionType::PERSPECTIVE;
 };
+
 #endif

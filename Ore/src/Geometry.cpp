@@ -2,10 +2,8 @@
 #include "VertexArrayObject.h"
 #include "Logger.hpp"
 
-Geometry::Geometry(std::vector<Vertex> const& vertices, std::vector<uint32> const& indices)
+Geometry::Geometry(std::span<Vertex const> points, std::vector<uint32> const& indices)
 {
-    Logger::Log("Start Geometry");
-
     m_indiceSize = static_cast<uint32>(indices.size());
     GLuint vaoId;
 
@@ -14,7 +12,7 @@ Geometry::Geometry(std::vector<Vertex> const& vertices, std::vector<uint32> cons
     m_pVao = std::make_unique<VertexArrayObject>(vaoId);
     m_pVao->Bind();
 
-    AddPoints(vertices);
+    AddPoints(points);
     AddIndices(indices);
     Setup();    
 }
@@ -27,22 +25,14 @@ Geometry::Geometry(Geometry const& other)
     m_pVertexBuffer = std::make_unique<Buffer<Vertex>>(*other.m_pVertexBuffer);
 }
 
-Geometry::~Geometry()
-{
-}
-
 void Geometry::Draw()
 {
-
-    Logger::Log("Start Draw Geometry");
-    
     m_pVao->Bind();
     glDrawElements(GL_TRIANGLES, m_indiceSize, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-
 }
 
-void Geometry::AddPoints(std::vector<Vertex> const& vertices)
+void Geometry::AddPoints(std::span<Vertex const> vertices)
 {
     GLuint id;
     glGenBuffers(1, &id); 
@@ -50,7 +40,7 @@ void Geometry::AddPoints(std::vector<Vertex> const& vertices)
     m_pVertexBuffer = std::make_unique<Buffer<Vertex>>(vertices, id, BufferType::BUFFER, true);
 }
 
-void Geometry::AddIndices(std::vector<uint32> const& indices)
+void Geometry::AddIndices(std::span<uint32 const> indices)
 {
     GLuint id;
     glGenBuffers(1, &id);

@@ -2,6 +2,7 @@
 #define ORE_BUFFER__H_
 
 #include "IBuffer.h"
+#include <span>
 
 enum class BufferType
 {
@@ -13,10 +14,9 @@ template<typename T>
 class Buffer final : public IBuffer<T>
 {
 public:
-    Buffer(std::vector<T> const& data, uint32 id, BufferType type, bool isDataPersistant);
+    Buffer(std::span<T const> data, uint32 id, BufferType type, bool isDataPersistant);
     Buffer(Buffer<T> const& other);
-
-    ~Buffer() override;
+    ~Buffer() = default;
 
     void Bind() override;
 
@@ -24,7 +24,7 @@ public:
     void Unmap() override;
 
 protected:
-    void StoreData(std::vector<T> const& data) override;
+    void StoreData(std::span<T const> data) override;
 
 private:
     BufferType m_type;

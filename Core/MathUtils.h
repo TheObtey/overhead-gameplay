@@ -67,4 +67,4 @@ namespace Maths
 	//}
 }
 
-#endif MATHSUTILS__H_
+#endif

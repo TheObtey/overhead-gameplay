@@ -17,8 +17,8 @@ SceneTree& SceneTree::operator=(SceneTree const& other)
     return *this;
 }
 
-void SceneTree::ChangeSceneToNode(Node& newScene)
+void SceneTree::ChangeSceneToNode(uptr<Node> newScene)
 {
     if (m_pCurrentScene) m_pCurrentScene->Destroy();
-
+    m_root->AddChild(newScene);
 }

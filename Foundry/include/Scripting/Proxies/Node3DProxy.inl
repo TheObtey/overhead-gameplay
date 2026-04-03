@@ -39,10 +39,10 @@ public:
 	glm::mat4x4 const& GetWorldMatrix() const						{ return m_pNode->GetWorldMatrix(); }
 	glm::vec3 GetWorldPosition() const								{ return m_pNode->GetWorldPosition(); }
 	glm::vec3 GetWorldScale() const									{ return m_pNode->GetWorldScale(); }
-	// Pitch, Yaw, Roll  / x, y, z												
-	// -- Angles in Degrees 													
+	// Pitch, Yaw, Roll  / x, y, z
+	// -- Angles in Degrees
 	glm::vec3 GetWorldRotation() const								{ return m_pNode->GetWorldRotation(); }
-	// { w, x, y, z }													
+	// { w, x, y, z }
 	glm::quat const& GetWorldRotationQuaternion() const				{ return m_pNode->GetWorldRotationQuaternion(); }
 
 	// =========== Setters ===========
@@ -74,13 +74,13 @@ public:
 	void AddLocalX(float const x)									{ m_pNode->AddLocalX(x); }
 	void AddLocalY(float const y)									{ m_pNode->AddLocalY(y); }
 	void AddLocalZ(float const z)									{ m_pNode->AddLocalZ(z); }
-	// -- Angles in Radians											
+	// -- Angles in Radians
 	void AddLocalRotation(glm::vec3 const rot)						{ m_pNode->AddLocalRotation(glm::vec4(rot, 1.0f)); }
-	// -- Angles in Radians											
+	// -- Angles in Radians
 	void AddLocalYaw(float const yaw)								{ m_pNode->AddLocalYaw(yaw); }
-	// -- Angles in Radians											
+	// -- Angles in Radians
 	void AddLocalPitch(float const pitch)							{ m_pNode->AddLocalPitch(pitch); }
-	// -- Angles in Radians											
+	// -- Angles in Radians
 	void AddLocalRoll(float const roll)								{ m_pNode->AddLocalRoll(roll); }
 
 private:

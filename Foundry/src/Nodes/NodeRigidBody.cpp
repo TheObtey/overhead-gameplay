@@ -307,6 +307,8 @@ bool NodeRigidBody::IsGravityEnabled()
 {
 	if (m_pOwner)
 		return m_pRigidBodyRP3D->isGravityEnabled();
+
+	return false;
 }
 
 void NodeRigidBody::SetSleepingEnabled(bool enabled)

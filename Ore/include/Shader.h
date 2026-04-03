@@ -2,7 +2,6 @@
 #define ORE_SHADER__H_
 
 #include "IShader.h"
-#include "Define.h"
 
 enum class ShaderType
 {
