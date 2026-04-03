@@ -147,7 +147,8 @@ int main()
         window.Clear();
         pNode->Update(0.5f);
         AnimationServer::FlushCommands();
-        //camera->SetYaw(yaw++);
+        camera->SetYaw(yaw--);
+        camera->SetPosition({ position.x++,position.y,position.z });
         window.Present();
     }
 

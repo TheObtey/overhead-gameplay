@@ -42,16 +42,17 @@ void NodeMeshAnimated3D::SetMesh(SceneMesh const& mesh)
 	{
 		text.push_back(mesh.meshTextures[i].get());
 	}
-	m_mesh = std::make_unique<Mesh>(geo, text,glm::mat4(1.0f));
+	m_mesh = std::make_unique<Mesh>(geo, text, mesh.meshMatrix);
 	m_mesh->SetBonesOffsets(mesh.bonesOffest);
-	m_mesh->SetBones(mesh.bonesOriginalTransform);
 	glm::mat4 GlobalTransformation = glm::mat4(1.0f);
 
-	for (uint8 i = 0; i < mesh.bonesOriginalTransform.size();++i)
+	std::vector<glm::mat4> bonesV = {};
+	for (uint8 i = 0; i < mesh.bonesTransform.size();++i)
 	{
-		GlobalTransformation = mesh.bonesOriginalTransform[i] * GlobalTransformation;
-		m_mesh->SetBoneValue(i, mesh.bonesOffest[i] * GlobalTransformation);
+		GlobalTransformation = GlobalTransformation * mesh.bonesTransform[i];
+		bonesV.push_back(GlobalTransformation * mesh.bonesOffest[i]);
 	}
+	m_mesh->SetBones(bonesV);
 }
 
 void NodeMeshAnimated3D::SetAnimation(Animation& anim)

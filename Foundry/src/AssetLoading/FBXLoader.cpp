@@ -23,7 +23,7 @@ glm::mat4x4 AIMatrixToGLMMatrix(aiMatrix4x4 const& matrix)
 {
     glm::mat4x4 out = {};
     memcpy(&out, &matrix, sizeof(aiMatrix4x4));
-    return out;
+    return glm::transpose(out);
 }
 
 void FBXLoader::LoadTextures(FBXLoader::Material& materials,std::vector<sptr<Texture>>& vect, uint32 matIndex)
@@ -76,20 +76,7 @@ sptr<SceneData> FBXLoader::LoadFile(std::string const& path)
 sptr<SceneNode> FBXLoader::BuildNodesTree(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, SceneData& outData, Material& outMat)
 {
     SceneNode node;
-    if (pNode->mMetaData != nullptr)
-    {
-        for (uint8 i = 0; i < pNode->mMetaData->mNumProperties;++i)
-        {
-            auto s = pNode->mMetaData->mKeys[i];
-            auto v = pNode->mMetaData->mValues[i];
-            Logger::Log("aaa");
-        }
-    }
-
     node.name = pNode->mName.C_Str();
-    if (node.name.find("Ctrl") != std::string::npos && node.name.find("_Grp") != std::string::npos)
-        node.isCtrlGrp = true;
-
     node.parent = parentIndex;
     node.transform = AIMatrixToGLMMatrix(pNode->mTransformation);
     uint32 selfIndex = outData.allNode.size();
@@ -251,7 +238,7 @@ void FBXLoader::BuildLights(aiScene const* pScene, SceneData& outData)
 void FBXLoader::BuildBones(SceneData& outData, aiMesh const* pMesh, SceneMesh& mesh)
 {
     mesh.bonesOffest.reserve(pMesh->mNumBones);
-    mesh.bonesOriginalTransform.reserve(pMesh->mNumBones);
+    mesh.bonesTransform.reserve(pMesh->mNumBones);
     std::vector<glm::mat4> offsetMatrix = {};
     uint32 firstBoneIndex = 0;
     for (uint32 i = 0; i < pMesh->mNumBones; ++i)
@@ -264,7 +251,8 @@ void FBXLoader::BuildBones(SceneData& outData, aiMesh const* pMesh, SceneMesh& m
                 if (i == 0) firstBoneIndex = k;
                 outData.allNode[k]->type = BONE;
                 outData.allNode[k]->boneIndexInMesh = i;
-                mesh.bonesOriginalTransform.push_back(outData.allNode[k]->transform);
+                mesh.bonesTransform.push_back(outData.allNode[k]->transform);
+                break;
             }
         }
         mesh.bonesOffest.push_back(AIMatrixToGLMMatrix(pBone->mOffsetMatrix));
@@ -275,7 +263,10 @@ void FBXLoader::BuildBones(SceneData& outData, aiMesh const* pMesh, SceneMesh& m
             for (uint32 n = 0; n < 4; ++n)
             {
                 if (mesh.vertices[vID].boneIDS[n] == -1)
+                {
                     index = n;
+                    break;
+                }
             }
             mesh.vertices[vID].weights[index] = static_cast<float>(pBone->mWeights[wIndex].mWeight);
             mesh.vertices[vID].boneIDS[index] = i;

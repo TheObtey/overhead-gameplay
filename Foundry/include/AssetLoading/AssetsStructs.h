@@ -41,7 +41,7 @@ struct SceneMesh
 
 	std::vector<sptr<Texture>> meshTextures;
 	std::vector<glm::mat4> bonesOffest;
-	std::vector<glm::mat4> bonesOriginalTransform;
+	std::vector<glm::mat4> bonesTransform;
 	glm::mat4 meshMatrix;
 	std::vector<uint32> animationlinked;
 };
