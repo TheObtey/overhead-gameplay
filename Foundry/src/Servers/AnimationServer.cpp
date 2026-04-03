@@ -28,8 +28,7 @@ glm::mat4 AnimationServer::InterpolateFrames(AnimationChannel const& pChannel, f
 
 void AnimationServer::BoneGlobalTransformHierarchy(Mesh* pMesh,uint32 ID, glm::mat4 const& parentTransform)
 {
-    glm::mat4 GlobalTransformation =  GlobalTransformation * pMesh->GetBoneValue(ID);
-
+    glm::mat4 GlobalTransformation = parentTransform * pMesh->GetBoneValue(ID);
     pMesh->SetBoneValue(ID, GlobalTransformation * pMesh->GetBoneOffset(ID));
     if (ID+1 < pMesh->GetBonesTransform().size())
         BoneGlobalTransformHierarchy(pMesh, ID+1,GlobalTransformation);
@@ -46,9 +45,19 @@ void AnimationServer::UpdateFrameImediate(Animation* pAnim, Mesh* pMesh)
         pAnim->isRestarting = false;
     }
     float currentTime = pAnim->currentTime;
+    std::vector<glm::mat4> toTransform = std::vector<glm::mat4>(pAnim->animationTransform.size() + 1);
     for (uint32 i = 0; i < pAnim->animationTransform.size();++i)
     {
         AnimationChannel& channel = *pAnim->animationTransform[i];
+        if (channel.currentFrame == channel.frameCount-1)
+        {
+            glm::vec3 newPos = channel.positionKeys[channel.currentFrame].vec;
+            glm::quat newRot = channel.rotationKeys[channel.currentFrame].quaternion;
+            glm::vec3 newScale = channel.scalingKeys[channel.currentFrame].vec;
+            glm::mat4 rotationMatrix = glm::mat4_cast(newRot);
+            toTransform[i] = (Maths::Translate(newPos) * rotationMatrix * Maths::Scale(newScale));
+            continue;
+        }
         if (pAnim->currentTime >= channel.positionKeys[channel.currentFrame+1].time)
         {
             channel.currentFrame += 1;
@@ -56,17 +65,8 @@ void AnimationServer::UpdateFrameImediate(Animation* pAnim, Mesh* pMesh)
             glm::quat newRot = channel.rotationKeys[channel.currentFrame].quaternion;
             glm::vec3 newScale = channel.scalingKeys[channel.currentFrame].vec;
             glm::mat4 rotationMatrix = glm::mat4_cast(newRot);
-            pMesh->SetBoneValue(channel.sceneNodeImpacted , (Maths::Translate(newPos) * rotationMatrix * Maths::Scale(newScale)));
+            pMesh->SetBoneValue(channel.sceneNodeImpacted, (Maths::Translate(newPos) * rotationMatrix * Maths::Scale(newScale)) * pMesh->GetBoneValue(channel.sceneNodeImpacted));
         }
-        //if (channel.currentFrame == channel.frameCount-1)
-        //{
-        //    glm::vec3 newPos = channel.positionKeys[channel.currentFrame].vec;
-        //    glm::quat newRot = channel.rotationKeys[channel.currentFrame].quaternion;
-        //    glm::vec3 newScale = channel.scalingKeys[channel.currentFrame].vec;
-        //    glm::mat4 rotationMatrix = glm::mat4_cast(newRot);
-        //    pMesh->SetBoneValue(channel.sceneNodeImpacted, Maths::Translate(newPos) * rotationMatrix * Maths::Scale(newScale));
-        //    continue;
-        //}
         //float ratio = pAnim->currentTime / (channel.positionKeys[channel.currentFrame].time + channel.positionKeys[channel.currentFrame + 1].time);
         //pMesh->SetBoneValue(channel.sceneNodeImpacted, InterpolateFrames(channel, ratio) * pMesh->GetBoneOffset(channel.sceneNodeImpacted));
     }

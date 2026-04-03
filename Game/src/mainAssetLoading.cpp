@@ -54,7 +54,7 @@ int main()
     textures.push_back(&normal);
     Mesh mesh(cube, textures, glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f)));
 
-    glm::vec3 position(-15.0f, 0.0f, 0.0f);
+    glm::vec3 position(-10.0f, 0.0f, 0.0f);
     glm::vec3 up(0.0f, 1.0f, 0.0f);
 
     float yaw = 0.0f;
@@ -140,13 +140,13 @@ int main()
     //viewport.AddPass(&geoPass);
     viewport.AddPass(&animPass);
     viewport.AddPass(&lightPass);
-    //pMesh->PlayAnimation("Test Anim 2",true);
+    pMesh->PlayAnimation("Test Anim 2",true);
 	
     while(window.IsOpen())
     {
         window.Clear();
-        pNode->Update(0.5f);
-        p3D->AddLocalRotation({ 0.0f,0.16f,0.0f });
+        pNode->Update(0.16f);
+        //p3D->AddLocalRotation({ 0.0f,0.016f,0.0f });
         AnimationServer::FlushCommands();
         window.Present();
     }
