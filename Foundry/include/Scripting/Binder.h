@@ -20,6 +20,7 @@ public:
 	template <typename T, typename ... Args>
 	void BindEnum(std::string const& name, Args&& ... params);
 
+	auto GetFunction(std::string const& name) const;
 	auto GetOrCreateNamespace(std::string const& name);
 
 	std::vector<std::string>& GetRegisteredTypesName() { return m_registeredTypesName; }

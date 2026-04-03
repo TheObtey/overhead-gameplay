@@ -2,8 +2,6 @@
 #define FOUNDRY_LUA_ENVIRO__H_
 
 #include "Scripting/ScriptInstance.h"
-
-#include <functional>
 #include <sol/sol.hpp>
 
 class LuaScriptInstance : public ScriptInstance
