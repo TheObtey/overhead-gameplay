@@ -12,6 +12,7 @@ struct AnimationChannel
 	uint32 sceneNodeImpacted;
 	uint32 frameCount;
 	uint32 currentFrame;
+	bool isController;
 	struct FrameVec3
 	{
 		float time;
@@ -25,6 +26,7 @@ struct AnimationChannel
 	std::vector<FrameVec3> positionKeys;
 	std::vector<FrameQuat> rotationKeys;
 	std::vector<FrameVec3> scalingKeys;
+	glm::mat4 originalWT;
 };
 
 struct Animation

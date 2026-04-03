@@ -27,7 +27,7 @@ int main()
 	Viewport viewport(0, 0, 1920, 1080, Color::SKY_BLUE);
 	window.AddViewport(viewport);
 
-    sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_3.fbx", AssetLoader::FileType::FBX);
+    //sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_3.fbx", AssetLoader::FileType::FBX);
     sptr<SceneData> Scene4 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_2.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene2 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene3 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Bones.fbx", AssetLoader::FileType::FBX);
@@ -54,10 +54,10 @@ int main()
     textures.push_back(&normal);
     Mesh mesh(cube, textures, glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f)));
 
-    glm::vec3 position(0.0f, 0.0f, 15.0f);
+    glm::vec3 position(-15.0f, 0.0f, 0.0f);
     glm::vec3 up(0.0f, 1.0f, 0.0f);
 
-    float yaw = -90.0f;
+    float yaw = 0.0f;
     float pitch = 0.0f;
     float roll = 0.0f;
 
@@ -112,17 +112,16 @@ int main()
     Shader animVert(ShaderType::TYPE_VERTEX);
     animVert.Load("res/shaders/Animated.vert");
 
-    animateProgram.AddShader(&lightFrag);
-    animateProgram.AddShader(&lightVert);
+    animateProgram.AddShader(&animFrag);
+    animateProgram.AddShader(&animVert);
     animateProgram.Load();
 
     animFrag.Unload();
     animVert.Unload();
 
-    mesh = *Scene4->allMesh[0];
+    //mesh = *Scene4->allMesh[0];
 
-    GeometryPass geoPass(geometryProgram, camera);
-    geoPass.AddMesh(mesh);
+    //GeometryPass geoPass(geometryProgram, camera);
     AnimatedPass animPass(animateProgram, camera);
     LightPass lightPass(lightProgram, lights, camera);
 
@@ -130,24 +129,25 @@ int main()
     AnimationServer::InitAnimationPass(&animPass);
 
     uptr<Node> pNode3D = Node::CreateNode<Node3D>("3D");
-    //uptr<Node> pNode = Node::CreateNode<NodeMeshAnimated3D>("AA");
-    //NodeMeshAnimated3D* pMesh = dynamic_cast<NodeMeshAnimated3D*>(pNode.get());
+    uptr<Node> pNode = Node::CreateNode<NodeMeshAnimated3D>("AA");
+    NodeMeshAnimated3D* pMesh = dynamic_cast<NodeMeshAnimated3D*>(pNode.get());
     Node3D* p3D = dynamic_cast<Node3D*>(pNode3D.get());
-    //pMesh->Instanciate(*Scene4->allMesh[0], *Scene4->animations[0]);
-    //pMesh->PlayAnimation("Test Anim 2",true);
+    pMesh->SetMesh(*Scene4->allMesh[0]);
     //pNode3D->AddChild(pNode);
     //p3D->SetWorldPosition({ 0.0f,0.0f,0.0f });
 
 
-    viewport.AddPass(&geoPass);
+    //viewport.AddPass(&geoPass);
     viewport.AddPass(&animPass);
     viewport.AddPass(&lightPass);
-	while(true)
+    //pMesh->PlayAnimation("Test Anim 2",true);
+	
+    while(window.IsOpen())
     {
-        //pNode->Update(1/60.0f);
-        AnimationServer::FlushCommands();
         window.Clear();
-        camera->SetYaw(yaw++);
+        pNode->Update(0.5f);
+        AnimationServer::FlushCommands();
+        //camera->SetYaw(yaw++);
         window.Present();
     }
 

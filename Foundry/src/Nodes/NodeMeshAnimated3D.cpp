@@ -2,7 +2,10 @@
 #include "Servers/AnimationServer.h"
 
 NodeMeshAnimated3D::NodeMeshAnimated3D(std::string const& name) : Node3D::Node3D(name)
-{}
+{
+	m_isPlaying = false;
+	m_currentAnim = "";
+}
 
 void NodeMeshAnimated3D::OnUpdate(double delta)
 {
@@ -30,18 +33,37 @@ void NodeMeshAnimated3D::OnUpdate(double delta)
 	AnimationServer::AddMesh(m_mesh.get());
 }
 
-void NodeMeshAnimated3D::Instanciate(Mesh const& mesh, Animation& anim)
+void NodeMeshAnimated3D::SetMesh(SceneMesh const& mesh)
 {
-	m_mesh = std::make_unique<Mesh>(mesh);
+
+	Geometry geo = Geometry(mesh.vertices, mesh.indices);
+	std::vector<Texture*> text = {};
+	for (uint8 i = 0 ; i < mesh.meshTextures.size();++i)
+	{
+		text.push_back(mesh.meshTextures[i].get());
+	}
+	m_mesh = std::make_unique<Mesh>(geo, text,glm::mat4(1.0f));
+	m_mesh->SetBonesOffsets(mesh.bonesOffest);
+	m_mesh->SetBones(mesh.bonesOriginalTransform);
+	glm::mat4 GlobalTransformation = glm::mat4(1.0f);
+
+	for (uint8 i = 0; i < mesh.bonesOriginalTransform.size();++i)
+	{
+		GlobalTransformation = mesh.bonesOriginalTransform[i] * GlobalTransformation;
+		m_mesh->SetBoneValue(i, mesh.bonesOffest[i] * GlobalTransformation);
+	}
+}
+
+void NodeMeshAnimated3D::SetAnimation(Animation& anim)
+{
 	Animation instanceAnim = {};
 	instanceAnim.duration = anim.duration;
 	instanceAnim.currentTime = 0.0f;
-	instanceAnim.isLooping =false;
+	instanceAnim.isLooping = false;
 	instanceAnim.name = anim.name;
 	for (uint8 i = 0; i < anim.animationTransform.size();++i)
 	{
 		instanceAnim.animationTransform.push_back(anim.animationTransform[i]);
-		instanceAnim.animationTransform[i]->sceneNodeImpacted = i;
 	}
 	m_linkedAnimations[instanceAnim.name] = std::make_unique<Animation>(instanceAnim);
 }

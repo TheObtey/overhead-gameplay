@@ -28,8 +28,22 @@ struct SceneNode
 
 	int32 boneIndexInMesh = -1;
 	int32 parent = -1;
-	std::vector<uint32> meshesIndex;
-	std::vector<uint32> children;
+	int32 MeshIndex = -1;
+	bool isCtrlGrp = false;
+	std::vector<sptr<SceneNode>> children;
+};
+
+struct SceneMesh
+{
+	// Geometry
+	std::vector<Vertex> vertices;
+	std::vector<uint32> indices;
+
+	std::vector<sptr<Texture>> meshTextures;
+	std::vector<glm::mat4> bonesOffest;
+	std::vector<glm::mat4> bonesOriginalTransform;
+	glm::mat4 meshMatrix;
+	std::vector<uint32> animationlinked;
 };
 
 struct SceneData
@@ -39,8 +53,7 @@ struct SceneData
 	std::vector<sptr<SceneNode>> allNode;
 	std::vector<sptr<Light>> alllights;
 	std::vector<sptr<Animation>> animations;
-	std::vector<sptr<Mesh>> allMesh;
-	std::vector<sptr<Texture>> allTextures;
+	std::vector<sptr<SceneMesh>> allMesh;
 };
 
 #endif // !FOUNDRY_ASSET_STRUCT_H__

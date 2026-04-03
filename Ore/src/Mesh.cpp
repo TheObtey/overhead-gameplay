@@ -54,14 +54,3 @@ void Mesh::Draw(IProgram const& pProgram) const
     m_pGeometry->Draw();
     glActiveTexture(GL_TEXTURE0);
 }
-
-
-void Mesh::SetBones(std::vector<glm::mat4> const& bones)
-{
-    m_bonesTransform = bones;
-}
-
-void Mesh::SetBoneValue(uint32 indx, glm::mat4 const& bone)
-{
-    m_bonesTransform[indx] = bone;
-}

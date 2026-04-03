@@ -5,6 +5,8 @@
 #include "AnimationStructs.h"
 
 #include <Passes/AnimatedPass.h>
+#include <glm/glm.hpp>
+#include <Define.h>
 
 class Animation;
 class Mesh;
@@ -30,6 +32,7 @@ private:
     static void UpdateFrameImediate(Animation* pAnim, Mesh* pMesh);
     static void AddMeshImmediate(Mesh* pMesh);
     static void PresentMeshs();
+    static void BoneGlobalTransformHierarchy(Mesh* pMesh, uint32 ID, glm::mat4 const& parentMatrix);
 
     static glm::mat4 InterpolateFrames(AnimationChannel const& pChannel, float delta);
 
