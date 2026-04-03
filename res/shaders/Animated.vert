@@ -26,7 +26,7 @@ void main()
     BoneTransform += gBones[aBoneIDs[3]] * aWeights[3];
 
     vec4 PosL = BoneTransform * vec4(aPosition, 1.0);
-    gl_Position = projection * view * worldPos  * PosL;
+    gl_Position = projection * view * model  * PosL;
     TexCoords = aTexCoords;
     vec4 NormalL = BoneTransform * vec4(aNormal, 0.0);
     Normal = (worldPos * NormalL).xyz;

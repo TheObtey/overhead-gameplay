@@ -27,20 +27,20 @@ public:
 	static sptr<SceneData> LoadFile(std::string const& path);
 
 private:
-	static sptr<SceneNode> BuildNodesTree(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, SceneData& outData, Material& outMat);
+	static sptr<SceneNode> BuildNodesTree(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, SceneData& outScene, Material& outMat);
 	
 	static void LoadEmbeddedTexture(std::string const& path, std::string& outPath, aiScene const* pScene, uint32& matIndex, TextureMaterialType type);
 	static void BuildMaterials(aiScene const* pScene, Material& outMat);
 
 	static void BuildGeometry(aiMesh const* pMesh,std::vector<Vertex>& vertices, std::vector<uint32>& indices);
-	static void BuildBones(SceneData& outData, aiMesh const* pMesh, SceneMesh& mesh);
-	static void BuildMeshs(aiScene const* pScene, SceneData& outData, Material& outMat);
+	static void BuildBones(SceneData& outScene, aiMesh const* pMesh, SceneMesh& mesh);
+	static void BuildMeshs(aiScene const* pScene, SceneData& outScene, Material& outMat);
 
 
-	static void BuildLights(aiScene const* pScene, SceneData& outData);
+	static void BuildLights(aiScene const* pScene, SceneData& outScene);
 	
-	static void BuildAnimations(aiScene const* pScene, SceneData& outData);
-	static void BuildAnimationsChannels(SceneData& outData,aiAnimation const* pAnim, Animation& outAnim, uint32 channelID,uint8 ctrID, uint8 boneID);
+	static void BuildAnimations(aiScene const* pScene, SceneData& outScene);
+	static void BuildAnimationsChannels(SceneData& outScene,aiAnimation const* pAnim, Animation& outAnim, uint32 channelID,uint8 ctrID, uint8 boneID);
 
 
 	static void LoadTextures(FBXLoader::Material& materials,std::vector<sptr<Texture>>& vect, uint32 matIndex);

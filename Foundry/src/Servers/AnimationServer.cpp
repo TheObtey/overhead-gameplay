@@ -28,12 +28,11 @@ glm::mat4 AnimationServer::InterpolateFrames(AnimationChannel const& pChannel, f
 
 void AnimationServer::BoneGlobalTransformHierarchy(Mesh* pMesh,uint32 ID, glm::mat4 const& parentTransform)
 {
-    //glm::mat4 GlobalTransformation = pMesh->m_originalBoneMatrix[ID] * parentTransform;
-    //GlobalTransformation =  GlobalTransformation * pMesh->GetBoneValue(ID);
+    glm::mat4 GlobalTransformation =  GlobalTransformation * pMesh->GetBoneValue(ID);
 
-    //pMesh->SetBoneValue(ID, GlobalTransformation * pMesh->GetBoneOffset(ID));
-    //if (ID+1 < pMesh->GetBonesTransform().size())
-    //    BoneGlobalTransformHierarchy(pMesh, ID+1,GlobalTransformation);
+    pMesh->SetBoneValue(ID, GlobalTransformation * pMesh->GetBoneOffset(ID));
+    if (ID+1 < pMesh->GetBonesTransform().size())
+        BoneGlobalTransformHierarchy(pMesh, ID+1,GlobalTransformation);
 }
 
 void AnimationServer::UpdateFrameImediate(Animation* pAnim, Mesh* pMesh)

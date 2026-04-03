@@ -128,11 +128,11 @@ int main()
 
     AnimationServer::InitAnimationPass(&animPass);
 
-    uptr<Node> pNode3D = Node::CreateNode<Node3D>("3D");
     uptr<Node> pNode = Node::CreateNode<NodeMeshAnimated3D>("AA");
     NodeMeshAnimated3D* pMesh = dynamic_cast<NodeMeshAnimated3D*>(pNode.get());
-    Node3D* p3D = dynamic_cast<Node3D*>(pNode3D.get());
+    Node3D* p3D = dynamic_cast<Node3D*>(pNode.get());
     pMesh->SetMesh(*Scene4->allMesh[0]);
+    pMesh->SetAnimation(*Scene4->animations[0]);
     //pNode3D->AddChild(pNode);
     //p3D->SetWorldPosition({ 0.0f,0.0f,0.0f });
 
@@ -146,9 +146,8 @@ int main()
     {
         window.Clear();
         pNode->Update(0.5f);
+        p3D->AddLocalRotation({ 0.0f,0.16f,0.0f });
         AnimationServer::FlushCommands();
-        camera->SetYaw(yaw--);
-        camera->SetPosition({ position.x++,position.y,position.z });
         window.Present();
     }
 

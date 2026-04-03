@@ -10,6 +10,7 @@ NodeMeshAnimated3D::NodeMeshAnimated3D(std::string const& name) : Node3D::Node3D
 void NodeMeshAnimated3D::OnUpdate(double delta)
 {
 	Node3D::OnUpdate(delta);
+	m_mesh->SetTransform(GetWorldMatrix());
 	if (m_isPlaying)
 	{
 		Animation& anim = *m_linkedAnimations[m_currentAnim];
