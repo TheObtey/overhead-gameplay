@@ -97,6 +97,7 @@ protected:
 class NodeBoxCollider : public NodeCollider
 {
 public:
+	class Proxy;
 	NodeBoxCollider(std::string const& name) : NodeCollider(name) {};
 	~NodeBoxCollider() override {};
 	void SetShape(const glm::vec3& halfExtents);
@@ -107,6 +108,7 @@ private:
 class NodeSphereCollider : public NodeCollider
 {
 public:
+	class Proxy;
 	NodeSphereCollider(std::string const& name) : NodeCollider(name) {};
 	~NodeSphereCollider() override {};
 	void SetShape(float radius);
@@ -117,6 +119,7 @@ private:
 class NodeCapsuleCollider : public NodeCollider
 {
 public:
+	class Proxy;
 	NodeCapsuleCollider(std::string const& name) : NodeCollider(name) {};
 	~NodeCapsuleCollider() override {};
 	void SetShape(float radius, float height);
@@ -125,7 +128,11 @@ private:
 };
 
 REGISTER_ISERIALIZABLE(NodeCollider, NodeCollider::CreateInstance);
+REGISTER_ISERIALIZABLE(NodeBoxCollider, NodeBoxCollider::CreateInstance);
+REGISTER_ISERIALIZABLE(NodeSphereCollider, NodeSphereCollider::CreateInstance);
+REGISTER_ISERIALIZABLE(NodeCapsuleCollider, NodeCapsuleCollider::CreateInstance);
 
 #include "Scripting/Proxies/NodeColliderProxy.inl"
+#include "Scripting/Proxies/NodeSpeColliderProxy.inl"
 
 #endif // !NODECOLLIDER__H_

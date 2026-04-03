@@ -6,6 +6,8 @@ public:
 
 	Proxy(Node& node) : Node3D::Proxy(node) {}
 
+	static Proxy* CreateNodeRigidBodyProxy(std::string const& name);
+
 	// =========== Forces and Torques ===========
 
 	void ApplyLocalForceAtCenterOfMass(const glm::vec3& force)								{ m_pNode->ApplyLocalForceAtCenterOfMass(force); }
@@ -81,59 +83,65 @@ private:
 	NodeRigidBody* m_pNode;
 };
 
-BindProxy(NodeRigidBody::Proxy,
-	return binder.BindClass<NodeRigidBody::Proxy>("noderigidbody",
-		"ApplyLocalForceAtCenterOfMass", BIND(ApplyLocalForceAtCenterOfMass),
-	"ApplyLocalForceAtLocalPosition", BIND(ApplyLocalForceAtLocalPosition),
-	"ApplyLocalForceAtWorldPosition", BIND(ApplyLocalForceAtWorldPosition),
-	"ApplyWorldForceAtCenterOfMass", BIND(ApplyWorldForceAtCenterOfMass),
-	"ApplyWorldForceAtLocalPosition", BIND(ApplyWorldForceAtLocalPosition),
-	"ApplyWorldForceAtWorldPosition", BIND(ApplyWorldForceAtWorldPosition),
-	"ApplyLocalTorque", BIND(ApplyLocalTorque),
-	"ApplyWorldTorque", BIND(ApplyWorldTorque),
 
-	"GetLinearVelocity", BIND(GetLinearVelocity),
-	"GetAngularVelocity", BIND(GetAngularVelocity),
-	"GetLinearDamping", BIND(GetLinearDamping),
-	"GetAngularDamping", BIND(GetAngularDamping),
-	"GetTotalForce", BIND(GetTotalForce),
+struct NodeRigidBody::Proxy::ProxyBinding
+{
+	static void Bind(Binder& binder)
+	{
+		binder.BindFunction("CreateNodeRigidBody", &NodeRigidBody::Proxy::CreateNodeRigidBodyProxy);
+		binder.BindClass<NodeRigidBody::Proxy>("noderigidbody",
+			sol::base_classes, sol::bases<Node3D::Proxy>(),
+			"ApplyLocalForceAtCenterOfMass", BIND(ApplyLocalForceAtCenterOfMass),
+			"ApplyLocalForceAtLocalPosition", BIND(ApplyLocalForceAtLocalPosition),
+			"ApplyLocalForceAtWorldPosition", BIND(ApplyLocalForceAtWorldPosition),
+			"ApplyWorldForceAtCenterOfMass", BIND(ApplyWorldForceAtCenterOfMass),
+			"ApplyWorldForceAtLocalPosition", BIND(ApplyWorldForceAtLocalPosition),
+			"ApplyWorldForceAtWorldPosition", BIND(ApplyWorldForceAtWorldPosition),
+			"ApplyLocalTorque", BIND(ApplyLocalTorque),
+			"ApplyWorldTorque", BIND(ApplyWorldTorque),
 
-	"SetLinearVelocity", BIND(SetLinearVelocity),
-	"SetAngularVelocity", BIND(SetAngularVelocity),
-	"SetLinearDamping", BIND(SetLinearDamping),
-	"SetAngularDamping", BIND(SetAngularDamping),
-	"LockLinearAxis", BIND(LockLinearAxis),
-	"LockAngularAxis", BIND(LockAngularAxis),
-	"ResetForces", BIND(ResetForces),
-	"ResetTorque", BIND(ResetTorque),
+			"GetLinearVelocity", BIND(GetLinearVelocity),
+			"GetAngularVelocity", BIND(GetAngularVelocity),
+			"GetLinearDamping", BIND(GetLinearDamping),
+			"GetAngularDamping", BIND(GetAngularDamping),
+			"GetTotalForce", BIND(GetTotalForce),
 
-	"GetMass", BIND(GetMass),
-	"SetMass", BIND(SetMass),
-	"GetBodyType", BIND(GetBodyType),
-	"SetBodyType", BIND(SetBodyType),
+			"SetLinearVelocity", BIND(SetLinearVelocity),
+			"SetAngularVelocity", BIND(SetAngularVelocity),
+			"SetLinearDamping", BIND(SetLinearDamping),
+			"SetAngularDamping", BIND(SetAngularDamping),
+			"LockLinearAxis", BIND(LockLinearAxis),
+			"LockAngularAxis", BIND(LockAngularAxis),
+			"ResetForces", BIND(ResetForces),
+			"ResetTorque", BIND(ResetTorque),
 
-	"SetBounciness",			OVERLOAD(NodeRigidBody::Proxy, void , float)		(BIND(SetBounciness)),
-	"GetBounciness",			OVERLOAD_CONST(NodeRigidBody::Proxy, float)			(BIND(GetBounciness)),
-	"SetFrictionCoefficient",	OVERLOAD(NodeRigidBody::Proxy, void , float)		(BIND(SetFrictionCoefficient)),
-	"GetFrictionCoefficient",	OVERLOAD_CONST(NodeRigidBody::Proxy, float)			(BIND(GetFrictionCoefficient)),
-	"SetMassDensity",			OVERLOAD(NodeRigidBody::Proxy, void , float)		(BIND(SetMassDensity)),
-	"GetMassDensity",			OVERLOAD_CONST(NodeRigidBody::Proxy, float)			(BIND(GetMassDensity)),
+			"GetMass", BIND(GetMass),
+			"SetMass", BIND(SetMass),
+			"GetBodyType", BIND(GetBodyType),
+			"SetBodyType", BIND(SetBodyType),
 
-	"SetBounciness",			OVERLOAD(NodeRigidBody::Proxy, void , int, float)	(BIND(SetBounciness)),
-	"GetBounciness",			OVERLOAD_CONST(NodeRigidBody::Proxy, float, int)	(BIND(GetBounciness)),
-	"SetFrictionCoefficient",	OVERLOAD(NodeRigidBody::Proxy, void , int, float)	(BIND(SetFrictionCoefficient)),
-	"GetFrictionCoefficient",	OVERLOAD_CONST(NodeRigidBody::Proxy, float, int)	(BIND(GetFrictionCoefficient)),
-	"SetMassDensity",			OVERLOAD(NodeRigidBody::Proxy, void , int, float)	(BIND(SetMassDensity)),
-	"GetMassDensity",			OVERLOAD_CONST(NodeRigidBody::Proxy, float, int)	(BIND(GetMassDensity)),
-		
-	"IsSleeping", BIND(IsSleeping),
-	"IsAllowedToSleep", BIND(IsAllowedToSleep),
-	"IsGravityEnabled", BIND(IsGravityEnabled),
-	"SetSleepingEnabled", BIND(SetSleepingEnabled),
-	"SetSleepingState", BIND(SetSleepingState),
-	"SetIsGravityEnabled", BIND(SetIsGravityEnabled)
+			"SetBounciness", OVERLOAD(NodeRigidBody::Proxy, void, float)		(BIND(SetBounciness)),
+			"GetBounciness", OVERLOAD_CONST(NodeRigidBody::Proxy, float)			(BIND(GetBounciness)),
+			"SetFrictionCoefficient", OVERLOAD(NodeRigidBody::Proxy, void, float)		(BIND(SetFrictionCoefficient)),
+			"GetFrictionCoefficient", OVERLOAD_CONST(NodeRigidBody::Proxy, float)			(BIND(GetFrictionCoefficient)),
+			"SetMassDensity", OVERLOAD(NodeRigidBody::Proxy, void, float)		(BIND(SetMassDensity)),
+			"GetMassDensity", OVERLOAD_CONST(NodeRigidBody::Proxy, float)			(BIND(GetMassDensity)),
 
+			"SetBounciness", OVERLOAD(NodeRigidBody::Proxy, void, int, float)	(BIND(SetBounciness)),
+			"GetBounciness", OVERLOAD_CONST(NodeRigidBody::Proxy, float, int)	(BIND(GetBounciness)),
+			"SetFrictionCoefficient", OVERLOAD(NodeRigidBody::Proxy, void, int, float)	(BIND(SetFrictionCoefficient)),
+			"GetFrictionCoefficient", OVERLOAD_CONST(NodeRigidBody::Proxy, float, int)	(BIND(GetFrictionCoefficient)),
+			"SetMassDensity", OVERLOAD(NodeRigidBody::Proxy, void, int, float)	(BIND(SetMassDensity)),
+			"GetMassDensity", OVERLOAD_CONST(NodeRigidBody::Proxy, float, int)	(BIND(GetMassDensity)),
+
+			"IsSleeping", BIND(IsSleeping),
+			"IsAllowedToSleep", BIND(IsAllowedToSleep),
+			"IsGravityEnabled", BIND(IsGravityEnabled),
+			"SetSleepingEnabled", BIND(SetSleepingEnabled),
+			"SetSleepingState", BIND(SetSleepingState),
+			"SetIsGravityEnabled", BIND(SetIsGravityEnabled)
 		);
-)
+	};
+};
 
 REGISTER_PROXY(NodeRigidBody::Proxy::ProxyBinding, NodeRigidBodyProxy);

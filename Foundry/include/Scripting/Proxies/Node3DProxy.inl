@@ -6,6 +6,8 @@ public:
 
 	Proxy(Node& node) : Node::Proxy(node) {}
 
+	static Proxy* CreateNode3DProxy(std::string const& name);
+
 	// =========== Getters ===========
 
 	glm::vec3 GetPosition() const									{ return m_pNode->GetPosition(); }
@@ -85,53 +87,59 @@ private:
 	Node3D* m_pNode;
 };
 
-BindProxy(Node3D::Proxy,
-	return binder.BindClass<Node3D::Proxy>("node3d",
-		"GetPosition", BIND(GetPosition),
-		"GetX", BIND(GetX),
-		"GetY", BIND(GetY),
-		"GetZ", BIND(GetZ),
-		"GetMatrixRotation", BIND(GetMatrixRotation),
-		"GetLocalRotationRad", BIND(GetLocalRotationRad),
-		"GetLocalRotationDeg", BIND(GetLocalRotationDeg),
-		"GetLocalRotationQuat", BIND(GetLocalRotationQuat),
-		"GetLocalYaw", BIND(GetLocalYaw),
-		"GetLocalPitch", BIND(GetLocalPitch),
-		"GetLocalRoll", BIND(GetLocalRoll),
-		"GetMaxScale", BIND(GetMaxScale),
-		"GetMinScale", BIND(GetMinScale),
-		"GetScale", BIND(GetScale),
-		"GetLocalRight", BIND(GetLocalRight),
-		"GetLocalUp", BIND(GetLocalUp),
-		"GetLocalForward", BIND(GetLocalForward),
-		"GetWorldMatrix", BIND(GetWorldMatrix),
-		"GetWorldPosition", BIND(GetWorldPosition),
-		"GetWorldScale", BIND(GetWorldScale),
-		"GetWorldRotation", BIND(GetWorldRotation),
-		"GetWorldRotationQuaternion", BIND(GetWorldRotationQuaternion),
-		"SetLocalPosition", BIND(SetLocalPosition),
-		"SetLocalX", BIND(SetLocalX),
-		"SetLocalY", BIND(SetLocalY),
-		"SetLocalZ", BIND(SetLocalZ),
-		"SetLocalRotationDeg", BIND(SetLocalRotationDeg),
-		"SetLocalRotationRad", BIND(SetLocalRotationRad),
-		"SetLocalRotationQuat", BIND(SetLocalRotationQuat),
-		"SetScale", BIND(SetScale),
-		"SetWorldPosition", BIND(SetWorldPosition),
-		"SetWorldScale", BIND(SetWorldScale),
-		"SetWorldRotation", BIND(SetWorldRotation),
-		"SetWorldRotationQuaternion", BIND(SetWorldRotationQuaternion),
+struct Node3D::Proxy::ProxyBinding
+{
+	static void Bind(Binder& binder)
+	{
+		binder.BindFunction("CreateNode3D", &Node3D::Proxy::CreateNode3DProxy);
+		binder.BindClass<Node3D::Proxy>("node3d",
+			sol::base_classes, sol::bases<Node::Proxy>(),
+			"GetPosition", BIND(GetPosition),
+			"GetX", BIND(GetX),
+			"GetY", BIND(GetY),
+			"GetZ", BIND(GetZ),
+			"GetMatrixRotation", BIND(GetMatrixRotation),
+			"GetLocalRotationRad", BIND(GetLocalRotationRad),
+			"GetLocalRotationDeg", BIND(GetLocalRotationDeg),
+			"GetLocalRotationQuat", BIND(GetLocalRotationQuat),
+			"GetLocalYaw", BIND(GetLocalYaw),
+			"GetLocalPitch", BIND(GetLocalPitch),
+			"GetLocalRoll", BIND(GetLocalRoll),
+			"GetMaxScale", BIND(GetMaxScale),
+			"GetMinScale", BIND(GetMinScale),
+			"GetScale", BIND(GetScale),
+			"GetLocalRight", BIND(GetLocalRight),
+			"GetLocalUp", BIND(GetLocalUp),
+			"GetLocalForward", BIND(GetLocalForward),
+			"GetWorldMatrix", BIND(GetWorldMatrix),
+			"GetWorldPosition", BIND(GetWorldPosition),
+			"GetWorldScale", BIND(GetWorldScale),
+			"GetWorldRotation", BIND(GetWorldRotation),
+			"GetWorldRotationQuaternion", BIND(GetWorldRotationQuaternion),
+			"SetLocalPosition", BIND(SetLocalPosition),
+			"SetLocalX", BIND(SetLocalX),
+			"SetLocalY", BIND(SetLocalY),
+			"SetLocalZ", BIND(SetLocalZ),
+			"SetLocalRotationDeg", BIND(SetLocalRotationDeg),
+			"SetLocalRotationRad", BIND(SetLocalRotationRad),
+			"SetLocalRotationQuat", BIND(SetLocalRotationQuat),
+			"SetScale", BIND(SetScale),
+			"SetWorldPosition", BIND(SetWorldPosition),
+			"SetWorldScale", BIND(SetWorldScale),
+			"SetWorldRotation", BIND(SetWorldRotation),
+			"SetWorldRotationQuaternion", BIND(SetWorldRotationQuaternion),
 
-		"AddScale", BIND(AddScale),
-		"AddLocalPosition", BIND(AddLocalPosition),
-		"AddLocalX", BIND(AddLocalX),
-		"AddLocalY", BIND(AddLocalY),
-		"AddLocalZ", BIND(AddLocalZ),
-		"AddLocalRotation", BIND(AddLocalRotation),
-		"AddLocalYaw", BIND(AddLocalYaw),
-		"AddLocalPitch", BIND(AddLocalPitch),
-		"AddLocalRoll", BIND(AddLocalRoll)
+			"AddScale", BIND(AddScale),
+			"AddLocalPosition", BIND(AddLocalPosition),
+			"AddLocalX", BIND(AddLocalX),
+			"AddLocalY", BIND(AddLocalY),
+			"AddLocalZ", BIND(AddLocalZ),
+			"AddLocalRotation", BIND(AddLocalRotation),
+			"AddLocalYaw", BIND(AddLocalYaw),
+			"AddLocalPitch", BIND(AddLocalPitch),
+			"AddLocalRoll", BIND(AddLocalRoll)
 		);
-)
+	};
+};
 
 REGISTER_PROXY(Node3D::Proxy::ProxyBinding, Node3DProxy);
