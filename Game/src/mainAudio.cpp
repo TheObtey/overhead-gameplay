@@ -1,18 +1,21 @@
-#include "GameLoop.h"
-#include "SceneTree.h"
-#include <Nodes/NodeWindow.h>
-
-#include <windows.h>
-
 #include "Nodes/NodeAudioEmitter.h"
 #include "Nodes/NodeAudioListener.h"
 #include "MixerAudio.h"
 #include "Define.h"
 
-//main v1 moteur
+#include "ActionMap.h"
+#include "Action.h"
+#include "GameLoop.h"
+
+#include <Nodes/NodeWindow.h>
 
 int main()
 {
+    uptr<Node> root = Node::CreateNode<NodeWindow>("Root");
+    uptr<Node> scene = Node::CreateNode<Node>("Scene");
+    root->AddChild(scene);
+    SceneTree defaultSceneTree(root);
+
 	// --- Audio Server ---
 	AudioServer::Init();
 
@@ -44,119 +47,126 @@ int main()
 	auto audioListen = Node::CreateNode<NodeAudioListener>("AudioListener");
 	audioListen->SetListenerPosition({ 0,0,0 });
 
-	printf("audio1 x:%.6f\n", audioEm->GetSourcePosition().x);
-	printf("audio2 x:%.6f\n", audioEm2->GetSourcePosition().x);
-	printf("listener x:%.6f\n", audioListen->GetListenerPosition().x);
+	Logger::Log("audio1 x:" + std::to_string(audioEm->GetSourcePosition().x));
+	Logger::Log("audio2 x:" + std::to_string(audioEm2->GetSourcePosition().x));
+	Logger::Log("listener x:" + std::to_string(audioListen->GetListenerPosition().x));
 
-	while (true)
-	{
-		if (GetAsyncKeyState('P') & 0x8000)
-		{
-			if (audioEm->IsPlaying()) 
-			{
-				audioEm->Stop();
-				std::cout << "Pause\n";
-			}
-			else
-			{
-				audioEm->Play();
-				std::cout << "Play\n";
-			}
-			Sleep(200);
-		}
+    // --- Actions ---
+    ActionMap actionMap;
 
-		else if (GetAsyncKeyState(VK_ADD) & 0x8000)
-		{
-			//Group volume
-			float next = AudioServer::GetGroupVolume(*sfx) + 0.01f;
-			AudioServer::SetGroupVolume(sfx, next);
-			printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
-		}
-		else if (GetAsyncKeyState(VK_SUBTRACT) & 0x8000)
-		{
-			//Group volume
-			float next = AudioServer::GetGroupVolume(*sfx) - 0.01f;
-			AudioServer::SetGroupVolume(sfx, next);
-			printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
-		}
-		else if (GetAsyncKeyState('T') & 0x8000)
-		{
-			//Master volume
-			float next = AudioServer::GetMasterVolume() + 0.05f;
-			AudioServer::SetMasterVolume(next);
-			printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
-		}
-		else if (GetAsyncKeyState('Y') & 0x8000)
-		{
-			//Master volume
-			float next = AudioServer::GetMasterVolume() - 0.05f;
-			AudioServer::SetMasterVolume(next);
-			printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
-		}
+    Action* pauseAction = new Action(ControlType::BUTTON, EventInput::KEY_P);
+    pauseAction->Event += [&](IControl& control)
+        {
+            if (audioEm->IsPlaying())
+            {
+                audioEm->Stop();
+                printf("Pause\n");
+            }
+            else
+            {
+                audioEm->Play();
+                printf("Play\n");
+            }
+        };
+    actionMap.Emplace("Pause", pauseAction);
 
-		else if (GetAsyncKeyState('W') & 0x8000) //PositionAudio3D Emitter
-		{
-			audioListen->SetListenerPosition({ 0,0,0 });
-		}
-		else if (GetAsyncKeyState('X') & 0x8000)
-		{
-			audioEm->SetSourcePosition({ 50,0,0 });
-		}
+    Action* volUpSfx = new Action(ControlType::BUTTON, EventInput::KEY_KP_ADD);
+    volUpSfx->Event += [&](IControl& control)
+        {
+            float next = AudioServer::GetGroupVolume(*sfx) + 0.01f;
+            AudioServer::SetGroupVolume(sfx, next);
+            printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
+        };
+    actionMap.Emplace("VolUpSfx", volUpSfx);
 
-		else if (GetAsyncKeyState('Z') & 0x8000) //PositionAudio3D Listener
-		{
-			glm::vec3 newPos = audioListen->GetListenerPosition();
-			newPos.y += 0.1f;
+    Action* volDownSfx = new Action(ControlType::BUTTON, EventInput::KEY_KP_SUBTRACT);
+    volDownSfx->Event += [&](IControl& control)
+        {
+            float next = AudioServer::GetGroupVolume(*sfx) - 0.01f;
+            AudioServer::SetGroupVolume(sfx, next);
+            printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
+        };
+    actionMap.Emplace("VolDownSfx", volDownSfx);
 
-			audioListen->SetListenerPosition(newPos);
-		}
-		else if (GetAsyncKeyState('Q') & 0x8000)
-		{
-			glm::vec3 newPos = audioListen->GetListenerPosition();
-			newPos.x -= 0.1f;
+    Action* masterUp = new Action(ControlType::BUTTON, EventInput::KEY_T);
+    masterUp->Event += [&](IControl& control)
+        {
+            float next = AudioServer::GetMasterVolume() + 0.05f;
+            AudioServer::SetMasterVolume(next);
+            printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
+        };
+    actionMap.Emplace("MasterUp", masterUp);
 
-			audioListen->SetListenerPosition(newPos);
-		}
-		else if (GetAsyncKeyState('S') & 0x8000)
-		{
-			glm::vec3 newPos = audioListen->GetListenerPosition();
-			newPos.y -= 0.1f;
+    Action* masterDown = new Action(ControlType::BUTTON, EventInput::KEY_Y);
+    masterDown->Event += [&](IControl& control)
+        {
+            float next = AudioServer::GetMasterVolume() - 0.05f;
+            AudioServer::SetMasterVolume(next);
+            printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
+        };
+    actionMap.Emplace("MasterDown", masterDown);
 
-			audioListen->SetListenerPosition(newPos);
-		}
-		else if (GetAsyncKeyState('D') & 0x8000)
-		{
-			glm::vec3 newPos = audioListen->GetListenerPosition();
-			newPos.x += 0.1f;
+    Action* resetListener = new Action(ControlType::BUTTON, EventInput::KEY_W);
+    resetListener->Event += [&](IControl& control)
+        {
+            audioListen->SetListenerPosition({ 0, 0, 0 });
+        };
+    actionMap.Emplace("ResetListener", resetListener);
 
-			audioListen->SetListenerPosition(newPos);
-		}
+    Action* moveEmitter = new Action(ControlType::BUTTON, EventInput::KEY_X);
+    moveEmitter->Event += [&](IControl& control)
+        {
+            audioEm->SetSourcePosition({ 50, 0, 0 });
+        };
+    actionMap.Emplace("MoveEmitter", moveEmitter);
 
-		Sleep(1);
-	}
+    Action* moveUp = new Action(ControlType::BUTTON, EventInput::KEY_Z);
+    moveUp->Event += [&](IControl& control)
+        {
+            glm::vec3 newPos = audioListen->GetListenerPosition();
+            newPos.y += 0.1f;
+            audioListen->SetListenerPosition(newPos);
+        };
+    actionMap.Emplace("MoveUp", moveUp);
+
+    Action* moveLeft = new Action(ControlType::BUTTON, EventInput::KEY_Q);
+    moveLeft->Event += [&](IControl& control)
+        {
+            glm::vec3 newPos = audioListen->GetListenerPosition();
+            newPos.x -= 0.1f;
+            audioListen->SetListenerPosition(newPos);
+        };
+    actionMap.Emplace("MoveLeft", moveLeft);
+
+    Action* moveDown = new Action(ControlType::BUTTON, EventInput::KEY_S);
+    moveDown->Event += [&](IControl& control)
+        {
+            glm::vec3 newPos = audioListen->GetListenerPosition();
+            newPos.y -= 0.1f;
+            audioListen->SetListenerPosition(newPos);
+        };
+    actionMap.Emplace("MoveDown", moveDown);
+
+    Action* moveRight = new Action(ControlType::BUTTON, EventInput::KEY_D);
+    moveRight->Event += [&](IControl& control)
+        {
+            glm::vec3 newPos = audioListen->GetListenerPosition();
+            newPos.x += 0.1f;
+            audioListen->SetListenerPosition(newPos);
+        };
+    actionMap.Emplace("MoveRight", moveRight);
+
+    // --- Main Loop ---
+    //while (true)
+    //{
+    //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    //}
+
+    GameLoop loop;
+    loop.StartGame(defaultSceneTree);
 
 	mixer.Shutdown();
 	AudioServer::Shutdown();
 
 	return 0;
 }
-
-//main v2 lua
-
-//int main(int argc, char** argv)
-//{
-//    uptr<Node> root = Node::CreateNode<NodeWindow>("Root");
-//    uptr<Node> scene = Node::CreateNode<Node>("Scene");    //Load this with the default .st file
-//    root->AddChild(scene);
-//    SceneTree defaultSceneTree(root);
-//
-//    //audio code
-//
-//    //end audio code
-//
-//    GameLoop loop;
-//    loop.StartGame(defaultSceneTree);
-//
-//
-//    return 0;
-//}

@@ -31,8 +31,6 @@ public:
 protected:
 	ma_sound m_sound{};
 	bool m_isPlaying = false;
-private:
-
 };
 
 REGISTER_ISERIALIZABLE(NodeAudioEmitter, NodeAudioEmitter::CreateInstance);

@@ -5,15 +5,15 @@
 bool AudioServer::Init()
 {
     Instance().m_soundEngineConfig = ma_engine_config_init();
-    Instance().m_soundEngineConfig.listenerCount = 2;
+    Instance().m_soundEngineConfig.listenerCount = MA_ENGINE_MAX_LISTENERS;
     
-    if (ma_engine_init(NULL, &Instance().m_soundEngine) != MA_SUCCESS)
+    if (ma_engine_init(&Instance().m_soundEngineConfig, &Instance().m_soundEngine) != MA_SUCCESS)
     {
-        printf("Failed to init audio engine\n");
+        Logger::Log("Failed to init audio engine");
         return false;
     }
-    Instance().m_channels.reserve(32);
 
+    Instance().m_channels.reserve(32);
     return true;
 }
 
@@ -40,12 +40,12 @@ AudioChannel* AudioServer::CreateChannel(const std::string& name)
 {
     if (GetChannel(name) != nullptr) { return GetChannel(name); }
 
-    AudioChannel* newChannel = new AudioChannel(); // allocation sur le heap
+    AudioChannel* newChannel = new AudioChannel();
     newChannel->name = name;
 
     if (ma_sound_group_init(&Instance().m_soundEngine, 0, NULL, &newChannel->soundGroup) != MA_SUCCESS)
     {
-        printf("Failed to create sound group: %s\n", name.c_str());
+        Logger::Log("Failed to create sound group: " + name);
         delete newChannel;
         return nullptr;
     }
@@ -53,6 +53,28 @@ AudioChannel* AudioServer::CreateChannel(const std::string& name)
     GetChannels().push_back(newChannel);
 
     return newChannel;
+}
+
+ma_uint32 AudioServer::AllocateListenerIndex()
+{
+    if (!Instance().m_availableListenerIndex.empty())
+    {
+        ma_uint32 index = Instance().m_availableListenerIndex.back();
+        Instance().m_availableListenerIndex.pop_back();
+        return index;
+    }
+    if (Instance().m_nextListenerIndex >= Instance().m_soundEngineConfig.listenerCount)
+    {
+        Logger::Log("Warning: max listeners reached " + Instance().m_soundEngineConfig.listenerCount);
+        return 0;
+    }
+
+    return Instance().m_nextListenerIndex++;
+}
+
+void AudioServer::ReleaseListenerIndex(ma_uint32 index)
+{
+    Instance().m_availableListenerIndex.push_back(index);
 }
 
 void AudioServer::SetMasterVolume(float volume)

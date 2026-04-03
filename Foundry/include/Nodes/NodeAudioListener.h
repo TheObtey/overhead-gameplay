@@ -11,7 +11,7 @@ public:
 	class Proxy;
 
 	NodeAudioListener(std::string const& name);
-	~NodeAudioListener() override = default;
+	~NodeAudioListener() override;
 
 	void SetListenerPosition(glm::vec3 position);
 	glm::vec3 GetListenerPosition();
@@ -24,9 +24,7 @@ public:
 	static ISerializable* CreateInstance();
 
 protected:
-
-private:
-
+	ma_uint32 m_listenerIndex;
 };
 
 REGISTER_ISERIALIZABLE(NodeAudioListener, NodeAudioListener::CreateInstance);

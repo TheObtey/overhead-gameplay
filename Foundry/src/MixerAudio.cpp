@@ -150,8 +150,7 @@ void MixerAudio::RemoveReverb(AudioChannel* channel)
     ma_node_uninit(&it->second->node, NULL);
 
     ma_node* groupNode = (ma_node*)&channel->soundGroup;
-    ma_node_attach_output_bus(groupNode, 0,
-        ma_engine_get_endpoint(&AudioServer::GetSoundEngine()), 0);
+    ma_node_attach_output_bus(groupNode, 0, ma_engine_get_endpoint(&AudioServer::GetSoundEngine()), 0);
 
     delete it->second;
     m_reverbs.erase(it);

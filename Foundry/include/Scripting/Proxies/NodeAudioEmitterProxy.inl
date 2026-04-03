@@ -4,7 +4,7 @@ class NodeAudioEmitter::Proxy : public Node::Proxy
 public:
 	struct ProxyBinding;
 
-	Proxy(Node& node) : Node::Proxy(node) {}
+	Proxy(Node& node) : Node::Proxy(node), m_pNode(static_cast<NodeAudioEmitter*>(&node)) {}
 
 	bool Load(std::string const& filePath, AudioChannel* channel) { return m_pNode->Load(filePath, channel); }
 

@@ -4,7 +4,7 @@ class NodeAudioListener::Proxy : public Node::Proxy
 public:
 	struct ProxyBinding;
 
-	Proxy(Node& node) : Node::Proxy(node) {}
+	Proxy(Node& node) : Node::Proxy(node), m_pNode(static_cast<NodeAudioListener*>(&node)) {}
 
 	void SetListenerPosition(glm::vec3 position) { return m_pNode->SetListenerPosition(position); }
 	glm::vec3 GetListenerPosition() { return m_pNode->GetListenerPosition(); }

@@ -10,7 +10,7 @@ bool NodeAudioEmitter::Load(const std::string& filePath, AudioChannel* channel)
 
     if (ma_sound_init_from_file(&soundEngine, filePath.c_str(), 0, &channel->soundGroup, NULL, &m_sound) != MA_SUCCESS)
     {
-        printf("Failed to load sound: %s\n", filePath);
+        Logger::Log("Failed to load sound: " + filePath);
         return false;
     }
 

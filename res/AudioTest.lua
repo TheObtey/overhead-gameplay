@@ -52,32 +52,32 @@ function OnInit()
 		if (GetAsyncKeyState('P') & 0x8000) then
 			if (audioEm:IsPlaying()) then 
 				audioEm:Stop();
-				--std::cout << "Pause\n";
+				print("Pause\n");
 			else
 				audioEm:Play();
-				--std::cout << "Play\n";
+				print("Play\n");
 			end
 			Sleep(200);
 		elseif (GetAsyncKeyState(VK_ADD) & 0x8000) then
 			--Group volume
 			local next = AudioServer:GetGroupVolume(sfx) + 0.01;
 			AudioServer:SetGroupVolume(sfx, next);
-			--printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
+			--print("GroupVolume: " + AudioServer::GetGroupVolume(*sfx));
 		elseif (GetAsyncKeyState(VK_SUBTRACT) & 0x8000) then
 			--Group volume
 			local next = AudioServer:GetGroupVolume(sfx) - 0.01;
 			AudioServer:SetGroupVolume(sfx, next);
-			--printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
+			--print("GroupVolume: " + AudioServer::GetGroupVolume(*sfx));
 		elseif (GetAsyncKeyState('T') & 0x8000) then
 			--Master volume
 			local next = AudioServer:GetMasterVolume() + 0.05;
 			AudioServer:SetMasterVolume(next);
-			--printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
+			--print("MasterVolume: " + AudioServer::GetMasterVolume());
 		elseif (GetAsyncKeyState('Y') & 0x8000) then
 			--Master volume
 			local next = AudioServer:GetMasterVolume() - 0.05;
 			AudioServer:SetMasterVolume(next);
-			--printf("MasterVolume: %.6f\n", AudioServer::GetMasterVolume());
+			--print("MasterVolume: " + AudioServer::GetMasterVolume());
 		elseif (GetAsyncKeyState('W') & 0x8000) then --PositionAudio3D Emitter
 			audioListen:SetListenerPosition({ x=0,y=0,z=0 });
 		elseif (GetAsyncKeyState('X') & 0x8000) then

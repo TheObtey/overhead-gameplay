@@ -14,7 +14,7 @@ int main()
     root->AddChild(scene);
 
     SceneTree defaultSceneTree(root);
-    //
+
     GameLoop loop;
     loop.StartGame(defaultSceneTree);
 }
