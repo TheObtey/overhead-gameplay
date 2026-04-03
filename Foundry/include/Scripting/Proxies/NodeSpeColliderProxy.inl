@@ -13,12 +13,16 @@ private:
 	NodeBoxCollider* m_pNode;
 };
 
-BindProxy(NodeBoxCollider::Proxy,
-	binder.BindFunction("CreateNodeBoxCollider", &NodeBoxCollider::Proxy::CreateNodeBoxColliderProxy);
-	return binder.BindClass<NodeBoxCollider::Proxy>("nodeboxcollider",
-		"SetShape", BIND(SetShape)
-	);
-)
+struct NodeBoxCollider::Proxy::ProxyBinding
+{
+	static void Bind(Binder& binder)
+	{
+		binder.BindFunction("CreateNodeBoxCollider", &NodeBoxCollider::Proxy::CreateNodeBoxColliderProxy);
+		binder.BindClass<NodeBoxCollider::Proxy>("nodeboxcollider",
+			sol::base_classes, sol::bases<NodeCollider::Proxy>(),
+			"SetShape", BIND(SetShape));
+	};
+};
 
 REGISTER_PROXY(NodeBoxCollider::Proxy::ProxyBinding, NodeBoxColliderProxy);
 
@@ -37,12 +41,16 @@ private:
 	NodeSphereCollider* m_pNode;
 };
 
-BindProxy(NodeSphereCollider::Proxy,
+struct NodeSphereCollider::Proxy::ProxyBinding
+{
+	static void Bind(Binder& binder)
+	{
 		binder.BindFunction("CreateNodeSphereCollider", &NodeSphereCollider::Proxy::CreateNodeSphereColliderProxy);
-	return binder.BindClass<NodeSphereCollider::Proxy>("nodespherecollider",
-		"SetShape", BIND(SetShape)
-	);
-)
+		binder.BindClass<NodeSphereCollider::Proxy>("nodespherecollider",
+			sol::base_classes, sol::bases<NodeCollider::Proxy>(),
+			"SetShape", BIND(SetShape));
+	};
+};
 
 REGISTER_PROXY(NodeSphereCollider::Proxy::ProxyBinding, NodeSphereColliderProxy);
 
@@ -61,11 +69,16 @@ private:
 	NodeCapsuleCollider* m_pNode;
 };
 
-BindProxy(NodeCapsuleCollider::Proxy,
-	binder.BindFunction("CreateNodeCapsuleCollider", &NodeCapsuleCollider::Proxy::CreateNodeCapsuleColliderProxy);
-	return binder.BindClass<NodeCapsuleCollider::Proxy>("nodecapsulecollider",
-		"SetShape", BIND(SetShape)
-	);
-)
+
+struct NodeCapsuleCollider::Proxy::ProxyBinding
+{
+	static void Bind(Binder& binder)
+	{
+		binder.BindFunction("CreateNodeCapsuleCollider", &NodeCapsuleCollider::Proxy::CreateNodeCapsuleColliderProxy);
+		binder.BindClass<NodeCapsuleCollider::Proxy>("nodecapsulecollider",
+			sol::base_classes, sol::bases<NodeCollider::Proxy>(),
+			"SetShape", BIND(SetShape));
+	};
+};
 
 REGISTER_PROXY(NodeCapsuleCollider::Proxy::ProxyBinding, NodeCapsuleColliderProxy);
