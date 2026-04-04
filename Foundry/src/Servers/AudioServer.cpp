@@ -23,6 +23,7 @@ void AudioServer::Shutdown()
     {
         ma_sound_group_uninit(&channel->soundGroup);
     }
+
     ma_engine_uninit(&Instance().m_soundEngine);
 }
 

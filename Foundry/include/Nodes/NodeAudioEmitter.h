@@ -5,13 +5,15 @@
 #include "Servers/AudioServer.h"
 #include "Transform3D.h"
 
+// Node that play and manage audio
+
 class NodeAudioEmitter : public Node
 {
 public:
 	class Proxy;
 
 	NodeAudioEmitter(std::string const& name);
-	~NodeAudioEmitter() override = default;
+	~NodeAudioEmitter() override;
 
 	bool Load(const std::string& filePath, AudioChannel* channel);
 
@@ -21,6 +23,9 @@ public:
 
 	void SetSourcePosition(glm::vec3 position);
 	glm::vec3 GetSourcePosition();
+
+	void SetSourceDirection(glm::vec3 position);
+	glm::vec3 GetSourceDirection();
 
 	bool IsPlaying() { return m_isPlaying; };
 

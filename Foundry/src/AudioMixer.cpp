@@ -1,4 +1,4 @@
-#include "MixerAudio.h"
+#include "AudioMixer.h"
 #include <algorithm>
 
 static void ReverbProcess(ma_node* pNode, const float** in, ma_uint32* inCount, float** out, ma_uint32* outCount)
@@ -34,7 +34,7 @@ static void ReverbProcess(ma_node* pNode, const float** in, ma_uint32* inCount, 
 
 static ma_node_vtable g_reverbVtable = { ReverbProcess, NULL, 1, 1, 0 };
 
-void MixerAudio::Shutdown()
+void AudioMixer::Shutdown()
 {
     for (auto& [ch, entry] : m_delays) 
     {
@@ -54,7 +54,7 @@ void MixerAudio::Shutdown()
     m_reverbs.clear();
 }
 
-void MixerAudio::AddDelay(AudioChannel* channel, float delaySeconds, float decay, float wet)
+void AudioMixer::AddDelay(AudioChannel* channel, float delaySeconds, float decay, float wet)
 {
     if (!channel || m_delays.count(channel)) return;
 
@@ -82,14 +82,14 @@ void MixerAudio::AddDelay(AudioChannel* channel, float delaySeconds, float decay
     m_delays[channel] = std::move(entry);
 }
 
-void MixerAudio::SetDelayWet(AudioChannel* channel, float wet)
+void AudioMixer::SetDelayWet(AudioChannel* channel, float wet)
 {
     auto it = m_delays.find(channel);
     if (it == m_delays.end() || !it->second.active) return;
     ma_delay_node_set_wet(&it->second.node, std::clamp(wet, 0.0f, 1.0f));
 }
 
-void MixerAudio::RemoveDelay(AudioChannel* channel)
+void AudioMixer::RemoveDelay(AudioChannel* channel)
 {
     auto it = m_delays.find(channel);
     if (it == m_delays.end()) return;
@@ -100,7 +100,7 @@ void MixerAudio::RemoveDelay(AudioChannel* channel)
     m_delays.erase(it);
 }
 
-void MixerAudio::AddReverb(AudioChannel* channel, float roomSize, float wet)
+void AudioMixer::AddReverb(AudioChannel* channel, float roomSize, float wet)
 {
     if (!channel || m_reverbs.count(channel)) return;
 
@@ -135,14 +135,14 @@ void MixerAudio::AddReverb(AudioChannel* channel, float roomSize, float wet)
     m_reverbs[channel] = rev;
 }
 
-void MixerAudio::SetReverbWet(AudioChannel* channel, float wet)
+void AudioMixer::SetReverbWet(AudioChannel* channel, float wet)
 {
     auto it = m_reverbs.find(channel);
     if (it == m_reverbs.end()) return;
     it->second->wet = std::clamp(wet, 0.0f, 1.0f);
 }
 
-void MixerAudio::RemoveReverb(AudioChannel* channel)
+void AudioMixer::RemoveReverb(AudioChannel* channel)
 {
     auto it = m_reverbs.find(channel);
     if (it == m_reverbs.end()) return;

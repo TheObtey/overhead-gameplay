@@ -30,7 +30,9 @@ struct ReverbEntry
     int ai[2] = {};
 };
 
-class MixerAudio
+// Input an audio to make different effects
+
+class AudioMixer
 {
 public:
     void Shutdown();

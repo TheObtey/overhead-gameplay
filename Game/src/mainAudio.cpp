@@ -1,6 +1,6 @@
 #include "Nodes/NodeAudioEmitter.h"
 #include "Nodes/NodeAudioListener.h"
-#include "MixerAudio.h"
+#include "AudioMixer.h"
 #include "Define.h"
 
 #include "ActionMap.h"
@@ -23,7 +23,7 @@ int main()
 	AudioChannel* sfx = AudioServer::CreateChannel("Sfx");
 
 	// --- Mixer ---
-	MixerAudio mixer;
+    AudioMixer mixer;
 
 	//mixer.AddDelay(sfx, 0.3f, 0.4f, 0.3f);
 	mixer.AddReverb(music, 0.85f, 0.3f);
@@ -70,21 +70,21 @@ int main()
         };
     actionMap.Emplace("Pause", pauseAction);
 
-    Action* volUpSfx = new Action(ControlType::BUTTON, EventInput::KEY_KP_ADD);
+    Action* volUpSfx = new Action(ControlType::BUTTON, EventInput::KEY_B);
     volUpSfx->Event += [&](IControl& control)
         {
-            float next = AudioServer::GetGroupVolume(*sfx) + 0.01f;
-            AudioServer::SetGroupVolume(sfx, next);
-            printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
+            float next = AudioServer::GetGroupVolume(*music) + 0.01f;
+            AudioServer::SetGroupVolume(music, next);
+            printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*music));
         };
     actionMap.Emplace("VolUpSfx", volUpSfx);
 
-    Action* volDownSfx = new Action(ControlType::BUTTON, EventInput::KEY_KP_SUBTRACT);
+    Action* volDownSfx = new Action(ControlType::BUTTON, EventInput::KEY_N);
     volDownSfx->Event += [&](IControl& control)
         {
-            float next = AudioServer::GetGroupVolume(*sfx) - 0.01f;
-            AudioServer::SetGroupVolume(sfx, next);
-            printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*sfx));
+            float next = AudioServer::GetGroupVolume(*music) - 0.01f;
+            AudioServer::SetGroupVolume(music, next);
+            printf("GroupVolume: %.6f\n", AudioServer::GetGroupVolume(*music));
         };
     actionMap.Emplace("VolDownSfx", volDownSfx);
 

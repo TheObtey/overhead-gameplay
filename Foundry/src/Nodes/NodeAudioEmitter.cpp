@@ -3,6 +3,10 @@
 NodeAudioEmitter::NodeAudioEmitter(std::string const& name) : Node(name)
 {
 }
+NodeAudioEmitter::~NodeAudioEmitter()
+{
+    ma_sound_uninit(&m_sound);
+}
 
 bool NodeAudioEmitter::Load(const std::string& filePath, AudioChannel* channel)
 {
@@ -49,6 +53,18 @@ glm::vec3 NodeAudioEmitter::GetSourcePosition()
 {
     ma_vec3f posMa = ma_sound_get_position(&m_sound);
     glm::vec3 posGlm = { posMa.x, posMa.y, posMa.z };
+    return posGlm;
+}
+
+void NodeAudioEmitter::SetSourceDirection(glm::vec3 position)
+{
+    ma_sound_set_direction(&m_sound, position.x, position.y, position.z);
+}
+
+glm::vec3 NodeAudioEmitter::GetSourceDirection()
+{
+    ma_vec3f dirMa = ma_sound_get_direction(&m_sound);
+    glm::vec3 posGlm = { dirMa.x, dirMa.y, dirMa.z };
     return posGlm;
 }
 

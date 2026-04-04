@@ -1,4 +1,4 @@
-class MixerAudio::Proxy
+class AudioMixer::Proxy
 {
 public:
     struct ProxyBinding;
@@ -35,11 +35,11 @@ public:
     }
 
 private:
-    MixerAudio m_mixer;
+    AudioMixer m_mixer;
 };
 
-BindProxy(MixerAudio::Proxy,
-    return binder.BindClass<MixerAudio::Proxy>("MixerAudio",
+BindProxy(AudioMixer::Proxy,
+    return binder.BindClass<AudioMixer::Proxy>("AudioMixer",
         "AddDelay", BIND(AddDelay),
         "SetDelayWet", BIND(SetDelayWet),
         "RemoveDelay", BIND(RemoveDelay),
@@ -49,4 +49,4 @@ BindProxy(MixerAudio::Proxy,
         "Shutdown", BIND(Shutdown)
     );
 )
-REGISTER_PROXY(MixerAudio::Proxy::ProxyBinding, MixerAudioProxy);
+REGISTER_PROXY(AudioMixer::Proxy::ProxyBinding, AudioMixerProxy);

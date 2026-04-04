@@ -5,6 +5,8 @@
 #include "Servers/AudioServer.h"
 #include "Transform3D.h"
 
+// Node that can listen to audio that emit an AudioEmitter
+
 class NodeAudioListener : public Node
 {
 public:

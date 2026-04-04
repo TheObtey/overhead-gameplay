@@ -16,6 +16,8 @@ struct AudioChannel
 	ma_sound_group soundGroup;
 };
 
+// Manage the complete audio system using channels. (Required when using any related sound Classes/Nodes)
+
 class AudioServer : public Server<AudioServer>
 {
 public:
@@ -47,6 +49,7 @@ protected:
 	std::vector<ma_uint32> m_availableListenerIndex;
 	ma_uint32 m_nextListenerIndex = 0;
 	float m_masterVolume = 1.f;
+
 private:
 	void FlushCommandsImpl() override {};
 	void BuildTasksImpl(TaskGraph& graph) override {};

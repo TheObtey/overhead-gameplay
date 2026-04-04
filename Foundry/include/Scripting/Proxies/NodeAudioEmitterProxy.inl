@@ -14,6 +14,8 @@ public:
 
 	void SetSourcePosition(glm::vec3 position) { return m_pNode->SetSourcePosition(position); }
 	glm::vec3 GetSourcePosition() { return m_pNode->GetSourcePosition(); }
+	void SetSourceDirection(glm::vec3 position) { return m_pNode->SetSourceDirection(position); }
+	glm::vec3 GetSourceDirection() { return m_pNode->GetSourceDirection(); }
 
 	bool IsPlaying() { return m_pNode->IsPlaying(); }
 
@@ -29,6 +31,8 @@ BindProxy(NodeAudioEmitter::Proxy,
 		"SetLoop", BIND(SetLoop),
 		"SetSourcePosition", BIND(SetSourcePosition),
 		"GetSourcePosition", BIND(GetSourcePosition),
+		"SetSourceDirection", BIND(SetSourceDirection),
+		"GetSourceDirection", BIND(GetSourceDirection),
 		"IsPlaying", BIND(IsPlaying)
 	);
 )
