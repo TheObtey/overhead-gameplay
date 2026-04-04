@@ -4,7 +4,7 @@ class NodeBoxCollider::Proxy : public NodeCollider::Proxy
 public:
 	struct ProxyBinding;
 
-	Proxy(Node& node) : NodeCollider::Proxy(node) {}
+	Proxy(Node& node) : NodeCollider::Proxy(node), m_pNode(static_cast<NodeBoxCollider*>(&node)) {}
 
 	static Proxy* CreateNodeBoxColliderProxy(std::string const& name);
 
@@ -32,7 +32,7 @@ class NodeSphereCollider::Proxy : public NodeCollider::Proxy
 public:
 	struct ProxyBinding;
 
-	Proxy(Node& node) : NodeCollider::Proxy(node) {}
+	Proxy(Node& node) : NodeCollider::Proxy(node), m_pNode(static_cast<NodeSphereCollider*>(&node)) {}
 
 	static Proxy* CreateNodeSphereColliderProxy(std::string const& name);
 
@@ -60,7 +60,7 @@ class NodeCapsuleCollider::Proxy : public NodeCollider::Proxy
 public:
 	struct ProxyBinding;
 
-	Proxy(Node& node) : NodeCollider::Proxy(node) {}
+	Proxy(Node& node) : NodeCollider::Proxy(node), m_pNode(static_cast<NodeCapsuleCollider*>(&node)) {}
 
 	static Proxy* CreateNodeCapsuleColliderProxy(std::string const& name);
 

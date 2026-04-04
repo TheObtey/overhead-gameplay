@@ -7,6 +7,7 @@ Node3D = {}
 ---@return Node3D
 function CreateNode3D(name) end
 
+---@return vec3
 function Node3D:GetPosition() end
 function Node3D:GetX() end
 function Node3D:GetY() end
@@ -33,6 +34,7 @@ function Node3D:GetLocalUp() end
 function Node3D:GetLocalForward() end
 
 function Node3D:GetWorldMatrix() end
+---@return vec3
 function Node3D:GetWorldPosition() end
 function Node3D:GetWorldScale() end
 --- Pitch, Yaw, Roll / x, y, z									

@@ -135,7 +135,6 @@ std::unique_ptr<T> Node::CreateNode(std::string const& name)
 
 	uptr<concrete_Node> ptr = std::make_unique<concrete_Node>(name);
 	ptr->m_pProxy = std::make_unique<typename T::Proxy>(*ptr);
-
     return std::move(ptr);
 }
 

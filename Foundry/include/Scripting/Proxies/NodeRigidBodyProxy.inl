@@ -4,7 +4,7 @@ class NodeRigidBody::Proxy : public Node3D::Proxy
 public:
 	struct ProxyBinding;
 
-	Proxy(Node& node) : Node3D::Proxy(node) {}
+	Proxy(Node& node) : Node3D::Proxy(node), m_pNode(static_cast<NodeRigidBody*>(&node)) {}
 
 	static Proxy* CreateNodeRigidBodyProxy(std::string const& name);
 
