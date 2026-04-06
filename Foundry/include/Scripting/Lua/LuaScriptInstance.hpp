@@ -39,7 +39,7 @@ inline void LuaScriptInstance::AttachToProxy(T* const proxy)
 
 	proxy->OnSceneEnter			+= [this] { CallScriptOnInit(); };
 	proxy->OnUpdate				+= [this](double const dt) { CallScriptOnUpdate(dt); };
-	proxy->OnPhysicsUpdate		+= [this](double const dt) { CallScriptOnUpdate(dt); };
+	proxy->OnPhysicsUpdate		+= [this](double const dt) { CallScriptOnPhysicsUpdate(dt); };
 	proxy->OnSceneLeave			+= [this] { CallScriptOnDestroy(); } ;
 
 	auto file = m_state.script_file(m_stringPath, m_enviro);

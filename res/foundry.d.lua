@@ -1,61 +1,65 @@
 ---@meta
 
----@class Node
-Node = {}
+---@class node
+node = {}
 
----@class Node3D : Node
-Node3D = {}
+-- ---@class node3D : node
+-- node3D = {}
 
-function Node3D:ToTo() end
+-- function node3D:ToTo() end
 
----@class maths
-maths = {}
+---@class fmaths
+fmaths = {}
 
 ---@class vec3
 ---@field x number
 ---@field y number
 ---@field z number
-maths.vec3 = {}
+fmaths.vec3 = {}
 
 math = nil
 
 ---@param name string The node name.
----@return Node
+---@return node
 function CreateNode(name) end
 
----@param node Node
-function Node:AddChild(node) end
+---@param node node
+function node:AddChild(node) end
 
----@param node Node
-function Node:RemoveChild(node) end
-
----@param name string
-function Node:RemoveChild(name) end
+---@param node node
+function node:RemoveChild(node) end
 
 ---@param name string
----@return Node
-function Node:FindChild(name) end
+function node:RemoveChild(name) end
+
+---@param name string
+---@return node
+function node:FindChild(name) end
 
 ---@return string
-function Node:GetName() end
+function node:GetName() end
 
 ---@return vec3
-function maths.vec3:new() end
+function fmaths.vec3:new() end
 
 ---@param x number
 ---@param y number
 ---@param z number
 ---@return vec3
-function maths.vec3:new(x, y, z) end
+function fmaths.vec3:new(x, y, z) end
 
 ---@return number
-function maths.vec3:GetX() end
+function fmaths.vec3:GetX() end
 
 ---@return number
-function maths.vec3:GetY() end
+function fmaths.vec3:GetY() end
 
 ---@return number
-function maths.vec3:GetZ() end
+function fmaths.vec3:GetZ() end
 
 --- Called when the self node is initialized
 function OnInit() end
+
+
+
+
