@@ -50,7 +50,7 @@ public:
 
 	Node& GetChild(uint32 index);
 	std::vector<std::reference_wrapper<Node>> GetChildren();
-	uint32 GetChildCount();
+	uint32 GetChildCount() const;
 
 	template <NodeType T>
 	T& GetNode(std::string const& path);
@@ -62,6 +62,7 @@ public:
 	void Destroy();
 	virtual void Reparent(Node& newParent, bool keepGlobalTransform = true);
 	void MoveChild(Node const& child, uint32 to);
+	uptr<Node> DetachFromTree();
 
 	//override this method if the inherited node is not trivially copyable
 	virtual std::unique_ptr<Node> Clone();
@@ -72,8 +73,11 @@ public:
 	std::string GetName();
 	void SetName(std::string const& name);
 	void SetScriptPath(std::string const& path);
-	Node* GetParent();
-	SceneTree* GetSceneTree();
+	Node* GetParent() const;
+	bool HasParent() const;
+	SceneTree* GetSceneTree() const;
+
+	Proxy& GetNodeProxy() const;
 
 	//====Static Methods======
 	template <NodeType T>
@@ -83,7 +87,6 @@ public:
 	static void AttachScript(uptr<LuaScriptInstance>& script, T& node);
 
 	static ISerializable* CreateInstance();
-	static void Test() {};
 
 	static void SetStatusEditor(bool inEditor) { s_IsInEditor = inEditor; }
 
@@ -124,6 +127,7 @@ private:
 	inline static bool s_IsInEditor = false;
 
     friend class EngineServer;
+	friend class SceneTree;
 	friend class unique_ptr;
 };
 

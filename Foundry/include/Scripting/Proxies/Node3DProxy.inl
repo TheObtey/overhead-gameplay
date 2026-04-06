@@ -59,7 +59,10 @@ public:
 
 	void SetScale(glm::vec3 const scale)							{ m_pNode->SetScale(glm::vec4(scale, 1.0f)); }
 
-	void SetWorldPosition(glm::vec3 const& worldPos)				{ m_pNode->SetWorldPosition(worldPos); }
+	void SetWorldPosition(glm::vec3 const& worldPos)
+	{
+		m_pNode->SetWorldPosition(worldPos);
+	}
 	void SetWorldScale(glm::vec3 const& worldScale)					{ m_pNode->SetWorldScale(worldScale); }
 	// -- Angles in Degrees
 	void SetWorldRotation(glm::vec3 const& worldRot)				{ m_pNode->SetWorldRotation(worldRot); }

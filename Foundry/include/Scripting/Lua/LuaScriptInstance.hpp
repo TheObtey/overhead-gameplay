@@ -10,7 +10,7 @@ public:
 	LuaScriptInstance(std::string const& scriptPath);
 
 	template <typename T>
-	void AttachToProxy(T* const proxy);
+	void AttachToProxy(T* proxy);
 
 	std::string& GetPath() { return m_stringPath; }
 
