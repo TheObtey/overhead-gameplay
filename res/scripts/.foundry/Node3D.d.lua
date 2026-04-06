@@ -1,119 +1,121 @@
 ---@meta
 
----@class Node3D : Node
-Node3D = {}
+---@class node3d : Node
+node3d = {}
 
 ---@param name string The node name.
----@return Node3D
+---@return node3d
 function CreateNode3D(name) end
 
-function Node3D:GetPosition() end
-function Node3D:GetX() end
-function Node3D:GetY() end
-function Node3D:GetZ() end
-function Node3D:GetMatrixRotation() end
+---@return vec3
+function node3d:GetPosition() end
+function node3d:GetX() end
+function node3d:GetY() end
+function node3d:GetZ() end
+function node3d:GetMatrixRotation() end
 
 ---Euler angles
-function Node3D:GetLocalRotationRad() end
-function Node3D:GetLocalRotationDeg() end
+function node3d:GetLocalRotationRad() end
+function node3d:GetLocalRotationDeg() end
 
 --- { w, x, y, z }
-function Node3D:GetLocalRotationQuat() end
+function node3d:GetLocalRotationQuat() end
 --- Angle around Y axis in Degrees
-function Node3D:GetLocalYaw() end
+function node3d:GetLocalYaw() end
 --- AnNgle around X axis in Degrees
-function Node3D:GetLocalPitch() end
+function node3d:GetLocalPitch() end
 --- Angle around Z axis in Degrees
-function Node3D:GetLocalRoll() end
-function Node3D:GetMaxScale() end
-function Node3D:GetMinScale() end
-function Node3D:GetScale() end
-function Node3D:GetLocalRight() end
-function Node3D:GetLocalUp() end
-function Node3D:GetLocalForward() end
+function node3d:GetLocalRoll() end
+function node3d:GetMaxScale() end
+function node3d:GetMinScale() end
+function node3d:GetScale() end
+function node3d:GetLocalRight() end
+function node3d:GetLocalUp() end
+function node3d:GetLocalForward() end
 
-function Node3D:GetWorldMatrix() end
-function Node3D:GetWorldPosition() end
-function Node3D:GetWorldScale() end
+function node3d:GetWorldMatrix() end
+---@return vec3
+function node3d:GetWorldPosition() end
+function node3d:GetWorldScale() end
 --- Pitch, Yaw, Roll / x, y, z									
 --- Angles in Degrees 										
-function Node3D:GetWorldRotation() end
+function node3d:GetWorldRotation() end
 --- { w, x, y, z }												
-function Node3D:GetWorldRotationQuaternion() end
+function node3d:GetWorldRotationQuaternion() end
 
 --- =========== Setters ===========
 
 ---@param pos vec3
-function Node3D:SetLocalPosition(pos) end
+function node3d:SetLocalPosition(pos) end
 
 ---@param x number
-function Node3D:SetLocalX(x) end
+function node3d:SetLocalX(x) end
 
 ---@param y number
-function Node3D:SetLocalY(y) end
+function node3d:SetLocalY(y) end
 
 ---@param z number
-function Node3D:SetLocalZ(z) end
+function node3d:SetLocalZ(z) end
 
 ---@param x number
 ---@param y number
 ---@param z number
-function Node3D:SetLocalRotationDeg(x, y, z) end
+function node3d:SetLocalRotationDeg(x, y, z) end
 
 ---@param pitch number
 ---@param yaw number
 ---@param roll number
-function Node3D:SetLocalRotationRad(pitch, yaw, roll) end
+function node3d:SetLocalRotationRad(pitch, yaw, roll) end
 
 ---@param rot vec4
-function Node3D:SetLocalRotationQuat(rot) end
+function node3d:SetLocalRotationQuat(rot) end
 
 ---@param scale vec3
-function Node3D:SetScale(scale) end
+function node3d:SetScale(scale) end
 
 ---@param worldPos vec3
-function Node3D:SetWorldPosition(worldPos) end
+function node3d:SetWorldPosition(worldPos) end
 
 ---@param worldScale vec3
-function Node3D:SetWorldScale(worldScale) end
+function node3d:SetWorldScale(worldScale) end
 
 --- Angles in Degrees
 ---@param worldRot vec3
-function Node3D:SetWorldRotation(worldRot) end
+function node3d:SetWorldRotation(worldRot) end
 
 --- Angles in Radians
 ---@param worldRotQuat vec4 { w, x, y, z }
-function Node3D:SetWorldRotationQuaternion(worldRotQuat) end
+function node3d:SetWorldRotationQuaternion(worldRotQuat) end
 
 --- =========== Adders ===========
 
 ---@param scale vec3
-function Node3D:AddScale(scale) end
+function node3d:AddScale(scale) end
 
 ---@param pos vec3
-function Node3D:AddLocalPosition(pos) end
+function node3d:AddLocalPosition(pos) end
 
 ---@param x number
-function Node3D:AddLocalX(x) end
+function node3d:AddLocalX(x) end
 
 ---@param y number
-function Node3D:AddLocalY(y) end
+function node3d:AddLocalY(y) end
 
 ---@param z number
-function Node3D:AddLocalZ(z) end
+function node3d:AddLocalZ(z) end
 
 
 --- Angles in Radians											
-function Node3D:AddLocalRotation(rot) end
+function node3d:AddLocalRotation(rot) end
 
 --- Angles in Radians											
 ---@param yaw number
-function Node3D:AddLocalYaw(yaw) end
+function node3d:AddLocalYaw(yaw) end
 
 --- Angles in Radians
 ---@param pitch number									
-function Node3D:AddLocalPitch(pitch) end
+function node3d:AddLocalPitch(pitch) end
 
 --- Angles in Radians
 ---@param roll number
-function Node3D:AddLocalRoll(roll) end
+function node3d:AddLocalRoll(roll) end

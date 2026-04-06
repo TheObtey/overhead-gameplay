@@ -1,7 +1,7 @@
 ---@meta
 
----@class NodeCollider
-NodeCollider = {}
+---@class nodecollider
+nodecollider = {}
 
 ---@param name string
 function CreateNodeCollider(name) end
@@ -9,61 +9,72 @@ function CreateNodeCollider(name) end
 --- =========== Local transform (offset from RigidBody) ===========
 
 ---@param pos vec3
-function NodeCollider:SetLocalPosition(pos) end
+function nodecollider:SetLocalPosition(pos) end
 
 ---@param rot vec3
-function NodeCollider:SetLocalRotation(rot) end
+function nodecollider:SetLocalRotation(rot) end
 
-function NodeCollider:GetLocalPosition() end
-function NodeCollider:GetLocalRotation() end
+---@return vec3
+function nodecollider:GetLocalPosition() end
+
+---@return vec3
+function nodecollider:GetLocalRotation() end
 
 
 --- =========== Material ===========
 
 ---@param bounciness number [0,1]
-function NodeCollider:SetBounciness(bounciness) end
+function nodecollider:SetBounciness(bounciness) end
 
-function NodeCollider:GetBounciness() end
+---@return number
+function nodecollider:GetBounciness() end
 
 ---@param friction number
-function NodeCollider:SetFrictionCoefficient(friction) end
+function nodecollider:SetFrictionCoefficient(friction) end
 
-function NodeCollider:GetFrictionCoefficient() end
+---@return number
+function nodecollider:GetFrictionCoefficient() end
 
 ---@param density number
-function NodeCollider:SetMassDensity(density) end
+function nodecollider:SetMassDensity(density) end
 
-function NodeCollider:GetMassDensity() end
+---@return number
+function nodecollider:GetMassDensity() end
 
 
 
 --- =========== Collider behavior ===========
 
 ---@param trigger boolean
-function NodeCollider:SetIsTrigger(trigger) end
+function nodecollider:SetIsTrigger(trigger) end
 
-function NodeCollider:IsTrigger() end
-
----@param enabled boolean
-function NodeCollider:SetIsSimulationCollider(enabled) end
-function NodeCollider:IsSimulationCollider() end
+---@return boolean
+function nodecollider:IsTrigger() end
 
 ---@param enabled boolean
-function NodeCollider:SetIsWorldQueryCollider(enabled) end
+function nodecollider:SetIsSimulationCollider(enabled) end
 
+---@return boolean
+function nodecollider:IsSimulationCollider() end
 
-function NodeCollider:IsWorldQueryCollider() end
+---@param enabled boolean
+function nodecollider:SetIsWorldQueryCollider(enabled) end
+
+---@return boolean
+function nodecollider:IsWorldQueryCollider() end
 
 
 --- =========== Collision filtering ===========
 
 ---@param category bitsMask
-function NodeCollider:SetCollisionCategoryBits(category) end
+function nodecollider:SetCollisionCategoryBits(category) end
 
-function NodeCollider:GetCollisionCategoryBits() end
+---@return bitsMask
+function nodecollider:GetCollisionCategoryBits() end
 
 ---@param mask bitsMask
-function NodeCollider:SetCollideWithMaskBits(mask) end
+function nodecollider:SetCollideWithMaskBits(mask) end
 
-function NodeCollider:GetCollisionBitsMask() end
+---@return bitsMask
+function nodecollider:GetCollisionBitsMask() end
 
