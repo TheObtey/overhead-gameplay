@@ -4,9 +4,9 @@
 
 SceneTreeProxy::SceneTreeProxy(SceneTree *tree) : m_sceneTree(tree)
 {
-    tree->OnGameStarted += [&]()    { OnGameStarted(); };
-    tree->OnGameEnded += [&]()      { OnGameEnded(); };
-    tree->OnSceneChanged += [&]()   { OnSceneChanged(); };
+    tree->OnGameStarted += [&]()    { if (OnGameStarted)  OnGameStarted(); };
+    tree->OnGameEnded += [&]()      { if (OnGameEnded)    OnGameEnded(); };
+    tree->OnSceneChanged += [&]()   { if (OnSceneChanged) OnSceneChanged(); };
 }
 
 void SceneTreeProxy::ChangeSceneToNode(NodeProxy const& node)
