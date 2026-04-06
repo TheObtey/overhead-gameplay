@@ -2,6 +2,13 @@
 #include "SceneTree.h"
 #include "Servers/EngineServer.h"
 
+SceneTreeProxy::SceneTreeProxy(SceneTree *tree) : m_sceneTree(tree)
+{
+    tree->OnGameStarted += [&]()    { OnGameStarted(); };
+    tree->OnGameEnded += [&]()      { OnGameEnded(); };
+    tree->OnSceneChanged += [&]()   { OnSceneChanged(); };
+}
+
 void SceneTreeProxy::ChangeSceneToNode(NodeProxy const& node)
 {
     uptr<Node> unode = node.HasParent() ?

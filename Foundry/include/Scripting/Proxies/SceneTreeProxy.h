@@ -11,7 +11,7 @@ class SceneTreeProxy
 using NodeProxy = Node::Proxy;
 
 public:
-    explicit SceneTreeProxy(SceneTree* tree) : m_sceneTree(tree) {}
+    explicit SceneTreeProxy(SceneTree* tree);
     ~SceneTreeProxy() = default;
 
     void ChangeSceneToNode(const NodeProxy& node);
