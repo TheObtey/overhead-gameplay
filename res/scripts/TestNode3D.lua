@@ -7,11 +7,10 @@ function OnInit()
 end
 
 function OnUpdate(dt)
-
-    local vec = fmaths.vec3:new(0,dt,0)
+    local vec = fmaths.vec3:new(0, 0, 0)
     -- SetWorldPosition(vec)
-    self:AddLocalPosition(vec)
-    self:AddLocalRotation(vec)
+    -- self:AddLocalPosition(vec)
+    -- self:AddLocalRotation(vec)
     local pos = self:GetWorldPosition()
 
     print("Update pos TEST RENDER = (", pos.x,",", pos.y,",", pos.z,")" )

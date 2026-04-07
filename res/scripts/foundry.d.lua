@@ -9,13 +9,13 @@ Node3D = {}
 function Node3D:ToTo() end
 
 ---@class maths
-maths = {}
+fmaths = {}
 
 ---@class vec3
 ---@field x number
 ---@field y number
 ---@field z number
-maths.vec3 = {}
+fmaths.vec3 = {}
 
 math = nil
 
@@ -40,22 +40,22 @@ function Node:FindChild(name) end
 function Node:GetName() end
 
 ---@return vec3
-function maths.vec3:new() end
+function fmaths.vec3:new() end
 
 ---@param x number
 ---@param y number
 ---@param z number
 ---@return vec3
-function maths.vec3:new(x, y, z) end
+function fmaths.vec3:new(x, y, z) end
 
 ---@return number
-function maths.vec3:GetX() end
+function fmaths.vec3:GetX() end
 
 ---@return number
-function maths.vec3:GetY() end
+function fmaths.vec3:GetY() end
 
 ---@return number
-function maths.vec3:GetZ() end
+function fmaths.vec3:GetZ() end
 
 --- Called when the self node is initialized
 function OnInit() end

@@ -1,5 +1,7 @@
 #include "GameLoop.h"
 #include "SceneTree.h"
+#include "Scripting/Proxies/ActionMapProxy.h"
+#include "Scripting/Proxies/MathsProxy.h"
 #include "Nodes/NodeCamera.h"
 #include "Nodes/NodeMesh.h"
 #include "Nodes/NodeViewport.h"
