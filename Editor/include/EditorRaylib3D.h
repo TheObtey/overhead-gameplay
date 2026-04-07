@@ -1,13 +1,12 @@
 #ifndef EDITOR_EDITOR_RAYLIB3D_H__
 #define EDITOR_EDITOR_RAYLIB3D_H__
 
+#include <Node.h>
+#include <Nodes/Node3D.h>
+#include <Nodes/AllNodes.h>
 #include <Serialization/json.hpp>
 #include <Define.h>
-#include <Nodes/AllNodes.h>
 #include <raylib.h>
-
-class Node;
-class Node3D;
 
 using json = nlohmann::json;
 

@@ -81,9 +81,9 @@ void NodeRigidBody::Serialize(SerializedObject& datas) const
 	datas.SetType("NodeRigidBody");
 
 	int bodyType = static_cast<int>(RigidBodyType::NONE);
-	if (m_pRigidBody != nullptr)
+	if (m_pRigidBodyRP3D != nullptr)
 	{
-		auto type = m_pRigidBody->getType();
+		auto type = m_pRigidBodyRP3D->getType();
 		if (type == rp3d::BodyType::DYNAMIC)
 			bodyType = static_cast<int>(RigidBodyType::DYNAMIC);
 		else if (type == rp3d::BodyType::KINEMATIC)
@@ -93,7 +93,7 @@ void NodeRigidBody::Serialize(SerializedObject& datas) const
 	}
 	datas.AddPublicElement("BodyType", &bodyType);
 
-	float mass = (m_pRigidBody != nullptr) ? m_pRigidBody->getMass() : 0.0f;
+	float mass = (m_pRigidBodyRP3D != nullptr) ? m_pRigidBodyRP3D->getMass() : 0.0f;
 	datas.AddPublicElement("Mass", &mass);
 
 	glm::vec3 linearVelocity{ 0.0f };
@@ -106,22 +106,22 @@ void NodeRigidBody::Serialize(SerializedObject& datas) const
 	bool lockLinearX = false, lockLinearY = false, lockLinearZ = false;
 	bool lockAngularX = false, lockAngularY = false, lockAngularZ = false;
 
-	if (m_pRigidBody)
+	if (m_pRigidBodyRP3D)
 	{
-		linearVelocity = rp3dToGlm(m_pRigidBody->getLinearVelocity());
-		angularVelocity = rp3dToGlm(m_pRigidBody->getAngularVelocity());
-		linearDamping = m_pRigidBody->getLinearDamping();
-		angularDamping = m_pRigidBody->getAngularDamping();
-		gravityEnabled = m_pRigidBody->isGravityEnabled();
-		sleepingEnabled = m_pRigidBody->isAllowedToSleep();
-		isSleeping = m_pRigidBody->isSleeping();
+		linearVelocity = rp3dToGlm(m_pRigidBodyRP3D->getLinearVelocity());
+		angularVelocity = rp3dToGlm(m_pRigidBodyRP3D->getAngularVelocity());
+		linearDamping = m_pRigidBodyRP3D->getLinearDamping();
+		angularDamping = m_pRigidBodyRP3D->getAngularDamping();
+		gravityEnabled = m_pRigidBodyRP3D->isGravityEnabled();
+		sleepingEnabled = m_pRigidBodyRP3D->isAllowedToSleep();
+		isSleeping = m_pRigidBodyRP3D->isSleeping();
 
-		auto linearFactor = m_pRigidBody->getLinearLockAxisFactor();
+		auto linearFactor = m_pRigidBodyRP3D->getLinearLockAxisFactor();
 		lockLinearX = linearFactor.x == 0.0f;
 		lockLinearY = linearFactor.y == 0.0f;
 		lockLinearZ = linearFactor.z == 0.0f;
 
-		auto angularFactor = m_pRigidBody->getAngularLockAxisFactor();
+		auto angularFactor = m_pRigidBodyRP3D->getAngularLockAxisFactor();
 		lockAngularX = angularFactor.x == 0.0f;
 		lockAngularY = angularFactor.y == 0.0f;
 		lockAngularZ = angularFactor.z == 0.0f;
