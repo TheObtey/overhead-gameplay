@@ -27,7 +27,7 @@ void Camera::UpdateCamera()
 
 void Camera::SetTransform(glm::mat4 const& transform)
 {
-    m_viewMatrix = glm::inverse(transform);
+    m_viewMatrix = glm::scale(glm::inverse(transform), { 1.0,-1.0,1.0 });
 }
 
 void Camera::LookAt(glm::vec3 const& target)
