@@ -1,32 +1,88 @@
-#include "Nodes/NodeViewport.h" 
+#include "Nodes/NodeViewport.h"
+#include "Nodes/NodeWindow.h"
 #include "Nodes/Node2D.h"
+#include "Nodes/NodeCamera.h"
+#include "Nodes/NodeMesh.h"
+#include "Servers/GraphicServer.h"
 
 #include <glm/fwd.hpp>
 #include <memory>
 
 NodeViewport::NodeViewport(std::string const& name) : Node2D(name)
 {
-	m_pViewPort = std::make_unique<Viewport>( );
+	m_pViewPort = std::make_unique<Viewport>();
+	GraphicServer::LoadShaderPrograms(this);
+
+	OnHierarchyChanged += [&](){ TryAttachToWindow(); };
+}
+
+void NodeViewport::Setup()
+{
+	m_pViewPort->Setup({0.0f, 0.0f}, {10.0f, 10.0f}, m_clearColor);
+	m_pGeometryPass = std::make_unique<GeometryPass>(GraphicServer::GetGeoProgram());
+	m_pLightPass = std::make_unique<LightPass>(GraphicServer::GetLightProgram(), dummyLight);
+
+	GraphicServer::GetLightProgram().Use();
+	GraphicServer::GetLightProgram().SetUniform("gPosition", 0);
+	GraphicServer::GetLightProgram().SetUniform("gNormal", 1);
+	GraphicServer::GetLightProgram().SetUniform("gAlbedoSpec", 2);
+
+
+	m_pViewPort->AddPass(m_pGeometryPass.get());
+	m_pViewPort->AddPass(m_pLightPass.get());
+	UpdateViewport();
 }
 
 void NodeViewport::OnUpdate(double const delta)
 {
-	if (m_transform.GetDirty())
-		UpdateViewport();
+	bool const dirty = m_transform.GetDirty();
 	Node2D::OnUpdate(delta);
+	if (dirty) UpdateViewport();
+
+	GraphicServer::Clear(this);
+	GraphicServer::Present(this);
 }
 
-void NodeViewport::SetBackgroundColor(Color const &color) const
+void NodeViewport::SetBackgroundColor(Color const &color)
 {
-	if (m_pViewPort) m_pViewPort->SetBackgroundColor(color);
+	m_clearColor = color;
+	m_pViewPort->SetBackgroundColor(color);
 }
 
-void NodeViewport::UpdateViewport() const
+void NodeViewport::SetCamera(NodeCamera* pCamera) const
+{
+	m_pGeometryPass->SetCamera(&pCamera->m_camera);
+	m_pLightPass->SetCamera(&pCamera->m_camera);
+}
+
+void NodeViewport::AddMesh(NodeMesh const& mesh) const
+{
+	m_pGeometryPass->AddMesh(*mesh.m_pMesh);
+}
+
+void NodeViewport::UpdateViewport()
 {
 	glm::vec2 const& pos = m_transform.GetPosition();
 	glm::vec2 const& scale = m_transform.GetScale();
 	m_pViewPort->SetPos(pos.x, pos.y);
 	m_pViewPort->SetSize(scale.x, scale.y);
+	OnViewportResize(scale.x, scale.y);
+}
+
+void NodeViewport::TryAttachToWindow()
+{
+	if (auto const window = FindFirstParentOfType<NodeWindow>())
+		GraphicServer::AttachToWindow(this, &window->get());
+}
+
+void NodeViewport::Clear() const
+{
+	m_pViewPort->Clear();
+}
+
+void NodeViewport::Present() const
+{
+	m_pViewPort->Present();
 }
 
 ISerializable* NodeViewport::CreateInstance() { return CreateNode<NodeViewport>("NodeViewport").release(); }

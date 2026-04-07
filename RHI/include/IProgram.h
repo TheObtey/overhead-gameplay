@@ -2,21 +2,18 @@
 #define RHI_IPROGRAM__H_
 
 #include <Define.h>
-#include <string>
-#include <glm/glm.hpp>
 
 class IShader;
 class IProgram 
 {
 public:
     virtual void Load() = 0;
+    virtual void Unload() = 0;
 
-    virtual void AddShader(IShader* pShader) = 0;
+    virtual void AddShader(IShader const& pShader) = 0;
 
     virtual void Use() = 0;
     virtual uint32 GetProgramId() const = 0;
-
-    virtual void Unload() = 0;
 
     //template <typename T>
     //virtual void SetUniform(std::string const& name, T value) = 0;

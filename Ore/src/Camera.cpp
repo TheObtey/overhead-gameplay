@@ -1,60 +1,37 @@
 #include "Camera.h"
-#include "Logger.hpp"
-#include <iostream>
+
 #include <glm/gtc/matrix_transform.hpp>
+#include <array>
 
-Camera::Camera(glm::vec3 const& position, glm::vec3 const& up, float yaw, float pitch, float roll, float fov)
+std::array<glm::vec3, 8> Camera::GetFrustum() const
 {
-    m_position = position;
-    m_worldUp = up;
-    m_forward = glm::vec3(0.0f);
-    m_yaw = yaw;
-    m_pitch = pitch;
-    m_fov = fov;
-    m_roll = roll;
-
-    UpdateVectors();
+    //TODO ADD FUNCTION
+    return {};
 }
 
-Camera::~Camera()
+glm::mat4 const& Camera::GetViewProjMatrix() const
 {
+    return m_viewProjMat;
 }
 
-glm::mat4 Camera::GetProjectionMatrix(ProjectionType type, uint16 screenWidth, uint16 screenHeight, float near, float far) const
+glm::vec3 Camera::GetPosition() const
 {
-    glm::mat4 projMatrix;
-
-    switch(type)
-    {
-    case ProjectionType::PERSPECTIVE :
-        projMatrix = glm::perspective(glm::radians(m_fov), (float)screenWidth / (float)screenHeight, near, far);
-        break;
-    case ProjectionType::ORTHOGRAPHIC : 
-        projMatrix = glm::ortho(0.0f, (float)screenWidth, (float)screenHeight, 0.0f, near, far);
-        break;
-    }
-
-    return projMatrix;
+    return { m_transform[0][3], m_transform[1][3], m_transform[2][3]};
 }
 
-glm::mat4 Camera::GetViewMatrix() const
+void Camera::UpdateCamera()
 {
-    return glm::lookAt(m_position, m_position + m_forward, m_up);
+    glm::mat4 const projMatrix = glm::perspective(Perspective.fov,Perspective.aspectRatio, Perspective.nearPlane, Perspective.farPlane);
+    m_viewProjMat = projMatrix * m_viewMatrix;
 }
 
-void Camera::UpdateVectors()
+void Camera::SetTransform(glm::mat4 const& transform)
 {
-    glm::vec3 front;
-    front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-    front.y = sin(glm::radians(m_pitch));
-    front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-    m_forward = glm::normalize(front);
+    m_viewMatrix = glm::inverse(transform);
+}
 
-    glm::vec3 right = glm::normalize(glm::cross(m_forward, m_worldUp));
-
-    m_up = glm::normalize(glm::cross(right, m_forward));
-
-    float rollRad = glm::radians(m_roll);
-    glm::mat4 rollMatrix = glm::rotate(glm::mat4(1.0f), rollRad, m_forward);
-    m_up = rollMatrix * glm::vec4(m_up, 0.0f);
+void Camera::LookAt(glm::vec3 const& target)
+{
+    glm::vec3 camPos = { m_transform[0][3], m_transform[1][3], m_transform[2][3]};
+    m_viewMatrix = glm::lookAt(camPos, target, Perspective.up);
 }

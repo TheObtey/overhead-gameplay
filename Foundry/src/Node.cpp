@@ -17,6 +17,7 @@
 Node::Node(std::string const& name) : m_name(name) , m_scriptPath("")
 {
     DEBUG("Node : " << m_name << " has been " << ANSI_GREEN << "created !" << ANSI_RESET << std::endl);
+	OnHierarchyChanged += [&]() { NotifyHierarchyChanged(); };
 }
 
 Node::~Node()
@@ -62,8 +63,15 @@ void Node::AttachChildImmediate(std::unique_ptr<Node>& child)
 
 	m_children[childName]->OnSceneEnter(*m_children[childName]);
 	m_children[childName]->OnParentChange(*this);
+	NotifyHierarchyChanged();
 
 	DEBUG("Node : " << childName << " is now a child of : " << m_name << std::endl);
+}
+
+void Node::NotifyHierarchyChanged()
+{
+	for (auto const& node: m_children | std::views::values)
+		node->OnHierarchyChanged();
 }
 
 void Node::AddChild(std::unique_ptr<Node>& child)
@@ -123,28 +131,25 @@ std::vector<std::reference_wrapper<Node>> Node::GetChildren()
 {
 	std::vector<std::reference_wrapper<Node>> res;
 
-	for (auto&[nodeName, nodePtr] : m_children)
-	{
+	for (auto &nodePtr: m_children | std::views::values)
 		res.emplace_back(*nodePtr.get());
-	}
+
 	return res;
 }
 
-uint32 Node::GetChildCount()
+uint32 Node::GetChildCount() const
 {
     return m_children.size();
 }
 
 void Node::Destroy()
 {
-	//TODO make that work in all case (maybe ?)
     if (m_pOwner)
-    {
         m_pOwner->RemoveChild(*this);
-        return;
-    }
+	else if (m_pSceneTree)
+		m_pSceneTree->m_root.reset();
 
-	if (m_pSceneTree) m_pSceneTree->m_root.reset();
+	NotifyHierarchyChanged();
 }
 
 void Node::Reparent(Node& newParent, bool keepGlobalTransform)
@@ -153,6 +158,7 @@ void Node::Reparent(Node& newParent, bool keepGlobalTransform)
 	if (newParent.m_name == m_pOwner->m_name)
 	{
 		OnParentChange(newParent);
+		OnHierarchyChanged();
 		return;
 	}
 
@@ -173,6 +179,22 @@ void Node::MoveChild(Node const& child, uint32 to)
 
     auto childIt = std::find(m_childrenOrder.begin(), m_childrenOrder.end(), child.m_name);
     std::iter_swap(childIt, m_childrenOrder.begin() + to);
+}
+
+uptr<Node> Node::DetachFromTree()
+{
+	if (HasParent() == true)
+	{
+		uptr<Node> detachedNode = std::move(m_pOwner->m_children[m_name]);
+		m_pOwner->m_children.erase(m_name);
+		return detachedNode;
+	}
+
+	if (GetChildCount() == 0) return std::move(m_pSceneTree->m_root);
+
+	uptr<Node> detachedNode = std::move(m_pSceneTree->m_root);
+	m_pSceneTree->ChangeSceneToNode(m_children[m_childrenOrder[0]]);
+	return detachedNode;
 }
 
 std::unique_ptr<Node> Node::Clone()
@@ -283,7 +305,9 @@ void Node::SetName(const std::string& newName)
 		m_name = newName;
 	}
 }
-std::string Node::GetName() { return m_name; }
-void Node::SetScriptPath(std::string const& path) { m_scriptPath = path;}
-Node* Node::GetParent() { return m_pOwner; }
-SceneTree* Node::GetSceneTree() { return m_pSceneTree; }
+std::string Node::GetName()							{ return m_name; }
+void Node::SetScriptPath(std::string const& path)	{ m_scriptPath = path;}
+Node* Node::GetParent() const						{ return m_pOwner; }
+bool Node::HasParent() const						{ return m_pOwner != nullptr; }
+SceneTree* Node::GetSceneTree() const				{ return m_pSceneTree; }
+Node::Proxy& Node::GetNodeProxy() const				{ return *m_pProxy; }

@@ -83,7 +83,9 @@ bool EventManager::GetButton(GamepadId id, EventInput button)
 
 void EventManager::GetKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-	const char* ch = glfwGetKeyName(key, scancode);
+
+    int tmp = glfwGetKeyScancode(key);
+	const char* ch = glfwGetKeyName(key, tmp);
 	
 	uint32 val = 0;
     ch != nullptr ? val = static_cast<uint32>(std::toupper(ch[0])) : val = key;

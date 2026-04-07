@@ -4,6 +4,8 @@
 #include "Node.h"
 #include "NodeRigidBody.h"
 
+#include <functional>
+
 class NodeCollider : public Node3D
 {
 public:
@@ -12,36 +14,34 @@ public:
 
 	class Proxy;
 
-	NodeCollider(std::string const& name);
+	NodeCollider(std::string const &name);
 	~NodeCollider() override;
 
-	void AttachToRigidBody(NodeRigidBody* rigidBody);
+	void AttachToRigidBody(NodeRigidBody *rigidBody);
 	void Detach();
 	bool IsAttached() const { return m_pCollider != nullptr; }
 
-	//rp3d::Collider* GetCollider() const { return m_pCollider; }
-
 	// Engine
 	////////////////////////////////////////////////////////////
-	virtual void Serialize(SerializedObject& datas) const override;
-	virtual void Deserialize(SerializedObject const& datas) override;
+	virtual void Serialize(SerializedObject &datas) const override;
+	virtual void Deserialize(SerializedObject const &datas) override;
 
 	// =========== Local transform (offset from RigidBody) ===========
 
-	void SetLocalPosition(const glm::vec3& pos);
-	void SetLocalRotation(const glm::quat& rot);
-	glm::vec3 const& GetLocalPosition() const { return m_localPosition; }
-	glm::quat const& GetLocalRotation() const { return m_localRotation; }
+	void SetLocalPosition(const glm::vec3 &pos);
+	void SetLocalRotation(const glm::quat &rot);
+	glm::vec3 const &GetLocalPosition() const { return m_localPosition; }
+	glm::quat const &GetLocalRotation() const { return m_localRotation; }
 
 	// =========== Material ===========
 
 	// 0.0 < v < 1.0
-	void  SetBounciness(float bounciness);
+	void SetBounciness(float bounciness);
 	// 0.0 < v < 1.0
 	float GetBounciness() const;
-	void  SetFrictionCoefficient(float friction);
+	void SetFrictionCoefficient(float friction);
 	float GetFrictionCoefficient() const;
-	void  SetMassDensity(float density);
+	void SetMassDensity(float density);
 	float GetMassDensity() const;
 
 	// =========== Collider behavior ===========
@@ -55,41 +55,44 @@ public:
 
 	// =========== Collision filtering ===========
 
-	void     SetCollisionCategoryBits(uint16_t category);
+	void SetCollisionCategoryBits(uint16_t category);
 	uint16_t GetCollisionCategoryBits() const;
-	void     SetCollideWithMaskBits(uint16_t mask);
+	void SetCollideWithMaskBits(uint16_t mask);
 	uint16_t GetCollisionBitsMask() const;
 
+	// =========== RP3D Events ===========
+
+	void ContactEvent(NodeCollider &other);
+	void TriggerEvent(NodeCollider &other);
+
+	Event<void(NodeCollider &, const NodeRigidBody &data)> OnContact;
+	Event<void(NodeCollider &, const NodeRigidBody &data)> OnTrigger;
 
 protected:
-	virtual void      DestroyShape() = 0;
-	rp3d::Transform   GetLocalRp3dTransform() const;
+	virtual void DestroyShape() = 0;
+	rp3d::Transform GetLocalRp3dTransform() const;
+	NodeRigidBody *m_pNodeRigidBody = nullptr;
 
-	rp3d::Collider* m_pCollider = nullptr;
-	rp3d::CollisionShape* m_pShape = nullptr;
-	rp3d::RigidBody* m_pRigidBody = nullptr;
-
-	NodeRigidBody* m_pAttachedRigidBody = nullptr;
-
-	glm::vec3 m_localPosition{ 0.0f, 0.0f, 0.0f };
-	glm::quat m_localRotation{ 1.0f, 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_localPosition{0.0f, 0.0f, 0.0f};
+	glm::quat m_localRotation{1.0f, 0.0f, 0.0f, 0.0f};
 
 	int m_indexInRigidBody = -1;
 
 	friend class PhysicsServer;
 };
 
-
 class NodeBoxCollider : public NodeCollider
 {
 public:
-	NodeBoxCollider(std::string const& name) : NodeCollider(name) {};
+	class Proxy;
+	NodeBoxCollider(std::string const &name) : NodeCollider(name) {};
 	~NodeBoxCollider() override {};
-	virtual void Serialize(SerializedObject& datas) const override;
-	virtual void Deserialize(SerializedObject const& datas) override;
-	static ISerializable* CreateInstance();
+	virtual void Serialize(SerializedObject &datas) const override;
+	virtual void Deserialize(SerializedObject const &datas) override;
+	static ISerializable *CreateInstance();
 
-	void SetShape(const glm::vec3& halfExtents);
+	void SetShape(const glm::vec3 &halfExtents);
+
 private:
 	virtual void DestroyShape() override;
 };
@@ -97,13 +100,15 @@ private:
 class NodeSphereCollider : public NodeCollider
 {
 public:
-	NodeSphereCollider(std::string const& name) : NodeCollider(name) {};
+	class Proxy;
+	NodeSphereCollider(std::string const &name) : NodeCollider(name) {};
 	~NodeSphereCollider() override {};
-	virtual void Serialize(SerializedObject& datas) const override;
-	virtual void Deserialize(SerializedObject const& datas) override;
-	static ISerializable* CreateInstance();
+	virtual void Serialize(SerializedObject &datas) const override;
+	virtual void Deserialize(SerializedObject const &datas) override;
+	static ISerializable *CreateInstance();
 
 	void SetShape(float radius);
+
 private:
 	virtual void DestroyShape() override;
 };
@@ -111,22 +116,25 @@ private:
 class NodeCapsuleCollider : public NodeCollider
 {
 public:
-	NodeCapsuleCollider(std::string const& name) : NodeCollider(name) {};
+	class Proxy;
+	NodeCapsuleCollider(std::string const &name) : NodeCollider(name) {};
 	~NodeCapsuleCollider() override {};
-	virtual void Serialize(SerializedObject& datas) const override;
-	virtual void Deserialize(SerializedObject const& datas) override;
-	static ISerializable* CreateInstance();
+	virtual void Serialize(SerializedObject &datas) const override;
+	virtual void Deserialize(SerializedObject const &datas) override;
+	static ISerializable *CreateInstance();
 
 	void SetShape(float radius, float height);
+
 private:
 	virtual void DestroyShape() override;
 };
 
+REGISTER_ISERIALIZABLE(NodeCollider, NodeCollider::CreateInstance);
 REGISTER_ISERIALIZABLE(NodeBoxCollider, NodeBoxCollider::CreateInstance);
 REGISTER_ISERIALIZABLE(NodeSphereCollider, NodeSphereCollider::CreateInstance);
 REGISTER_ISERIALIZABLE(NodeCapsuleCollider, NodeCapsuleCollider::CreateInstance);
 
-
 #include "Scripting/Proxies/NodeColliderProxy.inl"
+#include "Scripting/Proxies/NodeSpeColliderProxy.inl"
 
 #endif // !NODECOLLIDER__H_

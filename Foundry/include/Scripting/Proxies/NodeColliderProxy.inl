@@ -5,7 +5,7 @@ class NodeCollider::Proxy : public Node3D::Proxy
 public:
 	struct ProxyBinding;
 
-	Proxy(Node& node) : Node3D::Proxy(node) {}
+	Proxy(Node& node) : Node3D::Proxy(node), m_pNode(static_cast<NodeCollider*>(&node)) {}
 
     // =========== Local transform (offset from RigidBody) ===========
 
@@ -43,33 +43,37 @@ private:
 	NodeCollider* m_pNode;
 };
 
-BindProxy(NodeCollider::Proxy,
-	return binder.BindClass<NodeCollider::Proxy>("nodecollider",
-		"SetLocalPosition", BIND(SetLocalPosition),
-		"SetLocalRotation", BIND(SetLocalRotation),
-		"GetLocalPosition", BIND(GetLocalPosition),
-		"GetLocalRotation", BIND(GetLocalRotation),
+struct NodeCollider::Proxy::ProxyBinding
+{
+	static void Bind(Binder& binder)
+	{
+		binder.BindClass<NodeCollider::Proxy>("nodecollider",
+			sol::base_classes, sol::bases<Node3D::Proxy>(),
+			"SetLocalPosition", BIND(SetLocalPosition),
+			"SetLocalRotation", BIND(SetLocalRotation),
+			"GetLocalPosition", BIND(GetLocalPosition),
+			"GetLocalRotation", BIND(GetLocalRotation),
 
-		"SetBounciness", BIND(SetBounciness),
-		"GetBounciness", BIND(GetBounciness),
-		"SetFrictionCoefficient", BIND(SetFrictionCoefficient),
-		"GetFrictionCoefficient", BIND(GetFrictionCoefficient),
-		"SetMassDensity", BIND(SetMassDensity),
-		"GetMassDensity", BIND(GetMassDensity),
+			"SetBounciness", BIND(SetBounciness),
+			"GetBounciness", BIND(GetBounciness),
+			"SetFrictionCoefficient", BIND(SetFrictionCoefficient),
+			"GetFrictionCoefficient", BIND(GetFrictionCoefficient),
+			"SetMassDensity", BIND(SetMassDensity),
+			"GetMassDensity", BIND(GetMassDensity),
 
-		"SetIsTrigger", BIND(SetIsTrigger),
-		"IsTrigger", BIND(IsTrigger),
-		"SetIsSimulationCollider", BIND(SetIsSimulationCollider),
-		"IsSimulationCollider", BIND(IsSimulationCollider),
-		"SetIsWorldQueryCollider", BIND(SetIsWorldQueryCollider),
-		"IsWorldQueryCollider", BIND(IsWorldQueryCollider),
+			"SetIsTrigger", BIND(SetIsTrigger),
+			"IsTrigger", BIND(IsTrigger),
+			"SetIsSimulationCollider", BIND(SetIsSimulationCollider),
+			"IsSimulationCollider", BIND(IsSimulationCollider),
+			"SetIsWorldQueryCollider", BIND(SetIsWorldQueryCollider),
+			"IsWorldQueryCollider", BIND(IsWorldQueryCollider),
 
-		"SetCollisionCategoryBits", BIND(SetCollisionCategoryBits),
-		"GetCollisionCategoryBits", BIND(GetCollisionCategoryBits),
-		"SetCollideWithMaskBits", BIND(SetCollideWithMaskBits),
-		"GetCollisionBitsMask", BIND(GetCollisionBitsMask)
-	);
-)
+			"SetCollisionCategoryBits", BIND(SetCollisionCategoryBits),
+			"GetCollisionCategoryBits", BIND(GetCollisionCategoryBits),
+			"SetCollideWithMaskBits", BIND(SetCollideWithMaskBits),
+			"GetCollisionBitsMask", BIND(GetCollisionBitsMask));
+	};
+};
 
 REGISTER_PROXY(NodeCollider::Proxy::ProxyBinding, NodeColliderProxy);
 

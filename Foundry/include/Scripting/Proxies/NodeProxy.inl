@@ -1,6 +1,5 @@
 #include "Event.hpp"
 #include "Scripting/Binder.h"
-#include "SceneTree.h"
 #include "Registries/AutomaticRegisterProxy.hpp"
 
 #include <string>
@@ -8,7 +7,9 @@
 #define BindProxy(P, X) struct P::ProxyBinding { static void Bind(Binder& binder) { X } };
 #define BIND(F) &Proxy::F
 
-/*A node proxy class used to communicate between the scripting language and the engine API.
+class SceneTreeProxy;
+/*A node proxy class used
+ *to communicate between the scripting language and the engine API.
 The engine manage memory, scripting just get refs.
 Should be scripting language agnostic.
 */
@@ -47,16 +48,19 @@ public:
 
 	Proxy* Clone();
 
-	std::string GetName();
-	Proxy* GetParent();
-	SceneTree* GetSceneTree();
+	std::string GetName() const;
+	Proxy* GetParent() const;
+	bool HasParent() const;
+	SceneTreeProxy* GetSceneTree() const;
 
 	Event<void()> OnSceneEnter;
 	Event<void(double)> OnUpdate;
 	Event<void(double)> OnPhysicsUpdate;
 	Event<void()> OnSceneLeave;
 
-	operator Node&();
+	operator Node&() const;
+
+	Node* GetProxyOwner() const;
 
 private:
 	Node* m_pNode;
@@ -64,27 +68,7 @@ private:
 
 struct Node::Proxy::ProxyBinding
 {
-	static void Bind(Binder& binder)
-	{
-		binder.BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
-		binder.BindClass<Proxy>("node",
-			sol::meta_function::garbage_collect, BIND(GCNodeProxy),
-			"AddChild", BIND(AddChild),
-			"RemoveChild", OVERLOAD(Proxy, void, Proxy&)(BIND(RemoveChild)),
-			"RemoveChild", OVERLOAD(Proxy, void, std::string const&)(BIND(RemoveChild)),
-			"FindChild", BIND(FindChild),
-			"GetChild", BIND(GetChild),
-			"GetChildren", BIND(GetChildren),
-			"GetChildCount", BIND(GetChildCount),
-			"GetNode", BIND(GetNode),
-			"Destroy", BIND(Destroy),
-			"Reparent", BIND(Reparent),
-			"MoveChild", BIND(MoveChild),
-			"Clone", BIND(Clone),
-			"GetName", BIND(GetName),
-			"GetParent", BIND(GetParent),
-			"GetSceneTree", BIND(GetSceneTree));
-	};
+	static void Bind(Binder& binder);
 };
 
 REGISTER_PROXY(Node::Proxy::ProxyBinding, NodeProxy);

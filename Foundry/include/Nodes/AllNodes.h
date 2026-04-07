@@ -6,5 +6,8 @@
 #include "Node2D.h"
 #include "NodeRigidBody.h"
 #include "NodeCollider.h"
+#include "NodeCamera.h"
+#include "NodeViewport.h"
+#include "NodeWindow.h"
 
 #endif // !_ALL_NODES__H_

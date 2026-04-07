@@ -6,25 +6,28 @@
 #include "VertexArrayObject.h"
 #include "Buffer.h"
 
+#include <span>
+
+using LightSpan =  std::span<struct Light>;
+
 struct Light
 {
-    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 position = glm::vec3(0.0f, 0.0f, 2.0f);
     
     float constant = 1.0f;
     float linear = 0.7f;
     float quadratic = 1.8f;
     Color color = {1.0f, 1.0f, 1.0f, 1.0f};
-
-    Light() = default;
 };
 
 class LightPass final : public Pass
 {
 public:
-    LightPass(Program const& Program, std::vector<Light> const& lights, sptr<Camera> pCamera);
-    ~LightPass();
+    LightPass(Program& program, LightSpan lights);
+    LightPass(Program& program, LightSpan lights, Camera* pCamera);
+    ~LightPass() = default;
 
-    void SetLights(std::vector<Light> const& lights);
+    void SetLights(LightSpan const& lights);
     void Execute() override;
 
 private:
@@ -32,7 +35,7 @@ private:
     void GenerateQuad();
 
 private:
-    std::vector<sptr<Light>> m_lights;
+    LightSpan m_lights;
     uptr<VertexArrayObject> m_quadVAO;
     uptr<Buffer<float>> m_quadVBO;
     GLuint m_quadVAOId;
