@@ -40,7 +40,7 @@ uptr<Node> LoadScene()
     scene->AddChild(std::move(viewport));
     scene->AddChild(std::move(viewport2));
 
-    uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/test.lua");
+    uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/scripts/test.lua");
     Node::AttachScript(script, *scene);
 
     return scene;

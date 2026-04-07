@@ -44,42 +44,6 @@ namespace CameraUtils
 		return f;
 	}
 
-	//bool IsPointInFrustum(const Frustum& f, glm::vec3 point)
-	//{
-	//	for (const auto& plane : f.planes)
-	//	{
-	//		if (glm::dot(plane.normal, point) + plane.distance < 0.0f)
-	//			return false;
-	//	}
-	//	return true;
-	//}
-
-	//bool IsSphereInFrustum(const Frustum& f, glm::vec3 center, float radius)
-	//{
-	//	for (const auto& plane : f.planes)
-	//	{
-	//		if (glm::dot(plane.normal, center) + plane.distance < -radius)
-	//			return false;
-	//	}
-	//	return true;
-	//}
-
-	//bool IsAABBInFrustum(const Frustum& f, glm::vec3 aabb_min, glm::vec3 aabb_max)
-	//{
-	//	for (const auto& plane : f.planes)
-	//	{
-	//		glm::vec3 point =
-	//		{
-	//			plane.normal.x >= 0 ? aabb_max.x : aabb_min.x,
-	//			plane.normal.y >= 0 ? aabb_max.y : aabb_min.y,
-	//			plane.normal.z >= 0 ? aabb_max.z : aabb_min.z
-	//		};
-	//		if (glm::dot(plane.normal, point) + plane.distance < 0.0f)
-	//			return false;
-	//	}
-	//	return true;
-	//}
-	
 	bool IsPointInFrustum(const Frustum& f, glm::vec3 point)
 	{
 		for (const auto& plane : f.planes)
@@ -99,7 +63,6 @@ namespace CameraUtils
 		}
 		return false;
 	}
-
 
 	bool IsAABBInFrustum(const Frustum& f, glm::vec3 aabb_min, glm::vec3 aabb_max)
 	{
