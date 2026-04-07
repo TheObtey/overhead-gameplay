@@ -22,7 +22,7 @@ void AnimatedPass::Execute()
     Logger::Log("Start Animation Pass Execution");
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_program.Use();
     m_program.SetUniform("viewProj", m_pCamera->GetViewProjMatrix());
 

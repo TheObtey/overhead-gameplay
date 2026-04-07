@@ -31,8 +31,8 @@ void NodeViewport::Setup()
 	lightProgram.SetUniform("gAlbedoSpec", 2);
 
 	m_pViewPort->AddPass(m_pGeometryPass.get());
-	m_pViewPort->AddPass(m_pLightPass.get());
 	m_pViewPort->AddPass(m_pAnimatedPass.get());
+	m_pViewPort->AddPass(m_pLightPass.get());
 	UpdateViewport();
 }
 
