@@ -1,5 +1,6 @@
-#include "Servers/EngineServer.h"
 #include "Node.h"
+#include "Servers/EngineServer.h"
+#include "SceneTree.h"
 
 using Proxy = Node::Proxy;
 
@@ -110,22 +111,55 @@ Proxy* Proxy::Clone()
 	return ptr;
 }
 
-std::string Proxy::GetName()
-{ 
+std::string Proxy::GetName() const
+{
 	return m_pNode->GetName(); 
 }
 
-Proxy* Proxy::GetParent()
+Proxy* Proxy::GetParent() const
 {
-	return m_pNode->m_pProxy.get();
+	return m_pNode->GetParent()->m_pProxy.get();
 }
 
-SceneTree* Proxy::GetSceneTree()
+bool Proxy::HasParent() const
 {
-	return m_pNode->GetSceneTree();
+	return m_pNode->HasParent();
 }
 
-Proxy::operator Node&()
+SceneTreeProxy* Proxy::GetSceneTree() const
+{
+	return &m_pNode->GetSceneTree()->m_proxy;
+}
+
+Proxy::operator Node&() const
 {
 	return *m_pNode;
+}
+
+Node* Proxy::GetProxyOwner() const
+{
+	return m_pNode;
+}
+
+void Proxy::ProxyBinding::Bind(Binder &binder)
+{
+	binder.BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
+	binder.BindClass<Proxy>("node",
+		sol::meta_function::garbage_collect, BIND(GCNodeProxy),
+		"AddChild", BIND(AddChild),
+		"RemoveChild", OVERLOAD(Proxy, void, Proxy&)(BIND(RemoveChild)),
+		"RemoveChild", OVERLOAD(Proxy, void, std::string const&)(BIND(RemoveChild)),
+		"FindChild", BIND(FindChild),
+		"GetChild", BIND(GetChild),
+		"GetChildren", BIND(GetChildren),
+		"GetChildCount", BIND(GetChildCount),
+		"GetNode", BIND(GetNode),
+		"Destroy", BIND(Destroy),
+		"Reparent", BIND(Reparent),
+		"MoveChild", BIND(MoveChild),
+		"Clone", BIND(Clone),
+		"GetName", BIND(GetName),
+		"GetParent", BIND(GetParent),
+		"HasParent", BIND(HasParent),
+		"GetSceneTree", BIND(GetSceneTree));
 }

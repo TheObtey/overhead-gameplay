@@ -2,6 +2,7 @@
 #define FOUNDRY_SCENE_TREE__H_
 
 #include "Node.h"
+#include "Scripting/Proxies/SceneTreeProxy.h"
 
 class SceneTree
 {
@@ -16,7 +17,7 @@ public:
 
     ~SceneTree() = default;
 
-    void ChangeSceneToNode(uptr<Node> newScene);
+    void ChangeSceneToNode(uptr<Node>& newScene);
 
     Node& GetCurrentScene() const { return *m_pCurrentScene; }
     Node& GetRoot() const { return *m_root; }
@@ -31,8 +32,11 @@ private:
     //Where the scene begin, a direct child of the root
     Node* m_pCurrentScene = nullptr;
     uptr<Node> m_root;
+    SceneTreeProxy m_proxy {this};
 
     friend class Node;
+    friend class Node::Proxy;
+    friend class GameLoop;
 };
 
 #endif

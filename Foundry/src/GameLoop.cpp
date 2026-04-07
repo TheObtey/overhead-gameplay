@@ -17,13 +17,16 @@ void GameLoop::StartGame(SceneTree& defaultTree)
     }
 
     InitServers();
-
-    m_pDefaultTree = &defaultTree;
-    m_pDefaultTree->OnGameStarted();
-    m_pDefaultTree->OnSceneChanged();
     UpdateServers();
 
-    m_pDefaultTree->ChangeSceneToNode(LoadScene());
+    m_pDefaultTree = &defaultTree;
+    uptr<Node> defaultScene = LoadScene();
+    m_pDefaultTree->m_pCurrentScene = defaultScene.get();
+    m_pDefaultTree->m_root->AddChild(defaultScene);
+    UpdateServers();
+
+    m_pDefaultTree->OnGameStarted();
+    m_pDefaultTree->OnSceneChanged();
     LoopGame();
 }
 
