@@ -12,10 +12,10 @@
 
 int main()
 {
-    Window window(800, 600, "ORE ORE OREORE ORE ORE OREORE OREORE", false, true);
+    Window window(1920, 1080, "ORE ORE OREORE ORE ORE OREORE OREORE", false, true);
     window.Open();
-    Viewport viewport(0, 0, 800, 600, Color::SKY_BLUE);
-    //Viewport viewport(0, 0, 800, 600, Color::BLACK); 
+    Viewport viewport(0, 0, 1920, 1080, Color::SKY_BLUE);
+
     window.AddViewport(viewport);
 
     std::vector<Vertex> vertices;
@@ -29,41 +29,36 @@ int main()
         0,2,3
     };
 
-    sptr<Geometry> cube = std::make_shared<Geometry>(vertices, indices);
-    Texture diffuse("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
-    Texture specular("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
-    Texture normal("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+    sptr<Geometry> cube     = std::make_shared<Geometry>(vertices, indices);
 
-    std::vector<std::reference_wrapper<Texture>> textures;
+    sptr<Texture> diffuse   = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
+    sptr<Texture> specular  = std::make_shared<Texture>("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+    sptr<Texture> normal    = std::make_shared<Texture>("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+
+    std::vector<sptr<Texture>> textures;
     textures.push_back(diffuse);
     textures.push_back(specular);
     textures.push_back(normal);
 
-    Mesh mesh(cube, textures, glm::mat4(1.0f));
+    Mesh mesh(cube, textures, glm::scale(glm::mat4(1.0f), glm::vec3(0.12f)));
     Mesh mesh1(cube, textures, glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
 
-    glm::vec3 position(0.0f, 0.0f, 5.0f);
-    glm::vec3 up(0.0f, 1.0f, 0.0f);
-
-    float yaw = -90.0f;
-    float pitch = 0.0f;
-    float roll = 0.0f;
-
-    float fov = 45.0f;
-
-    sptr<Camera> camera = std::make_shared<Camera>(position, up, yaw, pitch, roll, fov);
-    std::vector<Mesh*> meshes;
-    meshes.push_back(&mesh);
-    meshes.push_back(&mesh1);
+    sptr<Camera> camera = std::make_shared<Camera>();
+    camera->Perspective.aspectRatio = 1920.0f/1080.0f;
+    camera->SetTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    camera->UpdateCamera();
 
     std::vector<Light> lights;
 
     for (int i = 0; i < 1; ++i)
     {
         float xPos = 0.0f;
-        float yPos = 0.0f;
+        float yPos = 2.0f;
         float zPos = 1.0f;
         Light light;
+        light.quadratic = 0.5f;
+        light.linear = 0.4f;
+        light.constant = 0.0f;
         //light.color = Color::BLUE;
         light.position = { xPos, yPos, zPos };
         lights.push_back(light);
@@ -77,21 +72,20 @@ int main()
     Shader geoVert(ShaderType::TYPE_VERTEX);
     geoVert.Load("res/shaders/GBuffer.vert");
 
-    geometryProgram.AddShader(&geoFrag);
-    geometryProgram.AddShader(&geoVert);
+    geometryProgram.AddShader(geoFrag);
+    geometryProgram.AddShader(geoVert);
     geometryProgram.Load();
 
     geoFrag.Unload();
     geoVert.Unload();
-
 
     Shader lightFrag(ShaderType::TYPE_FRAGMENT);
     lightFrag.Load("res/shaders/LightPass.frag");
     Shader lightVert(ShaderType::TYPE_VERTEX);
     lightVert.Load("res/shaders/LightPass.vert");
 
-    lightProgram.AddShader(&lightFrag);
-    lightProgram.AddShader(&lightVert);
+    lightProgram.AddShader(lightFrag);
+    lightProgram.AddShader(lightVert);
     lightProgram.Load();
 
     lightFrag.Unload();
@@ -107,14 +101,26 @@ int main()
 
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
+    float fact = 1.0f;
+    float inf = 0.0f;
 
     while (window.IsOpen())
     {
-        geoPass.AddMesh(mesh);
         window.Clear();
+        viewport.Clear();
+        viewport.Present();
+        geoPass.AddMesh(mesh);
 
         //glm::vec3 camPos = camera->GetPosition() + glm::vec3(0.016f,0.0f,0.0f);
-        //glm::mat4 meshTransform = glm::translate(mesh.GetTransform(), glm::vec3(0.0016f, 0.0f, 0.0f));
+        if(inf < -1.0f)
+            fact = 1.0f;
+
+        if(inf > 1.0f)
+            fact = -1.0f;
+
+
+        //inf += 0.0016f * fact;
+        //glm::mat4 meshTransform = glm::translate(mesh.GetTransform(), glm::vec3(0.0016f * fact, 0.0f, 0.0f));
         //mesh.SetTransform(meshTransform);
         //camera->SetRoll(roll ++);
         //Logger::LogWithLevel(LogLevel::ERROR, yaw);
