@@ -47,7 +47,7 @@ public:
 
 	// =========== Setters ===========
 
-	void SetLocalPosition(glm::vec3 const pos)						{ m_pNode->SetLocalPosition(glm::vec4(pos, 1.0f)); }
+	void SetLocalPosition(glm::vec3 const pos)						{ m_pNode->SetLocalPosition(pos); }
 	void SetLocalX(float const x)									{ m_pNode->SetLocalX(x); }
 	void SetLocalY(float const y)									{ m_pNode->SetLocalY(y); }
 	void SetLocalZ(float const z)									{ m_pNode->SetLocalZ(z); }
@@ -57,7 +57,7 @@ public:
 	// { w, x, y, z }
 	void SetLocalRotationQuat(glm::quat rot)						{ m_pNode->SetLocalRotationQuat(rot); }
 
-	void SetScale(glm::vec3 const scale)							{ m_pNode->SetScale(glm::vec4(scale, 1.0f)); }
+	void SetScale(glm::vec3 const scale)							{ m_pNode->SetScale(scale); }
 
 	void SetWorldPosition(glm::vec3 const& worldPos)				{ m_pNode->SetWorldPosition(worldPos); }
 	void SetWorldScale(glm::vec3 const& worldScale)					{ m_pNode->SetWorldScale(worldScale); }
@@ -69,13 +69,13 @@ public:
 
 	// =========== Adders ===========
 
-	void AddScale(glm::vec3 const scale)							{ m_pNode->AddScale(glm::vec4(scale, 1.0f)); }
-	void AddLocalPosition(glm::vec3 const pos)						{ m_pNode->AddLocalPosition(glm::vec4(pos, 1.0f)); }
+	void AddScale(glm::vec3 const scale)							{ m_pNode->AddScale(scale); }
+	void AddLocalPosition(glm::vec3 const pos)						{ m_pNode->AddLocalPosition(pos); }
 	void AddLocalX(float const x)									{ m_pNode->AddLocalX(x); }
 	void AddLocalY(float const y)									{ m_pNode->AddLocalY(y); }
 	void AddLocalZ(float const z)									{ m_pNode->AddLocalZ(z); }
 	// -- Angles in Radians
-	void AddLocalRotation(glm::vec3 const rot)						{ m_pNode->AddLocalRotation(glm::vec4(rot, 1.0f)); }
+	void AddLocalRotation(glm::vec3 const rot)						{ m_pNode->AddLocalRotation(rot); }
 	// -- Angles in Radians
 	void AddLocalYaw(float const yaw)								{ m_pNode->AddLocalYaw(yaw); }
 	// -- Angles in Radians

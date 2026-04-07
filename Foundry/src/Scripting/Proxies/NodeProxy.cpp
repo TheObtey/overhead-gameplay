@@ -12,6 +12,14 @@ Proxy* Proxy::CreateNodeProxy(std::string const& name)
 	return ptr;
 }
 
+Proxy* Proxy::LoadNode(std::string const& path)
+{
+	uptr<Node> node = Node::LoadNodeFromJSON<Node>(path);
+	Proxy* const ptr = node->m_pProxy.get();
+	EngineServer::RegisterUnattachedNode(node);
+	return ptr;
+}
+
 void Proxy::GCNodeProxy(Proxy* nodeProxy)
 {
 	if (nodeProxy)
@@ -144,6 +152,7 @@ Node* Proxy::GetProxyOwner() const
 void Proxy::ProxyBinding::Bind(Binder &binder)
 {
 	binder.BindFunction("CreateNode", &Node::Proxy::CreateNodeProxy);
+	binder.BindFunction("LoadNode", &Node::Proxy::LoadNode);
 	binder.BindClass<Proxy>("node",
 		sol::meta_function::garbage_collect, BIND(GCNodeProxy),
 		"AddChild", BIND(AddChild),

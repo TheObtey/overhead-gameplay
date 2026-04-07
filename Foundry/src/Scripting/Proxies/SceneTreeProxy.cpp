@@ -11,9 +11,12 @@ SceneTreeProxy::SceneTreeProxy(SceneTree *tree) : m_sceneTree(tree)
 
 void SceneTreeProxy::ChangeSceneToNode(NodeProxy const& node)
 {
-    uptr<Node> unode = node.HasParent() ?
-        std::move(EngineServer::GetUnattachedNode(node.GetProxyOwner())) :
-        node.GetProxyOwner()->DetachFromTree();
+    uptr<Node> unode;
+    if (node.HasParent())
+        unode = std::move(EngineServer::GetUnattachedNode(node.GetProxyOwner()));
+    else
+        unode = node.GetProxyOwner()->DetachFromTree();
+
     m_sceneTree->ChangeSceneToNode(unode);
 }
 

@@ -5,13 +5,18 @@
 #include "Event.hpp"
 #include "Scripting/Lua/LuaScriptInstance.hpp"
 #include "Serialization/ISerializable.h"
+#include "Serialization/json.hpp"
 #include "Registries/AutomaticRegister.hpp"
 
+#include <filesystem>
+#include <fstream>
 #include <functional>
 #include <optional>
 #include <string>
 #include <sstream>
 #include <vector>
+
+#include "Serialization/SerializeObject.hpp"
 
 class SceneTree;
 class SerializedObject;
@@ -84,11 +89,13 @@ public:
 	static std::unique_ptr<T> CreateNode(std::string const& name);
 
 	template <NodeType T>
+	static uptr<T> LoadNodeFromJSON(std::filesystem::path path);
+
+	template <NodeType T>
 	static void AttachScript(uptr<LuaScriptInstance>& script, T& node);
 
-	static ISerializable* CreateInstance();
-
 	static void SetStatusEditor(bool inEditor) { s_IsInEditor = inEditor; }
+	static ISerializable* CreateInstance();
 
 	//====Event======
 	Event<void(Node&)> OnSceneEnter;
@@ -144,6 +151,28 @@ std::unique_ptr<T> Node::CreateNode(std::string const& name)
 	uptr<concrete_Node> ptr = std::make_unique<concrete_Node>(name);
 	ptr->m_pProxy = std::make_unique<typename T::Proxy>(*ptr);
     return std::move(ptr);
+}
+
+template <NodeType T>
+uptr<T> Node::LoadNodeFromJSON(std::filesystem::path path)
+{
+	std::fstream file;
+	file.open(path, std::ios::in);
+	nlohmann::json jsonFile(nlohmann::json::parse(file));
+	file.close();
+
+	uptr<T> firstNode = Node::CreateNode<T>("Node");
+
+	SerializedObject object = {};
+	if (jsonFile[0].contains("Root")) {
+		object.SetJson(jsonFile[0]["Root"]);
+		firstNode.get()->Deserialize(object);
+	}
+	else if (jsonFile[0].contains("Node")) {
+		object.SetJson(jsonFile[0]["Node"]);
+		firstNode.get()->Deserialize(object);
+	}
+	return firstNode;
 }
 
 
