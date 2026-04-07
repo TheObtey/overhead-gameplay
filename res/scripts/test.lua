@@ -19,9 +19,10 @@ function OnInit()
     -- print("bob" )
     -- local pos = nTest:GetWorldPosition()
     -- print("Init pos = (", pos.x,",", pos.y,",", pos.z,")" )
+    print("billy")
 
-    -- pos = nTestChild:GetWorldPosition()
-    -- print("InitChild pos = (", pos.x,",", pos.y,",", pos.z,")" )
+    LoadNode("res/scripts/prefabs/TestEdit.nd.json")
+    print("billy")
 
     -- self:AddChild(nTest)
     -- self:AddChild(nTestChild)
@@ -30,13 +31,5 @@ function OnInit()
 end
 
 function OnUpdate(dt)
-    --  local vec1 = fmaths.vec3:new(0,0,7)
-    -- nTest.SetWorldPosition(nTest, vec1)
 
-    -- local vec = fmaths.vec3:new(0,2,0)
-    -- -- nTestChild.SetLocalPosition(nTestChild, vec)
-    -- nTestChild.AddLocalPosition(nTestChild, vec)
-    -- local pos = nTestChild:GetWorldPosition()
-
-    -- print("Update pos = (", pos.x,",", pos.y,",", pos.z,")" )
 end

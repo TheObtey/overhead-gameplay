@@ -17,6 +17,7 @@ class Node::Proxy
 {
 public:
 	static Proxy* CreateNodeProxy(std::string const& name);
+	static Proxy* LoadNode(std::string const& path);
 	//Garbage collect node proxy in case lua loose reference to node
 	static void GCNodeProxy(Proxy* node);
 

@@ -41,9 +41,10 @@ uptr<Node> LoadScene()
     //mesh2->AddTextures(normal, specular);
     //mesh2->SetLocalX(-2);
 
-    viewport->AddChild(std::move(camera));
-    //node3d->AddChild(std::move(mesh));
-    viewport->AddChild(std::move(mesh));
+    //uptr<Node> loadedNode = Node::LoadNodeFromJSON<Node>("res/scripts/prefabs/TestNode.nd.json");
+
+    viewport2->AddChild(std::move(camera));
+    viewport2->AddChild(std::move(mesh));
 
     //viewport2->AddChild(std::move(mesh2));
     //viewport2->AddChild(std::move(camera2));
