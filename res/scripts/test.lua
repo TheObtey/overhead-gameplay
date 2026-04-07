@@ -9,7 +9,7 @@ function OnInit()
     nTest = CreateNode3D("bob")
     nTestChild = CreateNode3D("bobChild")
 
-    print("billy")
+    -- print("billy")
     -- local vec = fmaths.vec3:new(0,0,2)
     -- print("vec = (", vec.x,",", vec.y,",", vec.z,")" )
     -- nTest:SetWorldPosition(vec)
@@ -26,7 +26,7 @@ function OnInit()
     -- self:AddChild(nTest)
     -- self:AddChild(nTestChild)
 
-    -- self:GetSceneTree().OnGameStarted = OnGameStarted
+    self:GetSceneTree().OnGameStarted = OnGameStarted
 end
 
 function OnUpdate(dt)
