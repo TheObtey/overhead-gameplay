@@ -2,6 +2,7 @@
 #include "AnimationStructs.h"
 #include "Mesh.h"
 
+
 #include <Define.h>
 #include <MathUtils.h>
 #include <Logger.hpp>
@@ -76,7 +77,7 @@ void AnimationServer::UpdateFrameImediate(Animation* pAnim, Mesh* pMesh)
 
 void AnimationServer::AddMeshImmediate(Mesh* pMesh)
 {
-    bigtemp->AddSkeletalMesh(*pMesh);
+    // ->AddSkeletalMesh(*pMesh);
 }
 
 void AnimationServer::FlushCommandsImpl()

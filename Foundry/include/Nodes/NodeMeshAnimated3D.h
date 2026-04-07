@@ -2,14 +2,14 @@
 #define FOUNDRY_NODE_MESHANIMATED3D__H_
 
 #include "Define.h"
-#include "Nodes/Node3D.h"
+#include "Nodes/NodeVisual.h"
 #include "AnimationStructs.h"
 #include "AssetLoading/AssetsStructs.h"
 
 #include <map>
 #include <Mesh.h>
 
-class NodeMeshAnimated3D : public Node3D
+class NodeMeshAnimated3D : public NodeVisual
 {
 public:
 	//class Proxy
@@ -31,8 +31,11 @@ public:
 protected:
 	uptr<Mesh> m_mesh;
 	std::map<std::string, uptr<Animation>> m_linkedAnimations;
+	std::vector<sptr<Texture>> m_textures;
 	std::string m_currentAnim;
 	bool m_isPlaying;
+
+	friend class NodeViewport;
 };
 
 REGISTER_ISERIALIZABLE(NodeMeshAnimated3D, NodeMeshAnimated3D::CreateInstance);

@@ -7,8 +7,10 @@
 
 #include "Passes/GeometryPass.h"
 #include "Passes/LightPass.h"
+#include "Passes/AnimatedPass.h"
 
 class NodeMesh;
+class NodeMeshAnimated3D;
 class NodeCamera;
 
 class NodeViewport : public Node2D
@@ -27,6 +29,7 @@ public:
 	//Set to nullptr if no camera is used
 	void SetCamera(NodeCamera *pCamera) const;
 	void AddMesh(NodeMesh const &mesh) const;
+	void AddSkeletalMesh(NodeMeshAnimated3D const &mesh) const;
 
 	static ISerializable* CreateInstance();
 
@@ -43,6 +46,7 @@ protected:
 
 	uptr<GeometryPass> m_pGeometryPass;
 	uptr<LightPass> m_pLightPass;
+	uptr<AnimatedPass> m_pAnimatedPass;
 
 	Color m_clearColor {Color::SKY_BLUE};
 	//TODO REMOVE

@@ -45,6 +45,8 @@ public:
     static Shader& GetLightVert() { return Instance().m_lightVert; }
     static Shader& GetLightFrag() { return Instance().m_lightFrag; }
     static Program& GetLightProgram() { return Instance().m_lightProgram; }
+    static Shader& GetAnimatedVert() { return Instance().m_animatedVert; }
+    static Program& GetAnimatedProgram() { return Instance().m_animatedProgram; }
 
     static sptr<Geometry> GetDefaultGeo() { return Instance().m_defaultCubeGeo; }
     static sptr<Texture> GetDefaultTexture() { return Instance().m_defaultTexture; }
@@ -60,6 +62,9 @@ private:
     //default shaders
     Program m_geoProgram;
     Program m_lightProgram;
+    Program m_animatedProgram;
+
+    Shader m_animatedVert {ShaderType::TYPE_VERTEX};
 
     Shader m_geoVert {ShaderType::TYPE_VERTEX};
     Shader m_geoFrag {ShaderType::TYPE_FRAGMENT};

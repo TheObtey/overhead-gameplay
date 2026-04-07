@@ -3,6 +3,7 @@
 #include "Nodes/Node2D.h"
 #include "Nodes/NodeCamera.h"
 #include "Nodes/NodeMesh.h"
+#include "Nodes/NodeMeshAnimated3D.h"
 #include "Servers/GraphicServer.h"
 
 #include <glm/fwd.hpp>
@@ -21,15 +22,16 @@ void NodeViewport::Setup()
 	m_pViewPort->Setup({0.0f, 0.0f}, {10.0f, 10.0f}, m_clearColor);
 	m_pGeometryPass = std::make_unique<GeometryPass>(GraphicServer::GetGeoProgram());
 	m_pLightPass = std::make_unique<LightPass>(GraphicServer::GetLightProgram(), dummyLight);
+	m_pAnimatedPass = std::make_unique<AnimatedPass>(GraphicServer::GetAnimatedProgram());
 
-	GraphicServer::GetLightProgram().Use();
-	GraphicServer::GetLightProgram().SetUniform("gPosition", 0);
-	GraphicServer::GetLightProgram().SetUniform("gNormal", 1);
-	GraphicServer::GetLightProgram().SetUniform("gAlbedoSpec", 2);
-
+	//GraphicServer::GetLightProgram().Use();
+	//GraphicServer::GetLightProgram().SetUniform("gPosition", 0);
+	//GraphicServer::GetLightProgram().SetUniform("gNormal", 1);
+	//GraphicServer::GetLightProgram().SetUniform("gAlbedoSpec", 2);
 
 	m_pViewPort->AddPass(m_pGeometryPass.get());
 	m_pViewPort->AddPass(m_pLightPass.get());
+	m_pViewPort->AddPass(m_pAnimatedPass.get());
 	UpdateViewport();
 }
 
@@ -53,11 +55,17 @@ void NodeViewport::SetCamera(NodeCamera* pCamera) const
 {
 	m_pGeometryPass->SetCamera(&pCamera->m_camera);
 	m_pLightPass->SetCamera(&pCamera->m_camera);
+	m_pAnimatedPass->SetCamera(&pCamera->m_camera);
 }
 
 void NodeViewport::AddMesh(NodeMesh const& mesh) const
 {
 	m_pGeometryPass->AddMesh(*mesh.m_pMesh);
+}
+
+void NodeViewport::AddSkeletalMesh(NodeMeshAnimated3D const& mesh) const
+{
+	m_pAnimatedPass->AddSkeletalMesh(*mesh.m_mesh);
 }
 
 void NodeViewport::UpdateViewport()

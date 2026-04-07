@@ -26,8 +26,6 @@ public:
 
     static void UpdateFrame(Animation* pAnim, Mesh* pMesh);
     static void AddMesh(Mesh* pMesh);
-
-    static void InitAnimationPass(AnimatedPass* pPass) { bigtemp = pPass;}
 private:
     static void UpdateFrameImediate(Animation* pAnim, Mesh* pMesh);
     static void AddMeshImmediate(Mesh* pMesh);
@@ -39,8 +37,6 @@ private:
     void FlushCommandsImpl() override;
     void BuildTasksImpl(TaskGraph& graph) override {};
     void OnInitialize() override {}
-
-    inline static AnimatedPass* bigtemp = nullptr;
 };
 
 #endif

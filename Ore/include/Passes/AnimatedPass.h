@@ -8,6 +8,7 @@ class Mesh;
 class AnimatedPass final : public Pass
 {
 public:
+    AnimatedPass(Program& shader);
     AnimatedPass(Program& shader, Camera* camera);
     ~AnimatedPass() = default;
 

@@ -1,7 +1,8 @@
 #include "Nodes/NodeMeshAnimated3D.h"
 #include "Servers/AnimationServer.h"
+#include "Nodes/NodeViewport.h"
 
-NodeMeshAnimated3D::NodeMeshAnimated3D(std::string const& name) : Node3D::Node3D(name)
+NodeMeshAnimated3D::NodeMeshAnimated3D(std::string const& name) : NodeVisual(name)
 {
 	m_isPlaying = false;
 	m_currentAnim = "";
@@ -9,36 +10,40 @@ NodeMeshAnimated3D::NodeMeshAnimated3D(std::string const& name) : Node3D::Node3D
 
 void NodeMeshAnimated3D::OnUpdate(double delta)
 {
-	Node3D::OnUpdate(delta);
-	m_mesh->SetTransform(GetWorldMatrix());
+	NodeVisual::OnUpdate(delta);
+	m_mesh->SetTransform(m_transform.GetMatrix());
+
+	if (IsVisible() && m_pViewport)
+		m_pViewport->AddSkeletalMesh(*this);
+
 	if (m_isPlaying)
 	{
 		Animation& anim = *m_linkedAnimations[m_currentAnim];
 		anim.currentTime += delta;
+
 		if (anim.currentTime == anim.duration)
 		{
 			if (anim.isLooping == false)
 			{
 				StopCurrentAnim();
+				return;
 			}
-			else
-			{
-				anim.currentTime = 0.0f;
-				anim.isRestarting = true;
-				AnimationServer::UpdateFrame(m_linkedAnimations[m_currentAnim].get(), m_mesh.get());
-			}
+			anim.currentTime = 0.0f;
+			anim.isRestarting = true;
 		}
-		else
-			AnimationServer::UpdateFrame(m_linkedAnimations[m_currentAnim].get(), m_mesh.get());
+		
+		AnimationServer::UpdateFrame(m_linkedAnimations[m_currentAnim].get(), m_mesh.get());
 	}
-	AnimationServer::AddMesh(m_mesh.get());
 }
 
 void NodeMeshAnimated3D::SetMesh(SceneMesh& mesh)
 {
 
 	sptr<Geometry> geo = std::make_shared<Geometry>(Geometry(mesh.vertices, mesh.indices));
-	m_mesh = std::make_unique<Mesh>(Mesh(geo, mesh.meshTextures, mesh.meshMatrix));
+	m_textures = mesh.meshTextures;
+	m_mesh = std::make_unique<Mesh>(Mesh());
+	m_mesh->SetGeometry(geo);
+	m_mesh->SetTextures(m_textures);
 	m_mesh->SetBonesOffsets(mesh.bonesOffest);
 	glm::mat4 GlobalTransformation = glm::mat4(1.0f);
 
@@ -85,8 +90,10 @@ ISerializable* NodeMeshAnimated3D::CreateInstance()
 
 void NodeMeshAnimated3D::Deserialize(SerializedObject const& datas)
 {
+	NodeVisual::Deserialize(datas);
 }
 
 void NodeMeshAnimated3D::Serialize(SerializedObject& datas) const
 {
+	NodeVisual::Serialize(datas);
 }
