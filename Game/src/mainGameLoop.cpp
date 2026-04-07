@@ -29,7 +29,8 @@ uptr<Node> LoadScene()
     uptr<NodeMesh> mesh = Node::CreateNode<NodeMesh>("Cube");
     mesh->AddTextures(normal, specular);
     //mesh->SetWorldPosition({ 0.0,1.5,0.0 });
-	//mesh->SetLocalX(2);
+	mesh->SetLocalX(2);
+    //mesh->SetWorldPosition({ 2, 0, 0});
 
     uptr<LuaScriptInstance> scriptNode3D = std::make_unique<LuaScriptInstance>("res/scripts/TestNode3D.lua");
     Node::AttachScript(scriptNode3D, *mesh);
