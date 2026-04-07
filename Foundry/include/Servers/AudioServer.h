@@ -40,12 +40,12 @@ public:
 	static float GetGroupVolume(AudioChannel channel) { return ma_sound_group_get_volume(&channel.soundGroup); };
 
 	static ma_engine& GetSoundEngine() { return Instance().m_soundEngine; };
-	static std::vector<AudioChannel*>& GetChannels() { return Instance().m_channels; };
+	static std::vector<uptr<AudioChannel>>& GetChannels() { return Instance().m_channels; };
 
 protected:
 	ma_engine m_soundEngine;
 	ma_engine_config m_soundEngineConfig;
-	std::vector<AudioChannel*> m_channels;
+	std::vector<uptr<AudioChannel>> m_channels;
 	std::vector<uint32> m_availableListenerIndex;
 	uint32 m_nextListenerIndex = 0;
 	float m_masterVolume = 1.f;

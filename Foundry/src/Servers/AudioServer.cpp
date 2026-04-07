@@ -23,7 +23,7 @@ void AudioServer::Shutdown()
     {
         ma_sound_group_uninit(&channel->soundGroup);
     }
-
+    Instance().m_channels.clear();
     ma_engine_uninit(&Instance().m_soundEngine);
 }
 
@@ -31,9 +31,8 @@ AudioChannel* AudioServer::GetChannel(const std::string& name)
 {
     for (auto& channel : Instance().m_channels)
     {
-        if (channel->name == name) return channel;
+        if (channel->name == name) return channel.get();
     }
-
     return nullptr;
 }
 
@@ -41,19 +40,21 @@ AudioChannel* AudioServer::CreateChannel(const std::string& name)
 {
     if (GetChannel(name) != nullptr) { return GetChannel(name); }
 
-    uptr<AudioChannel> newChannel = std::make_unique<AudioChannel>(AudioChannel());
-    newChannel.get()->name = name;
+    uptr<AudioChannel> newChannel = std::make_unique<AudioChannel>();
+    newChannel->name = name;
 
-    if (ma_sound_group_init(&Instance().m_soundEngine, 0, NULL, &newChannel.get()->soundGroup) != MA_SUCCESS)
+    if (ma_sound_group_init(&Instance().m_soundEngine, 0, NULL, &newChannel->soundGroup) != MA_SUCCESS)
     {
         Logger::Log("Failed to create sound group: " + name);
-        delete newChannel.get();
         return nullptr;
     }
 
-    GetChannels().push_back(newChannel.get());
+    AudioChannel* raw = newChannel.get();
+    GetChannels().push_back(std::move(newChannel));
 
-    return newChannel.get();
+    newChannel.release(); 
+
+    return raw;
 }
 
 uint32 AudioServer::AllocateListenerIndex()

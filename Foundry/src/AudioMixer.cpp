@@ -52,7 +52,6 @@ void AudioMixer::Shutdown()
     for (auto& [ch, rev] : m_reverbs)
     {
         ma_node_uninit(&rev->node, NULL);
-        delete rev;
     }
 
     m_delays.clear();
@@ -109,11 +108,10 @@ void AudioMixer::AddReverb(AudioChannel* channel, float roomSize, float wet)
 {
     if (!channel || m_reverbs.count(channel)) return;
 
-    uptr<ReverbEntry> rev = std::make_unique<ReverbEntry>(ReverbEntry());
-    memset(rev.get(), 0, sizeof(ReverbEntry));
-    rev.get()->roomSize = std::clamp(roomSize, 0.0f, 0.98f);
-    rev.get()->wet = std::clamp(wet, 0.0f, 1.0f);
-    rev.get()->active = true;
+    uptr<ReverbEntry> rev = std::make_unique<ReverbEntry>();
+    rev->roomSize = std::clamp(roomSize, 0.0f, 0.98f);
+    rev->wet = std::clamp(wet, 0.0f, 1.0f);
+    rev->active = true;
 
     ma_engine& engine = AudioServer::GetSoundEngine();
 
@@ -126,10 +124,9 @@ void AudioMixer::AddReverb(AudioChannel* channel, float roomSize, float wet)
     cfg.inputBusCount = 1;
     cfg.outputBusCount = 1;
 
-    if (ma_node_init(ma_engine_get_node_graph(&engine), &cfg, NULL, &rev.get()->node) != MA_SUCCESS)
+    if (ma_node_init(ma_engine_get_node_graph(&engine), &cfg, NULL, &rev->node) != MA_SUCCESS)
     {
         Logger::Log("[MixerAudio] AddReverb failed on " + channel->name);
-        delete rev.get();
         return;
     }
 
@@ -137,7 +134,7 @@ void AudioMixer::AddReverb(AudioChannel* channel, float roomSize, float wet)
     ma_node_attach_output_bus(groupNode, 0, &rev->node, 0);
     ma_node_attach_output_bus(&rev->node, 0, ma_engine_get_endpoint(&engine), 0);
 
-    m_reverbs[channel] = rev.get();
+    m_reverbs[channel] = std::move(rev);
 }
 
 void AudioMixer::SetReverbWet(AudioChannel* channel, float wet)
@@ -157,6 +154,5 @@ void AudioMixer::RemoveReverb(AudioChannel* channel)
     ma_node* groupNode = (ma_node*)&channel->soundGroup;
     ma_node_attach_output_bus(groupNode, 0, ma_engine_get_endpoint(&AudioServer::GetSoundEngine()), 0);
 
-    delete it->second;
     m_reverbs.erase(it);
 }

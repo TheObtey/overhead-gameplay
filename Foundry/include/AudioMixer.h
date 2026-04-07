@@ -48,7 +48,7 @@ public:
 
 protected:
     std::unordered_map<AudioChannel*, DelayEntry> m_delays;
-    std::unordered_map<AudioChannel*, ReverbEntry*> m_reverbs;
+    std::unordered_map<AudioChannel*, uptr<ReverbEntry>> m_reverbs;
 
 private:
     static void ReverbProcess(ma_node* pNode, const float** in, uint32* inCount, float** out, uint32* outCount);
