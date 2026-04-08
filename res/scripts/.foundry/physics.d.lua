@@ -1,40 +1,27 @@
 ---@meta
 
 ---@class physics
-Physics = {}
+physics = {}
 
 ---@class raycast
----@field impactPos fmath.vec3
----@field normal fmath.vec3
+---@field impactPos fmaths.vec3
+---@field normal fmaths.vec3
 ---@field dist number
----@field node NodeRigidBody
-Physics.raycast = {}
+---@field node noderigidbody
+physics.raycast = {}
 
+---@overload fun(origin:fmath.vec3, direction:fmath.vec3)
+---@overload fun(origin:fmath.vec3, direction:fmath.vec3, maxDist:number)
+---@overload fun(origin:fmath.vec3, direction:fmath.vec3, maxDist:number, mask:bitsmask)
+function physics.Raycast(origin, direction, maxDist, mask) end
 
---- ---@param origin fmath.vec3
---- ---@param direction fmath.vec3
---- function Physics:Raycast(origin, direction) end
+---@overload fun(origin:fmath.vec3, direction:fmath.vec3)
+---@overload fun(origin:fmath.vec3, direction:fmath.vec3, maxDist:number)
+---@overload fun(origin:fmath.vec3, direction:fmath.vec3, maxDist:number, mask:bitsmask)
+function physics:RaycastAll(origin, direction, maxDist, mask) end
 
---- ---@param origin fmath.vec3
---- ---@param direction fmath.vec3
---- ---@param maxDist number
---- function Physics:Raycast(origin, direction, maxDist) end
+---@param gravity fmaths.vec3
+function physics:SetGravity(gravity) end
 
----@param origin fmath.vec3
----@param direction fmath.vec3
----@param maxDist number
----@param mask bitsMask
-function Physics:Raycast(origin, direction, maxDist, mask) end
-
-
----@param origin fmath.vec3
----@param direction fmath.vec3
----@param maxDist number
----@param mask bitsMask
-function Physics:RaycastAll(origin, direction, maxDist, mask) end.
-
----@param gravity fmath.vec3
-function Physics:SetGravity(gravity) end
-
-function Physics:GetGravity() end
+function physics:GetGravity() end
 

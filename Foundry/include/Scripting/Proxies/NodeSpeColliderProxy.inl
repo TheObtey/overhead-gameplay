@@ -19,7 +19,7 @@ struct NodeBoxCollider::Proxy::ProxyBinding
 	{
 		binder.BindFunction("CreateNodeBoxCollider", &NodeBoxCollider::Proxy::CreateNodeBoxColliderProxy);
 		binder.BindClass<NodeBoxCollider::Proxy>("nodeboxcollider",
-			sol::base_classes, sol::bases<NodeCollider::Proxy>(),
+			sol::base_classes, sol::bases<Node::Proxy, Node3D::Proxy, NodeCollider::Proxy>(),
 			"SetShape", BIND(SetShape));
 	};
 };
@@ -47,7 +47,7 @@ struct NodeSphereCollider::Proxy::ProxyBinding
 	{
 		binder.BindFunction("CreateNodeSphereCollider", &NodeSphereCollider::Proxy::CreateNodeSphereColliderProxy);
 		binder.BindClass<NodeSphereCollider::Proxy>("nodespherecollider",
-			sol::base_classes, sol::bases<NodeCollider::Proxy>(),
+			sol::base_classes, sol::bases<Node::Proxy, Node3D::Proxy, NodeCollider::Proxy>(),
 			"SetShape", BIND(SetShape));
 	};
 };
@@ -76,7 +76,7 @@ struct NodeCapsuleCollider::Proxy::ProxyBinding
 	{
 		binder.BindFunction("CreateNodeCapsuleCollider", &NodeCapsuleCollider::Proxy::CreateNodeCapsuleColliderProxy);
 		binder.BindClass<NodeCapsuleCollider::Proxy>("nodecapsulecollider",
-			sol::base_classes, sol::bases<NodeCollider::Proxy>(),
+			sol::base_classes, sol::bases<Node::Proxy, Node3D::Proxy, NodeCollider::Proxy>(),
 			"SetShape", BIND(SetShape));
 	};
 };

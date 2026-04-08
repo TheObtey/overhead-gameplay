@@ -1,28 +1,28 @@
 ---@meta
 
----@class NodeBoxCollider
-NodeBoxCollider = {}
+---@class nodeboxbollider
+nodeboxbollider = {}
 
 ---@param name string The node name.
 function CreateBoxCollider(name) end
 ---@param halfExtents fmath.vec3
-function NodeBoxCollider:SetShape(halfExtents) end
+function nodeboxbollider:SetShape(halfExtents) end
 
----@class NodeSphereCollider
-NodeSphereCollider = {}
+---@class nodespherebollider
+nodespherebollider = {}
 
 ---@param name string The node name.
 function CreateSphereCollider(name) end
 ---@param radius number
-function NodeSphereCollider:SetShape(radius) end
+function nodespherebollider:SetShape(radius) end
 
 
 
----@class NodeCapsuleCollider
-NodeCapsuleCollider = {}
+---@class nodecapsulebollider
+nodecapsulebollider = {}
 
 ---@param name string The node name.
 function CreateCapsuleCollider(name) end
 ---@param radius number
 ---@param height number
-function NodeCapsuleCollider:SetShape(radius, height) end
+function nodecapsulebollider:SetShape(radius, height) end

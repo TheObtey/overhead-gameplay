@@ -1,6 +1,7 @@
 ---@meta
 
 ---@class fmath
+fmath = {}
 
 --========================
 -- VECTORS
