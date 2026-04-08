@@ -2,11 +2,21 @@
 #include "Nodes/NodeViewport.h"
 #include "GeometryFactory.h"
 #include "Servers/GraphicServer.h"
+#include "Serialization/SerializeObject.hpp"
+
+namespace
+{
+    sptr<Geometry> BuildPrimitiveGeometry(PrimitivesType const primitiveType)
+    {
+        GeoInfo const& geoInfo = GeometryFactory::GetGeometry(primitiveType);
+        return std::make_shared<Geometry>(geoInfo.m_vertices, geoInfo.m_indices);
+    }
+}
 
 NodeMesh::NodeMesh(std::string const& name) : NodeVisual(name)
 {
     m_pMesh = std::make_unique<Mesh>();
-    m_pMesh->SetGeometry(GraphicServer::GetDefaultGeo());
+    SetPrimitive(PrimitivesType::CUBE);
     //problem here
     AddTextures(GraphicServer::GetDefaultTexture());
     m_pMesh->SetTransform(m_transform.GetMatrix());
@@ -27,9 +37,106 @@ bool NodeMesh::IsVisible()
     return true;
 }
 
-void NodeMesh::SetGeometry(sptr<Geometry> const& geometry) const
+void NodeMesh::SetGeometry(sptr<Geometry> const& geometry)
 {
     m_pMesh->SetGeometry(geometry);
+}
+
+void NodeMesh::SetActive(bool isActive) const
+{
+    m_pMesh->SetActive(isActive);
+}
+
+void NodeMesh::SetPrimitive(PrimitivesType primitiveType)
+{
+    m_geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
+    m_primitiveType = primitiveType;
+    m_fbxPath.clear();
+    m_pMesh->SetGeometry(BuildPrimitiveGeometry(primitiveType));
+}
+
+void NodeMesh::SetFbxPath(std::filesystem::path const& fbxPath)
+{
+    m_geometrySourceType = MeshGeometrySourceType::FBX;
+    m_fbxPath = fbxPath;
+    m_pMesh->SetGeometry(GraphicServer::GetDefaultGeo());
+}
+
+void NodeMesh::Serialize(SerializedObject& datas) const
+{
+    Node3D::Serialize(datas);
+    datas.SetType("NodeMesh");
+
+    bool const isActive = m_pMesh->GetIsActive();
+    datas.AddPublicElement("IsActive", &isActive);
+
+    int const geometrySourceType = static_cast<int>(m_geometrySourceType);
+    int const primitiveType = static_cast<int>(m_primitiveType);
+    std::string const fbxPath = m_fbxPath.string();
+
+    datas.AddPublicElement("GeometrySourceType", &geometrySourceType);
+    datas.AddPublicElement("PrimitiveType", &primitiveType);
+    datas.AddPublicElement("FbxPath", &fbxPath);
+
+    uint32 textureCount = static_cast<uint32>(m_textureMaterialTypes.size());
+    if (textureCount == 0)
+        textureCount = static_cast<uint32>(m_textures.size());
+    datas.AddPublicElement("TextureCount", &textureCount);
+}
+
+void NodeMesh::Deserialize(SerializedObject const& datas)
+{
+    Node3D::Deserialize(datas);
+
+    if (!m_pMesh)
+        m_pMesh = std::make_unique<Mesh>();
+
+    int geometrySourceType = static_cast<int>(MeshGeometrySourceType::PRIMITIVE);
+    int primitiveType = static_cast<int>(PrimitivesType::CUBE);
+    std::string fbxPath;
+
+    datas.GetPublicElement("GeometrySourceType", &geometrySourceType);
+    datas.GetPublicElement("PrimitiveType", &primitiveType);
+    datas.GetPublicElement("FbxPath", &fbxPath);
+
+    m_geometrySourceType = static_cast<MeshGeometrySourceType>(geometrySourceType);
+    m_primitiveType = static_cast<PrimitivesType>(primitiveType);
+    m_fbxPath = fbxPath;
+
+    if (m_geometrySourceType == MeshGeometrySourceType::PRIMITIVE)
+    {
+        SetPrimitive(m_primitiveType);
+    }
+    else
+    {
+        SetFbxPath(m_fbxPath);
+    }
+
+    bool isActive = true;
+    datas.GetPublicElement("IsActive", &isActive);
+    m_pMesh->SetActive(isActive);
+
+    m_textures.clear();
+    m_textureMaterialTypes.clear();
+
+    uint32 textureCount = 1;
+    datas.GetPublicElement("TextureCount", &textureCount);
+    if (textureCount == 0)
+    {
+        m_textureMaterialTypes.push_back(TextureMaterialType::DIFFUSE);
+    }
+    else
+    {
+        m_textureMaterialTypes.assign(textureCount, TextureMaterialType::DIFFUSE);
+    }
+
+    for (TextureMaterialType const type : m_textureMaterialTypes)
+    {
+        m_textures.push_back(std::make_shared<Texture>("res/textures/Default.png", TextureType::TYPE_2D, type));
+    }
+
+    m_pMesh->SetTextures(m_textures);
+    m_pMesh->SetTransform(m_transform.GetMatrix());
 }
 
 ISerializable* NodeMesh::CreateInstance()

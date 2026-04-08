@@ -11,8 +11,8 @@ public:
     explicit NodeVisual(std::string const& name);
     ~NodeVisual() override = default;
 
-    virtual void Serialize(SerializedObject& datas) const override {};
-    virtual void Deserialize(SerializedObject const& datas) override {};
+    virtual void Serialize(SerializedObject& datas) const override;
+    virtual void Deserialize(SerializedObject const& datas) override;
 
     static ISerializable* CreateInstance();
 

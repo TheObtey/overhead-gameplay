@@ -3,6 +3,13 @@
 
 #include "Mesh.h"
 #include "NodeVisual.h"
+#include "GeometryFactory.h"
+
+enum class MeshGeometrySourceType : uint8
+{
+	PRIMITIVE,
+	FBX
+};
 
 class NodeMesh : public NodeVisual
 {
@@ -11,12 +18,15 @@ public:
     ~NodeMesh() override = default;
 
     virtual void OnUpdate(double delta) override;
-    virtual void Serialize(SerializedObject& datas) const override {};
-    virtual void Deserialize(SerializedObject const& datas) override {};
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
 
     bool IsVisible() override;
 
-    void SetGeometry(sptr<Geometry> const& geometry) const;
+	void SetGeometry(sptr<Geometry> const& geometry);
+	void SetActive(bool isActive) const;
+	void SetPrimitive(PrimitivesType primitiveType);
+	void SetFbxPath(std::filesystem::path const& fbxPath);
 
     template <typename ... Args>
     void AddTextures(Args ... textures);
@@ -26,6 +36,10 @@ public:
 private:
     uptr<Mesh> m_pMesh;
     std::vector<sptr<Texture>> m_textures;
+    std::vector<TextureMaterialType> m_textureMaterialTypes;
+	MeshGeometrySourceType m_geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
+	PrimitivesType m_primitiveType = PrimitivesType::CUBE;
+	std::filesystem::path m_fbxPath {};
 
     friend class NodeViewport;
 };
@@ -34,10 +48,10 @@ private:
 template <typename ... Args>
 void NodeMesh::AddTextures(Args ... textures)
 {
-    (m_textures.push_back(textures), ...);
+	((m_textures.push_back(textures), m_textureMaterialTypes.push_back(textures->GetTextureMaterialType())), ...);
     m_pMesh->SetTextures(m_textures);
 }
 
-REGISTER_ISERIALIZABLE(NodeMesh, NodeVisual::CreateInstance);
+REGISTER_ISERIALIZABLE(NodeMesh, NodeMesh::CreateInstance);
 
 #endif
