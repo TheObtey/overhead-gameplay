@@ -12,19 +12,13 @@ Action::Action(ControlType controlType, EventInput eventInput, ActionMap* pActio
 				return;
 			for (int i = 0; i  < m_controls.size(); i++)
 			{
-				if (in == m_controls[i]->GetEventInput() && ac == EventAction::PRESS)
-					std::invoke(Event, *m_controls[i]);
+				if (in == m_controls[i].GetEventInput() && ac == EventAction::PRESS)
+					std::invoke(Event, m_controls[i]);
 			}
 		};
 }
 
-Action::~Action() 
-{
-	for (IControl* iControl : m_controls)
-	{
-		delete iControl;
-	}
-}
+Action::~Action() {}
 
 
 uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
@@ -32,23 +26,23 @@ uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
 	switch (type)
 	{
 	case ControlType::BUTTON:
-		m_controls.push_back(new ButtonControl(eventInput, this));
+		m_controls.push_back(ButtonControl(eventInput, this));
 		break;
 	case ControlType::SLIDER:
-		m_controls.push_back(new SliderControl(eventInput, this));
+		m_controls.push_back(SliderControl(eventInput, this));
 		break;
 	case ControlType::STICK:
-		m_controls.push_back(new StickControl(eventInput, this));
+		m_controls.push_back(StickControl(eventInput, this));
 		break;
 	}
 
 	return m_controls.size() - 1;
 }
 
-IControl* Action::GetControl(uint32 index)
+IControl& Action::GetControl(uint32 index)
 {
+	IControl ic = IControl();
 	if (index > m_controls.size())
-		return nullptr;
-
+		return ic;
 	return m_controls[index];
 }

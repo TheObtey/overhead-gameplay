@@ -21,16 +21,17 @@ enum class ControlType : byte;
 class Action /*: public ISerializable*/
 {
 public:
+	Action() = default;
 	Action(ControlType controlType, EventInput eventInput, ActionMap* pActionMap = nullptr);
 	~Action();
 
 	uint32 AddControl(ControlType const& type, EventInput const& eventInput);
-	IControl* GetControl(uint32 index);
+	IControl& GetControl(uint32 index);
 
 	std::function<void(IControl&)> Event;
 
 private:
-	std::vector<IControl*> m_controls;
+	std::vector<IControl> m_controls;
 	ActionMap* m_pOwner;
 
 	friend ActionMap;
