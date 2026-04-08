@@ -49,6 +49,9 @@ struct NodeCollider::Proxy::ProxyBinding
 	{
 		binder.BindClass<NodeCollider::Proxy>("nodecollider",
 			sol::base_classes, sol::bases<Node::Proxy, Node3D::Proxy>(),
+			sol::meta_function::garbage_collect, BIND(GCNodeProxy),
+			sol::meta_function::new_index, StoreUserData(),
+			sol::meta_function::index, LoadUserData(),
 			"SetLocalPosition", BIND(SetLocalPosition),
 			"SetLocalRotation", BIND(SetLocalRotation),
 			"GetLocalPosition", BIND(GetLocalPosition),

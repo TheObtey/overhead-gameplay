@@ -1,3 +1,6 @@
+#define StoreUserData() [](Proxy& n, sol::stack_object key, sol::stack_object value) { n.m_userData.set(key, value); }
+#define LoadUserData() [](Proxy& n, sol::stack_object key) { return n.m_userData.get<sol::object>(key); }
+
 template <typename T, typename ... Args>
 void Binder::BindClass(std::string const& name, Args&& ... params)
 {
