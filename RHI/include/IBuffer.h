@@ -5,6 +5,8 @@
 #include "Define.h"
 #include <span>
 
+namespace Ore
+{
 template <typename T>
 class IBuffer : public IObject  
 {
@@ -16,5 +18,5 @@ public:
 protected:
     virtual void StoreData(std::span<T const> data) = 0;
 };
-
+}
 #endif //!RHI_IBUFFER__H_

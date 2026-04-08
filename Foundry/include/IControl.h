@@ -10,8 +10,6 @@
 
 
 class Action;
-enum class EventInput;
-
 
 enum class ControlType : byte
 {
@@ -33,11 +31,11 @@ class IControl /*: public ISerializable*/
 {
 public:
 	IControl() = default;
-	IControl(ControlType const& type, EventInput const& eventInput, Action* pAction = nullptr);
+	IControl(ControlType const& type, Ore::EventInput const& eventInput, Action* pAction = nullptr);
 	virtual ~IControl();
 
 	ControlType GetControlType() const;
-	EventInput GetEventInput() const;
+	Ore::EventInput GetEventInput() const;
 	
 	template <typename T>
 	static T Read(IControl& iControl);
@@ -46,7 +44,7 @@ public:
 
 private:
 	ControlType m_type;
-	EventInput m_eventInput;
+	Ore::EventInput m_eventInput;
 	Action* m_pAction; 
 };
 
@@ -54,7 +52,7 @@ class ButtonControl : public IControl
 {
 public:
 	ButtonControl() = default;
-	ButtonControl(EventInput const& eventInput, Action* pAction);
+	ButtonControl(Ore::EventInput const& eventInput, Action* pAction);
 	~ButtonControl() = default;
 
 	ButtonState GetState() const;
@@ -68,7 +66,7 @@ class SliderControl : public IControl
 {
 public:
 	SliderControl() = default;
-	SliderControl(EventInput const& eventInput, Action* pAction);
+	SliderControl(Ore::EventInput const& eventInput, Action* pAction);
 	~SliderControl() = default;
 
 	float GetPos() const;
@@ -82,7 +80,7 @@ class StickControl : public IControl
 {
 public:
 	StickControl() = default;
-	StickControl(EventInput const& eventInput, Action* pAction);
+	StickControl(Ore::EventInput const& eventInput, Action* pAction);
 	~StickControl() = default;
 
 	glm::vec2 GetPos() const;

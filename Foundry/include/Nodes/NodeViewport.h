@@ -22,7 +22,7 @@ public:
 	void Setup();
 
 	virtual void OnUpdate(double delta) override;
-	void SetBackgroundColor(Color const& color);
+	void SetBackgroundColor(Ore::Color const& color);
 
 	//Set to nullptr if no camera is used
 	void SetCamera(NodeCamera *pCamera) const;
@@ -38,15 +38,15 @@ private:
 	void Present() const;
 
 protected:
-	uptr<Viewport> m_pViewPort;
-	std::vector<Light*> m_visibleLights;
+	uptr<Ore::Viewport> m_pViewPort;
+	std::vector<Ore::Light*> m_visibleLights;
 
-	uptr<GeometryPass> m_pGeometryPass;
-	uptr<LightPass> m_pLightPass;
+	uptr<Ore::GeometryPass> m_pGeometryPass;
+	uptr<Ore::LightPass> m_pLightPass;
 
-	Color m_clearColor {Color::SKY_BLUE};
+	Ore::Color m_clearColor { Ore::Color::SKY_BLUE};
 	//TODO REMOVE
-	std::array<Light, 5> dummyLight {};
+	std::array<Ore::Light, 5> dummyLight {};
 
 
 	friend class GraphicServer;

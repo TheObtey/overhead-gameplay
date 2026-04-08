@@ -4,6 +4,7 @@
 #include <cctype>
 
 
+using namespace Ore;
 bool EventManager::CheckGamepad(GamepadId id)
 {
 	uint32 present = glfwJoystickPresent((uint32)id);

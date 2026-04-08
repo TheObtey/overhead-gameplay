@@ -3,6 +3,8 @@
 
 #include "Define.h"
 
+namespace Ore
+{
 class IRenderGraph 
 {
 public:
@@ -11,4 +13,5 @@ public:
 protected:
     virtual void CreateGBuffer(uint32 screenWidth, uint32 screenHeight) = 0;
 };
+}
 #endif //!RHI_IRENDER_GRAPH__H_

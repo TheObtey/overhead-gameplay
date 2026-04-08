@@ -2,6 +2,7 @@
 #include "VertexArrayObject.h"
 #include "Logger.hpp"
 
+using namespace Ore;
 Geometry::Geometry(std::span<Vertex const> points, std::vector<uint32> const& indices)
 {
     m_indiceSize = static_cast<uint32>(indices.size());

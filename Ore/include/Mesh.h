@@ -7,7 +7,8 @@
 
 #include <span>
 #include <glm/glm.hpp>
-
+namespace Ore
+{
 using TextureSpan = std::span<sptr<Texture>>;
 
 class Mesh final : public IMesh 
@@ -33,5 +34,5 @@ private:
     glm::mat4 m_transform;
     bool m_isActive = true;
 };
-
+}
 #endif

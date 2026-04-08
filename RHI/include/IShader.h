@@ -4,6 +4,8 @@
 #include "Define.h"
 #include <filesystem>
 
+namespace Ore
+{
 class IShader
 {
 public:
@@ -12,5 +14,5 @@ public:
 
     virtual uint32 GetId() const = 0;
 };
-
+}
 #endif

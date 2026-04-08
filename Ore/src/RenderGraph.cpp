@@ -6,6 +6,7 @@
 
 #include "Viewport.h"
 
+using namespace Ore;
 RenderGraph::RenderGraph(Viewport& viewport) : m_viewport(viewport)
 {
     glGenFramebuffers(1, &m_gBuffer);

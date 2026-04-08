@@ -3,6 +3,8 @@
 
 #include <Define.h>
 
+namespace Ore
+{
 class IShader;
 class IProgram 
 {
@@ -29,5 +31,5 @@ public:
     //virtual void SetMat3(std::string const& name, glm::mat3 const& value) = 0;
     //virtual void SetMat4(std::string const& name, glm::mat4 const& value) = 0;
 };
-
+}
 #endif //!RHI_ISHADER__H_

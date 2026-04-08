@@ -10,7 +10,7 @@
 
 NodeViewport::NodeViewport(std::string const& name) : Node2D(name)
 {
-	m_pViewPort = std::make_unique<Viewport>();
+	m_pViewPort = std::make_unique<Ore::Viewport>();
 	GraphicServer::LoadShaderPrograms(this);
 
 	OnHierarchyChanged += [&](){ TryAttachToWindow(); };
@@ -19,13 +19,14 @@ NodeViewport::NodeViewport(std::string const& name) : Node2D(name)
 void NodeViewport::Setup()
 {
 	m_pViewPort->Setup({0.0f, 0.0f}, {10.0f, 10.0f}, m_clearColor);
-	m_pGeometryPass = std::make_unique<GeometryPass>(GraphicServer::GetGeoProgram());
-	m_pLightPass = std::make_unique<LightPass>(GraphicServer::GetLightProgram(), dummyLight);
+	m_pGeometryPass = std::make_unique<Ore::GeometryPass>(GraphicServer::GetGeoProgram());
+	m_pLightPass = std::make_unique<Ore::LightPass>(GraphicServer::GetLightProgram(), dummyLight);
 
-	GraphicServer::GetLightProgram().Use();
-	GraphicServer::GetLightProgram().SetUniform("gPosition", 0);
-	GraphicServer::GetLightProgram().SetUniform("gNormal", 1);
-	GraphicServer::GetLightProgram().SetUniform("gAlbedoSpec", 2);
+	Ore::Program& program = GraphicServer::GetLightProgram();
+	program.Use();
+	program.SetUniform("gPosition", 0);
+	program.SetUniform("gNormal", 1);
+	program.SetUniform("gAlbedoSpec", 2);
 
 
 	m_pViewPort->AddPass(m_pGeometryPass.get());
@@ -43,7 +44,7 @@ void NodeViewport::OnUpdate(double const delta)
 	GraphicServer::Present(this);
 }
 
-void NodeViewport::SetBackgroundColor(Color const &color)
+void NodeViewport::SetBackgroundColor(Ore::Color const &color)
 {
 	m_clearColor = color;
 	m_pViewPort->SetBackgroundColor(color);

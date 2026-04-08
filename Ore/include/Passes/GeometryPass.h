@@ -4,6 +4,8 @@
 #include "Pass.h"
 #include <vector>
 
+namespace Ore
+{
 class Mesh;
 class GeometryPass final : public Pass
 {
@@ -19,5 +21,6 @@ private:
     std::vector<std::reference_wrapper<Mesh const>> m_meshes;
 
 };
+}
 #endif
  

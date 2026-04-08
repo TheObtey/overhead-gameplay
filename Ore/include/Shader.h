@@ -2,7 +2,10 @@
 #define ORE_SHADER__H_
 
 #include "IShader.h"
+#include "Ore.h"
 
+namespace Ore
+{
 enum class ShaderType
 {
     TYPE_VERTEX = GL_VERTEX_SHADER,
@@ -24,4 +27,5 @@ private:
     GLuint m_id;
     ShaderType m_type;
 };
+}
 #endif

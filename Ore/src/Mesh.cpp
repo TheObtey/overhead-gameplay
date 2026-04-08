@@ -3,6 +3,7 @@
 
 #include <Logger.hpp>
 
+using namespace Ore;
 Mesh::Mesh(sptr<Geometry> const& geometry, TextureSpan textures, glm::mat4 const& transform)
 {
     m_pGeometry = geometry;

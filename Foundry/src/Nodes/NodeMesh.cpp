@@ -5,7 +5,7 @@
 
 NodeMesh::NodeMesh(std::string const& name) : NodeVisual(name)
 {
-    m_pMesh = std::make_unique<Mesh>();
+    m_pMesh = std::make_unique<Ore::Mesh>();
     m_pMesh->SetGeometry(GraphicServer::GetDefaultGeo());
     //problem here
     AddTextures(GraphicServer::GetDefaultTexture());
@@ -27,7 +27,7 @@ bool NodeMesh::IsVisible()
     return true;
 }
 
-void NodeMesh::SetGeometry(sptr<Geometry> const& geometry) const
+void NodeMesh::SetGeometry(sptr<Ore::Geometry> const& geometry) const
 {
     m_pMesh->SetGeometry(geometry);
 }

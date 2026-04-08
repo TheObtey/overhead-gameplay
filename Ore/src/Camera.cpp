@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <array>
 
+using namespace Ore;
 std::array<glm::vec3, 8> Camera::GetFrustum() const
 {
     //TODO ADD FUNCTION

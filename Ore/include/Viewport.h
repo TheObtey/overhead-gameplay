@@ -5,6 +5,8 @@
 #include "Passes/Pass.h"
 #include "RenderGraph.h"
 
+namespace Ore
+{
 class Window;
 class Pass;
 class Viewport : public IViewport
@@ -35,5 +37,5 @@ public:
 private:
     uptr<RenderGraph> m_pRenderGraph;
 };
-
+}
 #endif

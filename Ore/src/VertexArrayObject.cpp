@@ -1,5 +1,8 @@
 #include "VertexArrayObject.h"
 
+#include <glad/glad.h>
+
+using namespace Ore;
 VertexArrayObject::VertexArrayObject(uint32 const id)
 {
     m_id = id;

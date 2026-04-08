@@ -3,6 +3,7 @@
 
 #include <dependencies/stb_image.h>
 
+using namespace Ore;
 TextureObject::TextureObject(uint32 id, TextureType type)
 {
     m_id = id;

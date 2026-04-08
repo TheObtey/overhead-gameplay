@@ -2,8 +2,11 @@
 #define ORE_BUFFER__H_
 
 #include "IBuffer.h"
+#include "Ore.h"
 #include <span>
 
+namespace Ore
+{
 enum class BufferType
 {
     BUFFER = GL_ARRAY_BUFFER, 
@@ -34,4 +37,5 @@ private:
 
 #include "Buffer.inl"
 
+}
 #endif
