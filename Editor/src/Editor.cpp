@@ -121,7 +121,6 @@ void Editor::Shutdown()
 {
 	if (m_running)
 	{
-		m_hiddenWindowContext.reset();
 		rlImGuiShutdown();
 		CloseWindow();
 		m_running = false;
