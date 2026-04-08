@@ -2,7 +2,6 @@
 
 #include "Servers/GraphicServer.h"
 
-using namespace Ore;
 NodeWindow::NodeWindow(std::string const& name) : Node2D(name)
 {
     m_pWindow = std::make_unique<Ore::Window>(1920, 1080, name);

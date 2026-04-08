@@ -10,7 +10,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace Ore;
-
 int main()
 {
     Window window(1920, 1080, "ORE ORE OREORE ORE ORE OREORE OREORE", false, true);

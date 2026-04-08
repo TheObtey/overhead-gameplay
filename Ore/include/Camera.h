@@ -4,6 +4,7 @@
 #include "Define.h"
 #include "ICamera.h"
 #include <glm/glm.hpp>
+#include <array>
 
 namespace Ore
 {

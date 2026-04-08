@@ -8,7 +8,6 @@
 
 #include <string>
 
-using namespace Ore;
 class NodeWindow : public Node2D
 {
 public:

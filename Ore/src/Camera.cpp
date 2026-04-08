@@ -5,7 +5,7 @@
 using namespace Ore;
 std::array<glm::vec3, 8> Camera::GetFrustum() const
 {
-    //TODO ADD FUNCTION
+    return {};
 }
 
 glm::mat4 const& Camera::GetViewProjMatrix() const

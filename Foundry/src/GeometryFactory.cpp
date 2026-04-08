@@ -78,13 +78,13 @@ GeoInfo GeometryFactory::MakeCube(float width, float height, float depth)
 }
 
 
-std::vector<Vertex> GeometryFactory::CreateCubeVertices(float width, float height, float depth)
+std::vector<Ore::Vertex> GeometryFactory::CreateCubeVertices(float width, float height, float depth)
 {
 	const float hx = width * 0.5f;
 	const float hy = height * 0.5f;
 	const float hz = depth * 0.5f;
 
-	std::vector<Vertex> vertices;
+	std::vector<Ore::Vertex> vertices;
 	vertices.reserve(24);
 
 	// +X
@@ -234,7 +234,7 @@ GeoInfo GeometryFactory::CreateCylinder(float radius, float height, uint32 radia
 	const float invRadial = 1.0f / static_cast<float>(radialSegments);
 	const float invHeight = 1.0f / static_cast<float>(heightSegments);
 
-	std::vector<Vertex> vertices;
+	std::vector<Ore::Vertex> vertices;
 	vertices.reserve((heightSegments + 1u) * ringStride + (radialSegments + 1u) * 2u + 2u);
 
 	std::vector<uint32> indices;
@@ -348,7 +348,7 @@ GeoInfo GeometryFactory::CreateCapsule(float radius, float height, uint32 radial
 	const float invRadial = 1.0f / static_cast<float>(radialSegments);
 	const uint32 ringStride = radialSegments + 1u;
 
-	std::vector<Vertex> vertices;
+	std::vector<Ore::Vertex> vertices;
 	vertices.reserve((heightSegments + 1u + (capSegments - 1u) * 2u) * ringStride + 2u);
 
 	std::vector<uint32> indices;

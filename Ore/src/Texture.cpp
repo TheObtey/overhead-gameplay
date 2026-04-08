@@ -23,7 +23,7 @@ void Texture::Load(std::filesystem::path const& path, TextureType const type, Te
 
     uint32 width, height;
     m_textureObject.Bind();
-    m_textureObject.GenerateTextureFromImage(DataType::UBYTE, width, height, path);
+    m_textureObject.GenerateTextureFromImage(DataType::UBYTE, width, height, path.string());
     Logger::Log("Texture : ", m_textureObject.GetTextureID(), " loaded");
 }
 

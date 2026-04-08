@@ -4,7 +4,6 @@
 #include "Camera.h"
 #include "Node3D.h"
 
-using namespace Ore;
 class NodeViewport;
 
 class NodeCamera : public Node3D

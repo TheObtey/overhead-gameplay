@@ -4,7 +4,6 @@
 #include "Mesh.h"
 #include "NodeVisual.h"
 
-using namespace Ore;
 class NodeMesh : public NodeVisual
 {
 public:
@@ -17,7 +16,7 @@ public:
 
     bool IsVisible() override;
 
-    void SetGeometry(sptr<Geometry> const& geometry) const;
+    void SetGeometry(sptr<Ore::Geometry> const& geometry) const;
 
     template <typename ... Args>
     void AddTextures(Args ... textures);
@@ -25,8 +24,8 @@ public:
     static ISerializable* CreateInstance();
 
 private:
-    uptr<Mesh> m_pMesh;
-    std::vector<sptr<Texture>> m_textures;
+    uptr<Ore::Mesh> m_pMesh;
+    std::vector<sptr<Ore::Texture>> m_textures;
 
     friend class NodeViewport;
 };
