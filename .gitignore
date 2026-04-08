@@ -2,7 +2,9 @@ build/
 out/
 vcpkg_installed/
 cmake-build-debug/
+cmake-build-release/
 cmake-build-debug-visual-studio/
+cmake-build-release-visual-studio/
 logs/
 compile_commands.json
 

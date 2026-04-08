@@ -6,15 +6,14 @@
 using namespace Ore;
 Mesh::Mesh(sptr<Geometry> const& geometry, TextureSpan textures, glm::mat4 const& transform)
 {
-    Logger::Log("Start Mesh");
     m_pGeometry = geometry;
     m_transform = transform;
     m_textures = textures;
+    Logger::Log("Created Mesh");
 }
 
 void Mesh::Draw(IProgram const& pProgram) const
 {
-    Logger::Log("Start Draw Mesh");
     uint32 diffuseNr = 1;
     uint32 specularNr = 1;
     uint32 normalNr = 1;
@@ -41,7 +40,6 @@ void Mesh::Draw(IProgram const& pProgram) const
             break;
         }
 
-        Logger::Log(name);
         glUniform1i(glGetUniformLocation(pProgram.GetProgramId(), name.c_str()), i);
         m_textures[i]->GetTextureObject().Bind();
     }

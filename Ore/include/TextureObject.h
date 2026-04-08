@@ -5,6 +5,7 @@
 #include "ITextureObject.h"
 
 #include <glad/glad.h>
+#include <filesystem>
 
 namespace Ore
 {
@@ -29,7 +30,7 @@ public:
 
     void Bind() override;
 
-    void GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::string imagePath = "");
+    void GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::filesystem::path const& path = "");
     void GenerateTexture(DataType type, uint32 const& width, uint32 const& height, uint32 rgbType);
     void AddParameters(uint32 parameter, uint32 value) override;
     void AttachToFrameBuffer(uint32 frameBuffer, uint32 attachment) override;

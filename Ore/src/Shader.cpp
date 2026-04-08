@@ -14,8 +14,6 @@ Shader::~Shader()
 
 void Shader::Load(std::filesystem::path const& path)
 {
-    Logger::Log("Start Shader");
-
     std::string shader;
     std::ifstream shaderFile;
 
@@ -44,9 +42,12 @@ void Shader::Load(std::filesystem::path const& path)
     glGetShaderiv(m_id, GL_COMPILE_STATUS, &isCompiled);
     if(isCompiled == GL_FALSE)
         Logger::LogWithLevel(LogLevel::ERROR, "Shader is not compiled");
+
+    Logger::Log("Loaded Shader : ", path, "| With ID ", m_id);
 }
 
 void Shader::Unload()
 {
     glDeleteShader(m_id);
+    Logger::Log("Unloaded Shader : ", m_id);
 }

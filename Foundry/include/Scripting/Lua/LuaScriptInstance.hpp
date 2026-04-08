@@ -2,8 +2,6 @@
 #define FOUNDRY_LUA_ENVIRO__H_
 
 #include "Scripting/ScriptInstance.h"
-
-#include <functional>
 #include <sol/sol.hpp>
 
 class LuaScriptInstance : public ScriptInstance
@@ -12,7 +10,7 @@ public:
 	LuaScriptInstance(std::string const& scriptPath);
 
 	template <typename T>
-	void AttachToProxy(T* const proxy);
+	void AttachToProxy(T* proxy);
 
 	std::string& GetPath() { return m_stringPath; }
 
@@ -41,7 +39,7 @@ inline void LuaScriptInstance::AttachToProxy(T* const proxy)
 
 	proxy->OnSceneEnter			+= [this] { CallScriptOnInit(); };
 	proxy->OnUpdate				+= [this](double const dt) { CallScriptOnUpdate(dt); };
-	proxy->OnPhysicsUpdate		+= [this](double const dt) { CallScriptOnUpdate(dt); };
+	proxy->OnPhysicsUpdate		+= [this](double const dt) { CallScriptOnPhysicsUpdate(dt); };
 	proxy->OnSceneLeave			+= [this] { CallScriptOnDestroy(); } ;
 
 	auto file = m_state.script_file(m_stringPath, m_enviro);

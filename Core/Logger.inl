@@ -34,15 +34,12 @@ inline void Logger::CreateLogFile()
 inline void Logger::PurgeOldFiles()
 {
 	auto const time = ch::system_clock::now();
-
 	for (auto& file : std::filesystem::directory_iterator{LogDir})
 	{
-	    //const auto file_time_sys = ch::clock_cast<ch::system_clock>(file.last_write_time());
+	    const auto file_time_sys = ch::clock_cast<ch::system_clock>(file.last_write_time());
 
-		//if ((time - file_time_sys) >= ch::minutes(10))
-		//{
-		//	std::filesystem::remove(file.path());
-		//}
+		if ((time - file_time_sys) >= ch::minutes(10))
+			std::filesystem::remove(file.path());
 	}
 }
 
@@ -69,13 +66,13 @@ inline std::string Logger::ToColorCode(LogLevel level)
 }
 
 template <typename ... Params>
-inline void Logger::Log(Params... params)
+void Logger::Log(Params... params)
 {
 	LogWithLevel(LogLevel::DEBUG, params ...);
 }
 
 template <typename ... Params>
-inline void Logger::LogWithLevel(LogLevel level, Params... params) 
+void Logger::LogWithLevel(LogLevel level, Params... params)
 {
 	Logger& instance = Instance();
 

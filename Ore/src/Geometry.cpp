@@ -5,8 +5,6 @@
 using namespace Ore;
 Geometry::Geometry(std::span<Vertex const> points, std::vector<uint32> const& indices)
 {
-    Logger::Log("Start Geometry");
-
     m_indiceSize = static_cast<uint32>(indices.size());
     GLuint vaoId;
 
@@ -30,8 +28,6 @@ Geometry::Geometry(Geometry const& other)
 
 void Geometry::Draw()
 {
-    Logger::Log("Start Draw Geometry");
-    
     m_pVao->Bind();
     glDrawElements(GL_TRIANGLES, m_indiceSize, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

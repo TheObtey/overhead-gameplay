@@ -55,9 +55,15 @@ private:
 	std::fstream m_file {};
 };
 
+#ifdef NO_LOGGER
+template <typename ... Params>
+void Logger::Log(Params... params) {}
 
-
+template <typename ... Params>
+void Logger::LogWithLevel(LogLevel level, Params... params) {}
+#else
 #include "Logger.inl"
+#endif
 
 
 #endif // !LOGGING__H_
