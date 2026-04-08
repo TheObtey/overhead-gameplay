@@ -126,12 +126,12 @@ protected:
 
 	std::unordered_map<std::string, std::unique_ptr<Node>> m_children{};
 	std::vector<std::string> m_childrenOrder{};
+	inline static bool s_IsInEditor = false;
 
 private:
     void AttachChildImmediate(std::unique_ptr<Node>& child);
 	void NotifyHierarchyChanged();
 
-	inline static bool s_IsInEditor = false;
 
     friend class EngineServer;
 	friend class SceneTree;

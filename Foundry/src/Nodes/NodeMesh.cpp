@@ -18,7 +18,8 @@ NodeMesh::NodeMesh(std::string const &name) : NodeVisual(name)
     m_pMesh = std::make_unique<Ore::Mesh>();
     SetPrimitive(PrimitivesType::CUBE);
     // problem here
-    AddTextures(GraphicServer::GetDefaultTexture());
+    if (!s_IsInEditor)
+        AddTextures(GraphicServer::GetDefaultTexture());
     m_pMesh->SetTransform(m_transform.GetMatrix());
 }
 
@@ -52,7 +53,9 @@ void NodeMesh::SetPrimitive(PrimitivesType primitiveType)
     m_geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
     m_primitiveType = primitiveType;
     m_fbxPath.clear();
-    m_pMesh->SetGeometry(BuildPrimitiveGeometry(primitiveType));
+
+    if (!s_IsInEditor)
+        m_pMesh->SetGeometry(BuildPrimitiveGeometry(primitiveType));
 }
 
 void NodeMesh::SetFbxPath(std::filesystem::path const &fbxPath)
@@ -122,21 +125,26 @@ void NodeMesh::Deserialize(SerializedObject const &datas)
 
     uint32 textureCount = 1;
     datas.GetPublicElement("TextureCount", &textureCount);
+
     if (textureCount == 0)
     {
-        m_textureMaterialTypes.push_back(Ore::TextureMaterialType::DIFFUSE);
+        if (!s_IsInEditor)
+            m_textureMaterialTypes.push_back(Ore::TextureMaterialType::DIFFUSE);
     }
     else
     {
-        m_textureMaterialTypes.assign(textureCount, Ore::TextureMaterialType::DIFFUSE);
+        if (!s_IsInEditor)
+            m_textureMaterialTypes.assign(textureCount, Ore::TextureMaterialType::DIFFUSE);
     }
 
     for (Ore::TextureMaterialType const type : m_textureMaterialTypes)
     {
-        m_textures.push_back(std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, type));
+        if (!s_IsInEditor)
+            m_textures.push_back(std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, type));
     }
 
-    m_pMesh->SetTextures(m_textures);
+    if (!s_IsInEditor)
+        m_pMesh->SetTextures(m_textures);
     m_pMesh->SetTransform(m_transform.GetMatrix());
 }
 

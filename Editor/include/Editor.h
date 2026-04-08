@@ -10,6 +10,7 @@
 #include <vector>
 #include <unordered_map>
 
+
 class Editor
 {
 public:
@@ -63,6 +64,8 @@ private:
 
 	// Scene
 	uptr<Node> m_sceneRoot = nullptr;
+	uptr<NodeWindow> m_hiddenWindowContext = nullptr;
+	uptr<NodeViewport> m_hiddenWindowViewport = nullptr;
 	
 	std::string m_scenePathBuffer;
 	std::string m_nodePathBuffer;

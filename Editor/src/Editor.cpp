@@ -1,11 +1,11 @@
 #include "Editor.h"
 #include "EditorSerializer.h"
-
-
 #include "Debug.h"
 
 #include <Servers/EngineServer.h>
 #include <Servers/PhysicsServer.h>
+#include <Servers/GraphicServer.h>
+
 #include <Serialization/SerializeObject.hpp>
 #include <iostream>
 #include <filesystem>
@@ -15,6 +15,7 @@
 #include <rlImGui.h>
 #include <rlImGuiColors.h>
 #include <Nodes/Node3D.h>
+#include <Nodes/NodeWindow.h>
 
 #if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
 
@@ -30,13 +31,24 @@ Editor::Editor() : m_editorRaylib() ,m_editorImgui(this,&m_editorRaylib)
 
 Editor::~Editor()
 {
+
+	Node::SetStatusEditor(false);
 	Shutdown();
 }
 
 void Editor::Init() 
 {
+	Node::SetStatusEditor(true);
 	m_editorRaylib.Init(m_screenWidth, m_screenHeight);
 	PhysicsServer::Initialize();
+
+	//m_hiddenWindowContext = Node::CreateNode<NodeWindow>("EditorHiddenWindow");
+	//GraphicServer::Initialize();
+	//m_hiddenWindowViewport = Node::CreateNode<NodeViewport>("EditorHiddenViewport");
+	//m_hiddenWindowContext->AddChild(std::move(m_hiddenWindowViewport));
+	//EngineServer::FlushCommands();
+	//GraphicServer::FlushCommands();
+
 	m_sceneRoot = Node::CreateNode<Node>("SceneRoot");
 
 	rlImGuiSetup(true);
@@ -48,7 +60,7 @@ void Editor::Init()
 	std::filesystem::path scriptStockDir = "ScriptStock";
 	std::filesystem::create_directories(scriptStockDir);
 
-	std::filesystem::path source = "../Game/res/.foundry";
+	std::filesystem::path source = "../Game/res/scripts/.foundry";
 	std::filesystem::path dest = scriptStockDir / ".foundry";
 
 	std::error_code ec;
@@ -95,13 +107,11 @@ void Editor::Run()
 	{
 		float deltaTime = GetFrameTime();
 		Update(deltaTime);
-		
 		BeginDrawing();
 		ClearBackground(DARKGRAY);
 
 		Render3D();
 		RenderUI();
-		m_sceneRoot;
 		
 		EndDrawing();
 	}
@@ -111,6 +121,7 @@ void Editor::Shutdown()
 {
 	if (m_running)
 	{
+		m_hiddenWindowContext.reset();
 		rlImGuiShutdown();
 		CloseWindow();
 		m_running = false;
@@ -123,7 +134,7 @@ void Editor::Update(float deltaTime)
 	m_sceneRoot->Update(deltaTime);
 	m_editorRaylib.Update(deltaTime);
 	m_editorRaylib.UpdateDisplay(m_sceneRoot.get());
-
+	//m_hiddenWindowContext->OnUpdate(deltaTime);
 	// Keyboard shortcuts
 	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
 	{
@@ -145,6 +156,7 @@ void Editor::Update(float deltaTime)
 	ProcessUICommands();
 
 	EngineServer::FlushCommands();
+	//GraphicServer::FlushCommands();
 	PhysicsServer::FlushCommands();
 }
 

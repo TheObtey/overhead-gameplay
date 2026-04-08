@@ -9,5 +9,8 @@
 #include "NodeCamera.h"
 #include "NodeViewport.h"
 #include "NodeWindow.h"
+#include "NodeVisual.h"
+#include "NodeMesh.h"
+
 
 #endif // !_ALL_NODES__H_

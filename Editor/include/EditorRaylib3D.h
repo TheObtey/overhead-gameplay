@@ -15,9 +15,9 @@ struct DrawableElement
 	uptr<Mesh> mesh;
 	Matrix worldMatrix; // Raylib Draw
 	Transform gizmoTransform; // Gizmo Transform
+	PrimitivesType primitiveType = PrimitivesType::CUBE;
 	bool gizmoUpdated = false;
 };
-
 enum class GizmoFlags
 {
 	NONE = 0,
