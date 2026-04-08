@@ -7,6 +7,8 @@
 #include "Texture.h"
 #include "Program.h"
 
+using namespace Ore;
+
 class NodeCamera;
 class NodeWindow;
 class NodeViewport;

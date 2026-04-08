@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+using namespace Ore;
 GeometryPass::GeometryPass(Program& program) : Pass(program) {}
 GeometryPass::GeometryPass(Program& program, Camera* pCamera) : Pass(program, pCamera) {}
 

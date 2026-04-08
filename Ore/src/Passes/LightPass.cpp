@@ -2,6 +2,9 @@
 #include "TextureObject.h"
 #include "Logger.hpp"
 
+#include <glad/glad.h>
+
+using namespace Ore;
 LightPass::LightPass(Program& program,LightSpan lights) : Pass(program)
 {
     m_quadVAOId = 0;

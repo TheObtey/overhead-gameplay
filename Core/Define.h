@@ -8,7 +8,6 @@
 
 #include <string>
 #include <vector>
-#include <glad/glad.h>
 
 using char8 = std::int8_t;
 using int8  = std::int8_t;

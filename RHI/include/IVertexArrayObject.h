@@ -3,9 +3,12 @@
 
 #include "IObject.h"
 
+namespace Ore
+{
 class IVertexArrayObject : public IObject
 {
 public:
     virtual void Bind() override = 0;
 };
+}
 #endif //!RHI_IVERTEX_ARRAY_OBJECT__H_

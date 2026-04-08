@@ -2,9 +2,10 @@
 
 #include "Servers/GraphicServer.h"
 
+using namespace Ore;
 NodeWindow::NodeWindow(std::string const& name) : Node2D(name)
 {
-    m_pWindow = std::make_unique<Window>(1920, 1080, name);
+    m_pWindow = std::make_unique<Ore::Window>(1920, 1080, name);
     m_transform.SetScale(1920, 1080);
     m_pWindow->onResizeEvent += [&](int32 const width, int32 const height) { m_transform.SetScale(width, height); };
     GraphicServer::OpenWindow(this);

@@ -5,6 +5,8 @@
 #include "TextureObject.h"
 #include <filesystem>
 
+namespace Ore
+{
 enum class TextureMaterialType : uint8
 {
     DIFFUSE,
@@ -19,4 +21,5 @@ public:
     virtual void Load(std::filesystem::path const& path, TextureType type, TextureMaterialType meterialType) = 0;
     virtual void Unload() = 0;
 };
+}
 #endif //!RHI_ITEXTURE_H__

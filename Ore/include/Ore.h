@@ -5,6 +5,7 @@
 
 namespace Ore
 {
+    #include <glad/glad.h>
     void GLAPIENTRY MessageCallback(GLenum source,
                  GLenum type,
                  GLuint id,

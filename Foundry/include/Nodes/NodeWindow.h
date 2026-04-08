@@ -8,6 +8,7 @@
 
 #include <string>
 
+using namespace Ore;
 class NodeWindow : public Node2D
 {
 public:
@@ -33,7 +34,7 @@ private:
     void PresentWindow() const;
 
 private:
-    uptr<Window> m_pWindow;
+    uptr<Ore::Window> m_pWindow;
     std::vector<std::reference_wrapper<NodeViewport>> m_nViewports;
     std::string m_windowTitle;
 

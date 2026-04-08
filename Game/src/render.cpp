@@ -9,6 +9,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+using namespace Ore;
 
 int main()
 {

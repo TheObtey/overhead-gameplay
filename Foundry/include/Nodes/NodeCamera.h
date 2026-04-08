@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Node3D.h"
 
+using namespace Ore;
 class NodeViewport;
 
 class NodeCamera : public Node3D
@@ -28,7 +29,7 @@ private:
     void UpdateCameraOwner(NodeViewport& newOwner);
 
 protected:
-    Camera m_camera;
+    Ore::Camera m_camera;
     NodeViewport* m_pCurrentViewport = nullptr;
 
     friend class GraphicServer;

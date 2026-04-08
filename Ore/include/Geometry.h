@@ -7,6 +7,8 @@
 #include <Define.h>
 #include <glm/glm.hpp>
 
+namespace Ore
+{
 struct Vertex 
 {
     glm::vec3 position;
@@ -38,5 +40,5 @@ private:
     uint32 m_indiceSize;
 
 };
-
+}
 #endif //!ORE_GEOMETRY__H_

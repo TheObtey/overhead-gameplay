@@ -3,6 +3,7 @@
 #include "RenderGraph.h"
 #include "Passes/Pass.h"
 
+using namespace Ore;
 Viewport::Viewport(uint16 x, uint16 y, uint16 width, uint16 height, Color const& backgroundColor)
 {
     Setup(x, y, width, height, backgroundColor);

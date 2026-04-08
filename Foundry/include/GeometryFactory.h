@@ -5,6 +5,7 @@
 #include <Debug.h>
 #include <unordered_map>
 
+using namespace Ore;
 struct GeoInfo {
 	GeoInfo() = default;
 	GeoInfo(std::vector<Vertex> vertices, std::vector<uint32> indices) {

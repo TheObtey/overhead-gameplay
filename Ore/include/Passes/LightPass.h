@@ -8,6 +8,8 @@
 
 #include <span>
 
+namespace Ore
+{
 using LightSpan =  std::span<struct Light>;
 
 struct Light
@@ -41,5 +43,6 @@ private:
     GLuint m_quadVAOId;
     GLuint m_quadVBOId;
 };
+}
 #endif
  

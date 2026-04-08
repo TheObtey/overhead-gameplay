@@ -2,6 +2,7 @@
 #include "VertexArrayObject.h"
 #include "Logger.hpp"
 
+using namespace Ore;
 Geometry::Geometry(std::span<Vertex const> points, std::vector<uint32> const& indices)
 {
     Logger::Log("Start Geometry");

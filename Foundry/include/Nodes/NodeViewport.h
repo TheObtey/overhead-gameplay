@@ -8,6 +8,7 @@
 #include "Passes/GeometryPass.h"
 #include "Passes/LightPass.h"
 
+using namespace Ore;
 class NodeMesh;
 class NodeCamera;
 

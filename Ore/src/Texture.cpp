@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "Logger.hpp"
 
+using namespace Ore;
 Texture::Texture(std::filesystem::path const& path, TextureType const type, TextureMaterialType const materialType)
 {
     Load(path, type, materialType);

@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "NodeVisual.h"
 
+using namespace Ore;
 class NodeMesh : public NodeVisual
 {
 public:

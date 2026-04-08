@@ -6,7 +6,8 @@
 
 #include <vector>
 #include <GLFW/glfw3.h>
-
+namespace Ore
+{
 class Window : public IWindow
 {
 public:
@@ -40,5 +41,5 @@ private:
     friend class Viewport;
     friend class EventManager;
 };
-
+}
 #endif //!ORE_WINDOW__H_

@@ -4,6 +4,8 @@
 #include "IRenderGraph.h"
 #include "TextureObject.h"
 
+namespace Ore
+{
 class Viewport;
 class Pass;
 class RenderGraph : public IRenderGraph
@@ -33,4 +35,5 @@ private:
     sptr<TextureObject> m_pGNormal;
     sptr<TextureObject> m_pGAlbedoSpec;
 };
+}
 #endif

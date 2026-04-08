@@ -4,6 +4,8 @@
 #include "Define.h"
 #include "IVertexArrayObject.h"
 
+namespace Ore
+{
 class VertexArrayObject final : public IVertexArrayObject 
 {
 public:
@@ -15,4 +17,5 @@ public:
 private:
     uint32 m_id;
 };
+}
 #endif //!ORE_VERTEX_ARRAY_OBJECT__H_

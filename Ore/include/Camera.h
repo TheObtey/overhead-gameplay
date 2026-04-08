@@ -5,6 +5,8 @@
 #include "ICamera.h"
 #include <glm/glm.hpp>
 
+namespace Ore
+{
 enum class ProjectionType : uint8
 {
     PERSPECTIVE,
@@ -43,5 +45,5 @@ private:
 
     ProjectionType m_projectionType = ProjectionType::PERSPECTIVE;
 };
-
+}
 #endif
