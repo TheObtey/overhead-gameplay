@@ -15,7 +15,7 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 
 
 	binder.BindClass<IControl>("icontrol",
-		sol::constructors<IControl(), IControl(ControlType const&, EventInput const&, Action*)>(),
+		sol::constructors<IControl(), IControl(ControlType const&, Ore::EventInput const&, Action*)>(),
 		"GetControlType", &IControl::GetControlType,
 		"GetEventInput", &IControl::GetEventInput,
 		"ReadAsBool", &IControl::Read<bool>,
@@ -25,19 +25,19 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 	);
 
 	binder.BindClass<ButtonControl>("buttoncontrol",
-		sol::constructors<ButtonControl(), ButtonControl(EventInput const&, Action*)>(),
+		sol::constructors<ButtonControl(), ButtonControl(Ore::EventInput const&, Action*)>(),
 		sol::base_classes, sol::bases<IControl>(),
 		"GetState", &ButtonControl::GetState
 	);
 
 	binder.BindClass<SliderControl>("slidercontrol",
-		sol::constructors<SliderControl(), SliderControl(EventInput const&, Action*)>(),
+		sol::constructors<SliderControl(), SliderControl(Ore::EventInput const&, Action*)>(),
 		sol::base_classes, sol::bases<IControl>(),
 		"GetPos", &SliderControl::GetPos
 	);
 
 	binder.BindClass<StickControl>("stickcontrol",
-		sol::constructors<StickControl(), StickControl(EventInput const&, Action*)>(),
+		sol::constructors<StickControl(), StickControl(Ore::EventInput const&, Action*)>(),
 		sol::base_classes, sol::bases<IControl>(),
 		"GetPos", &StickControl::GetPos
 	);
@@ -45,7 +45,7 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 
 
 	binder.BindClass<Action>("action",
-		sol::constructors<Action(), Action(ControlType, EventInput)>(),
+		sol::constructors<Action(), Action(ControlType, Ore::EventInput)>(),
 		"Event", &Action::OnAction,
 		"AddControl", &Action::AddControl,
 		"GetControl", &Action::GetControl
