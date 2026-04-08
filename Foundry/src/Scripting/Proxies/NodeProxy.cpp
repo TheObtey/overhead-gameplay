@@ -26,7 +26,8 @@ void Proxy::GCNodeProxy(Proxy* nodeProxy)
 		EngineServer::UnregisterUnattachedNode(nodeProxy->m_pNode);
 }
 
-Proxy::Proxy(Node& node) : m_pNode(&node)  
+Proxy::Proxy(Node& node) : m_pNode(&node),
+m_userData(ScriptingEngine::GetScriptEngine(), sol::new_table())
 {
 	node.OnSceneEnter			+= [&](Node& n){ OnSceneEnter();};
 	node.OnNodeUpdated			+= [&](Node& n, double const dt){ OnUpdate(dt); };
@@ -155,6 +156,8 @@ void Proxy::ProxyBinding::Bind(Binder &binder)
 	binder.BindFunction("LoadNode", &Node::Proxy::LoadNode);
 	binder.BindClass<Proxy>("node",
 		sol::meta_function::garbage_collect, BIND(GCNodeProxy),
+		sol::meta_function::new_index, StoreUserData(),
+		sol::meta_function::index, LoadUserData(),
 		"AddChild", BIND(AddChild),
 		"RemoveChild", OVERLOAD(Proxy, void, Proxy&)(BIND(RemoveChild)),
 		"RemoveChild", OVERLOAD(Proxy, void, std::string const&)(BIND(RemoveChild)),
@@ -170,5 +173,6 @@ void Proxy::ProxyBinding::Bind(Binder &binder)
 		"GetName", BIND(GetName),
 		"GetParent", BIND(GetParent),
 		"HasParent", BIND(HasParent),
-		"GetSceneTree", BIND(GetSceneTree));
+		"GetSceneTree", BIND(GetSceneTree)
+	);
 }
