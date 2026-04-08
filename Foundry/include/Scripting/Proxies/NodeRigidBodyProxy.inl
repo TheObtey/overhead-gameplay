@@ -90,7 +90,7 @@ struct NodeRigidBody::Proxy::ProxyBinding
 	{
 		binder.BindFunction("CreateNodeRigidBody", &NodeRigidBody::Proxy::CreateNodeRigidBodyProxy);
 		binder.BindClass<NodeRigidBody::Proxy>("noderigidbody",
-			sol::base_classes, sol::bases<Node3D::Proxy>(),
+			sol::base_classes, sol::bases<Node::Proxy, Node3D::Proxy>(),
 			"ApplyLocalForceAtCenterOfMass", BIND(ApplyLocalForceAtCenterOfMass),
 			"ApplyLocalForceAtLocalPosition", BIND(ApplyLocalForceAtLocalPosition),
 			"ApplyLocalForceAtWorldPosition", BIND(ApplyLocalForceAtWorldPosition),

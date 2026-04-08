@@ -4,66 +4,66 @@
 -- NODE
 --========================
 
----@class Node
-local Node = {}
+---@class node 
+local node = {}
 
 -- Constructor (factory)
----@overload fun(name:string):Node
+---@overload fun(name:string):node
 function CreateNode(name) end
 
 --========================
 -- METHODS
 --========================
 
----@param child Node
-function Node:AddChild(child) end
+---@param child node
+function node:AddChild(child) end
 
----@overload fun(child:Node)
+---@overload fun(child:node)
 ---@overload fun(name:string)
-function Node:RemoveChild(arg) end
+function node:RemoveChild(arg) end
 
 ---@param name string
----@return Node|nil
-function Node:FindChild(name) end
+---@return node|nil
+function node:FindChild(name) end
 
 ---@param index integer
----@return Node
-function Node:GetChild(index) end
+---@return node
+function node:GetChild(index) end
 
----@return Node[]
-function Node:GetChildren() end
+---@return node[]
+function node:GetChildren() end
 
 ---@return integer
-function Node:GetChildCount() end
+function node:GetChildCount() end
 
 ---@param path string
----@return Node
-function Node:GetNode(path) end
+---@return node
+function node:Getnode(path) end
 
-function Node:Destroy() end
+function node:Destroy() end
 
----@param newParent Node
+---@param newParent node
 ---@param keepGlobalTransform boolean
-function Node:Reparent(newParent, keepGlobalTransform) end
+function node:Reparent(newParent, keepGlobalTransform) end
 
----@param child Node
+---@param child node
 ---@param to integer
-function Node:MoveChild(child, to) end
+function node:MoveChild(child, to) end
 
----@return Node
-function Node:Clone() end
+---@return node
+function node:Clone() end
 
 ---@return string
-function Node:GetName() end
+function node:GetName() end
 
----@return Node
-function Node:GetParent() end
+---@return node
+function node:GetParent() end
 
 ---@return boolean
-function Node:HasParent() end
+function node:HasParent() end
 
 ---@return SceneTree
-function Node:GetSceneTree() end
+function node:GetSceneTree() end
 
 ---@meta
 
@@ -78,13 +78,13 @@ local SceneTree = {}
 -- METHODS
 --========================
 
----@param node Node
-function SceneTree:ChangeSceneToNode(node) end
+---@param node node
+function SceneTree:ChangeSceneTonode(node) end
 
----@return Node
+---@return node
 function SceneTree:GetCurrentScene() end
 
----@return Node
+---@return node
 function SceneTree:GetRoot() end
 
 

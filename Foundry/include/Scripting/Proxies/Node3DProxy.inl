@@ -52,8 +52,8 @@ public:
 	void SetLocalY(float const y)									{ m_pNode->SetLocalY(y); }
 	void SetLocalZ(float const z)									{ m_pNode->SetLocalZ(z); }
 
-	void SetLocalRotationDeg(float x, float y, float z)				{ m_pNode->SetLocalRotationDeg(x, y, z); }
-	void SetLocalRotationRad(float pitch, float yaw, float roll)	{ m_pNode->SetLocalRotationRad(pitch, yaw, roll); }
+	void SetLocalRotationDeg(glm::vec3 const& rotation)				{ m_pNode->SetLocalRotationDeg(rotation); }
+	void SetLocalRotationRad(glm::vec3 const& rotation)				{ m_pNode->SetLocalRotationRad(rotation); }
 	// { w, x, y, z }
 	void SetLocalRotationQuat(glm::quat rot)						{ m_pNode->SetLocalRotationQuat(rot); }
 
