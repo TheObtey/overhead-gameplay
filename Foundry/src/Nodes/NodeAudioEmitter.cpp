@@ -8,7 +8,7 @@ NodeAudioEmitter::~NodeAudioEmitter()
     ma_sound_uninit(&m_sound);
 }
 
-bool NodeAudioEmitter::Load(const std::string& filePath, AudioChannel* channel)
+bool NodeAudioEmitter::Load(const std::string const& filePath, AudioChannel* channel)
 {
     ma_engine& soundEngine = AudioServer::GetSoundEngine();
 

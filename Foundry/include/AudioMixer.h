@@ -2,9 +2,7 @@
 #define MIXER_AUDIO__H_
 
 #include "Servers/AudioServer.h"
-
 #include "Define.h"
-//Struct for each effects
 
 struct ExampleEntry
 {

@@ -27,8 +27,8 @@ public:
 	static bool Init();
 	static void Shutdown();
 
-	static AudioChannel* GetChannel(const std::string& name);
-	static AudioChannel* CreateChannel(const std::string& name);
+	static AudioChannel* GetChannel(std::string const& name);
+	static AudioChannel* CreateChannel(std::string const& name);
 
 	static uint32 AllocateListenerIndex();
 	static void ReleaseListenerIndex(uint32 index);

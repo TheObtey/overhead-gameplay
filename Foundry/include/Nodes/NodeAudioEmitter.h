@@ -15,7 +15,7 @@ public:
 	NodeAudioEmitter(std::string const& name);
 	~NodeAudioEmitter() override;
 
-	bool Load(const std::string& filePath, AudioChannel* channel);
+	bool Load(const std::string const& filePath, AudioChannel* channel);
 
 	void Play();
 	void Stop();
