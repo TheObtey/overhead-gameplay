@@ -2,9 +2,38 @@
 #include "Editor.h"
 #include "NewGizmo.hpp"
 
+#include <GeometryFactory.h>
+
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <cmath>
+
+namespace
+{
+Mesh BuildRaylibMesh(GeoInfo const& geoInfo)
+{
+	Mesh mesh = {};
+	mesh.vertexCount = static_cast<int>(geoInfo.m_vertices.size());
+	mesh.triangleCount = static_cast<int>(geoInfo.m_indices.size() / 3);
+
+	mesh.vertices = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 3));
+	for (int i = 0; i < mesh.vertexCount; ++i)
+	{
+		mesh.vertices[i * 3 + 0] = geoInfo.m_vertices[i].position.x;
+		mesh.vertices[i * 3 + 1] = geoInfo.m_vertices[i].position.y;
+		mesh.vertices[i * 3 + 2] = geoInfo.m_vertices[i].position.z;
+	}
+
+	mesh.indices = static_cast<unsigned short*>(MemAlloc(sizeof(unsigned short) * geoInfo.m_indices.size()));
+	for (size_t i = 0; i < geoInfo.m_indices.size(); ++i)
+	{
+		mesh.indices[i] = static_cast<unsigned short>(geoInfo.m_indices[i]);
+	}
+
+	UploadMesh(&mesh, false);
+	return mesh;
+}
+}
 
 bool AreMatrixEqual(Matrix const& m1, Matrix const& m2)
 {
@@ -109,10 +138,11 @@ void EditorRaylib3D::UpdateDisplay(Node* pNode)
 
 void EditorRaylib3D::AddDrawableObject(std::string const& name, Node* pNode)
 {
-	if (dynamic_cast<Node3D*>(pNode) != nullptr) // TestTemp
-	{
-		Instanciate3DMesh(name, pNode);
-	}
+	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNode);
+	if (pNodeMesh == nullptr) return;
+	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX) return;
+
+	Instanciate3DMesh(name, pNode);
 
 	//if (dynamic_cast<NodeLight*>(pNode) != nullptr)
 	//{
@@ -159,11 +189,27 @@ Node* EditorRaylib3D::FindNode3DWorldMatrix(Node* pNode, Matrix& outMatrix)
 
 void EditorRaylib3D::UpdateDrawableElement(Node* pNode)
 {
-	if (dynamic_cast<Node3D*>(pNode) != nullptr) // TestTemp
+	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNode);
+	if (pNodeMesh != nullptr)
 	{
 		std::string name = pNode->GetName();
+
+		if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX)
+		{
+			RemoveDrawableElement(name);
+			return;
+		}
+
+		if (!m_loadedMeshs.contains(name))
+		{
+			Instanciate3DMesh(name, pNode);
+			if (!m_loadedMeshs.contains(name)) return;
+		}
+
 		Matrix newWorldMatrix = {};
 		Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNode, newWorldMatrix)); // Matrix given by Inspector
+		if (pNode3D == nullptr) return;
+
 		if (!AreMatrixEqual(newWorldMatrix, m_loadedMeshs[name].get()->worldMatrix))
 		{
 			m_loadedMeshs[name]->gizmoTransform.translation = Vector3{ pNode3D->GetWorldPosition().x,pNode3D->GetWorldPosition().y,pNode3D->GetWorldPosition().z};
@@ -195,28 +241,42 @@ void EditorRaylib3D::RemoveDrawableElement(std::string const& elementName)
 {
 	 if (m_loadedMeshs.contains(elementName))
 	 {
-		 UnloadMesh(*m_loadedMeshs[elementName]->mesh.release());
+		 if (m_loadedMeshs[elementName]->mesh)
+		 {
+			 UnloadMesh(*m_loadedMeshs[elementName]->mesh);
+		 }
 		 m_loadedMeshs.erase(elementName);
 	 }
 }
 
 void EditorRaylib3D::ClearWindow()
 {
+	for (auto& [name, drawable] : m_loadedMeshs)
+	{
+		if (drawable && drawable->mesh)
+		{
+			UnloadMesh(*drawable->mesh);
+		}
+	}
 	m_loadedMeshs.clear();
 }
 
 
 void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3D) // NodeMesh3D
 {
+	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNodeMesh3D);
+	if (pNodeMesh == nullptr) return;
+	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX) return;
+
 	if (m_loadedMeshs.find(name) != m_loadedMeshs.end())
 	{
 		// ERROR
 	}
 	else
 	{
-		Mesh m_mesh = GenMeshCube(1, 1, 1);
-		// Custom Mesh with Mesh3D
-		UploadMesh(&m_mesh, false);
+		GeoInfo const& geoInfo = GeometryFactory::GetGeometry(pNodeMesh->GetPrimitiveType());
+		Mesh m_mesh = BuildRaylibMesh(geoInfo);
+
 		m_loadedMeshs[name] = std::make_unique<DrawableElement>();
 		m_loadedMeshs[name]->gizmoTransform = RayGizmo::GizmoIdentity();
 		m_loadedMeshs[name]->mesh = std::make_unique<Mesh>(m_mesh); // GetMesh

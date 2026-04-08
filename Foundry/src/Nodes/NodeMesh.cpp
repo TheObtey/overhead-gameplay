@@ -59,6 +59,7 @@ void NodeMesh::SetFbxPath(std::filesystem::path const& fbxPath)
 {
     m_geometrySourceType = MeshGeometrySourceType::FBX;
     m_fbxPath = fbxPath;
+    /*TODO Re;ove Default and add fbx parsing + setting geometry logic here*/
     m_pMesh->SetGeometry(GraphicServer::GetDefaultGeo());
 }
 

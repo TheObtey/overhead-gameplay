@@ -41,7 +41,7 @@ public:
 	void UpdateDisplay(Node* pNode);
 	void Shutdown();
 
-	void AddDrawableObject(std::string const& name,Node* jsonObject);
+	void AddDrawableObject(std::string const& name, Node* pNode);
 	void UpdateDrawableElement(Node* pNode);
 	void UpdateElementName(std::string const& oldName,Node* pNode);
 	void RemoveDrawableElement(std::string const& elementName);

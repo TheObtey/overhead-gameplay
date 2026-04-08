@@ -27,6 +27,9 @@ public:
 	void SetActive(bool isActive) const;
 	void SetPrimitive(PrimitivesType primitiveType);
 	void SetFbxPath(std::filesystem::path const& fbxPath);
+	MeshGeometrySourceType GetGeometrySourceType() const { return m_geometrySourceType; }
+	PrimitivesType GetPrimitiveType() const { return m_primitiveType; }
+	std::filesystem::path const& GetFbxPath() const { return m_fbxPath; }
 
     template <typename ... Args>
     void AddTextures(Args ... textures);

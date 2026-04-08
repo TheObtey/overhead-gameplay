@@ -49,11 +49,18 @@ void EditorImGui::Init()
 	auto colliderbox = Node::CreateNode<Node>("NodeBoxCollider");
 	auto collidersphere = Node::CreateNode<Node>("NodeSphereCollider");
 	auto collidercapsule = Node::CreateNode<Node>("NodeCapsuleCollider");
+	auto nodeMesh = Node::CreateNode<Node>("NodeMesh");
+	auto nodeVisual = Node::CreateNode<Node>("NodeVisual");
+	auto nodeCamera = Node::CreateNode<Node>("NodeCamera");
+
 	collider->AddChild(colliderbox);
 	collider->AddChild(collidersphere);
 	collider->AddChild(collidercapsule);
+	nodeVisual->AddChild(nodeMesh);
+	node3D->AddChild(nodeVisual);
 	node3D->AddChild(collider);
 	node3D->AddChild(rigibody);
+	node3D->AddChild(nodeCamera);
 	m_newNodeTypeSelector->AddChild(node3D);
 	EngineServer::FlushCommands();
 
