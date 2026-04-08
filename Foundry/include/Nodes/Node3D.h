@@ -72,7 +72,9 @@ public:
 	void SetLocalZ(float const z)					{ m_transform.SetZ(z); }
 
 	void SetLocalRotationDeg(float x, float y, float z)				{ m_transform.SetRotationDeg(x, y, z); }
+	void SetLocalRotationDeg(glm::vec3 const& rotation)				{ m_transform.SetRotationDeg(rotation.x, rotation.y, rotation.z); }
 	void SetLocalRotationRad(float pitch, float yaw, float roll)	{ m_transform.SetRotationRad(pitch, yaw, roll); }
+	void SetLocalRotationRad(glm::vec3 const& rotation)				{ m_transform.SetRotationRad(rotation.x, rotation.y, rotation.z); }
 	// { w, x, y, z }
 	void SetLocalRotationQuat(glm::quat rot)						{ m_transform.SetRotationQuat(rot); }
 
@@ -109,7 +111,10 @@ private:
 	void UpdateLocalTransform();
 
 protected:
-	Transform3D m_transform;
+	bool IsTransformDirty() const { return m_transform.GetDirty() || (m_isParentNode3D && static_cast<Node3D*>(m_pOwner)->m_transform.GetDirty()); }
+
+protected:
+	Transform3D m_transform {};
 
 	glm::mat4x4 m_worldTransform{ 1.0f };
 	glm::vec4 m_worldPosition{0.0f, 0.0f, 0.0f, 1.0f};

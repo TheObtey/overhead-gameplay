@@ -32,10 +32,8 @@ public:
 	virtual void OnUpdate(double delta) override;
 
 	void SetNode3DParent(Node3D* owner);
-	rp3d::RigidBody* GetRigidBody() { return m_pRigidBody; }
-	void SetRigidBody(rp3d::RigidBody* rb) { m_pRigidBody = rb; }
-
-
+	rp3d::RigidBody* GetRigidBody() { return m_pRigidBodyRP3D; }
+	void SetRigidBody(rp3d::RigidBody* rb) { m_pRigidBodyRP3D = rb; }
 
 	operator rp3d::Transform();
 	operator rp3d::Transform* ();
@@ -111,8 +109,8 @@ public:
 
 	// =========== Sleeping and Gravity ===========
 
-	bool IsSleeping() const;
 	bool IsAllowedToSleep() const;
+	bool IsSleeping() const;
 	bool IsGravityEnabled();
 
 	void SetSleepingEnabled(bool enabled);
@@ -123,7 +121,7 @@ public:
 #ifdef DEBUG_BUILD
 	glm::vec3 GetPosition() const
 	{
-		return rp3dToGlm(m_pRigidBody->getTransform().getPosition());
+		return rp3dToGlm(m_pRigidBodyRP3D->getTransform().getPosition());
 	}
 #endif
 
@@ -132,7 +130,7 @@ protected:
 private:
 
 	//Node3D* m_pNode3D;
-	rp3d::RigidBody* m_pRigidBody;
+	rp3d::RigidBody* m_pRigidBodyRP3D;
 	std::vector<NodeCollider*> m_colliders;
 	bool m_rigidBodyCreated = false;
 	//std::vector<uptr<NodeCollider>> m_colliders;

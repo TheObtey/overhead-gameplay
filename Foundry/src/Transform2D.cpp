@@ -264,7 +264,7 @@ void Transform2D::SetPosition(glm::vec2 const& _position)
 }
 glm::vec2 const& Transform2D::GetPosition() const
 {
-	return { m_position.x, m_position.y };
+	return m_position;
 }
 
 glm::mat3 const& Transform2D::GetTransformationMatrix() const

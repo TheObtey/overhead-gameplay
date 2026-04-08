@@ -12,7 +12,7 @@
 
 int main()
 {
-    Window window(800, 600, "ORE ORE OREORE ORE ORE OREORE OREORE", false, false);
+    Window window(800, 600, "ORE ORE OREORE ORE ORE OREORE OREORE", false, true);
     window.Open();
     Viewport viewport(0, 0, 800, 600, Color::SKY_BLUE);
     //Viewport viewport(0, 0, 800, 600, Color::BLACK); 
@@ -29,15 +29,15 @@ int main()
         0,2,3
     };
 
-    Geometry cube(vertices, indices);
+    sptr<Geometry> cube = std::make_shared<Geometry>(vertices, indices);
     Texture diffuse("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
     Texture specular("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     Texture normal("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
 
-    std::vector<Texture*> textures;
-    textures.push_back(&diffuse);
-    textures.push_back(&specular); 
-    textures.push_back(&normal);
+    std::vector<std::reference_wrapper<Texture>> textures;
+    textures.push_back(diffuse);
+    textures.push_back(specular);
+    textures.push_back(normal);
 
     Mesh mesh(cube, textures, glm::mat4(1.0f));
     Mesh mesh1(cube, textures, glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
@@ -102,14 +102,15 @@ int main()
     lightProgram.SetUniform("gNormal", 1);
     lightProgram.SetUniform("gAlbedoSpec", 2);
 
-    GeometryPass geoPass(geometryProgram, meshes, camera);
-    LightPass lightPass(lightProgram, lights, camera);
+    GeometryPass geoPass(geometryProgram, camera.get());
+    LightPass lightPass(lightProgram, lights, camera.get());
 
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
 
     while (window.IsOpen())
     {
+        geoPass.AddMesh(mesh);
         window.Clear();
 
         //glm::vec3 camPos = camera->GetPosition() + glm::vec3(0.016f,0.0f,0.0f);

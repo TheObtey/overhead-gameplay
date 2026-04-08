@@ -18,15 +18,15 @@ class VertexArrayObject;
 class Geometry final : public IGeometry
 {
 public:
-    Geometry(std::vector<Vertex> const& points, std::vector<uint32> const& indices);
+    Geometry(std::span<Vertex const> points, std::vector<uint32> const& indices);
     Geometry(Geometry const& other);
-    ~Geometry();
+    ~Geometry() = default;
 
     void Draw() override;
 
 protected:
-    void AddPoints(std::vector<Vertex> const& vertices);
-    void AddIndices(std::vector<uint32> const& indices);
+    void AddPoints(std::span<Vertex const> vertices);
+    void AddIndices(std::span<uint32 const> indices);
 
 private:
     void Setup();

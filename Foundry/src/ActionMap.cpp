@@ -1,6 +1,5 @@
 #include "ActionMap.h"
 #include "Action.h"
-#include "Event.hpp"
 
 ActionMap::ActionMap(std::string const& name) : m_name(name), Active(true), m_actions(std::unordered_map<std::string, Action*>()) {}
 

@@ -139,6 +139,14 @@ uint16_t NodeCollider::GetCollisionBitsMask() const
 	return m_pCollider ? m_pCollider->getCollideWithMaskBits() : 0xFFFF;
 }
 
+void NodeCollider::ContactEvent(NodeCollider& other)
+{
+	OnContact(*this, *other.m_pNodeRigidBody);
+}
+void NodeCollider::TriggerEvent(NodeCollider& other)
+{
+	OnTrigger(*this, *other.m_pNodeRigidBody);
+}
 
 
 void NodeBoxCollider::SetShape(const glm::vec3& halfExtents)

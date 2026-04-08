@@ -9,9 +9,6 @@
 class IWindow 
 {
 public:
-
-    virtual ~IWindow() = 0;
-    
     virtual void Close() = 0;
     virtual bool IsOpen() = 0; 
     virtual void Clear() = 0;
@@ -31,7 +28,4 @@ protected:
     uint32 m_height = 0;
     std::string m_name = "";
 };
-
-inline IWindow::~IWindow() {}
-
 #endif //!RHI_IWINDOW__H_ 

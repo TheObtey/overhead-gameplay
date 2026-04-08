@@ -1,4 +1,5 @@
 #include "Scripting/Proxies/EventManagerProxy.h"
+#include "EventManager.h"
 
 void EventManagerProxyBinding::Bind(Binder& binder)
 {

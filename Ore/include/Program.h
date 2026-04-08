@@ -4,13 +4,18 @@
 #include "IProgram.h"
 #include "Define.h"
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat2x2.hpp>
+#include <glm/mat4x4.hpp>
+
 class Program : public IProgram
 {
 public:
     Program();
     ~Program();
 
-    void AddShader(IShader* pShader) override;
+    void AddShader(IShader const& pShader) override;
     void Load() override;
 
     void Use() override;
@@ -21,18 +26,6 @@ public:
     void SetUniform(std::string const& name, T value);
 
     void Unload() override;
-
-    //void SetBool(std::string const& name, bool value) override;
-    //void SetInt(std::string const& name, int value) override;
-    //void SetFloat(std::string const& name, float value) override;
-
-    //void SetVec2(std::string const& name, glm::vec2 const& value) override;
-    //void SetVec3(std::string const& name, glm::vec3 const& value) override;
-    //void SetVec4(std::string const& name, glm::vec4 const& value) override;
-
-    //void SetMat2(std::string const& name, glm::mat2 const& value) override;
-    //void SetMat3(std::string const& name, glm::mat3 const& value) override;
-    //void SetMat4(std::string const& name, glm::mat4 const& value) override;
 
 private:
     GLuint m_programId;

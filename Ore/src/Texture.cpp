@@ -1,10 +1,18 @@
 #include "Texture.h"
 #include "Logger.hpp"
 
-Texture::Texture(std::string const& path, TextureType type, TextureMaterialType materialType)  
+Texture::Texture(std::filesystem::path const& path, TextureType const type, TextureMaterialType const materialType)
 {
+    Load(path, type, materialType);
+}
 
-    Logger::Log("Start Texture creation");
+Texture::~Texture()
+{
+    Unload();
+}
+
+void Texture::Load(std::filesystem::path const& path, TextureType const type, TextureMaterialType const materialType)
+{
     m_materialType = materialType;
 
     GLuint textureId;
@@ -15,9 +23,13 @@ Texture::Texture(std::string const& path, TextureType type, TextureMaterialType 
     uint32 width, height;
     m_textureObject.Bind();
     m_textureObject.GenerateTextureFromImage(DataType::UBYTE, width, height, path);
+    Logger::Log("Loaded texture : ", path, " | With ID ", textureId);
 }
 
-
-Texture::~Texture()
+void Texture::Unload()
 {
+    GLuint const id = m_textureObject.GetTextureID();
+    //TODO FIX
+    //glDeleteTextures(1, &id);
+    Logger::Log("Texture : ", m_textureObject.GetTextureID(), " unloaded");
 }
