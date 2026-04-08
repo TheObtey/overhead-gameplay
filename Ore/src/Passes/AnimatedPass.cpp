@@ -6,6 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
+using namespace Ore;
+
 AnimatedPass::AnimatedPass(Program& program) : Pass(program)
 {}
 

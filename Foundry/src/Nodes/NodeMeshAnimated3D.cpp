@@ -39,9 +39,9 @@ void NodeMeshAnimated3D::OnUpdate(double delta)
 void NodeMeshAnimated3D::SetMesh(SceneMesh& mesh)
 {
 
-	sptr<Geometry> geo = std::make_shared<Geometry>(Geometry(mesh.vertices, mesh.indices));
+	sptr<Ore::Geometry> geo = std::make_shared<Ore::Geometry>(Ore::Geometry(mesh.vertices, mesh.indices));
 	m_textures = mesh.meshTextures;
-	m_mesh = std::make_unique<Mesh>(Mesh());
+	m_mesh = std::make_unique<Ore::Mesh>(Ore::Mesh());
 	m_mesh->SetGeometry(geo);
 	m_mesh->SetTextures(m_textures);
 	m_mesh->SetBonesOffsets(mesh.bonesOffest);

@@ -63,7 +63,7 @@ private:
     Ore::Program m_geoProgram;
     Ore::Program m_lightProgram;
     Ore::Program m_animatedProgram;
-    Ore::Shader m_animatedVert {ShaderType::TYPE_VERTEX};
+    Ore::Shader m_animatedVert { Ore::ShaderType::TYPE_VERTEX};
 
     Ore::Shader m_geoVert{ Ore::ShaderType::TYPE_VERTEX };
     Ore::Shader m_geoFrag { Ore::ShaderType::TYPE_FRAGMENT};

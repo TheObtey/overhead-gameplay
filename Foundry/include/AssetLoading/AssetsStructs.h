@@ -36,10 +36,10 @@ struct SceneNode
 struct SceneMesh
 {
 	// Geometry
-	std::vector<Vertex> vertices;
+ 	std::vector<Ore::Vertex> vertices;
 	std::vector<uint32> indices;
 
-	std::vector<sptr<Texture>> meshTextures;
+	std::vector<sptr<Ore::Texture>> meshTextures;
 	std::vector<glm::mat4> bonesOffest;
 	std::vector<glm::mat4> bonesTransform;
 	glm::mat4 meshMatrix;
@@ -51,7 +51,7 @@ struct SceneData
 	sptr<SceneNode> rootNode;
 	bool isAnimated = false;
 	std::vector<sptr<SceneNode>> allNode;
-	std::vector<sptr<Light>> alllights;
+	std::vector<sptr<Ore::Light>> alllights;
 	std::vector<sptr<Animation>> animations;
 	std::vector<sptr<SceneMesh>> allMesh;
 };

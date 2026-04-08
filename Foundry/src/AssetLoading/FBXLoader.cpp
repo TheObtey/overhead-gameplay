@@ -27,22 +27,22 @@ glm::mat4x4 AIMatrixToGLMMatrix(aiMatrix4x4 const& matrix)
     return glm::transpose(out);
 }
 
-void FBXLoader::LoadTextures(FBXLoader::Material& materials,std::vector<sptr<Texture>>& vect, uint32 matIndex)
+void FBXLoader::LoadTextures(FBXLoader::Material& materials,std::vector<sptr<Ore::Texture>>& vect, uint32 matIndex)
 {
-    for (std::map<TextureMaterialType, std::string>::iterator it = materials.textures[matIndex].begin(); it != materials.textures[matIndex].end(); ++it)
+    for (std::map<Ore::TextureMaterialType, std::string>::iterator it = materials.textures[matIndex].begin(); it != materials.textures[matIndex].end(); ++it)
     {
-        sptr<Texture> text = std::make_shared<Texture>(Texture(it->second, TextureType::TYPE_2D, it->first));
+        sptr<Ore::Texture> text = std::make_shared<Ore::Texture>(Ore::Texture(it->second, Ore::TextureType::TYPE_2D, it->first));
         vect.push_back(text);
     }
 }
 
-void FBXLoader::LoadDefaultsTextures(std::vector<sptr<Texture>>& vect)
+void FBXLoader::LoadDefaultsTextures(std::vector<sptr<Ore::Texture>>& vect)
 {
-    sptr<Texture> text = std::make_shared<Texture>("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+    sptr<Ore::Texture> text = std::make_shared<Ore::Texture>("res/textures/NormalMap.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::NORMAL);
     vect.push_back(text);
-    sptr<Texture> text2 = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
+    sptr<Ore::Texture> text2 = std::make_shared<Ore::Texture>("res/textures/diffuse.jpg", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE);
     vect.push_back(text2);
-    sptr<Texture> text3 = std::make_shared<Texture>("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+    sptr<Ore::Texture> text3 = std::make_shared<Ore::Texture>("res/textures/specular.jpg", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::SPECULAR);
     vect.push_back(text3);
 }
 
@@ -116,7 +116,7 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material&
         if (outScene.allNode[nodeIdx]->MeshIndex == -1)
             continue;
         aiMesh* pMesh = pScene->mMeshes[outScene.allNode[nodeIdx]->MeshIndex];
-        std::vector<Vertex> vertices = {};
+        std::vector<Ore::Vertex> vertices = {};
         std::vector<uint32> indices = {};
         vertices.reserve(pMesh->mNumVertices);
         indices.reserve(pMesh->mNumFaces * 3);
@@ -130,7 +130,7 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material&
         {
             BuildBones(outScene,pMesh,sMesh);
         }
-        std::vector<sptr<Texture>> textures = {};
+        std::vector<sptr<Ore::Texture>> textures = {};
         if (outMat.textures.size() > 0 && pMesh->mMaterialIndex < outMat.textures.size())
         {
             LoadTextures(outMat, textures, pMesh->mMaterialIndex);
@@ -143,11 +143,11 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material&
     }
 }
 
-void FBXLoader::BuildGeometry(aiMesh const* pMesh, std::vector<Vertex>& vertices, std::vector<uint32>& indices)
+void FBXLoader::BuildGeometry(aiMesh const* pMesh, std::vector<Ore::Vertex>& vertices, std::vector<uint32>& indices)
 {
     for (uint32 vIndex = 0; vIndex < pMesh->mNumVertices; ++vIndex)
     {
-        Vertex v = {};
+        Ore::Vertex v = {};
         v.position = { pMesh->mVertices[vIndex].x, pMesh->mVertices[vIndex].y, pMesh->mVertices[vIndex].z };
 
         if (pMesh->HasNormals())
@@ -166,7 +166,7 @@ void FBXLoader::BuildGeometry(aiMesh const* pMesh, std::vector<Vertex>& vertices
     }
 }
 
-void FBXLoader::LoadEmbeddedTexture(std::string const& path, std::string& outPath, aiScene const* pScene, uint32& matIndex, TextureMaterialType type)
+void FBXLoader::LoadEmbeddedTexture(std::string const& path, std::string& outPath, aiScene const* pScene, uint32& matIndex, Ore::TextureMaterialType type)
 {
     aiTexture const* pText = pScene->GetEmbeddedTexture(path.c_str());
     if (pText == nullptr || pText->mHeight != 0)
@@ -194,7 +194,7 @@ void FBXLoader::BuildMaterials(aiScene const* pScene, Material& outMat)
     for (uint32 i = 0; i < pScene->mNumMaterials; ++i)
     {
         aiMaterial* pMat = pScene->mMaterials[i];
-        for (uint8 c = 0; c < static_cast<uint8>(TextureMaterialType::COUNT); ++c)
+        for (uint8 c = 0; c < static_cast<uint8>(Ore::TextureMaterialType::COUNT); ++c)
         {
             aiTextureType t = static_cast<aiTextureType>(FBXLoader::m_sTexTypes[c]);
             aiString texturePath;
@@ -207,13 +207,13 @@ void FBXLoader::BuildMaterials(aiScene const* pScene, Material& outMat)
             std::string path = texturePath.C_Str();
             if (texturePath.data[0] != '*')
             {
-                outMat.textures[i][static_cast<TextureMaterialType>(c)] = path;
+                outMat.textures[i][static_cast<Ore::TextureMaterialType>(c)] = path;
                 continue;
             }
             std::string fullPath = "";
-            LoadEmbeddedTexture(path, fullPath, pScene, i, static_cast<TextureMaterialType>(c));
+            LoadEmbeddedTexture(path, fullPath, pScene, i, static_cast<Ore::TextureMaterialType>(c));
             if (fullPath != "")
-                outMat.textures[i][static_cast<TextureMaterialType>(c)] = fullPath;
+                outMat.textures[i][static_cast<Ore::TextureMaterialType>(c)] = fullPath;
         }
     }
 }
@@ -226,13 +226,13 @@ void FBXLoader::BuildLights(aiScene const* pScene, SceneData& outScene)
     outScene.alllights.reserve(pScene->mNumLights);
     for (uint32 i = 0; i < pScene->mNumLights; ++i)
     {
-        Light l = {};
+        Ore::Light l = {};
         l.position = { pScene->mLights[i]->mPosition.x,pScene->mLights[i]->mPosition.y,pScene->mLights[i]->mPosition.z },
         l.constant = pScene->mLights[i]->mAttenuationConstant;
         l.quadratic = pScene->mLights[i]->mAttenuationQuadratic;
         l.linear = pScene->mLights[i]->mAttenuationLinear;
-        l.color = Color(pScene->mLights[i]->mColorAmbient.r, pScene->mLights[i]->mColorAmbient.g, pScene->mLights[i]->mColorAmbient.b, 1.0f);
-        outScene.alllights.push_back(std::make_shared<Light>(l));
+        l.color = Ore::Color(pScene->mLights[i]->mColorAmbient.r, pScene->mLights[i]->mColorAmbient.g, pScene->mLights[i]->mColorAmbient.b, 1.0f);
+        outScene.alllights.push_back(std::make_shared<Ore::Light>(l));
     }
 }
 

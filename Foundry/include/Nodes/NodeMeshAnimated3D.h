@@ -29,9 +29,9 @@ public:
 	virtual void Deserialize(SerializedObject const& datas) override;
 
 protected:
-	uptr<Mesh> m_mesh;
+	uptr<Ore::Mesh> m_mesh;
 	std::map<std::string, uptr<Animation>> m_linkedAnimations;
-	std::vector<sptr<Texture>> m_textures;
+	std::vector<sptr<Ore::Texture>> m_textures;
 	std::string m_currentAnim;
 	bool m_isPlaying;
 

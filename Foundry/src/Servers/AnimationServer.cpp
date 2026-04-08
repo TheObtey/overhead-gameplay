@@ -8,11 +8,11 @@
 #include <Logger.hpp>
 
 
-void AnimationServer::UpdateFrame(Animation* pAnim, Mesh* pMesh)
+void AnimationServer::UpdateFrame(Animation* pAnim, Ore::Mesh* pMesh)
 {
     Instance().m_commands.push({ CommandType::UPDATE_FRAME, pAnim, pMesh });
 }
-void AnimationServer::AddMesh(Mesh* pMesh)
+void AnimationServer::AddMesh(Ore::Mesh* pMesh)
 {
     Instance().m_commands.push({ CommandType::ADD_MESH, nullptr, pMesh});
 }
@@ -28,7 +28,7 @@ glm::mat4 AnimationServer::InterpolateFrames(AnimationChannel const& pChannel, f
     return glm::mat4(1.0);
 }
 
-void AnimationServer::BoneGlobalTransformHierarchy(Mesh* pMesh,uint32 ID, glm::mat4 const& parentTransform)
+void AnimationServer::BoneGlobalTransformHierarchy(Ore::Mesh* pMesh,uint32 ID, glm::mat4 const& parentTransform)
 {
     glm::mat4 GlobalTransformation = parentTransform * pMesh->GetBoneValue(ID);
     pMesh->SetBoneValue(ID, pMesh->GetBoneValue(ID) * pMesh->GetBoneOffset(ID));
@@ -36,7 +36,7 @@ void AnimationServer::BoneGlobalTransformHierarchy(Mesh* pMesh,uint32 ID, glm::m
     //    BoneGlobalTransformHierarchy(pMesh, ID+1,GlobalTransformation);
 }
 
-void AnimationServer::UpdateFrameImediate(Animation* pAnim, Mesh* pMesh)
+void AnimationServer::UpdateFrameImediate(Animation* pAnim, Ore::Mesh* pMesh)
 {
     if (pAnim->isRestarting)
     {
@@ -75,7 +75,7 @@ void AnimationServer::UpdateFrameImediate(Animation* pAnim, Mesh* pMesh)
     BoneGlobalTransformHierarchy(pMesh, 0, glm::mat4(1.0f));
 }
 
-void AnimationServer::AddMeshImmediate(Mesh* pMesh)
+void AnimationServer::AddMeshImmediate(Ore::Mesh* pMesh)
 {
     // ->AddSkeletalMesh(*pMesh);
 }

@@ -9,14 +9,14 @@
 #include <Define.h>
 
 class Animation;
-class Mesh;
+class Ore::Mesh;
 
 template <>
 struct Command<class AnimationServer>
 {
     enum class CmdType { UPDATE_FRAME, ADD_MESH, PRESENT } Type;
     Animation* pAnim = nullptr;
-    Mesh* pMesh = nullptr;
+    Ore::Mesh* pMesh = nullptr;
 };
 
 class AnimationServer : public Server<AnimationServer>
@@ -24,13 +24,13 @@ class AnimationServer : public Server<AnimationServer>
 public:
     using CommandType = Command<AnimationServer>::CmdType;
 
-    static void UpdateFrame(Animation* pAnim, Mesh* pMesh);
-    static void AddMesh(Mesh* pMesh);
+    static void UpdateFrame(Animation* pAnim, Ore::Mesh* pMesh);
+    static void AddMesh(Ore::Mesh* pMesh);
 private:
-    static void UpdateFrameImediate(Animation* pAnim, Mesh* pMesh);
-    static void AddMeshImmediate(Mesh* pMesh);
+    static void UpdateFrameImediate(Animation* pAnim, Ore::Mesh* pMesh);
+    static void AddMeshImmediate(Ore::Mesh* pMesh);
     static void PresentMeshs();
-    static void BoneGlobalTransformHierarchy(Mesh* pMesh, uint32 ID, glm::mat4 const& parentMatrix);
+    static void BoneGlobalTransformHierarchy(Ore::Mesh* pMesh, uint32 ID, glm::mat4 const& parentMatrix);
 
     static glm::mat4 InterpolateFrames(AnimationChannel const& pChannel, float delta);
 

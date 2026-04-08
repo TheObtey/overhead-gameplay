@@ -4,20 +4,23 @@
 #include "Pass.h"
 #include <vector>
 
-class Mesh;
-class AnimatedPass final : public Pass
+namespace Ore
 {
-public:
-    AnimatedPass(Program& shader);
-    AnimatedPass(Program& shader, Camera* camera);
-    ~AnimatedPass() = default;
+    class Mesh;
+    class AnimatedPass final : public Pass
+    {
+    public:
+        AnimatedPass(Program& shader);
+        AnimatedPass(Program& shader, Camera* camera);
+        ~AnimatedPass() = default;
 
-    void Execute() override;
-    void AddSkeletalMesh(Mesh const& mesh);
-    
-private:
-    std::vector<std::reference_wrapper<Mesh const>> m_skeletalMeshes;
+        void Execute() override;
+        void AddSkeletalMesh(Mesh const& mesh);
 
+    private:
+        std::vector<std::reference_wrapper<Mesh const>> m_skeletalMeshes;
+
+    };
 };
 #endif
  
