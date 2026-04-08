@@ -10,6 +10,8 @@
 
 #include "Scripting/Lua/LuaScriptInstance.hpp"
 
+using namespace Ore;
+
 uptr<Node> LoadScene()
 {
     sptr<Texture> normal = std::make_shared<Texture>("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
