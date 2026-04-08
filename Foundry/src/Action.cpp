@@ -3,7 +3,7 @@
 
 Action::Action() : m_controls(), OnAction()
 {
-	EventManager::getKey += [&](EventInput in, EventAction ac)
+	Ore::EventManager::getKey += [&](Ore::EventInput in, Ore::EventAction ac)
 		{
 			for (int i = 0; i < m_controls.size(); i++)
 			{
@@ -13,15 +13,15 @@ Action::Action() : m_controls(), OnAction()
 		};
 }
 
-Action::Action(ControlType controlType, EventInput eventInput) :
+Action::Action(ControlType controlType, Ore::EventInput eventInput) :
 	m_controls(), OnAction()
 {
 	AddControl(controlType, eventInput);
-	EventManager::getKey += [&](EventInput in, EventAction ac)
+	Ore::EventManager::getKey += [&](Ore::EventInput in, Ore::EventAction ac)
 		{
 			for (int i = 0; i < m_controls.size(); i++)
 			{
-				if (in == m_controls[i]->GetEventInput() && ac == EventAction::PRESS)
+				if (in == m_controls[i]->GetEventInput() && ac == Ore::EventAction::PRESS)
 					OnAction.Invoke(*m_controls[i]);
 			}
 		};
@@ -30,7 +30,7 @@ Action::Action(ControlType controlType, EventInput eventInput) :
 Action::~Action() {}
 
 
-uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
+uint32 Action::AddControl(ControlType const& type, Ore::EventInput const& eventInput)
 {
 	switch (type)
 	{

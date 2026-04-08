@@ -1,6 +1,7 @@
 #include "Ore.h"
 #include "Logger.hpp"
 
+
 void GLAPIENTRY Ore::MessageCallback( GLenum source,
                  GLenum type,
                  GLuint id,

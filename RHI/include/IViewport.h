@@ -4,6 +4,8 @@
 #include "Define.h"
 #include "Color.h"
 
+namespace Ore
+{
 class IPass;
 class IViewport
 {
@@ -32,5 +34,5 @@ protected:
 };
 
 inline IViewport::~IViewport() {}
-
+}
 #endif //!RHI_IVIEWPORT__H_

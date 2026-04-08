@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "Logger.hpp"
 
+using namespace Ore;
 Texture::Texture(std::filesystem::path const& path, TextureType const type, TextureMaterialType const materialType)
 {
     Load(path, type, materialType);
@@ -22,7 +23,7 @@ void Texture::Load(std::filesystem::path const& path, TextureType const type, Te
 
     uint32 width, height;
     m_textureObject.Bind();
-    m_textureObject.GenerateTextureFromImage(DataType::UBYTE, width, height, path);
+    m_textureObject.GenerateTextureFromImage(DataType::UBYTE, width, height, path.string());
     Logger::Log("Loaded texture : ", path, " | With ID ", textureId);
 }
 

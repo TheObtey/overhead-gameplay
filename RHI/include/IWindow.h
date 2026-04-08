@@ -6,6 +6,8 @@
 
 #include <string>
 
+namespace Ore
+{
 class IWindow 
 {
 public:
@@ -28,4 +30,5 @@ protected:
     uint32 m_height = 0;
     std::string m_name = "";
 };
+}
 #endif //!RHI_IWINDOW__H_ 

@@ -1,6 +1,8 @@
 #include "Scripting/Proxies/EventManagerProxy.h"
 #include "EventManager.h"
 
+using namespace Ore;
+
 void EventManagerProxyBinding::Bind(Binder& binder)
 {
     binder.BindEnum<GamepadId>("gamepadid",

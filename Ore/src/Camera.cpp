@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <array>
 
+using namespace Ore;
 std::array<glm::vec3, 8> Camera::GetFrustum() const
 {
     //TODO ADD FUNCTION
@@ -27,7 +28,7 @@ void Camera::UpdateCamera()
 
 void Camera::SetTransform(glm::mat4 const& transform)
 {
-    m_viewMatrix = glm::inverse(transform);
+    m_viewMatrix = glm::scale(glm::inverse(transform), { 1.0,-1.0,1.0 });
 }
 
 void Camera::LookAt(glm::vec3 const& target)

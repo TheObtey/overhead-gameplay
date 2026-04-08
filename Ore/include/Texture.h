@@ -3,13 +3,15 @@
 
 #include "ITexture.h"
 
+namespace Ore
+{
 class Texture final : public ITexture
 {
 public:
     Texture(std::filesystem::path const& path, TextureType type, TextureMaterialType materialType);
     ~Texture();
 
-    void Load(std::filesystem::path const& path, TextureType type, TextureMaterialType materialType) override;
+    void Load(std::filesystem::path const& path, Ore::TextureType type, TextureMaterialType materialType) override;
     void Unload() override;
 
     TextureObject& GetTextureObject() { return m_textureObject; }
@@ -20,5 +22,5 @@ private:
     TextureMaterialType m_materialType;
      
 };
-
+}
 #endif

@@ -79,8 +79,8 @@ void GraphicServer::LoadShader()
     m_lightProgram.Load();
 
     GeoInfo cubeInfo = GeometryFactory::MakeCube(1.0f, 1.0f, 1.0f);
-    m_defaultCubeGeo = std::make_shared<Geometry>(cubeInfo.m_vertices, cubeInfo.m_indices);
-    m_defaultTexture = std::make_shared<Texture>("res/textures/Default.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
+    m_defaultCubeGeo = std::make_shared<Ore::Geometry>(cubeInfo.m_vertices, cubeInfo.m_indices);
+    m_defaultTexture = std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE);
 }
 
 void GraphicServer::BuildTasksImpl(TaskGraph& graph) {}

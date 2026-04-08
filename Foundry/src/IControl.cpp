@@ -2,7 +2,7 @@
 
 #include "glm/glm.hpp"
 
-IControl::IControl(ControlType const& type, EventInput const& eventInput, Action* pAction) : 
+IControl::IControl(ControlType const& type, Ore::EventInput const& eventInput, Action* pAction) :
 	m_type(type), m_eventInput(eventInput), m_pAction(pAction) {}
 
 IControl::~IControl()
@@ -15,7 +15,7 @@ ControlType IControl::GetControlType() const
 	return m_type;
 }
 
-EventInput IControl::GetEventInput() const
+Ore::EventInput IControl::GetEventInput() const
 {
 	return m_eventInput;
 }
@@ -53,7 +53,7 @@ void IControl::SetAction(Action* pAction)
 }
 
 
-ButtonControl::ButtonControl(EventInput const& eventInput, Action* pAction) : IControl(ControlType::BUTTON, eventInput, pAction), m_state(ButtonState::UP) {}
+ButtonControl::ButtonControl(Ore::EventInput const& eventInput, Action* pAction) : IControl(ControlType::BUTTON, eventInput, pAction), m_state(ButtonState::UP) {}
 
 ButtonState ButtonControl::GetState() const
 {
@@ -61,14 +61,14 @@ ButtonState ButtonControl::GetState() const
 }
 
 
-SliderControl::SliderControl(EventInput const& eventInput, Action* pAction) : IControl(ControlType::SLIDER, eventInput, pAction), m_pos(0.0f) {}
+SliderControl::SliderControl(Ore::EventInput const& eventInput, Action* pAction) : IControl(ControlType::SLIDER, eventInput, pAction), m_pos(0.0f) {}
 
 float SliderControl::GetPos() const
 {
 	return m_pos;
 }
 
-StickControl::StickControl(EventInput const& eventInput, Action* pAction) : IControl(ControlType::STICK, eventInput, pAction), m_pos(0.0f) {}
+StickControl::StickControl(Ore::EventInput const& eventInput, Action* pAction) : IControl(ControlType::STICK, eventInput, pAction), m_pos(0.0f) {}
 
 glm::vec2 StickControl::GetPos() const
 {

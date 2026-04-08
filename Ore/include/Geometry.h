@@ -7,6 +7,8 @@
 #include <Define.h>
 #include <glm/glm.hpp>
 
+namespace Ore
+{
 struct Vertex 
 {
     glm::vec3 position;
@@ -38,5 +40,5 @@ private:
     uptr<VertexArrayObject> m_pVao;
 
 };
-
+}
 #endif //!ORE_GEOMETRY__H_

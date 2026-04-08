@@ -8,16 +8,16 @@ namespace
 {
     sptr<Geometry> BuildPrimitiveGeometry(PrimitivesType const primitiveType)
     {
-        GeoInfo const& geoInfo = GeometryFactory::GetGeometry(primitiveType);
+        GeoInfo const &geoInfo = GeometryFactory::GetGeometry(primitiveType);
         return std::make_shared<Geometry>(geoInfo.m_vertices, geoInfo.m_indices);
     }
 }
 
-NodeMesh::NodeMesh(std::string const& name) : NodeVisual(name)
+NodeMesh::NodeMesh(std::string const &name) : NodeVisual(name)
 {
-    m_pMesh = std::make_unique<Mesh>();
+    m_pMesh = std::make_unique<Ore::Mesh>();
     SetPrimitive(PrimitivesType::CUBE);
-    //problem here
+    // problem here
     AddTextures(GraphicServer::GetDefaultTexture());
     m_pMesh->SetTransform(m_transform.GetMatrix());
 }
@@ -33,11 +33,11 @@ void NodeMesh::OnUpdate(double delta)
 
 bool NodeMesh::IsVisible()
 {
-    //TODO CULLING
+    // TODO CULLING
     return true;
 }
 
-void NodeMesh::SetGeometry(sptr<Geometry> const& geometry)
+void NodeMesh::SetGeometry(sptr<Ore::Geometry> const &geometry) const
 {
     m_pMesh->SetGeometry(geometry);
 }
@@ -55,7 +55,7 @@ void NodeMesh::SetPrimitive(PrimitivesType primitiveType)
     m_pMesh->SetGeometry(BuildPrimitiveGeometry(primitiveType));
 }
 
-void NodeMesh::SetFbxPath(std::filesystem::path const& fbxPath)
+void NodeMesh::SetFbxPath(std::filesystem::path const &fbxPath)
 {
     m_geometrySourceType = MeshGeometrySourceType::FBX;
     m_fbxPath = fbxPath;
@@ -63,7 +63,7 @@ void NodeMesh::SetFbxPath(std::filesystem::path const& fbxPath)
     m_pMesh->SetGeometry(GraphicServer::GetDefaultGeo());
 }
 
-void NodeMesh::Serialize(SerializedObject& datas) const
+void NodeMesh::Serialize(SerializedObject &datas) const
 {
     Node3D::Serialize(datas);
     datas.SetType("NodeMesh");
@@ -85,7 +85,7 @@ void NodeMesh::Serialize(SerializedObject& datas) const
     datas.AddPublicElement("TextureCount", &textureCount);
 }
 
-void NodeMesh::Deserialize(SerializedObject const& datas)
+void NodeMesh::Deserialize(SerializedObject const &datas)
 {
     Node3D::Deserialize(datas);
 
@@ -140,7 +140,7 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
     m_pMesh->SetTransform(m_transform.GetMatrix());
 }
 
-ISerializable* NodeMesh::CreateInstance()
+ISerializable *NodeMesh::CreateInstance()
 {
     return Node::CreateNode<NodeMesh>("NodeMesh").release();
 }

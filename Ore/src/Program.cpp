@@ -5,7 +5,9 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <glad/glad.h>
 
+using namespace Ore;
 Program::Program()
 {
 }

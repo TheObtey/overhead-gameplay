@@ -3,6 +3,7 @@
 #include <Logger.hpp>
 #include <fstream>
 
+using namespace Ore;
 Shader::Shader(ShaderType type) : m_type(type), m_id(0)
 {
 }

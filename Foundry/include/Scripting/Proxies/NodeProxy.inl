@@ -1,5 +1,6 @@
 #include "Event.hpp"
 #include "Scripting/Binder.h"
+#include "Scripting/UserData.h"
 #include "Registries/AutomaticRegisterProxy.hpp"
 
 #include <string>
@@ -17,6 +18,7 @@ class Node::Proxy
 {
 public:
 	static Proxy* CreateNodeProxy(std::string const& name);
+	static Proxy* LoadNode(std::string const& path);
 	//Garbage collect node proxy in case lua loose reference to node
 	static void GCNodeProxy(Proxy* node);
 
@@ -61,6 +63,9 @@ public:
 	operator Node&() const;
 
 	Node* GetProxyOwner() const;
+
+protected:
+	UserData m_userData;
 
 private:
 	Node* m_pNode;

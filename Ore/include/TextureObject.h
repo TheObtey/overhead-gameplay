@@ -7,6 +7,8 @@
 #include <glad/glad.h>
 #include <filesystem>
 
+namespace Ore
+{
 enum class DataType
 {
     UBYTE = GL_UNSIGNED_BYTE,
@@ -40,5 +42,5 @@ private:
     GLuint m_id;
     TextureType m_type;
 };
-
+}
 #endif
