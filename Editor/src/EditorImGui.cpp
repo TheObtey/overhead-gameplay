@@ -759,7 +759,6 @@ void EditorImGui::ApplyInspectorChanges(json& datas)
 	std::string oldName = m_pSelectedNode->GetName();
 	m_selectedNodeData.SetJson(cleanJson);
 
-	Node::SetStatusEditor(true);
 	m_pSelectedNode->Deserialize(m_selectedNodeData);
 	std::cout << "Name from m_sceneroor" << m_pSceneRoot->GetChild(0).GetName() << std::endl;
 
@@ -767,7 +766,6 @@ void EditorImGui::ApplyInspectorChanges(json& datas)
 	{
 		m_pRaylibEditor->UpdateElementName(oldName, m_pSelectedNode);
 	}
-	Node::SetStatusEditor(false);
 
 	//DEBUG("[EditorImGui] Applied inspector changes" << std::endl);
 }

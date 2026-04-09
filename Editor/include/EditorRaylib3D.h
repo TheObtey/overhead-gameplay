@@ -13,11 +13,19 @@ using json = nlohmann::json;
 struct DrawableElement
 {
 	uptr<Mesh> mesh;
+	PrimitivesType primitiveType = PrimitivesType::CUBE;
 	Matrix worldMatrix; // Raylib Draw
 	Transform gizmoTransform; // Gizmo Transform
-	PrimitivesType primitiveType = PrimitivesType::CUBE;
 	bool gizmoUpdated = false;
 };
+
+struct Node3DElement
+{
+	Matrix worldMatrix; // Raylib Draw
+	Transform gizmoTransform; // Gizmo Transform
+	bool gizmoUpdated = false;
+};
+
 enum class GizmoFlags
 {
 	NONE = 0,
@@ -89,7 +97,8 @@ private:
 
 	Material m_defaultMaterial;
 
-	std::map<std::string, uptr<DrawableElement>> m_loadedMeshs;
+	std::map<std::string, uptr<DrawableElement>> m_loadedMeshes;
+	std::map<std::string, uptr<Node3DElement>> m_loadedNode3D;
 
 	std::string m_selectedObject;
 

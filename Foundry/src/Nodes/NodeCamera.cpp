@@ -23,14 +23,48 @@ void NodeCamera::OnUpdate(double delta)
     }
 }
 
-void NodeCamera::Serialize(SerializedObject &datas) const
+void NodeCamera::Serialize(SerializedObject& datas) const
 {
     Node3D::Serialize(datas);
+    datas.SetType("NodeCamera");
+
+    float fov = m_camera.Perspective.fov;
+    float nearPlane = m_camera.Perspective.nearPlane;
+    float farPlane = m_camera.Perspective.farPlane;
+    float aspectRatio = m_camera.Perspective.aspectRatio;
+    glm::vec3 up = m_camera.Perspective.up;
+
+    datas.AddPublicElement("FOV", &fov);
+    datas.AddPublicElement("NearPlane", &nearPlane);
+    datas.AddPublicElement("FarPlane", &farPlane);
+    datas.AddPublicElement("AspectRatio", &aspectRatio);
+    datas.AddPublicElement("Up", &up);
 }
 
-void NodeCamera::Deserialize(SerializedObject const &datas)
+void NodeCamera::Deserialize(SerializedObject const& datas)
 {
     Node3D::Deserialize(datas);
+
+    float fov = 45.0f;
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+    float aspectRatio = 1.0f;
+    glm::vec3 up = { 0.0f, 1.0f, 0.0f };
+
+    datas.GetPublicElement("FOV", &fov);
+    datas.GetPublicElement("NearPlane", &nearPlane);
+    datas.GetPublicElement("FarPlane", &farPlane);
+    datas.GetPublicElement("AspectRatio", &aspectRatio);
+    datas.GetPublicElement("Up", &up);
+
+    m_camera.Perspective.fov = fov;
+    m_camera.Perspective.nearPlane = nearPlane;
+    m_camera.Perspective.farPlane = farPlane;
+    m_camera.Perspective.aspectRatio = aspectRatio;
+    m_camera.Perspective.up = up;
+
+    m_camera.SetTransform(m_transform.GetMatrix());
+    m_camera.UpdateCamera();
 }
 
 ISerializable* NodeCamera::CreateInstance()

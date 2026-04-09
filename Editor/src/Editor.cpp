@@ -258,16 +258,29 @@ void Editor::CreateNode(std::string const& type, std::string const& name, Node* 
 	m_editorRaylib.AddDrawableObject(name, static_cast<Node*>(outObject));
 }
 
+void Editor::RemoveDrawableRecursive(Node* pNode)
+{
+	if (pNode == nullptr) return;
+
+	for (uint32 i = 0; i < pNode->GetChildCount(); ++i)
+	{
+		RemoveDrawableRecursive(&pNode->GetChild(i));
+	}
+
+	m_editorRaylib.RemoveDrawableElement(pNode->GetName());
+}
+
 void Editor::DeleteNode(Node* pNode)
 {
 	if (!pNode) return;
 
-	std::string nodeName = pNode->GetName();
-	m_editorRaylib.RemoveDrawableElement(nodeName);
-	if (pNode && pNode->GetParent())
+	std::string const nodeName = pNode->GetName();
+	RemoveDrawableRecursive(pNode);
+
+	if (pNode->GetParent())
 	{
 		pNode->Destroy();
-		DEBUG( "[Editor] Node '" << nodeName << "' deleted" << std::endl);
+		DEBUG("[Editor] Node '" << nodeName << "' deleted" << std::endl);
 	}
 }
 
@@ -275,9 +288,7 @@ void Editor::LoadScene(std::string const& path)
 {
 	try
 	{
-		Node::SetStatusEditor(true);
 		LoadReturn tmp = EditorSerializer::LoadFromJson(path);
-		Node::SetStatusEditor(false);
 		if (tmp.IsRoot) {
 			m_sceneRoot = std::move(tmp.uptrNode);
 			m_editorImgui.SetSceneRoot(m_sceneRoot.get());

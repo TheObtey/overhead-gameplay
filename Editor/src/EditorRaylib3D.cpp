@@ -138,24 +138,40 @@ void EditorRaylib3D::UpdateDisplay(Node* pNode)
 
 void EditorRaylib3D::AddDrawableObject(std::string const& name, Node* pNode)
 {
+	Node3D* pNode3D = dynamic_cast<Node3D*>(pNode);
+	if (pNode3D != nullptr && !m_loadedNode3D.contains(name))
+	{
+		m_loadedNode3D[name] = std::make_unique<Node3DElement>();
+		m_loadedNode3D[name]->gizmoTransform = RayGizmo::GizmoIdentity();
+		m_loadedNode3D[name]->gizmoTransform.translation = {
+			pNode3D->GetWorldPosition().x,
+			pNode3D->GetWorldPosition().y,
+			pNode3D->GetWorldPosition().z
+		};
+		m_loadedNode3D[name]->gizmoTransform.scale = {
+			pNode3D->GetWorldScale().x,
+			pNode3D->GetWorldScale().y,
+			pNode3D->GetWorldScale().z
+		};
+		m_loadedNode3D[name]->gizmoTransform.rotation = {
+			pNode3D->GetWorldRotationQuaternion().x,
+			pNode3D->GetWorldRotationQuaternion().y,
+			pNode3D->GetWorldRotationQuaternion().z,
+			pNode3D->GetWorldRotationQuaternion().w
+		};
+		m_loadedNode3D[name]->worldMatrix = RayGizmo::GizmoToMatrix(m_loadedNode3D[name]->gizmoTransform);
+	}
+
 	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNode);
 	if (pNodeMesh == nullptr) return;
 	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX) return;
 
 	Instanciate3DMesh(name, pNode);
-
 	//if (dynamic_cast<NodeLight*>(pNode) != nullptr)
 	//{
 	//	//DrawLight();
 	//}
-	//else if (dynamic_cast<NodeMesh3D*>(pNode) != nullptr)
-	//{
-	//	Instanciate3DMesh(name, jsonObject);
-	//}
-	//else if (dynamic_cast<NodeCollider3D*>(pNode) != nullptr)
-	//{
-	//	//DrawCollider3D(m_loadedMeshs[element["DATAS"]["m_name"]]);
-	//}
+	//else
 }
 
 Node* EditorRaylib3D::FindNode3DWorldMatrix(Node* pNode, Matrix& outMatrix)
@@ -180,126 +196,162 @@ Node* EditorRaylib3D::FindNode3DWorldMatrix(Node* pNode, Matrix& outMatrix)
 
 	return pNode3D;
 }
+
 void EditorRaylib3D::UpdateDrawableElement(Node* pNode)
 {
+	std::string const name = pNode->GetName();
+
+	Node3D* pNode3D = dynamic_cast<Node3D*>(pNode);
+	if (pNode3D != nullptr)
+	{
+		if (!m_loadedNode3D.contains(name))
+		{
+			m_loadedNode3D[name] = std::make_unique<Node3DElement>();
+			m_loadedNode3D[name]->gizmoTransform = RayGizmo::GizmoIdentity();
+			m_loadedNode3D[name]->worldMatrix = RayGizmo::GizmoToMatrix(m_loadedNode3D[name]->gizmoTransform);
+		}
+
+		Node3DElement& node3D = *m_loadedNode3D[name].get();
+
+		if (node3D.gizmoUpdated)
+		{
+			node3D.gizmoUpdated = false;
+
+			pNode3D->SetWorldPosition({
+				node3D.gizmoTransform.translation.x,
+				node3D.gizmoTransform.translation.y,
+				node3D.gizmoTransform.translation.z
+				});
+			pNode3D->SetWorldScale({
+				node3D.gizmoTransform.scale.x,
+				node3D.gizmoTransform.scale.y,
+				node3D.gizmoTransform.scale.z
+				});
+			pNode3D->SetWorldRotationQuaternion(glm::quat{
+				node3D.gizmoTransform.rotation.w,
+				node3D.gizmoTransform.rotation.x,
+				node3D.gizmoTransform.rotation.y,
+				node3D.gizmoTransform.rotation.z
+				});
+
+			m_gizmoDirty = true;
+		}
+
+		node3D.gizmoTransform.translation = {
+			pNode3D->GetWorldPosition().x,
+			pNode3D->GetWorldPosition().y,
+			pNode3D->GetWorldPosition().z
+		};
+		node3D.gizmoTransform.scale = {
+			pNode3D->GetWorldScale().x,
+			pNode3D->GetWorldScale().y,
+			pNode3D->GetWorldScale().z
+		};
+		node3D.gizmoTransform.rotation = {
+			pNode3D->GetWorldRotationQuaternion().x,
+			pNode3D->GetWorldRotationQuaternion().y,
+			pNode3D->GetWorldRotationQuaternion().z,
+			pNode3D->GetWorldRotationQuaternion().w
+		};
+		node3D.worldMatrix = RayGizmo::GizmoToMatrix(node3D.gizmoTransform);
+	}
+
 	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNode);
 	if (pNodeMesh == nullptr) return;
 
-	std::string name = pNode->GetName();
-
 	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX)
 	{
-		RemoveDrawableElement(name);
+		if (m_loadedMeshes.contains(name))
+		{
+			if (m_loadedMeshes[name] && m_loadedMeshes[name]->mesh)
+			{
+				UnloadMesh(*m_loadedMeshes[name]->mesh);
+			}
+			m_loadedMeshes.erase(name);
+		}
 		return;
 	}
 
-	if (!m_loadedMeshs.contains(name))
+	if (!m_loadedMeshes.contains(name))
 	{
 		Instanciate3DMesh(name, pNode);
-		if (!m_loadedMeshs.contains(name)) return;
+		if (!m_loadedMeshes.contains(name)) return;
 	}
 
-	// Vérif primitive type node vs raylib
-	if (m_loadedMeshs[name]->primitiveType != pNodeMesh->GetPrimitiveType())
+	if (m_loadedMeshes[name]->primitiveType != pNodeMesh->GetPrimitiveType())
 	{
 		RemoveDrawableElement(name);
-		Instanciate3DMesh(name, pNode);
-		if (!m_loadedMeshs.contains(name)) return;
+		AddDrawableObject(name, pNode);
+		if (!m_loadedMeshes.contains(name)) return;
 	}
 
-	Matrix unused = {};
-	Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNode, unused));
-	if (pNode3D == nullptr) return;
-
-	DrawableElement& drawable = *m_loadedMeshs[name].get();
-
-	if (drawable.gizmoUpdated)
+	DrawableElement& drawable = *m_loadedMeshes[name].get();
+	if (m_loadedNode3D.contains(name))
 	{
-		drawable.gizmoUpdated = false;
-
-		pNode3D->SetWorldPosition({
-			drawable.gizmoTransform.translation.x,
-			drawable.gizmoTransform.translation.y,
-			drawable.gizmoTransform.translation.z
-		});
-		pNode3D->SetWorldScale({
-			drawable.gizmoTransform.scale.x,
-			drawable.gizmoTransform.scale.y,
-			drawable.gizmoTransform.scale.z
-		});
-		pNode3D->SetWorldRotationQuaternion(glm::quat{
-			drawable.gizmoTransform.rotation.w,
-			drawable.gizmoTransform.rotation.x,
-			drawable.gizmoTransform.rotation.y,
-			drawable.gizmoTransform.rotation.z
-		});
-
-		m_gizmoDirty = true;
-		drawable.worldMatrix = RayGizmo::GizmoToMatrix(drawable.gizmoTransform);
-		return;
+		drawable.worldMatrix = m_loadedNode3D[name]->worldMatrix;
 	}
-
-	drawable.gizmoTransform.translation = {
-		pNode3D->GetWorldPosition().x,
-		pNode3D->GetWorldPosition().y,
-		pNode3D->GetWorldPosition().z
-	};
-	drawable.gizmoTransform.scale = {
-		pNode3D->GetWorldScale().x,
-		pNode3D->GetWorldScale().y,
-		pNode3D->GetWorldScale().z
-	};
-	drawable.gizmoTransform.rotation = {
-		pNode3D->GetWorldRotationQuaternion().x,
-		pNode3D->GetWorldRotationQuaternion().y,
-		pNode3D->GetWorldRotationQuaternion().z,
-		pNode3D->GetWorldRotationQuaternion().w
-	};
-
-	drawable.worldMatrix = RayGizmo::GizmoToMatrix(drawable.gizmoTransform);
+	else if (pNode3D != nullptr)
+	{
+		drawable.worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
+	}
 }
+
 
 void EditorRaylib3D::UpdateElementName(std::string const& oldName, Node* pNode)
 {
-	if (!m_loadedMeshs.contains(oldName)) return;
+	std::string const& newName = pNode->GetName();
 
-	AddDrawableObject(pNode->GetName(), pNode);
-	m_loadedMeshs.erase(oldName);
-	m_selectedObject = pNode->GetName();
+	if (m_loadedMeshes.contains(oldName))
+	{
+		m_loadedMeshes[newName] = std::move(m_loadedMeshes[oldName]);
+		m_loadedMeshes.erase(oldName);
+	}
+
+	if (m_loadedNode3D.contains(oldName))
+	{
+		m_loadedNode3D[newName] = std::move(m_loadedNode3D[oldName]);
+		m_loadedNode3D.erase(oldName);
+	}
+
+	m_selectedObject = newName;
 }
 
 void EditorRaylib3D::RemoveDrawableElement(std::string const& elementName)
 {
-	 if (m_loadedMeshs.contains(elementName))
-	 {
-		 if (m_loadedMeshs[elementName]->mesh)
-		 {
-			 UnloadMesh(*m_loadedMeshs[elementName]->mesh);
-		 }
-		 m_loadedMeshs.erase(elementName);
-	 }
+	if (m_loadedMeshes.contains(elementName))
+	{
+		if (m_loadedMeshes[elementName] && m_loadedMeshes[elementName]->mesh)
+		{
+			UnloadMesh(*m_loadedMeshes[elementName]->mesh);
+		}
+		m_loadedMeshes.erase(elementName);
+	}
+
+	if (m_loadedNode3D.contains(elementName))
+	{
+		m_loadedNode3D.erase(elementName);
+	}
 }
 
 void EditorRaylib3D::ClearWindow()
 {
-	for (auto& [name, drawable] : m_loadedMeshs)
+	for (auto& [name, drawable] : m_loadedMeshes)
 	{
 		if (drawable && drawable->mesh)
 		{
 			UnloadMesh(*drawable->mesh);
 		}
 	}
-	m_loadedMeshs.clear();
+	m_loadedMeshes.clear();
 }
 
-
-void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3D) // NodeMesh3D
+void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3D)
 {
 	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNodeMesh3D);
 	if (pNodeMesh == nullptr) return;
 	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX) return;
 
-	if (m_loadedMeshs.find(name) != m_loadedMeshs.end())
+	if (m_loadedMeshes.find(name) != m_loadedMeshes.end())
 	{
 		// ERROR
 	}
@@ -308,22 +360,27 @@ void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3
 		GeoInfo const& geoInfo = GeometryFactory::GetGeometry(pNodeMesh->GetPrimitiveType());
 		Mesh m_mesh = BuildRaylibMesh(geoInfo);
 
-		m_loadedMeshs[name] = std::make_unique<DrawableElement>();
-		m_loadedMeshs[name]->gizmoTransform = RayGizmo::GizmoIdentity();
-		m_loadedMeshs[name]->mesh = std::make_unique<Mesh>(m_mesh);
-		m_loadedMeshs[name]->primitiveType = pNodeMesh->GetPrimitiveType();
-		m_loadedMeshs[name]->worldMatrix = RayGizmo::GizmoToMatrix(m_loadedMeshs[name]->gizmoTransform);
+		m_loadedMeshes[name] = std::make_unique<DrawableElement>();
+		m_loadedMeshes[name]->mesh = std::make_unique<Mesh>(m_mesh);
+		m_loadedMeshes[name]->primitiveType = pNodeMesh->GetPrimitiveType();
+		m_loadedMeshes[name]->worldMatrix = MatrixIdentity();
 
-		Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNodeMesh3D, m_loadedMeshs[name].get()->worldMatrix));
-		if (pNode3D != nullptr)
+		if (m_loadedNode3D.contains(name))
 		{
-			m_loadedMeshs[name]->gizmoTransform.translation = Vector3{ pNode3D->GetWorldPosition().x,pNode3D->GetWorldPosition().y,pNode3D->GetWorldPosition().z };
-			m_loadedMeshs[name]->gizmoTransform.scale = Vector3{ pNode3D->GetWorldScale().x,pNode3D->GetWorldScale().y,pNode3D->GetWorldScale().z };
-			m_loadedMeshs[name]->gizmoTransform.rotation = Quaternion{ pNode3D->GetWorldRotationQuaternion().x,pNode3D->GetWorldRotationQuaternion().y,pNode3D->GetWorldRotationQuaternion().z,pNode3D->GetWorldRotationQuaternion().w };
-			m_loadedMeshs[name]->worldMatrix = RayGizmo::GizmoToMatrix(m_loadedMeshs[name]->gizmoTransform);
+			m_loadedMeshes[name]->worldMatrix = m_loadedNode3D[name]->worldMatrix;
+		}
+		else
+		{
+			Matrix world = {};
+			Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNodeMesh3D, world));
+			if (pNode3D != nullptr)
+			{
+				m_loadedMeshes[name]->worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
+			}
 		}
 	}
 }
+
 
 
 void EditorRaylib3D::InstanciateCollider3D()
@@ -334,23 +391,23 @@ void EditorRaylib3D::InstanciateLight()
 {
 }
 
-
 void EditorRaylib3D::Render()
 {
-	//UpdateCamera(&m_camera, m_cameraMode);
 	BeginMode3D(m_camera);
 	DrawViewPort();
 
-	for (std::map<std::string, uptr<DrawableElement>>::iterator it  = m_loadedMeshs.begin(); it != m_loadedMeshs.end(); it++)
-	{	
+	for (std::map<std::string, uptr<DrawableElement>>::iterator it = m_loadedMeshes.begin(); it != m_loadedMeshes.end(); it++)
+	{
 		DrawMesh(*it->second->mesh.get(), m_defaultMaterial, it->second->worldMatrix);
-		if (it->first == m_selectedObject)
+	}
+
+	if (m_loadedNode3D.contains(m_selectedObject))
+	{
+		RayGizmo::SetGizmoSize(m_gizmoSize);
+
+		if (RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), &m_loadedNode3D[m_selectedObject]->gizmoTransform))
 		{
-			RayGizmo::SetGizmoSize(m_gizmoSize);
-			if(RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), &it->second->gizmoTransform))
-			{
-				m_loadedMeshs[it->first]->gizmoUpdated = true;
-			}
+			m_loadedNode3D[m_selectedObject]->gizmoUpdated = true;
 		}
 	}
 

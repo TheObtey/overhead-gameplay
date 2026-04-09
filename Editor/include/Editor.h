@@ -36,6 +36,7 @@ private:
 	void CreateNewScene();
 	void CreateNode(std::string const& type, std::string const& name, Node* pParent = nullptr);
 	void DeleteNode(Node* pNode);
+	void RemoveDrawableRecursive(Node* pNode);
 
 	// Load/Save
 	void LoadScene(std::string const& path);
