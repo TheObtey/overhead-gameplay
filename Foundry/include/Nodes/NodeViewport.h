@@ -27,13 +27,15 @@ public:
 	void SetBackgroundColor(Ore::Color const& color);
 
 	//Set to nullptr if no camera is used
-	void SetCamera(NodeCamera *pCamera) const;
+	void SetCamera(NodeCamera *pCamera);
 	void AddMesh(NodeMesh const &mesh) const;
 	void AddSkeletalMesh(NodeMeshAnimated3D const &mesh) const;
 
 	static ISerializable* CreateInstance();
 
 	Event<void(uint32, uint32)> OnViewportResize;
+	uptr<Node> Clone() override;
+
 private:
 	void UpdateViewport();
 	void TryAttachToWindow();
@@ -52,6 +54,7 @@ protected:
 	//TODO REMOVE
 	std::array<Ore::Light, 5> dummyLight {};
 
+	NodeCamera* m_pCamera = nullptr;
 
 	friend class GraphicServer;
 	friend class NodeWindow;

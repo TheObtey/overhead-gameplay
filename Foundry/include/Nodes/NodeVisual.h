@@ -15,6 +15,7 @@ public:
     virtual void Deserialize(SerializedObject const& datas) override;
 
     static ISerializable* CreateInstance();
+    uptr<Node> Clone() override;
 
 protected:
     virtual bool IsVisible();

@@ -454,5 +454,16 @@ void NodeRigidBody::SetIsGravityEnabled(bool enabled)
 	PhysicsServer::SetIsGravityEnabled(enabled, *this);
 }
 
+uptr<Node> NodeRigidBody::Clone()
+{
+	uptr<NodeRigidBody> clone = Node::CreateNode<NodeRigidBody>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}
+
 
 

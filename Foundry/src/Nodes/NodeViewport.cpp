@@ -43,8 +43,11 @@ void NodeViewport::OnUpdate(double const delta)
 	Node2D::OnUpdate(delta);
 	if (dirty) UpdateViewport();
 
-	GraphicServer::Clear(this);
-	GraphicServer::Present(this);
+	if (m_pCamera)
+	{
+		GraphicServer::Clear(this);
+		GraphicServer::Present(this);
+	}
 }
 
 void NodeViewport::SetBackgroundColor(Ore::Color const &color)
@@ -53,11 +56,12 @@ void NodeViewport::SetBackgroundColor(Ore::Color const &color)
 	m_pViewPort->SetBackgroundColor(color);
 }
 
-void NodeViewport::SetCamera(NodeCamera* pCamera) const
+void NodeViewport::SetCamera(NodeCamera* pCamera)
 {
 	m_pGeometryPass->SetCamera(&pCamera->m_camera);
 	m_pLightPass->SetCamera(&pCamera->m_camera);
 	m_pAnimatedPass->SetCamera(&pCamera->m_camera);
+	m_pCamera = pCamera;
 }
 
 void NodeViewport::AddMesh(NodeMesh const& mesh) const
@@ -96,3 +100,14 @@ void NodeViewport::Present() const
 }
 
 ISerializable* NodeViewport::CreateInstance() { return CreateNode<NodeViewport>("NodeViewport").release(); }
+
+uptr<Node> NodeViewport::Clone()
+{
+	uptr<NodeViewport> clone = Node::CreateNode<NodeViewport>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}

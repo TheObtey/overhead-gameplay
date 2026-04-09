@@ -103,6 +103,7 @@ public:
 	void AddLocalPitch(float const pitch)			{ m_transform.AddPitch(pitch); }
 	// -- Angles in Radians							
 	void AddLocalRoll(float const roll)				{ m_transform.AddRoll(roll); }
+	uptr<Node> Clone() override;
 
 
 private:

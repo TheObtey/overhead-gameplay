@@ -1,33 +1,45 @@
 #include "Action.h"
-#include "IControl.h"
+#include "EventManager.h"
+#include "ActionMap.h"
 
-Action::Action() : m_controls(), OnAction()
-{
-	Ore::EventManager::getKey += [&](Ore::EventInput in, Ore::EventAction ac)
-		{
-			for (int i = 0; i < m_controls.size(); i++)
-			{
-				if (in == m_controls[i]->GetEventInput())
-					OnAction.Invoke(*m_controls[i]);
-			}
-		};
-}
-
-Action::Action(ControlType controlType, Ore::EventInput eventInput) :
-	m_controls(), OnAction()
+Action::Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* pActionMap) :
+	m_controls(std::vector<IControl*>()), Event(), m_pOwner(pActionMap)
 {
 	AddControl(controlType, eventInput);
+
+	if (controlType == ControlType::STICK && eventInput == Ore::EventInput::MOUSE_MOVE)
+	{
+		Ore::EventManager::getCursorPos += [&](int32 x, int32 y)
+			{
+				if (m_pOwner == nullptr || m_pOwner->Active == false)
+					return;
+				for (int i = 0; i < m_controls.size(); i++)
+				{
+					if (m_controls[i]->GetEventInput() == Ore::EventInput::MOUSE_MOVE)
+						std::invoke(Event, *m_controls[i]);
+				}
+			};
+	}
+
 	Ore::EventManager::getKey += [&](Ore::EventInput in, Ore::EventAction ac)
 		{
-			for (int i = 0; i < m_controls.size(); i++)
+			if (m_pOwner == nullptr || m_pOwner->Active == false)
+				return;
+			for (int i = 0; i  < m_controls.size(); i++)
 			{
 				if (in == m_controls[i]->GetEventInput() && ac == Ore::EventAction::PRESS)
-					OnAction.Invoke(*m_controls[i]);
+ 					std::invoke(Event, *m_controls[i]);
 			}
 		};
 }
 
-Action::~Action() {}
+Action::~Action() 
+{
+	for (IControl* iControl : m_controls)
+		delete iControl;
+
+	m_pOwner = nullptr;
+}
 
 
 uint32 Action::AddControl(ControlType const& type, Ore::EventInput const& eventInput)
@@ -45,15 +57,13 @@ uint32 Action::AddControl(ControlType const& type, Ore::EventInput const& eventI
 		break;
 	}
 
-	m_controls.back()->SetAction(this);
-
 	return m_controls.size() - 1;
 }
 
-IControl* Action::GetControl(uint32 index)
+IControl& Action::GetControl(uint32 index)
 {
+	IControl ic = IControl();
 	if (index > m_controls.size())
-		return nullptr;
-
-	return m_controls[index];
+		return ic;
+	return *m_controls[index];
 }
