@@ -4,6 +4,7 @@
 
 #include "Define.h"
 //#include "Serialization/ISerializable.h"
+#include "Ore.h"
 #include "IControl.h"
 
 
@@ -14,7 +15,6 @@
 
 
 class ActionMap;
-enum class EventInput;
 enum class ControlType : byte;
 
 
@@ -22,10 +22,10 @@ class Action /*: public ISerializable*/
 {
 public:
 	Action() = default;
-	Action(ControlType controlType, EventInput eventInput, ActionMap* pActionMap = nullptr);
+	Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* pActionMap = nullptr);
 	~Action();
 
-	uint32 AddControl(ControlType const& type, EventInput const& eventInput);
+	uint32 AddControl(ControlType const& type, Ore::EventInput const& eventInput);
 	IControl& GetControl(uint32 index);
 
 	std::function<void(IControl&)> Event;

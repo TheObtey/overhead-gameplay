@@ -33,11 +33,11 @@ public:
 
 	Action*	GetAction(std::string_view const& name);
 	Action*	operator[](std::string const& name);
-			
+
 	uint32	Length() const;
 	void	Rename(std::string_view const& old, std::string_view const& name);
 
-	void	CreateAction(std::string_view const& name, ControlType type, EventInput eventInput);
+	void	CreateAction(std::string_view const& name, ControlType type, Ore::EventInput eventInput);
 
 	bool	Active = true;
 

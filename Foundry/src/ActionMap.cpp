@@ -59,7 +59,7 @@ void ActionMap::Rename(std::string_view const& old, std::string_view const& name
 	m_actions.erase(m_actions.find(std::string(old)));
 }
 
-void ActionMap::CreateAction(std::string_view const& name, ControlType type, EventInput eventInput)
+void ActionMap::CreateAction(std::string_view const& name, ControlType type, Ore::EventInput eventInput)
 {
 	Emplace(name, new Action(type, eventInput, this));
 }

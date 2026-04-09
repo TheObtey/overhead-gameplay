@@ -2,17 +2,17 @@
 #include "EventManager.h"
 #include "ActionMap.h"
 
-Action::Action(ControlType controlType, EventInput eventInput, ActionMap* pActionMap) :
+Action::Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* pActionMap) :
 	m_controls(std::vector<IControl*>()), Event(), m_pOwner(pActionMap)
 {
 	AddControl(controlType, eventInput);
-	EventManager::getKey += [&](EventInput in, EventAction ac)
+	Ore::EventManager::getKey += [&](Ore::EventInput in, Ore::EventAction ac)
 		{
 			if (m_pOwner == nullptr || m_pOwner->Active == false)
 				return;
 			for (int i = 0; i  < m_controls.size(); i++)
 			{
-				if (in == m_controls[i]->GetEventInput() && ac == EventAction::PRESS)
+				if (in == m_controls[i]->GetEventInput() && ac == Ore::EventAction::PRESS)
  					std::invoke(Event, *m_controls[i]);
 			}
 		};
@@ -27,7 +27,7 @@ Action::~Action()
 }
 
 
-uint32 Action::AddControl(ControlType const& type, EventInput const& eventInput)
+uint32 Action::AddControl(ControlType const& type, Ore::EventInput const& eventInput)
 {
 	switch (type)
 	{
