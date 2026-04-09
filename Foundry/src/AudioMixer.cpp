@@ -45,14 +45,14 @@ void AudioMixer::AddDelay(AudioChannel* channel, float delaySeconds, float decay
 
 	if (ma_delay_node_init(ma_engine_get_node_graph(&engine), &cfg, NULL, &entry.node) != MA_SUCCESS)
 	{
-		Logger::Log("[MixerAudio] AddDelay failed on " + channel->name);
+		Logger::Log("[MixerAudio] AddDelay failed on " + channel->GetName());
 		return;
 	}
 
 	ma_delay_node_set_wet(&entry.node, wet);
 	ma_delay_node_set_dry(&entry.node, 1.0f);
 
-	ma_node_attach_output_bus(&channel->soundGroup, 0, &entry.node, 0);
+	ma_node_attach_output_bus(&channel->GetGroup(), 0, &entry.node, 0);
 	ma_node_attach_output_bus(&entry.node, 0, ma_engine_get_endpoint(&engine), 0);
 
 	entry.active = true;
@@ -72,7 +72,7 @@ void AudioMixer::RemoveDelay(AudioChannel* channel)
 	if (it == m_delays.end()) return;
 	if (it->second.active) ma_delay_node_uninit(&it->second.node, NULL);
 
-	ma_node_attach_output_bus(&channel->soundGroup, 0, ma_engine_get_endpoint(&AudioServer::GetSoundEngine()), 0);
+	ma_node_attach_output_bus(&channel->GetGroup(), 0, ma_engine_get_endpoint(&AudioServer::GetSoundEngine()), 0);
 
 	m_delays.erase(it);
 }
@@ -99,11 +99,11 @@ void AudioMixer::AddReverb(AudioChannel* channel, float roomSize, float wet)
 
 	if (ma_node_init(ma_engine_get_node_graph(&engine), &cfg, NULL, &rev->node) != MA_SUCCESS)
 	{
-		Logger::Log("[MixerAudio] AddReverb failed on " + channel->name);
+		Logger::Log("[MixerAudio] AddReverb failed on " + channel->GetName());
 		return;
 	}
 
-	ma_node* groupNode = &channel->soundGroup.engineNode.baseNode;
+	ma_node* groupNode = &channel->GetGroup().engineNode.baseNode;
 	ma_node_attach_output_bus(groupNode, 0, &rev->node, 0);
 	ma_node_attach_output_bus(&rev->node, 0, ma_engine_get_endpoint(&engine), 0);
 
@@ -124,7 +124,7 @@ void AudioMixer::RemoveReverb(AudioChannel* channel)
 
 	ma_node_uninit(&it->second->node, NULL);
 
-	ma_node* groupNode = (ma_node*)&channel->soundGroup;
+	ma_node* groupNode = (ma_node*)&channel->GetGroup();
 	ma_node_attach_output_bus(groupNode, 0, ma_engine_get_endpoint(&AudioServer::GetSoundEngine()), 0);
 
 	m_reverbs.erase(it);

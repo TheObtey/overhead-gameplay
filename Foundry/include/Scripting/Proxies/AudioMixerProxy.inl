@@ -39,7 +39,7 @@ private:
 };
 
 BindProxy(AudioMixer::Proxy,
-    return binder.BindClass<AudioMixer::Proxy>("AudioMixer",
+    return binder.BindClass<AudioMixer::Proxy>("audiomixer",
         "AddDelay", BIND(AddDelay),
         "SetDelayWet", BIND(SetDelayWet),
         "RemoveDelay", BIND(RemoveDelay),

@@ -1,119 +1,117 @@
 ---@meta
 
----@class audioChannel
-audioChannel = {}
+---@class audiochannel
+audiochannel = {}
 
 -- -- AudioServer -- --
----@class audioServer
-audioServer = {}
+---@class audioserver
+audioserver = {}
 
 ---@return boolean
-function audioServer:Init() end
-function audioServer:Shutdown() end
+function audioserver:Init() end
+function audioserver:Shutdown() end
 
 ---@param name string
----@return AudioChannel
-function audioServer:CreateChannel(name) end
+---@return audiochannel
+function audioserver:CreateChannel(name) end
 
 ---@param volume number
-function audioServer:SetMasterVolume(volume) end
+function audioserver:SetMasterVolume(volume) end
 
 ---@return number
-function audioServer:GetMasterVolume() end
+function audioserver:GetMasterVolume() end
 
----@param channel AudioChannel
+---@param channel audiochannel
 ---@param volume number
-function audioServer:SetGroupVolume(channel, volume) end
+function audioserver:SetGroupVolume(channel, volume) end
 
----@param channel AudioChannel
+---@param channel audiochannel
 ---@return number
-function audioServer:GetGroupVolume(channel) end
+function audioserver:GetGroupVolume(channel) end
 
 
 -- -- AudioMixer -- --
----@class audioMixer
-audioMixer = {}
+---@class audiomixer
+audiomixer = {}
 
----@param channel AudioChannel
+---@param channel audiochannel
 ---@param delaySeconds number
 ---@param decay number
 ---@param wet number
-function audioMixer:AddDelay(channel, delaySeconds, decay, wet) end
+function audiomixer:AddDelay(channel, delaySeconds, decay, wet) end
 
----@param channel AudioChannel
+---@param channel audiochannel
 ---@param wet number
-function audioMixer:SetDelayWet(channel, wet) end
+function audiomixer:SetDelayWet(channel, wet) end
 
----@param channel AudioChannel
-function audioMixer:RemoveDelay(channel) end
+---@param channel audiochannel
+function audiomixer:RemoveDelay(channel) end
 
----@param channel AudioChannel
+---@param channel audiochannel
 ---@param roomSize number
 ---@param wet number
-function audioMixer:AddReverb(channel, roomSize, wet) end
+function audiomixer:AddReverb(channel, roomSize, wet) end
 
----@param AudioChannel channel
+---@param channel audiochannel
 ---@param wet number
-function audioMixer:SetReverbWet(channel, wet) end
+function audiomixer:SetReverbWet(channel, wet) end
 
----@param channel AudioChannel
-function audioMixer:RemoveReverb(channel) end
+---@param channel audiochannel
+function audiomixer:RemoveReverb(channel) end
 
-function audioMixer:Shutdown() end
+function audiomixer:Shutdown() end
 
 -- -- NodeAudioListener -- --
----@class nodeAudioListener
-nodeAudioListener = {}
+---@class nodeaudiolistener
+nodeaudiolistener = {}
 
--- Constructeur de la classe nodeAudioListener
 ---@param name string
----@return nodeAudioListener
-function nodeAudioListener:new(name) end
+---@return nodeaudiolistener
+function nodeaudiolistener:new(name) end
 
 ---@return vec3
-function nodeAudioListener:GetListenerPosition() end
+function nodeaudiolistener:GetListenerPosition() end
 
 ---@param position vec3
-function nodeAudioListener:SetListenerPosition(position) end
+function nodeaudiolistener:SetListenerPosition(position) end
 
 ---@return vec3
-function nodeAudioListener:GetListenerDirection() end
+function nodeaudiolistener:GetListenerDirection() end
 
 ---@param position vec3
-function nodeAudioListener:SetListenerDirection(position) end
+function nodeaudiolistener:SetListenerDirection(position) end
 
 
 -- -- NodeAudioEmitter -- --
----@class nodeAudioEmitter
-nodeAudioEmitter = {}
+---@class nodeaudioemitter
+nodeaudioemitter = {}
 
--- Constructeur de la classe NodeAudioEmitter
 ---@param name string
----@return NodeAudioEmitter
-function nodeAudioEmitter:new(name) end
+---@return nodeaudioemitter
+function nodeaudioemitter:new(name) end
 
 ---@param filePath string
 ---@param channel AudioChannel
 ---@return boolean
-function nodeAudioEmitter:Load(filePath, channel) end
+function nodeaudioemitter:Load(filePath, channel) end
 
-function nodeAudioEmitter:Play() end
-function nodeAudioEmitter:Stop() end
+function nodeaudioemitter:Play() end
+function nodeaudioemitter:Stop() end
 
 ---@param isLooping boolean
-function nodeAudioEmitter:SetLoop(isLooping) end
+function nodeaudioemitter:SetLoop(isLooping) end
 
 ---@param position vec3
-function nodeAudioEmitter:SetSourcePosition(position) end
+function nodeaudioemitter:SetSourcePosition(position) end
 
 ---@return vec3
-function nodeAudioEmitter:GetSourcePosition() end
+function nodeaudioemitter:GetSourcePosition() end
 
 ---@param direction vec3
-function nodeAudioEmitter:SetSourceDirection(direction) end
+function nodeaudioemitter:SetSourceDirection(direction) end
 
 ---@return vec3
-function nodeAudioEmitter:GetSourceDirection() end
+function nodeaudioemitter:GetSourceDirection() end
 
 ---@return boolean
-function nodeAudioEmitter:IsPlaying() end
+function nodeaudioemitter:IsPlaying() end

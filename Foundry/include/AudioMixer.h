@@ -43,7 +43,7 @@ public:
     void AddReverb(AudioChannel* channel, float roomSize, float wet);
     void SetReverbWet(AudioChannel* channel, float wet);
     void RemoveReverb(AudioChannel* channel);
-    static inline bool reverbCalled = false;
+
 protected:
     std::unordered_map<AudioChannel*, DelayEntry> m_delays;
     std::unordered_map<AudioChannel*, uptr<ReverbEntry>> m_reverbs;

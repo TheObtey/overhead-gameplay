@@ -12,8 +12,15 @@
 
 struct AudioChannel 
 {
+public:
+	std::string const& GetName() const { return name; };
+	ma_sound_group& GetGroup() { return soundGroup; };
+
+private:
 	std::string name;
 	ma_sound_group soundGroup;
+
+	friend class AudioServer;
 };
 
 // Manage the complete audio system using channels. (Required when using any related sound Classes/Nodes)
@@ -37,7 +44,7 @@ public:
 	static void SetGroupVolume(AudioChannel* channel, float volume);
 
 	static float GetMasterVolume() { return Instance().m_masterVolume; };
-	static float GetGroupVolume(AudioChannel channel) { return ma_sound_group_get_volume(&channel.soundGroup); };
+	static float GetGroupVolume(AudioChannel& channel) { return ma_sound_group_get_volume(&channel.soundGroup); };
 
 	static ma_engine& GetSoundEngine() { return Instance().m_soundEngine; };
 	static std::vector<uptr<AudioChannel>>& GetChannels() { return Instance().m_channels; };
