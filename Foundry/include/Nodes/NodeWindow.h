@@ -25,6 +25,7 @@ public:
     void SetIcon(std::string const& path) const;
 
     static ISerializable* CreateInstance();
+    uptr<Node> Clone() override;
 
 private:
     void UpdateWindow() const;

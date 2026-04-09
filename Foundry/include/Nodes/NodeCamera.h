@@ -20,7 +20,7 @@ public:
     virtual void Reparent(Node& newParent, bool keepGlobalTransform = true) override {};
     virtual void Serialize(SerializedObject& datas) const override;
     virtual void Deserialize(SerializedObject const& datas) override;
-
+	uptr<Node> Clone() override;
     static ISerializable* CreateInstance();
 
 private:

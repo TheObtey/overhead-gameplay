@@ -97,6 +97,7 @@ public:
 	static ISerializable *CreateInstance();
 
 	void SetShape(const glm::vec3 &halfExtents);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;
@@ -113,6 +114,7 @@ public:
 	static ISerializable *CreateInstance();
 
 	void SetShape(float radius);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;
@@ -129,6 +131,7 @@ public:
 	static ISerializable *CreateInstance();
 
 	void SetShape(float radius, float height);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;

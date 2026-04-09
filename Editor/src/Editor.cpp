@@ -241,10 +241,9 @@ void Editor::CreateNode(std::string const& type, std::string const& name, Node* 
 	ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(type);
 	uptr<Node> newNode = uptr<Node>(static_cast<Node*>(outObject));
 	newNode.get()->SetName(name);
-
-
 	if (pParent)
 	{
+
 		pParent->AddChild(newNode);
 		DEBUG( "[Editor] Node '" << name << "' added as child of '" 
 		          << pParent->GetName() << "'" << std::endl);

@@ -34,6 +34,8 @@ public:
 	static ISerializable* CreateInstance();
 
 	Event<void(uint32, uint32)> OnViewportResize;
+	uptr<Node> Clone() override;
+
 private:
 	void UpdateViewport();
 	void TryAttachToWindow();
