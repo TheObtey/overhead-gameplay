@@ -3,6 +3,7 @@ project(Editor)
 
 find_package(imgui CONFIG REQUIRED)
 find_package(raylib CONFIG REQUIRED)
+find_package(ReactPhysics3D REQUIRED)
 
 file(GLOB_RECURSE SOURCES 
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
@@ -21,6 +22,9 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
-target_link_libraries(${PROJECT_NAME} PRIVATE Foundry::library)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Foundry::library
+    ReactPhysics3D::ReactPhysics3D
+)
 target_link_libraries(${PROJECT_NAME} PRIVATE imgui::imgui)
 

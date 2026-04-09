@@ -36,8 +36,8 @@ private:
 private:
     uptr<Buffer<Vertex>> m_pVertexBuffer;
     uptr<Buffer<uint32>> m_pIndexBuffer;
-    uptr<VertexArrayObject> m_pVao;
     uint32 m_indiceSize;
+    uptr<VertexArrayObject> m_pVao;
 
 };
 }

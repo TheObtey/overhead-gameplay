@@ -1,13 +1,12 @@
 #ifndef FOUNDRY_ISCRIPTING_ENGINE__H_
 #define FOUNDRY_ISCRIPTING_ENGINE__H_
 
-#define LUA
-
 #ifdef LUA
 #include <sol/state.hpp>
 #include <sol/sol.hpp>
 using ScriptEngine = sol::state;
 #endif
+
 #include <set>
 
 class ScriptingEngine

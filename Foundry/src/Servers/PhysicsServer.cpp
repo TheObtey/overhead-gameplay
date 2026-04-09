@@ -509,7 +509,7 @@ void  PhysicsServer::SetMassDensity(float mass, NodeCollider& c)
 	Command<PhysicsServer> cmd;
 	cmd.Type = CommandTyp::SET_MASS_DENSITY;
 	cmd.To = &c;
-	cmd.friction = mass;
+	cmd.mass = mass;
 	Instance().m_commands.push(cmd);
 }
 void PhysicsServer::SetIsTrigger(bool value, NodeCollider& c)

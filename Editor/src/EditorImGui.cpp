@@ -1,5 +1,4 @@
-﻿
-#include "EditorImGui.h"
+﻿#include "EditorImGui.h"
 #include "Editor.h"
 #include "EditorRaylib3D.h"
 #include "Debug.h"
@@ -44,8 +43,28 @@ EditorImGui::~EditorImGui()
 void EditorImGui::Init()
 {
 	m_newNodeTypeSelector = Node::CreateNode<Node>("Node");
-	auto test = Node::CreateNode<Node>("Node3D");
-	m_newNodeTypeSelector->AddChild(test);
+	auto node3D = Node::CreateNode<Node>("Node3D");
+	auto rigibody = Node::CreateNode<Node>("NodeRigidBody");
+
+	auto collider = Node::CreateNode<Node>("NodeCollider");
+	auto colliderbox = Node::CreateNode<Node>("NodeBoxCollider");
+	auto collidersphere = Node::CreateNode<Node>("NodeSphereCollider");
+	auto collidercapsule = Node::CreateNode<Node>("NodeCapsuleCollider");
+
+	auto nodeVisual = Node::CreateNode<Node>("NodeVisual");
+	auto nodeMesh = Node::CreateNode<Node>("NodeMesh");
+
+	auto nodeCamera = Node::CreateNode<Node>("NodeCamera");
+
+	collider->AddChild(colliderbox);
+	collider->AddChild(collidersphere);
+	collider->AddChild(collidercapsule);
+	nodeVisual->AddChild(nodeMesh);
+	node3D->AddChild(nodeVisual);
+	node3D->AddChild(collider);
+	node3D->AddChild(rigibody);
+	node3D->AddChild(nodeCamera);
+	m_newNodeTypeSelector->AddChild(node3D);
 	EngineServer::FlushCommands();
 
 	ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
@@ -56,6 +75,10 @@ void EditorImGui::Init()
 	m_loadBrowser = LoadBrowseWindow;
 	m_saveBrowser.SetDirectory("../Game/res");
 	m_loadBrowser.SetDirectory("../Game/res");
+	m_assetBrowser.SetRoot("../");
+	m_assetBrowser.SetThumbnailSize(64.0f);
+	m_assetBrowser.SetTypeFilters({ ".png", ".jpg", ".fbx", ".obj", ".lua", ".json" });
+	m_assetBrowser.SetFlags(ImGui::AssetBrowserFlags_MultiSelect | ImGui::AssetBrowserFlags_AutoRefresh);
 
 	m_inspector.SetWindow(m_screenWidth, m_screenHeight);
 }
@@ -88,6 +111,7 @@ void EditorImGui::Render()
 
 	ShowSaveAsSceneBrowsing();
 	ShowLoadSceneBrowsing();
+	m_assetBrowser.Display();
 
 	ImGui::SetNextWindowPos(ImVec2(m_screenWidth - 120.0f, m_screenHeight - 40.0f));
 	ImGui::SetNextWindowSize(ImVec2(110, 30));
@@ -552,21 +576,34 @@ void EditorImGui::ShowLoadSceneBrowsing()
 
 	if (m_loadBrowser.HasSelected())
 	{
-		std::string tmpbuffer = m_loadBrowser.GetSelected().string();
-		if (tmpbuffer.find(".sc")) {
-			m_scenePathBuffer = tmpbuffer;
+		std::filesystem::path const selected = m_loadBrowser.GetSelected();
+		std::string selectedLogicalPath;
+
+		if (selected.extension() == ".json")
+		{
+			std::filesystem::path const logical = selected.parent_path() / selected.stem();
+
+			if (logical.extension() == ".sc")
+			{
+				m_scenePathBuffer = logical.string();
+				selectedLogicalPath = m_scenePathBuffer;
+			}
+			else if (logical.extension() == ".nd")
+			{
+				m_nodeSavePathBuffer = logical.string();
+				selectedLogicalPath = m_nodeSavePathBuffer;
+			}
 		}
-		else if (tmpbuffer.find(".nd")) {
-			m_nodeSavePathBuffer = tmpbuffer;
-		}
-		if (m_scenePathBuffer.length() > 0 || m_nodeSavePathBuffer.length() > 0)
+
+		if (!selectedLogicalPath.empty())
 		{
 			m_haveFileSelected = true;
 			m_command.type = EditorCommand::Type::LOAD_SCENE;
-			m_command.stringParam1 = m_scenePathBuffer; // ici usitliser m_nodeSavePathBuffer
+			m_command.stringParam1 = selectedLogicalPath + ".json";
 			m_pSelectedNode = nullptr;
 			m_pViewRoot = m_pSceneRoot;
 		}
+
 		m_loadBrowser.ClearSelected();
 		m_loadBrowser.Close();
 	}

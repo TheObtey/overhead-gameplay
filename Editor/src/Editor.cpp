@@ -1,10 +1,11 @@
 #include "Editor.h"
 #include "EditorSerializer.h"
-
-
 #include "Debug.h"
 
 #include <Servers/EngineServer.h>
+#include <Servers/PhysicsServer.h>
+#include <Servers/GraphicServer.h>
+
 #include <Serialization/SerializeObject.hpp>
 #include <iostream>
 #include <filesystem>
@@ -14,6 +15,7 @@
 #include <rlImGui.h>
 #include <rlImGuiColors.h>
 #include <Nodes/Node3D.h>
+#include <Nodes/NodeWindow.h>
 
 #if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
 
@@ -29,12 +31,24 @@ Editor::Editor() : m_editorRaylib() ,m_editorImgui(this,&m_editorRaylib)
 
 Editor::~Editor()
 {
+
+	Node::SetStatusEditor(false);
 	Shutdown();
 }
 
 void Editor::Init() 
 {
+	Node::SetStatusEditor(true);
 	m_editorRaylib.Init(m_screenWidth, m_screenHeight);
+	PhysicsServer::Initialize();
+
+	//m_hiddenWindowContext = Node::CreateNode<NodeWindow>("EditorHiddenWindow");
+	//GraphicServer::Initialize();
+	//m_hiddenWindowViewport = Node::CreateNode<NodeViewport>("EditorHiddenViewport");
+	//m_hiddenWindowContext->AddChild(std::move(m_hiddenWindowViewport));
+	//EngineServer::FlushCommands();
+	//GraphicServer::FlushCommands();
+
 	m_sceneRoot = Node::CreateNode<Node>("SceneRoot");
 
 	rlImGuiSetup(true);
@@ -43,28 +57,45 @@ void Editor::Init()
 	m_editorImgui.SetSceneRoot(m_sceneRoot.get());
 	m_editorImgui.SetScreenSize(m_screenWidth, m_screenHeight);
 
-	std::filesystem::path ScriptStock = "ScriptStock/.foundry";
-	std::filesystem::create_directories(ScriptStock);
+	std::filesystem::path scriptStockDir = "ScriptStock";
+	std::filesystem::create_directories(scriptStockDir);
 
-	std::filesystem::path source = "../Game/res/foundry.d.lua";
-	std::filesystem::path dest = ScriptStock / "foundry.d.lua";
+	std::filesystem::path source = "../Game/res/scripts/.foundry";
+	std::filesystem::path dest = scriptStockDir / ".foundry";
 
+	std::error_code ec;
+
+	if (!std::filesystem::exists(source, ec) || !std::filesystem::is_directory(source, ec))
 	{
-		std::error_code ec;
-		if (std::filesystem::exists(source, ec))
-		{
-			std::filesystem::copy_file(source, dest, ec);
-			if (ec)
-			{
-				DEBUG("[Editor] WARNING: Couldn't copy foundry.d.lua"
-					<< dest.string() << " : " << ec.message() << std::endl);
-			}
-		}
+		DEBUG("[Editor] WARNING: Source .foundry directory not found: " << source.string() << std::endl);
 	}
+	else
+	{
+		if (std::filesystem::exists(dest, ec))
+		{
+			std::filesystem::remove_all(dest, ec);
+			ec.clear();
+		}
 
-	#if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
-		::SetFileAttributesW(ScriptStock.wstring().c_str(), FILE_ATTRIBUTE_HIDDEN);
-	#endif
+		std::filesystem::copy(
+			source,
+			dest,
+			std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing,
+			ec);
+
+		if (ec)
+		{
+			DEBUG("[Editor] WARNING: Couldn't copy directory "
+				<< source.string() << " to " << dest.string()
+				<< " : " << ec.message() << std::endl);
+		}
+#if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
+		else
+		{
+			::SetFileAttributesW(dest.wstring().c_str(), FILE_ATTRIBUTE_HIDDEN);
+		}
+#endif
+	}
 
 	m_running = true;
 	DEBUG("[Editor] Initialized successfully!" << std::endl);
@@ -76,13 +107,11 @@ void Editor::Run()
 	{
 		float deltaTime = GetFrameTime();
 		Update(deltaTime);
-		
 		BeginDrawing();
 		ClearBackground(DARKGRAY);
 
 		Render3D();
 		RenderUI();
-		m_sceneRoot;
 		
 		EndDrawing();
 	}
@@ -104,7 +133,7 @@ void Editor::Update(float deltaTime)
 	m_sceneRoot->Update(deltaTime);
 	m_editorRaylib.Update(deltaTime);
 	m_editorRaylib.UpdateDisplay(m_sceneRoot.get());
-
+	//m_hiddenWindowContext->OnUpdate(deltaTime);
 	// Keyboard shortcuts
 	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
 	{
@@ -126,6 +155,8 @@ void Editor::Update(float deltaTime)
 	ProcessUICommands();
 
 	EngineServer::FlushCommands();
+	//GraphicServer::FlushCommands();
+	PhysicsServer::FlushCommands();
 }
 
 
@@ -156,6 +187,7 @@ void Editor::ProcessUICommands()
 
 	case EditorCommand::Type::LOAD_SCENE:
 		LoadScene(cmd.stringParam1);
+		PhysicsServer::FlushCommands();
 		break;
 
 	case EditorCommand::Type::LUNCH_GAME:
@@ -473,7 +505,7 @@ void Editor::UpdateScriptPathsInJson(json& nodeJson, ScriptPathMap const& script
 void Editor::RemoveStringClone(Node* pNode) {
 	std::string thisnodeName = pNode->GetName();
 	if (thisnodeName.size() >= 4 && thisnodeName.substr(thisnodeName.size() - 4) == "Copy") {
-		pNode->SetName(thisnodeName.substr(0, 4));
+		pNode->SetName(thisnodeName.substr(0, thisnodeName.size() - 4));
 	}
 	for (uint32 i = 0; i < pNode->GetChildCount(); i++)
 	{
@@ -487,11 +519,10 @@ void Editor::SaveScene(std::string const& path)
 	{
 		std::string tmp = path;
 
-		bool isScene = false;
-		if (path.size() >= 3 && path.substr(path.size() - 3) == ".sc")
-		{
-			isScene = true;
-		}
+		if (tmp.size() >= 5 && tmp.ends_with(".json"))
+			tmp = tmp.substr(0, tmp.size() - 5);
+
+		bool isScene = (tmp.size() >= 3 && tmp.ends_with(".sc"));
 
 		if (isScene)
 		{
@@ -506,7 +537,7 @@ void Editor::SaveScene(std::string const& path)
 				std::cerr << "[Editor] Cannot save scene: no scene loaded" << std::endl;
 			}
 		}
-		else if (isScene == false || m_editorImgui.GetSelectedNode())
+		else if (!isScene && m_editorImgui.GetSelectedNode() != nullptr)
 		{
 			Node* selected = m_editorImgui.GetSelectedNode();
 			if (!selected)

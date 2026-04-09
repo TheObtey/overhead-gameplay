@@ -298,8 +298,8 @@ GeoInfo GeometryFactory::CreateCylinder(float radius, float height, uint32 radia
 		const uint32 curr = topRingStart + r;
 		const uint32 next = topRingStart + r + 1u;
 		indices.push_back(topCenterIndex);
-		indices.push_back(curr);
 		indices.push_back(next);
+		indices.push_back(curr);
 	}
 
 	// Bottom cap
@@ -324,8 +324,8 @@ GeoInfo GeometryFactory::CreateCylinder(float radius, float height, uint32 radia
 		const uint32 curr = bottomRingStart + r;
 		const uint32 next = bottomRingStart + r + 1u;
 		indices.push_back(bottomCenterIndex);
-		indices.push_back(next);
 		indices.push_back(curr);
+		indices.push_back(next);
 	}
 
 	GeoInfo geo;
@@ -468,11 +468,12 @@ GeoInfo GeometryFactory::CreateCapsule(float radius, float height, uint32 radial
 	}
 
 	const uint32 topFanRing = previousRing;
+	// Top fan
 	for (uint32 r = 0; r < radialSegments; ++r)
 	{
 		indices.push_back(topFanRing + r);
-		indices.push_back(topFanRing + r + 1u);
 		indices.push_back(topPoleIndex);
+		indices.push_back(topFanRing + r + 1u);
 	}
 
 	uint32 upperRing = cylinderRings.front();
@@ -483,11 +484,12 @@ GeoInfo GeometryFactory::CreateCapsule(float radius, float height, uint32 radial
 	}
 
 	const uint32 bottomFanRing = bottomCapRings.empty() ? cylinderRings.front() : bottomCapRings.back();
+	// Bottom fan
 	for (uint32 r = 0; r < radialSegments; ++r)
 	{
 		indices.push_back(bottomPoleIndex);
-		indices.push_back(bottomFanRing + r + 1u);
 		indices.push_back(bottomFanRing + r);
+		indices.push_back(bottomFanRing + r + 1u);
 	}
 
 	GeoInfo geo;

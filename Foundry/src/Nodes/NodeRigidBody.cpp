@@ -1,4 +1,5 @@
 #include "Nodes/NodeRigidBody.h"
+#include "Serialization/SerializeObject.hpp"
 
 #include "Servers/PhysicsServer.h"
 #include "Nodes/NodeCollider.h"
@@ -14,10 +15,10 @@ NodeRigidBody::NodeRigidBody(std::string const& name) : Node3D(name)
 	//OnSceneEnter.Subscribe([this](Node& self)
 	//	{
 	//	});
-	OnParentChange.Subscribe([this](Node& self)
-		{
-			SetNode3DParent(static_cast<Node3D*>(m_pOwner));
-		});
+	//OnParentChange.Subscribe([this](Node& self)
+	//	{
+	//		SetNode3DParent(static_cast<Node3D*>(m_pOwner));
+	//	});
 
 	//OnSceneLeave.Subscribe([this](Node& self)
 	//	{
@@ -73,25 +74,154 @@ void NodeRigidBody::OnUpdate(double delta)
 	}
 }
 
+
+void NodeRigidBody::Serialize(SerializedObject& datas) const
+{
+	Node3D::Serialize(datas);
+	datas.SetType("NodeRigidBody");
+
+	int bodyType = static_cast<int>(RigidBodyType::NONE);
+	if (m_pRigidBodyRP3D != nullptr)
+	{
+		auto type = m_pRigidBodyRP3D->getType();
+		if (type == rp3d::BodyType::DYNAMIC)
+			bodyType = static_cast<int>(RigidBodyType::DYNAMIC);
+		else if (type == rp3d::BodyType::KINEMATIC)
+			bodyType = static_cast<int>(RigidBodyType::KINEMATIC);
+		else
+			bodyType = static_cast<int>(RigidBodyType::STATIC);
+	}
+	datas.AddPublicElement("BodyType", &bodyType);
+
+	float mass = (m_pRigidBodyRP3D != nullptr) ? m_pRigidBodyRP3D->getMass() : 0.0f;
+	datas.AddPublicElement("Mass", &mass);
+
+	glm::vec3 linearVelocity{ 0.0f };
+	glm::vec3 angularVelocity{ 0.0f };
+	float linearDamping = 0.0f;
+	float angularDamping = 0.0f;
+	bool gravityEnabled = false;
+	bool sleepingEnabled = false;
+	bool isSleeping = false;
+	bool lockLinearX = false, lockLinearY = false, lockLinearZ = false;
+	bool lockAngularX = false, lockAngularY = false, lockAngularZ = false;
+
+	if (m_pRigidBodyRP3D)
+	{
+		linearVelocity = rp3dToGlm(m_pRigidBodyRP3D->getLinearVelocity());
+		angularVelocity = rp3dToGlm(m_pRigidBodyRP3D->getAngularVelocity());
+		linearDamping = m_pRigidBodyRP3D->getLinearDamping();
+		angularDamping = m_pRigidBodyRP3D->getAngularDamping();
+		gravityEnabled = m_pRigidBodyRP3D->isGravityEnabled();
+		sleepingEnabled = m_pRigidBodyRP3D->isAllowedToSleep();
+		isSleeping = m_pRigidBodyRP3D->isSleeping();
+
+		auto linearFactor = m_pRigidBodyRP3D->getLinearLockAxisFactor();
+		lockLinearX = linearFactor.x == 0.0f;
+		lockLinearY = linearFactor.y == 0.0f;
+		lockLinearZ = linearFactor.z == 0.0f;
+
+		auto angularFactor = m_pRigidBodyRP3D->getAngularLockAxisFactor();
+		lockAngularX = angularFactor.x == 0.0f;
+		lockAngularY = angularFactor.y == 0.0f;
+		lockAngularZ = angularFactor.z == 0.0f;
+	}
+	datas.AddPublicElement("LinearVelocity", &linearVelocity);
+	datas.AddPublicElement("AngularVelocity", &angularVelocity);
+	datas.AddPublicElement("LinearDamping", &linearDamping);
+	datas.AddPublicElement("AngularDamping", &angularDamping);
+	datas.AddPublicElement("IsGravityEnabled", &gravityEnabled);
+	datas.AddPublicElement("IsAllowedToSleep", &sleepingEnabled);
+	datas.AddPublicElement("IsSleeping", &isSleeping);
+	datas.AddPublicElement("LockLinearX", &lockLinearX);
+	datas.AddPublicElement("LockLinearY", &lockLinearY);
+	datas.AddPublicElement("LockLinearZ", &lockLinearZ);
+	datas.AddPublicElement("LockAngularX", &lockAngularX);
+	datas.AddPublicElement("LockAngularY", &lockAngularY);
+	datas.AddPublicElement("LockAngularZ", &lockAngularZ);
+}
+
+void NodeRigidBody::Deserialize(SerializedObject const& datas)
+{
+	Node3D::Deserialize(datas);
+
+	int bodyTypeValue = static_cast<int>(RigidBodyType::STATIC);
+	datas.GetPublicElement("BodyType", &bodyTypeValue);
+
+	float mass = 1.0f;
+	datas.GetPublicElement("Mass", &mass);
+
+	glm::vec3 linearVelocity{ 0.0f };
+	datas.GetPublicElement("LinearVelocity", &linearVelocity);
+
+	glm::vec3 angularVelocity{ 0.0f };
+	datas.GetPublicElement("AngularVelocity", &angularVelocity);
+
+	float linearDamping = 0.0f;
+	datas.GetPublicElement("LinearDamping", &linearDamping);
+
+	float angularDamping = 0.0f;
+	datas.GetPublicElement("AngularDamping", &angularDamping);
+
+	bool gravityEnabled = true;
+	datas.GetPublicElement("IsGravityEnabled", &gravityEnabled);
+
+	bool sleepingEnabled = true;
+	datas.GetPublicElement("IsAllowedToSleep", &sleepingEnabled);
+
+	bool isSleeping = false;
+	datas.GetPublicElement("IsSleeping", &isSleeping);
+
+	bool lockLinearX = false, lockLinearY = false, lockLinearZ = false;
+	datas.GetPublicElement("LockLinearX", &lockLinearX);
+	datas.GetPublicElement("LockLinearY", &lockLinearY);
+	datas.GetPublicElement("LockLinearZ", &lockLinearZ);
+
+	bool lockAngularX = false, lockAngularY = false, lockAngularZ = false;
+	datas.GetPublicElement("LockAngularX", &lockAngularX);
+	datas.GetPublicElement("LockAngularY", &lockAngularY);
+	datas.GetPublicElement("LockAngularZ", &lockAngularZ);
+
+	CreateRigidBody();
+
+	SetBodyType(static_cast<RigidBodyType>(bodyTypeValue));
+	SetMass(mass);
+	SetLinearDamping(linearDamping);
+	SetAngularDamping(angularDamping);
+	SetIsGravityEnabled(gravityEnabled);
+	SetSleepingEnabled(sleepingEnabled);
+	SetSleepingState(isSleeping);
+	LockLinearAxis(lockLinearX, lockLinearY, lockLinearZ);
+	LockAngularAxis(lockAngularX, lockAngularY, lockAngularZ);
+	SetLinearVelocity(linearVelocity);
+	SetAngularVelocity(angularVelocity);
+	
+}
+
+ISerializable* NodeRigidBody::CreateInstance()
+{
+	return CreateNode<NodeRigidBody>("NodeRigidBody").release();
+}
+
 NodeRigidBody::operator reactphysics3d::Transform()
 {
 	rp3d::Transform reactTr;
 	Node3D* parent = static_cast<Node3D*>(m_pOwner);
 	auto pos = parent->GetWorldPosition();
 	auto rot = parent->GetWorldRotationQuaternion();
-	reactTr.setPosition({ pos.x, pos.y, pos.z});
+	reactTr.setPosition({ pos.x, pos.y, pos.z });
 	reactTr.setOrientation({ rot.x, rot.y, rot.z, rot.w });
 
 	return reactTr;
 }
 
-NodeRigidBody::operator reactphysics3d::Transform*()
+NodeRigidBody::operator reactphysics3d::Transform* ()
 {
 	rp3d::Transform* reactTr = new rp3d::Transform();
 	Node3D* parent = static_cast<Node3D*>(m_pOwner);
 	auto pos = parent->GetWorldPosition();
 	auto rot = parent->GetWorldRotationQuaternion();
-	reactTr->setPosition({ pos.x, pos.y, pos.z});
+	reactTr->setPosition({ pos.x, pos.y, pos.z });
 	reactTr->setOrientation({ rot.x, rot.y, rot.z, rot.w });
 
 	return reactTr;
@@ -137,7 +267,7 @@ float NodeRigidBody::GetMassDensity() const
 void NodeRigidBody::SetBounciness(int colliderIndex, float v)
 {
 	if (m_colliders.empty() || colliderIndex > m_colliders.size()) return;
-	
+
 	m_colliders[colliderIndex]->SetBounciness(v);
 }
 float NodeRigidBody::GetBounciness(int colliderIndex) const

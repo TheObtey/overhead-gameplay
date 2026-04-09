@@ -14,3 +14,7 @@ file(COPY ${PROJECT_SOURCE_DIR}/../res/
 
 target_link_libraries(${PROJECT_NAME}  PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,Foundry::library>")
 target_link_libraries(${PROJECT_NAME}  PRIVATE Foundry::library)
+
+if(MAIN STREQUAL "mainEditor")
+    target_link_libraries(${PROJECT_NAME} PRIVATE Editor::library)
+endif()

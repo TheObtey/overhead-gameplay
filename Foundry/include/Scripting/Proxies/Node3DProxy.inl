@@ -94,6 +94,9 @@ struct Node3D::Proxy::ProxyBinding
 		binder.BindFunction("CreateNode3D", &Node3D::Proxy::CreateNode3DProxy);
 		binder.BindClass<Node3D::Proxy>("node3d",
 			sol::base_classes, sol::bases<Node::Proxy>(),
+			sol::meta_function::garbage_collect, BIND(GCNodeProxy),
+			sol::meta_function::new_index, StoreUserData(),
+			sol::meta_function::index, LoadUserData(),
 			"GetPosition", BIND(GetPosition),
 			"GetX", BIND(GetX),
 			"GetY", BIND(GetY),

@@ -4,7 +4,7 @@ find_package(unofficial-enet CONFIG REQUIRED)
 find_package(ReactPhysics3D REQUIRED)
 find_package(lua REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
-find_package(raylib REQUIRED)
+#find_package(raylib REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 

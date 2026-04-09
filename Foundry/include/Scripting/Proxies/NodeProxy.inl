@@ -1,5 +1,6 @@
 #include "Event.hpp"
 #include "Scripting/Binder.h"
+#include "Scripting/UserData.h"
 #include "Registries/AutomaticRegisterProxy.hpp"
 
 #include <string>
@@ -62,6 +63,9 @@ public:
 	operator Node&() const;
 
 	Node* GetProxyOwner() const;
+
+protected:
+	UserData m_userData;
 
 private:
 	Node* m_pNode;

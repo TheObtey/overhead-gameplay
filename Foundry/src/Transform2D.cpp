@@ -5,6 +5,9 @@
 #include <glm/detail/type_quat.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "Serialization/SerializeObject.hpp"
+
+
 Transform2D::Transform2D(
 	float _x,		     float _y,
 	float _scaleX,	     float _scaleY,
@@ -321,3 +324,47 @@ bool Transform2D::GetDirty() const
 {
 	return m_isDirty;
 }
+
+void Transform2D::Serialize(SerializedObject& datas) const
+{
+
+	datas.SetType("Transform2D");
+
+	bool isStatic = m_isStatic;
+	datas.AddPublicElement("Static", static_cast<bool const*>(&isStatic));
+	glm::vec2 scale = m_scale;
+	datas.AddPublicElement("Scale", static_cast<glm::vec2 const*>(&scale));
+	glm::vec2 shear = m_shear;
+	datas.AddPublicElement("Shear", static_cast<glm::vec2 const*>(&shear));
+	float theta = m_theta;
+	datas.AddPublicElement("Theta", static_cast<float const*>(&theta));
+	glm::vec2 pos = m_position;
+	datas.AddPublicElement("Position", static_cast<glm::vec2 const*>(&pos));
+
+
+}
+
+void Transform2D::Deserialize(SerializedObject const& datas)
+{
+	bool isStatic = {};
+	datas.GetPublicElement("Static", &isStatic);
+	SetStatism(isStatic);
+	glm::vec2 scale = {};
+	datas.GetPublicElement("Scale", &scale);
+	SetScale(scale);
+	glm::vec2 shear = {};
+	datas.GetPublicElement("Shear", &shear);
+	SetShearing(shear);
+	float theta = {};
+	datas.GetPublicElement("Theta", &theta);
+	m_theta = theta;
+	glm::vec2 pos = {};
+	datas.GetPublicElement("Position",&pos);
+	SetPosition(pos);
+}
+
+
+ISerializable* Transform2D::CreateInstance()
+{
+	return std::make_unique<Transform2D>().release();
+};

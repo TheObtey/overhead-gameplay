@@ -1,6 +1,7 @@
 #include "Nodes/NodeVisual.h"
 #include "Nodes/NodeViewport.h"
 
+#include "Serialization/SerializeObject.hpp"
 NodeVisual::NodeVisual(::std::string const &name) : Node3D(name)
 {
     OnHierarchyChanged += [&](){ TryAttachToViewport(); };
@@ -22,3 +23,15 @@ void NodeVisual::TryAttachToViewport()
     if (const auto viewport = FindFirstParentOfType<NodeViewport>())
         m_pViewport = &viewport->get();
 }
+
+void NodeVisual::Serialize(SerializedObject &datas) const
+{
+    Node3D::Serialize(datas);
+    datas.SetType("NodeVisual");
+}
+
+void NodeVisual::Deserialize(SerializedObject const &datas)
+{
+    Node3D::Deserialize(datas);
+}
+
