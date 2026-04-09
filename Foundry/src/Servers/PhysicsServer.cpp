@@ -1,11 +1,41 @@
 #include "Servers/PhysicsServer.h"
-//#include "Nodes/NodeRigidBody.h"
 #include "Nodes/NodeCollider.h"
 #include "Debug.h"
 
-//reactphysics3d::PhysicsWorld* PhysicsServer::m_pPhysicsWorld = nullptr;
-//reactphysics3d::PhysicsCommon PhysicsServer::m_physicsCommon;
+void PhysicsEvents::onContact(const rp3d::CollisionCallback::CallbackData& data)
+{
+	uint32 nbPairs = data.getNbContactPairs();
+	for (int i = 0; i < nbPairs; i++)
+	{
+		ContactPair pair = data.getContactPair(i);
+		auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
+		auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
+		b1->ContactEvent(*b2);
+		b2->ContactEvent(*b1);
 
+		//auto eventType = pair.getEventType();
+		//if (eventType == ContactPair::EventType::ContactStart)
+		//	DEBUG("Start Contact\n");
+		//else if (eventType == ContactPair::EventType::ContactStay)
+		//	DEBUG("In Contact\n");
+		//else if (eventType == ContactPair::EventType::ContactExit)
+		//	DEBUG("Got out of Contact\n");
+	}
+}
+
+
+void PhysicsEvents::onTrigger(const rp3d::OverlapCallback::CallbackData& data)
+{
+	uint32 nbPairs = data.getNbOverlappingPairs();
+	for (int i = 0; i < nbPairs; i++)
+	{
+		rp3d::OverlapCallback::OverlapPair pair = data.getOverlappingPair(i);
+		auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
+		auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
+		b1->TriggerEvent(*b2);
+		b2->TriggerEvent(*b1);
+	}
+}
 
 PhysicsServer::PhysicsServer() : Server()
 {

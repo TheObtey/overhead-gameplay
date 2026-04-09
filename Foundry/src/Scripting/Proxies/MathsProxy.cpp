@@ -1,4 +1,5 @@
 #include "Scripting/Proxies/MathsProxy.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 
 void Vec3ProxyBinding::Bind(Binder& binder)
 {
@@ -62,3 +63,5 @@ void Vec3ProxyBinding::Bind(Binder& binder)
 
     maths.set("Pi", pi);
 }
+
+REGISTER_PROXY(Vec3ProxyBinding, Vec3Proxy);

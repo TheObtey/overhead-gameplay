@@ -152,3 +152,14 @@ ISerializable *NodeMesh::CreateInstance()
 {
     return Node::CreateNode<NodeMesh>("NodeMesh").release();
 }
+
+uptr<Node> NodeMesh::Clone()
+{
+	uptr<NodeMesh> clone = Node::CreateNode<NodeMesh>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}

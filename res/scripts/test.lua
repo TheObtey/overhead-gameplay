@@ -19,7 +19,6 @@ function OnInit()
     print("NAME _ ".. nTestChild.GetName(nTestChild))
 
 
-
     -- local pos = nTestRB:GetWorldPosition()
     -- print("Init pos RB = (", pos.x,",", pos.y,",", pos.z,")" )
     print("NAME _ "..nTestRB.GetName(nTestRB))

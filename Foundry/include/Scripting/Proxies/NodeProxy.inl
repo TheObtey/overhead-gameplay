@@ -1,7 +1,5 @@
-#include "Event.hpp"
 #include "Scripting/Binder.h"
 #include "Scripting/UserData.h"
-#include "Registries/AutomaticRegisterProxy.hpp"
 
 #include <string>
 
@@ -75,5 +73,3 @@ struct Node::Proxy::ProxyBinding
 {
 	static void Bind(Binder& binder);
 };
-
-REGISTER_PROXY(Node::Proxy::ProxyBinding, NodeProxy);

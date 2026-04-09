@@ -100,3 +100,14 @@ void NodeViewport::Present() const
 }
 
 ISerializable* NodeViewport::CreateInstance() { return CreateNode<NodeViewport>("NodeViewport").release(); }
+
+uptr<Node> NodeViewport::Clone()
+{
+	uptr<NodeViewport> clone = Node::CreateNode<NodeViewport>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}

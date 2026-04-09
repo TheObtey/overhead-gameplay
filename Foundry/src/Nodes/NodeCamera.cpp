@@ -89,3 +89,14 @@ void NodeCamera::UpdateCameraOwner(NodeViewport& newOwner)
     };
     newOwner.SetCamera(this);
 }
+
+uptr<Node> NodeCamera::Clone()
+{
+	uptr<NodeCamera> clone = Node::CreateNode<NodeCamera>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}

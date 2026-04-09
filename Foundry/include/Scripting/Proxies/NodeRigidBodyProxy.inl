@@ -1,4 +1,3 @@
-
 class NodeRigidBody::Proxy : public Node3D::Proxy
 {
 public:
@@ -146,5 +145,3 @@ struct NodeRigidBody::Proxy::ProxyBinding
 		);
 	};
 };
-
-REGISTER_PROXY(NodeRigidBody::Proxy::ProxyBinding, NodeRigidBodyProxy);

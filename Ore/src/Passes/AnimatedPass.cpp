@@ -21,14 +21,14 @@ void AnimatedPass::AddSkeletalMesh(Mesh const& mesh)
 
 void AnimatedPass::Execute()
 {
-    Logger::Log("Start Animation Pass Execution");
+    //Logger::Log("Start Animation Pass Execution");
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_program.Use();
     m_program.SetUniform("viewProj", m_pCamera->GetViewProjMatrix());
 
-    Logger::Log("Start SkeletalMesh");
+    //Logger::Log("Start SkeletalMesh");
     for(uint32 i = 0; i<m_skeletalMeshes.size(); ++i)
     {
         std::vector<glm::mat4> boneTransforms = m_skeletalMeshes[i].get().GetBonesTransform();

@@ -28,6 +28,10 @@ public:
 
 	glm::mat4 const& GetMatrix() const				{ return m_transform.GetMatrix(); }
 
+	// Engine
+	////////////////////////////////////////////////////////////	 
+	
+
 	// =========== Getters ===========
 
 	glm::vec3 GetPosition() const					{ return m_transform.GetPosition(); }
@@ -103,6 +107,7 @@ public:
 	void AddLocalPitch(float const pitch)			{ m_transform.AddPitch(pitch); }
 	// -- Angles in Radians							
 	void AddLocalRoll(float const roll)				{ m_transform.AddRoll(roll); }
+	uptr<Node> Clone() override;
 
 
 private:

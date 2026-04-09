@@ -35,3 +35,14 @@ void NodeVisual::Deserialize(SerializedObject const &datas)
     Node3D::Deserialize(datas);
 }
 
+uptr<Node> NodeVisual::Clone()
+{
+	uptr<NodeVisual> clone = Node::CreateNode<NodeVisual>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}
+

@@ -62,6 +62,4 @@ struct PhysicsProxyBinding
 	}
 };
 
-REGISTER_PROXY(PhysicsProxyBinding, PhysicsProxy);
-
 #endif // FOUNDRY_RAYCASTPROXY__H_

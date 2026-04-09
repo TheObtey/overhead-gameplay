@@ -1,5 +1,6 @@
 #include "Servers/EngineServer.h"
 #include "Nodes/NodeRigidBody.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 
 using Proxy = NodeRigidBody::Proxy;
 
@@ -11,3 +12,5 @@ Proxy* Proxy::CreateNodeRigidBodyProxy(std::string const& name)
 	EngineServer::RegisterUnattachedNode(nodeRigidBody);
 	return ptr;
 }
+
+REGISTER_PROXY(Proxy::ProxyBinding, NodeRigidBodyProxy);
