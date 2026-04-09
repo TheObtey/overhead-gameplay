@@ -3,10 +3,10 @@
 
 #include "Define.h"
 #include "Event.hpp"
-#include "Scripting/Lua/LuaScriptInstance.hpp"
-#include "Serialization/ISerializable.h"
 #include "Serialization/json.hpp"
-#include "Registries/AutomaticRegister.hpp"
+#include "Serialization/ISerializable.h"
+#include "Serialization/SerializeObject.hpp"
+#include "Scripting/Lua/LuaScriptInstance.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -16,7 +16,6 @@
 #include <sstream>
 #include <vector>
 
-#include "Serialization/SerializeObject.hpp"
 
 class SceneTree;
 class SerializedObject;

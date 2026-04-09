@@ -1,4 +1,3 @@
-
 class NodeBoxCollider::Proxy : public NodeCollider::Proxy
 {
 public:
@@ -26,9 +25,6 @@ struct NodeBoxCollider::Proxy::ProxyBinding
 			"SetShape", BIND(SetShape));
 	};
 };
-
-REGISTER_PROXY(NodeBoxCollider::Proxy::ProxyBinding, NodeBoxColliderProxy);
-
 
 class NodeSphereCollider::Proxy : public NodeCollider::Proxy
 {
@@ -58,7 +54,6 @@ struct NodeSphereCollider::Proxy::ProxyBinding
 	};
 };
 
-REGISTER_PROXY(NodeSphereCollider::Proxy::ProxyBinding, NodeSphereColliderProxy);
 
 
 class NodeCapsuleCollider::Proxy : public NodeCollider::Proxy
@@ -89,5 +84,3 @@ struct NodeCapsuleCollider::Proxy::ProxyBinding
 			"SetShape", BIND(SetShape));
 	};
 };
-
-REGISTER_PROXY(NodeCapsuleCollider::Proxy::ProxyBinding, NodeCapsuleColliderProxy);

@@ -28,6 +28,10 @@ public:
 
 	glm::mat4 const& GetMatrix() const				{ return m_transform.GetMatrix(); }
 
+	// Engine
+	////////////////////////////////////////////////////////////	 
+	
+
 	// =========== Getters ===========
 
 	glm::vec3 GetPosition() const					{ return m_transform.GetPosition(); }

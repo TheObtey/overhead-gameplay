@@ -1,5 +1,6 @@
 #include "Scripting/Proxies/EventManagerProxy.h"
 #include "EventManager.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 
 using namespace Ore;
 
@@ -187,3 +188,5 @@ void EventManagerProxyBinding::Bind(Binder& binder)
         "Unknown", EventAction::UNKNOWN
     );
 }
+
+REGISTER_PROXY(EventManagerProxyBinding, EventManagerProxy);

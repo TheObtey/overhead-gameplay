@@ -23,11 +23,8 @@ public:
 	auto GetFunction(std::string const& name) const;
 	auto GetOrCreateNamespace(std::string const& name);
 
-	std::vector<std::string>& GetRegisteredTypesName() { return m_registeredTypesName; }
-
 private:
 	ScriptEngine& m_scriptEngine;
-	std::vector<std::string> m_registeredTypesName {};
 };
 
 //ifdef LUA
