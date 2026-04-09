@@ -911,3 +911,42 @@ bool EditorImGui::IsDescendant(Node const& potentialAncestor, Node const& node) 
 
 	return false;
 }
+
+void EditorImGui::NotifyNodeWillBeDeleted(Node* pNode)
+{
+	if (pNode == nullptr)
+	{
+		return;
+	}
+
+	Node* const fallbackViewRoot = (pNode->GetParent() != nullptr) ? pNode->GetParent() : m_pSceneRoot;
+
+	auto const isInsideDeletedSubtree = [pNode](Node* pCandidate) -> bool
+	{
+		Node* current = pCandidate;
+		while (current != nullptr)
+		{
+			if (current == pNode)
+			{
+				return true;
+			}
+			current = current->GetParent();
+		}
+		return false;
+	};
+
+	if (m_pSelectedNode != nullptr && isInsideDeletedSubtree(m_pSelectedNode))
+	{
+		m_pSelectedNode = nullptr;
+		m_pRaylibEditor->SetSelectedNode("");
+	}
+
+	if (m_pViewRoot != nullptr && isInsideDeletedSubtree(m_pViewRoot))
+	{
+		m_pViewRoot = fallbackViewRoot;
+		if (m_pViewRoot == nullptr)
+		{
+			m_pViewRoot = m_pSceneRoot;
+		}
+	}
+}
