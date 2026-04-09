@@ -2,14 +2,14 @@
 #define PHYSICS_SERVER__H_
 
 #include "Server.hpp"
-#include "Node.h"
-#include "Nodes/NodeCollider.h"
+#include "Nodes/NodeRigidBody.h"
 
 #include <iostream>
 #include <memory>
-
 #include <reactphysics3d/reactphysics3d.h>
 #include <glm/ext/vector_float3.hpp>
+
+class NodeCollider;
 
 template <>
 struct Command<class PhysicsServer>
@@ -151,40 +151,9 @@ public:
 	PhysicsEvents() = default;
 	~PhysicsEvents() = default;
 
-	virtual void onContact(const rp3d::CollisionCallback::CallbackData& data) override
-	{
-		uint32 nbPairs = data.getNbContactPairs();
-		for (int i = 0; i < nbPairs; i++)
-		{
-			ContactPair pair = data.getContactPair(i);
-			auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
-			auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
-			b1->ContactEvent(*b2);
-			b2->ContactEvent(*b1);
+	virtual void onContact(const rp3d::CollisionCallback::CallbackData& data) override;
 
-			//auto eventType = pair.getEventType();
-			//if (eventType == ContactPair::EventType::ContactStart)
-			//	DEBUG("Start Contact\n");
-			//else if (eventType == ContactPair::EventType::ContactStay)
-			//	DEBUG("In Contact\n");
-			//else if (eventType == ContactPair::EventType::ContactExit)
-			//	DEBUG("Got out of Contact\n");
-		}
-	}
-
-
-	virtual void onTrigger(const rp3d::OverlapCallback::CallbackData& data) override
-	{
-		uint32 nbPairs = data.getNbOverlappingPairs();
-		for (int i = 0; i < nbPairs; i++)
-		{
-			rp3d::OverlapCallback::OverlapPair pair = data.getOverlappingPair(i);
-			auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
-			auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
-			b1->TriggerEvent(*b2);
-			b2->TriggerEvent(*b1);
-		}
-	}
+	virtual void onTrigger(const rp3d::OverlapCallback::CallbackData& data) override;
 };
 
 
@@ -341,14 +310,10 @@ private:
 	void S_SetCollisionCategoryBits(uint16_t category, NodeCollider& c);
 	void S_SetCollideWithMaskBits(uint16_t mask, NodeCollider& c);
 
-
-
 private:
 
 	rp3d::PhysicsCommon m_physicsCommon;
 	rp3d::PhysicsWorld* m_pPhysicsWorld;
-
-	//PhysicsEvents m_physicsEvents;
 
 	friend Server<PhysicsServer>;
 };

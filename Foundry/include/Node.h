@@ -3,10 +3,10 @@
 
 #include "Define.h"
 #include "Event.hpp"
-#include "Scripting/Lua/LuaScriptInstance.hpp"
-#include "Serialization/ISerializable.h"
 #include "Serialization/json.hpp"
-#include "Registries/AutomaticRegister.hpp"
+#include "Serialization/ISerializable.h"
+#include "Serialization/SerializeObject.hpp"
+#include "Scripting/Lua/LuaScriptInstance.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -16,7 +16,6 @@
 #include <sstream>
 #include <vector>
 
-#include "Serialization/SerializeObject.hpp"
 
 class SceneTree;
 class SerializedObject;
@@ -96,6 +95,7 @@ public:
 
 	static void SetStatusEditor(bool inEditor) { s_IsInEditor = inEditor; }
 	static ISerializable* CreateInstance();
+	static std::string BuildDuplicateName(Node& parent, std::string const& sourceName);
 
 	//====Event======
 	Event<void(Node&)> OnSceneEnter;

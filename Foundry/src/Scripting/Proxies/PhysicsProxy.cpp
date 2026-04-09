@@ -1,4 +1,5 @@
 #include "Scripting/Proxies/PhysicsProxy.hpp"
+#include "Registries/AutomaticRegisterProxy.hpp"
 
 namespace Physics
 {
@@ -36,3 +37,5 @@ namespace Physics
 		return cb.hits;
 	}
 };
+
+REGISTER_PROXY(PhysicsProxyBinding, PhysicsProxy);

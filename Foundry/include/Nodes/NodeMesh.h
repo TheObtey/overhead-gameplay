@@ -35,6 +35,7 @@ public:
     void AddTextures(Args... textures);
 
     static ISerializable *CreateInstance();
+    uptr<Node> Clone() override;
 
 private:
     uptr<Ore::Mesh> m_pMesh;

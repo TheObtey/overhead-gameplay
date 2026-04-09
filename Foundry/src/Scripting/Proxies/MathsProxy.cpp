@@ -1,8 +1,9 @@
 #include "Scripting/Proxies/MathsProxy.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 
 void Vec3ProxyBinding::Bind(Binder& binder)
 {
-    auto maths = binder.GetOrCreateNamespace("fmaths");
+    auto maths = binder.GetOrCreateNamespace("fmath");
     maths.new_usertype<glm::vec4>("vec4",
         sol::constructors<glm::vec4(), glm::vec4(float), glm::vec4(float, float, float, float)>(),
         "x", &glm::vec4::x,
@@ -62,3 +63,5 @@ void Vec3ProxyBinding::Bind(Binder& binder)
 
     maths.set("Pi", pi);
 }
+
+REGISTER_PROXY(Vec3ProxyBinding, Vec3Proxy);

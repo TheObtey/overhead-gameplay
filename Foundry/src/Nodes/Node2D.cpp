@@ -10,8 +10,9 @@ Node2D::Node2D(std::string const &name) : Node(name)
 {
 	OnParentChange += [&](Node& node)
 	{
-			CheckParentTransform(node);
-			UpdateWorld();
+		CheckParentTransform(node);
+		m_localDirty = true;
+		UpdateWorld();
 	};
 }
 
@@ -228,3 +229,13 @@ void Node2D::OnUpdate(double const _delta)
 	UpdateLocal();
 }
 
+uptr<Node> Node2D::Clone()
+{
+	uptr<Node2D> clone = Node::CreateNode<Node2D>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}

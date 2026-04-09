@@ -6,6 +6,21 @@ Action::Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* p
 	m_controls(std::vector<IControl*>()), Event(), m_pOwner(pActionMap)
 {
 	AddControl(controlType, eventInput);
+
+	if (controlType == ControlType::STICK && eventInput == Ore::EventInput::MOUSE_MOVE)
+	{
+		Ore::EventManager::getCursorPos += [&](int32 x, int32 y)
+			{
+				if (m_pOwner == nullptr || m_pOwner->Active == false)
+					return;
+				for (int i = 0; i < m_controls.size(); i++)
+				{
+					if (m_controls[i]->GetEventInput() == Ore::EventInput::MOUSE_MOVE)
+						std::invoke(Event, *m_controls[i]);
+				}
+			};
+	}
+
 	Ore::EventManager::getKey += [&](Ore::EventInput in, Ore::EventAction ac)
 		{
 			if (m_pOwner == nullptr || m_pOwner->Active == false)
