@@ -274,6 +274,8 @@ void Editor::DeleteNode(Node* pNode)
 	if (!pNode) return;
 
 	std::string const nodeName = pNode->GetName();
+
+	m_editorImgui.NotifyNodeWillBeDeleted(pNode);
 	RemoveDrawableRecursive(pNode);
 
 	if (pNode->GetParent())

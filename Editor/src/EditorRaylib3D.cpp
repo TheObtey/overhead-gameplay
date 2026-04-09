@@ -405,10 +405,15 @@ void EditorRaylib3D::Render()
 	{
 		RayGizmo::SetGizmoSize(m_gizmoSize);
 
+		// Gizmo toujours au-dessus de la géométrie
+		rlDisableDepthTest();
+
 		if (RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), &m_loadedNode3D[m_selectedObject]->gizmoTransform))
 		{
 			m_loadedNode3D[m_selectedObject]->gizmoUpdated = true;
 		}
+
+		rlEnableDepthTest();
 	}
 
 	EndMode3D();
