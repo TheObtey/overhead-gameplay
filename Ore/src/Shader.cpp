@@ -3,6 +3,7 @@
 #include <Logger.hpp>
 #include <fstream>
 
+using namespace Ore;
 Shader::Shader(ShaderType type) : m_type(type), m_id(0)
 {
 }
@@ -13,8 +14,6 @@ Shader::~Shader()
 
 void Shader::Load(std::filesystem::path const& path)
 {
-    Logger::Log("Start Shader");
-
     std::string shader;
     std::ifstream shaderFile;
 
@@ -41,11 +40,15 @@ void Shader::Load(std::filesystem::path const& path)
 
     GLint isCompiled;
     glGetShaderiv(m_id, GL_COMPILE_STATUS, &isCompiled);
-    if(isCompiled == GL_FALSE)
+    if (isCompiled == GL_FALSE)
+    {
         Logger::LogWithLevel(LogLevel::ERROR, "Shader is not compiled");
+    }
+    Logger::Log("Loaded Shader : ", path, "| With ID ", m_id);
 }
 
 void Shader::Unload()
 {
     glDeleteShader(m_id);
+    Logger::Log("Unloaded Shader : ", m_id);
 }

@@ -2,6 +2,7 @@
 
 SceneTree::SceneTree(uptr<Node>& rootNode)
 {
+    rootNode->m_pSceneTree = this;
     m_root = std::move(rootNode);
 }
 
@@ -17,8 +18,12 @@ SceneTree& SceneTree::operator=(SceneTree const& other)
     return *this;
 }
 
-void SceneTree::ChangeSceneToNode(uptr<Node> newScene)
+void SceneTree::ChangeSceneToNode(uptr<Node>& newScene)
 {
+    newScene->m_pSceneTree = this;
     if (m_pCurrentScene) m_pCurrentScene->Destroy();
-    m_root->AddChild(newScene);
+    m_pCurrentScene = newScene.get();
+    m_root->GetChild(0).AddChild(std::move(newScene));
+
+    OnSceneChanged();
 }

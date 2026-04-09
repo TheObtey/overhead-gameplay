@@ -6,6 +6,11 @@
 #include <Serialization/SerializeObject.hpp>
 #include <iostream>
 #include <imgui.h>
+#include <filesystem>
+#include <fstream>
+#include <algorithm>
+#include <cctype>
+#include <cstring>
 
 InspectorNodeProperties::InspectorNodeProperties(EditorImGui* pImGuiEditor)
     : m_pImguiEditor(pImGuiEditor),
@@ -13,7 +18,7 @@ InspectorNodeProperties::InspectorNodeProperties(EditorImGui* pImGuiEditor)
 {
     m_luaBrowser.SetTitle("Select Lua Script");
     m_luaBrowser.SetTypeFilters({ ".lua" });
-    m_luaBrowser.SetDirectory("../Game/res");
+    m_luaBrowser.SetDirectory("../Game/ScriptStock");
 }
 
 void InspectorNodeProperties::DrawWindow(bool windowState, Node* pNode)
@@ -152,7 +157,7 @@ bool InspectorNodeProperties::DrawDatas(json& publicDataJson)
 		{
 			int intVal = value.get<int>();
 			
-			if (ImGui::DragInt(label.c_str(), &intVal))
+		if (ImGui::DragInt(label.c_str(), &intVal))
 			{
 				publicDataJson[key] = intVal;
 				wasModified = true;
@@ -236,8 +241,10 @@ bool InspectorNodeProperties::DrawLuaScriptPicker(json& publicDataJson)
     ImGui::SameLine();
     bool const browseClicked = ImGui::Button("Browse");
 
+    bool const clearClicked = ImGui::Button("Clear Script");
+
     ImGui::SameLine();
-    bool const clearClicked = ImGui::Button("Clear");
+    bool const createClicked = ImGui::Button("Create Script");
 
     if (isSceneRoot)
     {
@@ -259,10 +266,103 @@ bool InspectorNodeProperties::DrawLuaScriptPicker(json& publicDataJson)
         m_showLuaBrowser = true;
     }
 
-    if (clearClicked)
+    if (clearClicked && !scriptPath.empty())
     {
         publicDataJson["m_scriptPath"] = "";
         wasModified = true;
+    }
+
+    if (createClicked)
+    {
+        m_newLuaScriptName[0] = '\0';
+        m_createLuaError.clear();
+        ImGui::OpenPopup("Create Lua Script");
+    }
+
+    if (ImGui::BeginPopupModal("Create Lua Script", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::InputText("Script name", m_newLuaScriptName, sizeof(m_newLuaScriptName));
+
+        if (!m_createLuaError.empty())
+        {
+            ImGui::TextColored(ImVec4(1.0f, 0.35f, 0.35f, 1.0f), "%s", m_createLuaError.c_str());
+        }
+
+        if (ImGui::Button("Create", ImVec2(120, 0)))
+        {
+            std::string name = m_newLuaScriptName;
+
+            auto notSpace = [](unsigned char c) { return !std::isspace(c); };
+            name.erase(name.begin(), std::find_if(name.begin(), name.end(), notSpace));
+            name.erase(std::find_if(name.rbegin(), name.rend(), notSpace).base(), name.end());
+
+            if (name.empty())
+            {
+                m_createLuaError = "Script name cannot be empty.";
+            }
+            else
+            {
+                if (name.size() >= 4 && name.ends_with(".lua"))
+                {
+                    name = name.substr(0, name.size() - 4);
+                }
+
+                std::filesystem::path const scriptsDir = "../Game/ScriptStock";
+                std::filesystem::create_directories(scriptsDir);
+
+                std::filesystem::path const scriptFilePath = scriptsDir / (name + ".lua");
+
+                if (std::filesystem::exists(scriptFilePath))
+                {
+                    m_createLuaError = "A script with this name already exists.";
+                }
+                else
+                {
+                    std::ofstream file(scriptFilePath, std::ios::out | std::ios::trunc);
+                    if (!file.is_open())
+                    {
+                        m_createLuaError = "Failed to create script file.";
+                    }
+                    else
+                    {
+						std::string nodeType = "Node";
+						if (m_pSelectedNode != nullptr)
+						{
+							SerializedObject nodeObject;
+							m_pSelectedNode->Serialize(nodeObject);
+							if (!nodeObject.GetType().empty())
+							{
+								nodeType = nodeObject.GetType();
+							}
+						}
+
+                        file << "---@type " << nodeType << "\n";
+                        file << "self = " << nodeType << "\n\n";
+                        file << "function OnInit()\n";
+                        file << "end\n\n";
+                        file << "function OnUpdate(dt)\n";
+                        file << "end\n\n";
+                        file << "function OnDestroy()\n";
+                        file << "end\n";
+
+                        file.close();
+
+                        publicDataJson["m_scriptPath"] = scriptFilePath.string();
+                        wasModified = true;
+                        m_luaBrowser.SetDirectory("../Game/ScriptStock");
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
     }
 
     if (m_showLuaBrowser)

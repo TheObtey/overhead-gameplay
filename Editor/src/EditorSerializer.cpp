@@ -45,7 +45,7 @@ LoadReturn EditorSerializer::LoadFromJson(std::string path)
 {
 	std::fstream file;
 	file.open(path, std::ios::in);
-	json jsonFile{ json::parse(file) };
+	json jsonFile (json::parse(file));
 	file.close();
 
 	uptr<Node> firstNode = Node::CreateNode<Node>("Node");

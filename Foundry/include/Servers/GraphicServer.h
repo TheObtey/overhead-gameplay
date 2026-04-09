@@ -39,15 +39,17 @@ public:
     static void EndFrame(NodeWindow* pWindow);
     static void LoadShaderPrograms(NodeViewport* pViewport);
 
-    static Shader& GetGeoVert() { return Instance().m_geoVert; }
-    static Shader& GetGeoFrag() { return Instance().m_geoFrag; }
-    static Program& GetGeoProgram() { return Instance().m_geoProgram; }
-    static Shader& GetLightVert() { return Instance().m_lightVert; }
-    static Shader& GetLightFrag() { return Instance().m_lightFrag; }
-    static Program& GetLightProgram() { return Instance().m_lightProgram; }
+    static Ore::Shader& GetGeoVert() { return Instance().m_geoVert; }
+    static Ore::Shader& GetGeoFrag() { return Instance().m_geoFrag; }
+    static Ore::Program& GetGeoProgram() { return Instance().m_geoProgram; }
+    static Ore::Shader& GetLightVert() { return Instance().m_lightVert; }
+    static Ore::Shader& GetLightFrag() { return Instance().m_lightFrag; }
+    static Ore::Program& GetLightProgram() { return Instance().m_lightProgram; }
+    static Ore::Shader& GetAnimatedVert() { return Instance().m_animatedVert; }
+    static Ore::Program& GetAnimatedProgram() { return Instance().m_animatedProgram; }
 
-    static sptr<Geometry> GetDefaultGeo() { return Instance().m_defaultCubeGeo; }
-    static sptr<Texture> GetDefaultTexture() { return Instance().m_defaultTexture; }
+    static sptr<Ore::Geometry> GetDefaultGeo() { return Instance().m_defaultCubeGeo; }
+    static sptr<Ore::Texture> GetDefaultTexture() { return Instance().m_defaultTexture; }
 
 private:
     void FlushCommandsImpl() override;
@@ -58,17 +60,19 @@ private:
 
 private:
     //default shaders
-    Program m_geoProgram;
-    Program m_lightProgram;
+    Ore::Program m_geoProgram;
+    Ore::Program m_lightProgram;
+    Ore::Program m_animatedProgram;
+    Ore::Shader m_animatedVert { Ore::ShaderType::TYPE_VERTEX};
 
-    Shader m_geoVert {ShaderType::TYPE_VERTEX};
-    Shader m_geoFrag {ShaderType::TYPE_FRAGMENT};
+    Ore::Shader m_geoVert{ Ore::ShaderType::TYPE_VERTEX };
+    Ore::Shader m_geoFrag { Ore::ShaderType::TYPE_FRAGMENT};
 
-    Shader m_lightVert {ShaderType::TYPE_VERTEX};
-    Shader m_lightFrag {ShaderType::TYPE_FRAGMENT};
+    Ore::Shader m_lightVert{ Ore::ShaderType::TYPE_VERTEX };
+    Ore::Shader m_lightFrag { Ore::ShaderType::TYPE_FRAGMENT};
 
-    sptr<Geometry> m_defaultCubeGeo;
-    sptr<Texture> m_defaultTexture;
+    sptr<Ore::Geometry> m_defaultCubeGeo;
+    sptr<Ore::Texture> m_defaultTexture;
 
     std::vector<NodeWindow*> m_pWindowsToSwap;
 };

@@ -1,6 +1,8 @@
 #ifndef ORE_OBJECT_FACTORY__H_
 #define ORE_OBJECT_FACTORY__H_
 
+namespace Ore
+{
 class ObjectFactory 
 {
 public:
@@ -12,4 +14,5 @@ private:
 
     static ObjectFactory m_pInstance;
 };
+}
 #endif

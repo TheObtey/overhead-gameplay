@@ -3,12 +3,15 @@
 
 #include "IProgram.h"
 #include "Define.h"
+#include "Ore.h"
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/mat2x2.hpp>
 #include <glm/mat4x4.hpp>
 
+namespace Ore
+{
 class Program : public IProgram
 {
 public:
@@ -86,6 +89,6 @@ inline void Program::SetUniform<glm::mat4>(const std::string &name, glm::mat4 va
 {
     glUniformMatrix4fv(glGetUniformLocation(m_programId, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
-
+}
 #endif
 

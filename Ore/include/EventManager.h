@@ -3,10 +3,12 @@
 
 #include "Define.h"
 #include "Event.hpp"
+#include "Ore.h"
 
 #include <GLFW/glfw3.h>
 
-
+namespace Ore
+{
 enum class GamepadId
 {
     GAMEPAD_1,
@@ -217,6 +219,6 @@ public:
     inline static Event<void(EventInput, EventAction)> getMouse = Event<void(EventInput, EventAction)>();
     inline static Event<void(int32, int32)> getCursorPos = Event<void(int32, int32)>();
 };
-
+}
 
 #endif // !ORE_EVENT_MANAGER__H_

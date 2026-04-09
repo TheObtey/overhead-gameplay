@@ -1,18 +1,26 @@
 #ifndef EDITOR_EDITOR_RAYLIB3D_H__
 #define EDITOR_EDITOR_RAYLIB3D_H__
 
+#include <Node.h>
+#include <Nodes/Node3D.h>
+#include <Nodes/AllNodes.h>
 #include <Serialization/json.hpp>
 #include <Define.h>
 #include <raylib.h>
-
-class Node;
-class Node3D;
 
 using json = nlohmann::json;
 
 struct DrawableElement
 {
 	uptr<Mesh> mesh;
+	PrimitivesType primitiveType = PrimitivesType::CUBE;
+	Matrix worldMatrix; // Raylib Draw
+	Transform gizmoTransform; // Gizmo Transform
+	bool gizmoUpdated = false;
+};
+
+struct Node3DElement
+{
 	Matrix worldMatrix; // Raylib Draw
 	Transform gizmoTransform; // Gizmo Transform
 	bool gizmoUpdated = false;
@@ -41,7 +49,7 @@ public:
 	void UpdateDisplay(Node* pNode);
 	void Shutdown();
 
-	void AddDrawableObject(std::string const& name,Node* jsonObject);
+	void AddDrawableObject(std::string const& name, Node* pNode);
 	void UpdateDrawableElement(Node* pNode);
 	void UpdateElementName(std::string const& oldName,Node* pNode);
 	void RemoveDrawableElement(std::string const& elementName);
@@ -89,7 +97,8 @@ private:
 
 	Material m_defaultMaterial;
 
-	std::map<std::string, uptr<DrawableElement>> m_loadedMeshs;
+	std::map<std::string, uptr<DrawableElement>> m_loadedMeshes;
+	std::map<std::string, uptr<Node3DElement>> m_loadedNode3D;
 
 	std::string m_selectedObject;
 

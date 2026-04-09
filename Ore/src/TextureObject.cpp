@@ -3,6 +3,7 @@
 
 #include <dependencies/stb_image.h>
 
+using namespace Ore;
 TextureObject::TextureObject(uint32 id, TextureType type)
 {
     m_id = id;
@@ -14,13 +15,13 @@ void TextureObject::Bind()
     glBindTexture(static_cast<uint32>(m_type), m_id);
 }
 
-void TextureObject::GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::string imagePath)
+void TextureObject::GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::filesystem::path const& path)
 {
     int32 nrChannels, imageWidth, imageHeight;
-    unsigned char* data = stbi_load(imagePath.c_str(), &imageWidth, &imageHeight, &nrChannels, 0);
+    unsigned char* data = stbi_load(path.string().c_str(), &imageWidth, &imageHeight, &nrChannels, 0);
     if(!data)
     {
-        Logger::LogWithLevel(LogLevel::ERROR, "Failed to load texture at pass : " + imagePath);
+        Logger::LogWithLevel(LogLevel::ERROR, "Failed to load texture at pass : " + path.string());
         stbi_image_free(data);
         return;
     }

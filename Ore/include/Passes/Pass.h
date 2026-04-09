@@ -5,6 +5,8 @@
 #include "Program.h"
 #include "Camera.h"
 
+namespace Ore
+{
 class TextureObject;
 class Pass : public IPass
 {
@@ -34,5 +36,5 @@ protected:
 
 friend class RenderGraph;
 };
-
+}
 #endif //!RHI_IPASS__H_

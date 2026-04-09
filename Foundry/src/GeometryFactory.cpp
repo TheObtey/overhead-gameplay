@@ -78,13 +78,13 @@ GeoInfo GeometryFactory::MakeCube(float width, float height, float depth)
 }
 
 
-std::vector<Vertex> GeometryFactory::CreateCubeVertices(float width, float height, float depth)
+std::vector<Ore::Vertex> GeometryFactory::CreateCubeVertices(float width, float height, float depth)
 {
 	const float hx = width * 0.5f;
 	const float hy = height * 0.5f;
 	const float hz = depth * 0.5f;
 
-	std::vector<Vertex> vertices;
+	std::vector<Ore::Vertex> vertices;
 	vertices.reserve(24);
 
 	// +X
@@ -234,7 +234,7 @@ GeoInfo GeometryFactory::CreateCylinder(float radius, float height, uint32 radia
 	const float invRadial = 1.0f / static_cast<float>(radialSegments);
 	const float invHeight = 1.0f / static_cast<float>(heightSegments);
 
-	std::vector<Vertex> vertices;
+	std::vector<Ore::Vertex> vertices;
 	vertices.reserve((heightSegments + 1u) * ringStride + (radialSegments + 1u) * 2u + 2u);
 
 	std::vector<uint32> indices;
@@ -298,8 +298,8 @@ GeoInfo GeometryFactory::CreateCylinder(float radius, float height, uint32 radia
 		const uint32 curr = topRingStart + r;
 		const uint32 next = topRingStart + r + 1u;
 		indices.push_back(topCenterIndex);
-		indices.push_back(curr);
 		indices.push_back(next);
+		indices.push_back(curr);
 	}
 
 	// Bottom cap
@@ -324,8 +324,8 @@ GeoInfo GeometryFactory::CreateCylinder(float radius, float height, uint32 radia
 		const uint32 curr = bottomRingStart + r;
 		const uint32 next = bottomRingStart + r + 1u;
 		indices.push_back(bottomCenterIndex);
-		indices.push_back(next);
 		indices.push_back(curr);
+		indices.push_back(next);
 	}
 
 	GeoInfo geo;
@@ -348,7 +348,7 @@ GeoInfo GeometryFactory::CreateCapsule(float radius, float height, uint32 radial
 	const float invRadial = 1.0f / static_cast<float>(radialSegments);
 	const uint32 ringStride = radialSegments + 1u;
 
-	std::vector<Vertex> vertices;
+	std::vector<Ore::Vertex> vertices;
 	vertices.reserve((heightSegments + 1u + (capSegments - 1u) * 2u) * ringStride + 2u);
 
 	std::vector<uint32> indices;
@@ -468,11 +468,12 @@ GeoInfo GeometryFactory::CreateCapsule(float radius, float height, uint32 radial
 	}
 
 	const uint32 topFanRing = previousRing;
+	// Top fan
 	for (uint32 r = 0; r < radialSegments; ++r)
 	{
 		indices.push_back(topFanRing + r);
-		indices.push_back(topFanRing + r + 1u);
 		indices.push_back(topPoleIndex);
+		indices.push_back(topFanRing + r + 1u);
 	}
 
 	uint32 upperRing = cylinderRings.front();
@@ -483,11 +484,12 @@ GeoInfo GeometryFactory::CreateCapsule(float radius, float height, uint32 radial
 	}
 
 	const uint32 bottomFanRing = bottomCapRings.empty() ? cylinderRings.front() : bottomCapRings.back();
+	// Bottom fan
 	for (uint32 r = 0; r < radialSegments; ++r)
 	{
 		indices.push_back(bottomPoleIndex);
-		indices.push_back(bottomFanRing + r + 1u);
 		indices.push_back(bottomFanRing + r);
+		indices.push_back(bottomFanRing + r + 1u);
 	}
 
 	GeoInfo geo;

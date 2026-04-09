@@ -60,6 +60,8 @@ void GraphicServer::OnUnInitialize()
 
     m_lightVert.Unload();
     m_lightFrag.Unload();
+
+    m_animatedVert.Unload();
 }
 
 void GraphicServer::LoadShader()
@@ -70,6 +72,8 @@ void GraphicServer::LoadShader()
     m_lightVert.Load("res/shaders/LightPass.vert");
     m_lightFrag.Load("res/shaders/LightPass.frag");
 
+    m_animatedVert.Load("res/shaders/Animated.vert");
+
     m_geoProgram.AddShader(m_geoVert);
     m_geoProgram.AddShader(m_geoFrag);
     m_geoProgram.Load();
@@ -78,9 +82,13 @@ void GraphicServer::LoadShader()
     m_lightProgram.AddShader(m_lightFrag);
     m_lightProgram.Load();
 
+    m_animatedProgram.AddShader(m_animatedVert);
+    m_animatedProgram.AddShader(m_geoFrag);
+    m_animatedProgram.Load();
+
     GeoInfo cubeInfo = GeometryFactory::MakeCube(1.0f, 1.0f, 1.0f);
-    m_defaultCubeGeo = std::make_shared<Geometry>(cubeInfo.m_vertices, cubeInfo.m_indices);
-    m_defaultTexture = std::make_shared<Texture>("res/textures/Default.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
+    m_defaultCubeGeo = std::make_shared<Ore::Geometry>(cubeInfo.m_vertices, cubeInfo.m_indices);
+    m_defaultTexture = std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE);
 }
 
 void GraphicServer::BuildTasksImpl(TaskGraph& graph) {}

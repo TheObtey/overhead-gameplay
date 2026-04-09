@@ -3,13 +3,16 @@
 
 #include "Define.h"
 
+#include "Serialization/ISerializable.h"
+#include "Registries/AutomaticRegister.hpp"
+
 #include <glm/glm.hpp>
 
 /// <summary>
 /// Describes a 2D element in a 2D space world.
 /// Handles positionning, scaling, rotation and statism (parameters locked or unlocked).
 /// </summary>
-class Transform2D
+class Transform2D : public ISerializable
 {
 public:
 	enum class Axis : uint32
@@ -74,9 +77,14 @@ public:
 
 	bool GetDirty() const;
 
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	static ISerializable* CreateInstance();
+
 private:
-	bool m_isStatic = false;
 	bool m_isDirty;
+
+	bool m_isStatic = false;
 
 	glm::vec2 m_scale;
 	glm::vec2 m_shear;
@@ -86,5 +94,5 @@ private:
 	glm::mat3 m_transformationMatrix;
 };
 
-
+REGISTER_ISERIALIZABLE(Transform2D, Transform2D::CreateInstance);
 #endif

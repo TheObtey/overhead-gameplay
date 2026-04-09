@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+using namespace Ore;
 GeometryPass::GeometryPass(Program& program) : Pass(program) {}
 GeometryPass::GeometryPass(Program& program, Camera* pCamera) : Pass(program, pCamera) {}
 
@@ -17,8 +18,6 @@ void GeometryPass::Execute()
 {
     if (m_pCamera == nullptr) return;
 
-    Logger::Log("Start Geometry Pass Execution");
-
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -26,13 +25,10 @@ void GeometryPass::Execute()
     m_program.SetUniform("viewProj", m_pCamera->GetViewProjMatrix());
     //m_program.SetUniform("view", viewMatrix);
 
-    Logger::Log("Start geometries");
-    for(uint32 i = 0; i<m_meshes.size(); ++i)
+    for (uint32 i = 0; i < m_meshes.size(); ++i)
     {
-        if(m_meshes[i].get().GetIsActive() == false)
+        if (m_meshes[i].get().GetIsActive() == false)
             continue;
-
-        Logger::Log("Mesh");
 
         m_program.SetUniform("model", glm::inverse(m_meshes[i].get().GetTransform()));
         m_meshes[i].get().Draw(m_program);

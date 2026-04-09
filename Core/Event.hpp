@@ -4,7 +4,6 @@
 #include <functional>
 #include <vector>
 #include <algorithm>
-#include <Define.h>
 
 using Connection = int;
 

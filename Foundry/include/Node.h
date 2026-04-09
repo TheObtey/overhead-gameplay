@@ -5,13 +5,18 @@
 #include "Event.hpp"
 #include "Scripting/Lua/LuaScriptInstance.hpp"
 #include "Serialization/ISerializable.h"
+#include "Serialization/json.hpp"
 #include "Registries/AutomaticRegister.hpp"
 
+#include <filesystem>
+#include <fstream>
 #include <functional>
 #include <optional>
 #include <string>
 #include <sstream>
 #include <vector>
+
+#include "Serialization/SerializeObject.hpp"
 
 class SceneTree;
 class SerializedObject;
@@ -50,7 +55,7 @@ public:
 
 	Node& GetChild(uint32 index);
 	std::vector<std::reference_wrapper<Node>> GetChildren();
-	uint32 GetChildCount();
+	uint32 GetChildCount() const;
 
 	template <NodeType T>
 	T& GetNode(std::string const& path);
@@ -62,6 +67,7 @@ public:
 	void Destroy();
 	virtual void Reparent(Node& newParent, bool keepGlobalTransform = true);
 	void MoveChild(Node const& child, uint32 to);
+	uptr<Node> DetachFromTree();
 
 	//override this method if the inherited node is not trivially copyable
 	virtual std::unique_ptr<Node> Clone();
@@ -72,20 +78,24 @@ public:
 	std::string GetName();
 	void SetName(std::string const& name);
 	void SetScriptPath(std::string const& path);
-	Node* GetParent();
-	SceneTree* GetSceneTree();
+	Node* GetParent() const;
+	bool HasParent() const;
+	SceneTree* GetSceneTree() const;
+
+	Proxy& GetNodeProxy() const;
 
 	//====Static Methods======
 	template <NodeType T>
 	static std::unique_ptr<T> CreateNode(std::string const& name);
 
 	template <NodeType T>
+	static uptr<T> LoadNodeFromJSON(std::filesystem::path path);
+
+	template <NodeType T>
 	static void AttachScript(uptr<LuaScriptInstance>& script, T& node);
 
-	static ISerializable* CreateInstance();
-	static void Test() {};
-
 	static void SetStatusEditor(bool inEditor) { s_IsInEditor = inEditor; }
+	static ISerializable* CreateInstance();
 
 	//====Event======
 	Event<void(Node&)> OnSceneEnter;
@@ -116,14 +126,15 @@ protected:
 
 	std::unordered_map<std::string, std::unique_ptr<Node>> m_children{};
 	std::vector<std::string> m_childrenOrder{};
+	inline static bool s_IsInEditor = false;
 
 private:
     void AttachChildImmediate(std::unique_ptr<Node>& child);
 	void NotifyHierarchyChanged();
 
-	inline static bool s_IsInEditor = false;
 
     friend class EngineServer;
+	friend class SceneTree;
 	friend class unique_ptr;
 };
 
@@ -139,8 +150,29 @@ std::unique_ptr<T> Node::CreateNode(std::string const& name)
 
 	uptr<concrete_Node> ptr = std::make_unique<concrete_Node>(name);
 	ptr->m_pProxy = std::make_unique<typename T::Proxy>(*ptr);
-
     return std::move(ptr);
+}
+
+template <NodeType T>
+uptr<T> Node::LoadNodeFromJSON(std::filesystem::path path)
+{
+	std::fstream file;
+	file.open(path, std::ios::in);
+	nlohmann::json jsonFile(nlohmann::json::parse(file));
+	file.close();
+
+	uptr<T> firstNode = Node::CreateNode<T>("Node");
+
+	SerializedObject object = {};
+	if (jsonFile[0].contains("Root")) {
+		object.SetJson(jsonFile[0]["Root"]);
+		firstNode.get()->Deserialize(object);
+	}
+	else if (jsonFile[0].contains("Node")) {
+		object.SetJson(jsonFile[0]["Node"]);
+		firstNode.get()->Deserialize(object);
+	}
+	return firstNode;
 }
 
 

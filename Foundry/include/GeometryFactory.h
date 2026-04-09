@@ -5,13 +5,14 @@
 #include <Debug.h>
 #include <unordered_map>
 
+
 struct GeoInfo {
 	GeoInfo() = default;
-	GeoInfo(std::vector<Vertex> vertices, std::vector<uint32> indices) {
+	GeoInfo(std::vector<Ore::Vertex> vertices, std::vector<uint32> indices) {
 		m_vertices = std::move(vertices);
 		m_indices = std::move(indices);
 	};
-	std::vector<Vertex> m_vertices;
+	std::vector<Ore::Vertex> m_vertices;
 	std::vector<uint32> m_indices;
 };
 
@@ -34,7 +35,7 @@ public:
 	static GeoInfo CreateCapsule(float radius, float height, uint32 radialSegments, uint32 heightSegments, uint32 capSegments);
 
 private:
-	static std::vector<Vertex> CreateCubeVertices(float width, float height, float depth);
+	static std::vector<Ore::Vertex> CreateCubeVertices(float width, float height, float depth);
 	static std::vector<uint32> CreateCubeIndices();
 private:
 	static inline std::unordered_map<PrimitivesType, GeoInfo> m_GeoInfo;

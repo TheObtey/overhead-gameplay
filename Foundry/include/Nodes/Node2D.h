@@ -12,6 +12,11 @@ public:
 	Node2D(std::string const& name);
 	~Node2D() override;
 
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	static ISerializable* CreateInstance();
+
+
 	void				SetScale(glm::vec2 const& _scale);
 	void				SetScale(float _width, float _height);
 	glm::vec2 const&	GetScale() const;
@@ -62,6 +67,8 @@ protected:
 	bool m_worldDirty : 1 = false;
 	bool m_localDirty : 1 = true;
 };
+
+REGISTER_ISERIALIZABLE(Node2D, Node2D::CreateInstance);
 
 #include "Scripting/Proxies/Node2DProxy.inl"
 

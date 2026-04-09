@@ -8,7 +8,6 @@
 
 #include <string>
 #include <vector>
-#include <glad/glad.h>
 
 using char8 = std::int8_t;
 using int8  = std::int8_t;
@@ -76,6 +75,14 @@ inline constexpr int32 operator""_kg(unsigned long long val) { return val * 1000
 #define OPERATING_SYSTEM_LINUX    1
 #define OPERATING_SYSTEM_WINDOWS  2
 #define OPERATING_SYSTEM_MACOS    3
+
+//====================
+// SIMD GLM
+//====================
+
+#ifdef RELEASE_BUILD
+    #define GLM_FORCE_INTRINSICS
+#endif
 
 #if defined(_WIN32) || defined(_WIN64)
     #define OPERATING_SYSTEM OPERATING_SYSTEM_WINDOWS
