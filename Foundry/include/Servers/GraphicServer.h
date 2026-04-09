@@ -45,6 +45,8 @@ public:
     static Ore::Shader& GetLightVert() { return Instance().m_lightVert; }
     static Ore::Shader& GetLightFrag() { return Instance().m_lightFrag; }
     static Ore::Program& GetLightProgram() { return Instance().m_lightProgram; }
+    static Ore::Shader& GetAnimatedVert() { return Instance().m_animatedVert; }
+    static Ore::Program& GetAnimatedProgram() { return Instance().m_animatedProgram; }
 
     static sptr<Ore::Geometry> GetDefaultGeo() { return Instance().m_defaultCubeGeo; }
     static sptr<Ore::Texture> GetDefaultTexture() { return Instance().m_defaultTexture; }
@@ -60,6 +62,8 @@ private:
     //default shaders
     Ore::Program m_geoProgram;
     Ore::Program m_lightProgram;
+    Ore::Program m_animatedProgram;
+    Ore::Shader m_animatedVert { Ore::ShaderType::TYPE_VERTEX};
 
     Ore::Shader m_geoVert{ Ore::ShaderType::TYPE_VERTEX };
     Ore::Shader m_geoFrag { Ore::ShaderType::TYPE_FRAGMENT};

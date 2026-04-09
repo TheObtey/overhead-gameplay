@@ -25,9 +25,9 @@ void GeometryPass::Execute()
     m_program.SetUniform("viewProj", m_pCamera->GetViewProjMatrix());
     //m_program.SetUniform("view", viewMatrix);
 
-    for(uint32 i = 0; i<m_meshes.size(); ++i)
+    for (uint32 i = 0; i < m_meshes.size(); ++i)
     {
-        if(m_meshes[i].get().GetIsActive() == false)
+        if (m_meshes[i].get().GetIsActive() == false)
             continue;
 
         m_program.SetUniform("model", glm::inverse(m_meshes[i].get().GetTransform()));

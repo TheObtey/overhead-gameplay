@@ -25,7 +25,7 @@ LightPass::LightPass(Program& program, LightSpan lights, Camera* pCamera) : Pass
 
 void LightPass::GenerateQuad()
 {
-    std::vector<float> quadVertices = 
+    std::vector<float> quadVertices =
     {
         // positions        // texture Coords
         -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
@@ -41,7 +41,7 @@ void LightPass::GenerateQuad()
     m_quadVAO->Bind();
 
     m_quadVBO = std::make_unique<Buffer<float>>(quadVertices, m_quadVBOId, BufferType::BUFFER, true);
-        
+
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
@@ -68,13 +68,13 @@ void LightPass::Execute()
     glActiveTexture(GL_TEXTURE2);
     m_pGAlbedoSpec->Bind();
 
-    for(uint32 i = 0; i < m_lights.size(); ++i)
+    for (uint32 i = 0; i < m_lights.size(); ++i)
     {
         std::string const indexStr = std::to_string(i);
         Light& light = m_lights[i];
 
         m_program.SetUniform("lights[" + indexStr + "].Position", light.position);
-        m_program.SetUniform("lights[" + indexStr + "].Color", glm::vec3{light.color.r, light.color.g, light.color.b});
+        m_program.SetUniform("lights[" + indexStr + "].Color", glm::vec3{ light.color.r, light.color.g, light.color.b });
 
         m_program.SetUniform("lights[" + indexStr + "].Linear", light.linear);
         m_program.SetUniform("lights[" + indexStr + "].Quadratic", light.quadratic);
@@ -94,4 +94,4 @@ void LightPass::RenderQuad()
     m_quadVAO->Bind();
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
-} 
+}

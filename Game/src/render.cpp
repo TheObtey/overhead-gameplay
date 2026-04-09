@@ -1,5 +1,6 @@
 #include "EventManager.h"
 #include "Passes/GeometryPass.h"
+#include "Passes/AnimatedPass.h"
 #include "Passes/LightPass.h"
 #include "Mesh.h"
 #include "Window.h"
@@ -15,7 +16,6 @@ int main()
     Window window(1920, 1080, "ORE ORE OREORE ORE ORE OREORE OREORE", false, true);
     window.Open();
     Viewport viewport(0, 0, 1920, 1080, Color::SKY_BLUE);
-
     window.AddViewport(viewport);
 
     std::vector<Vertex> vertices;
@@ -65,6 +65,7 @@ int main()
     }
 
     Program geometryProgram;
+    Program animatedProgram;
     Program lightProgram;
 
     Shader geoFrag(ShaderType::TYPE_FRAGMENT);
@@ -87,14 +88,11 @@ int main()
     lightProgram.AddShader(lightFrag);
     lightProgram.AddShader(lightVert);
     lightProgram.Load();
-
+    
     lightFrag.Unload();
     lightVert.Unload();
 
     lightProgram.Use();
-    lightProgram.SetUniform("gPosition", 0);
-    lightProgram.SetUniform("gNormal", 1);
-    lightProgram.SetUniform("gAlbedoSpec", 2);
 
     GeometryPass geoPass(geometryProgram, camera.get());
     LightPass lightPass(lightProgram, lights, camera.get());
@@ -125,7 +123,11 @@ int main()
         //camera->SetRoll(roll ++);
         //Logger::LogWithLevel(LogLevel::ERROR, yaw);
         //camera->SetPosition(camPos);
+        //lights[0].position += glm::vec3(1.0f, 0.0f, 0.0f);
 
+        geoPass.AddMesh(mesh);
+        //geoPass.AddMesh(mesh1);
+        viewport.Present();
         window.Present();
     }
 
