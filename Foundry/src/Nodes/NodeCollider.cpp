@@ -356,3 +356,36 @@ ISerializable *NodeCapsuleCollider::CreateInstance()
 {
 	return CreateNode<NodeCapsuleCollider>("NodeCapsuleCollider").release();
 }
+
+uptr<Node> NodeBoxCollider::Clone()
+{
+	uptr<NodeBoxCollider> clone = Node::CreateNode<NodeBoxCollider>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}
+
+uptr<Node> NodeSphereCollider::Clone()
+{
+	uptr<NodeSphereCollider> clone = Node::CreateNode<NodeSphereCollider>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}
+
+uptr<Node> NodeCapsuleCollider::Clone()
+{
+	uptr<NodeCapsuleCollider> clone = Node::CreateNode<NodeCapsuleCollider>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}

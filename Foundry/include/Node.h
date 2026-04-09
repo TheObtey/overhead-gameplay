@@ -96,6 +96,7 @@ public:
 
 	static void SetStatusEditor(bool inEditor) { s_IsInEditor = inEditor; }
 	static ISerializable* CreateInstance();
+	static std::string BuildDuplicateName(Node& parent, std::string const& sourceName);
 
 	//====Event======
 	Event<void(Node&)> OnSceneEnter;

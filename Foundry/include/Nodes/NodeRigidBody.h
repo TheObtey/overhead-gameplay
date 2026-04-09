@@ -127,6 +127,7 @@ public:
 		return rp3dToGlm(m_pRigidBodyRP3D->getTransform().getPosition());
 	}
 #endif
+	uptr<Node> Clone() override;
 
 protected:
 private:

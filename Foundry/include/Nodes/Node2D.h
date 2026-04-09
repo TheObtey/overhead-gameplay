@@ -49,6 +49,8 @@ public:
 	virtual void		OnUpdate(double _delta) override;
 	virtual void		Reparent(Node& _newParent, bool _keepGlobalTransform = true) override;
 
+	uptr<Node> Clone() override;
+
 private:
 	void				CheckParentTransform(Node& node);
 	void				UpdateLocal();
