@@ -20,8 +20,7 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 		"GetEventInput", &IControl::GetEventInput,
 		"ReadAsBool", &IControl::Read<bool>,
 		"ReadAsFloat", &IControl::Read<float>,
-		"ReadAsVec2", &IControl::Read<glm::vec2>,
-		"SetAction", &IControl::SetAction
+		"ReadAsVec2", &IControl::Read<glm::vec2>
 	);
 
 	binder.BindClass<ButtonControl>("buttoncontrol",
@@ -45,21 +44,21 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 
 
 	binder.BindClass<Action>("action",
-		sol::constructors<Action(), Action(ControlType, Ore::EventInput)>(),
-		"Event", &Action::OnAction,
+		"Event", &Action::Event,
 		"AddControl", &Action::AddControl,
 		"GetControl", &Action::GetControl
 	);
 
 
 	binder.BindClass<ActionMap>("actionmap",
-		sol::constructors<ActionMap()>(),
+		sol::constructors<ActionMap(std::string const&)>(),
 		sol::meta_function::index, &ActionMap::operator[],
 		"Emplace", &ActionMap::Emplace,
 		"Erase", &ActionMap::Erase,
 		"GetAction", &ActionMap::GetAction,
 		"Length", &ActionMap::Length,
 		"Rename", &ActionMap::Rename,
+		"CreateAction", &ActionMap::CreateAction,
 		"Active", &ActionMap::Active
 	);
 	}
