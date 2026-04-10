@@ -195,7 +195,12 @@ void NodeRigidBody::Deserialize(SerializedObject const& datas)
 	LockAngularAxis(lockAngularX, lockAngularY, lockAngularZ);
 	SetLinearVelocity(linearVelocity);
 	SetAngularVelocity(angularVelocity);
-	
+
+}
+
+void NodeRigidBody::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<NodeRigidBody>(script, *this);
 }
 
 ISerializable* NodeRigidBody::CreateInstance()
@@ -454,5 +459,13 @@ void NodeRigidBody::SetIsGravityEnabled(bool enabled)
 	PhysicsServer::SetIsGravityEnabled(enabled, *this);
 }
 
+uptr<Node> NodeRigidBody::Clone()
+{
+	uptr<NodeRigidBody> clone = Node::CreateNode<NodeRigidBody>(GetName());
 
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
 
+	return clone;
+}

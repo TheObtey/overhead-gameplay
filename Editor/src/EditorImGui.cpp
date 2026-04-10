@@ -9,6 +9,49 @@
 namespace
 {
 	constexpr char kHierarchyNodePayloadId[] = "EDITOR_HIERARCHY_NODE";
+	bool TryExtractTrailingIndex(std::string const& name, std::string& outBaseName, int& outIndex)
+	{
+		outBaseName = name;
+		outIndex = 0;
+
+		if (name.size() < 3 || name.back() != ')')
+			return false;
+
+		size_t const openPos = name.find_last_of('(');
+		if (openPos == std::string::npos || openPos + 1 >= name.size() - 1)
+			return false;
+
+		for (size_t i = openPos + 1; i < name.size() - 1; ++i)
+		{
+			if (!std::isdigit(static_cast<unsigned char>(name[i])))
+				return false;
+		}
+
+		outBaseName = name.substr(0, openPos);
+		outIndex = std::stoi(name.substr(openPos + 1, name.size() - openPos - 2));
+		return true;
+	}
+
+	std::string BuildDuplicateName(Node& parent, std::string const& sourceName)
+	{
+		std::string baseName;
+		int trailingIndex = 0;
+		TryExtractTrailingIndex(sourceName, baseName, trailingIndex);
+
+		if (baseName.empty())
+			baseName = sourceName;
+
+		int index = std::max(1, trailingIndex + 1);
+		std::string candidate;
+
+		do
+		{
+			candidate = baseName + "(" + std::to_string(index) + ")";
+			++index;
+		} while (parent.FindChild(candidate).has_value());
+
+		return candidate;
+	}
 }
 
 std::string EditorImGui::NormalizeScenePath(std::string path, bool saveAsNode)
@@ -380,9 +423,10 @@ void EditorImGui::DrawHierarchyNodeTree(Node& node)
 			if (!isSceneRoot)
 			{
 				auto clone = node.Clone();
-				if (node.GetParent())
+				if (Node* pParent = node.GetParent())
 				{
-					node.GetParent()->AddChild(clone);
+					clone->SetName(Node::BuildDuplicateName(*pParent, node.GetName()));
+					pParent->AddChild(clone);
 				}
 			}
 		}

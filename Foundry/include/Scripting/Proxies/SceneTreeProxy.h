@@ -1,10 +1,9 @@
 #ifndef FOUNDRY_SCENETREEPROXY__H_
 #define FOUNDRY_SCENETREEPROXY__H_
 
-#include "Scripting/Binder.h"
-#include "Registries/AutomaticRegisterProxy.hpp"
 #include "Node.h"
 
+class Binder;
 class SceneTree;
 class SceneTreeProxy
 {
@@ -31,6 +30,5 @@ struct SceneTreeProxyBinding
     static void Bind(Binder& binder);
 };
 
-REGISTER_PROXY(SceneTreeProxyBinding, SceneTreeProxy_);
 
 #endif

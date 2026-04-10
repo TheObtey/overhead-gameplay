@@ -93,6 +93,11 @@ void NodeMeshAnimated3D::Deserialize(SerializedObject const& datas)
 	NodeVisual::Deserialize(datas);
 }
 
+void NodeMeshAnimated3D::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<NodeMeshAnimated3D>(script, *this);
+}
+
 void NodeMeshAnimated3D::Serialize(SerializedObject& datas) const
 {
 	NodeVisual::Serialize(datas);

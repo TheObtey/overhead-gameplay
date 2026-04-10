@@ -89,3 +89,14 @@ void NodeWindow::PresentWindow() const
 {
     m_pWindow->Present();
 }
+
+uptr<Node> NodeWindow::Clone()
+{
+	uptr<NodeWindow> clone = Node::CreateNode<NodeWindow>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}

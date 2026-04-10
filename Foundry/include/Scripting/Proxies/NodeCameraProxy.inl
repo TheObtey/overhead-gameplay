@@ -12,11 +12,11 @@ private:
 
 BindProxy(NodeCamera::Proxy,
     return binder.BindClass<NodeCamera::Proxy>("nodecamera",
-    sol::base_classes, sol::bases<Node::Proxy, Node3D::Proxy>(),
-    sol::meta_function::garbage_collect, BIND(GCNodeProxy),
-    sol::meta_function::new_index, StoreUserData(),
-    sol::meta_function::index, LoadUserData(),
-    "SetFOV", BIND(SetFOV));
+        sol::base_classes, sol::bases<Node::Proxy, Node3D::Proxy>(),
+        sol::meta_function::garbage_collect, BIND(GCNodeProxy),
+        sol::meta_function::new_index, StoreUserData(),
+        sol::meta_function::index, LoadUserData(),
+        "SetFOV", BIND(SetFOV)
+    );
 )
 
-REGISTER_PROXY(NodeCamera::Proxy::ProxyBinding, NodeCameraProxy);

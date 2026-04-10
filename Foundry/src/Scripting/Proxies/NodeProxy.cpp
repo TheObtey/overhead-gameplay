@@ -1,6 +1,7 @@
 #include "Node.h"
 #include "Servers/EngineServer.h"
 #include "SceneTree.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 
 using Proxy = Node::Proxy;
 
@@ -176,3 +177,5 @@ void Proxy::ProxyBinding::Bind(Binder &binder)
 		"GetSceneTree", BIND(GetSceneTree)
 	);
 }
+
+REGISTER_PROXY(Node::Proxy::ProxyBinding, NodeProxy);

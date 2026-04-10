@@ -8,11 +8,14 @@
 
 Node3D::Node3D(std::string const& name) : Node(name), m_isParentNode3D(false)
 {
-	OnParentChange.Subscribe([&](Node& n) { CheckParentTransform(); });
-	UpdateWorldTransform();
-	
-}
+	OnParentChange.Subscribe([&](Node& n){
+		CheckParentTransform();
+		m_localDirty = true;
+		UpdateWorldTransform();
+		});
 
+	UpdateWorldTransform();
+}
 void Node3D::OnUpdate(double delta)
 {
 	Node::OnUpdate(delta);
@@ -27,6 +30,7 @@ void Node3D::Reparent(Node& newParent, bool keepGlobalTransform)
 {
 	Node::Reparent(newParent, keepGlobalTransform);
 	m_worldDirty = true;
+
 }
 
 void Node3D::CheckParentTransform()
@@ -94,7 +98,6 @@ void Node3D::UpdateLocalTransform()
 	m_worldDirty = false;
 }
 
-
 glm::mat4x4 const& Node3D::GetWorldMatrix() const
 {
 	return m_worldTransform;
@@ -158,7 +161,25 @@ void Node3D::Deserialize(SerializedObject const& datas)
 	datas.GetPublicElement("Transform", static_cast<ISerializable*>(&m_transform));
 }
 
+void Node3D::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<Node3D>(script, *this);
+}
+
 ISerializable* Node3D::CreateInstance()
 {
 	return CreateNode<Node3D>("Node3D").release();
+}
+
+uptr<Node> Node3D::Clone()
+{
+	uptr<Node3D> clone = Node::CreateNode<Node3D>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	clone->SetName(GetName());
+
+	return clone;
 }

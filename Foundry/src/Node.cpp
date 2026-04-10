@@ -12,6 +12,33 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <cctype>
+
+namespace
+{
+	bool TryExtractTrailingIndex(std::string const& name, std::string& outBaseName, int& outIndex)
+	{
+		outBaseName = name;
+		outIndex = 0;
+
+		if (name.size() < 3 || name.back() != ')')
+			return false;
+
+		size_t const openPos = name.find_last_of('(');
+		if (openPos == std::string::npos || openPos + 1 >= name.size() - 1)
+			return false;
+
+		for (size_t i = openPos + 1; i < name.size() - 1; ++i)
+		{
+			if (!std::isdigit(static_cast<unsigned char>(name[i])))
+				return false;
+		}
+
+		outBaseName = name.substr(0, openPos);
+		outIndex = std::stoi(name.substr(openPos + 1, name.size() - openPos - 2));
+		return true;
+	}
+}
 
 
 Node::Node(std::string const& name) : m_name(name) , m_scriptPath("")
@@ -199,7 +226,7 @@ uptr<Node> Node::DetachFromTree()
 
 std::unique_ptr<Node> Node::Clone()
 {
-    std::unique_ptr<Node> copy = Node::CreateNode<std::remove_reference_t<decltype(*this)>>(m_name + "Copy");
+    std::unique_ptr<Node> copy = Node::CreateNode<std::remove_reference_t<decltype(*this)>>(m_name + "_Copy");
 
     for (auto& [Name, nodePtr] : m_children)
     {
@@ -232,10 +259,7 @@ void Node::Serialize(SerializedObject& datas) const
 	{
 		datas.AddPrivateElementInArray("Children", static_cast<ISerializable const*>(m_children.at(m_childrenOrder[i]).get()));
 	}
-
 }
-
-
 
 void Node::Deserialize(SerializedObject const& datas)
 {
@@ -250,7 +274,7 @@ void Node::Deserialize(SerializedObject const& datas)
 	{
 		DEBUG("ATTACH " << m_scriptPath << std::endl);
 		uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>(m_scriptPath);
-		Node::AttachScript(script, *this);
+		AttachScriptDeserialize(script);
 	}
 
 	std::vector<ISerializable*> tempList = datas.GetPrivateArray<ISerializable*>("Children");
@@ -259,6 +283,11 @@ void Node::Deserialize(SerializedObject const& datas)
 		uptr<Node> pNode = uptr<Node>((Node*)tempList[i]);
 		AddChild(pNode);
 	}
+}
+
+void Node::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<Node>(script, *this);
 }
 
 ISerializable* Node::CreateInstance()
@@ -305,6 +334,30 @@ void Node::SetName(const std::string& newName)
 		m_name = newName;
 	}
 }
+
+
+std::string Node::BuildDuplicateName(Node& parent, std::string const& sourceName)
+{
+	std::string baseName;
+	int trailingIndex = 0;
+	TryExtractTrailingIndex(sourceName, baseName, trailingIndex);
+
+	if (baseName.empty())
+		baseName = sourceName;
+
+	int index = std::max(1, trailingIndex + 1);
+	std::string candidate;
+
+	do
+	{
+		candidate = baseName + "(" + std::to_string(index) + ")";
+		++index;
+	} while (parent.m_children.contains(candidate));
+
+	return candidate;
+}
+
+
 std::string Node::GetName()							{ return m_name; }
 void Node::SetScriptPath(std::string const& path)	{ m_scriptPath = path;}
 Node* Node::GetParent() const						{ return m_pOwner; }

@@ -1,4 +1,14 @@
 #include "Scripting/Proxies/ActionMapProxy.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
+#include "Scripting/Binder.h"
+#include "IControl.h"
+#include "Action.h"
+#include "ActionMap.h"
+#include "Event.hpp"
+
+#include <string_view>
+#include <unordered_map>
+#include <string>
 
 void ActionMapProxyBinding::Bind(Binder& binder)	
 {
@@ -62,3 +72,5 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 		"Active", &ActionMap::Active
 	);
 	}
+
+REGISTER_PROXY(ActionMapProxyBinding, ActionMapProxy);

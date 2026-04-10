@@ -70,6 +70,7 @@ public:
 
 protected:
 	virtual void DestroyShape() = 0;
+	void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
 	rp3d::Transform GetLocalRp3dTransform() const;
 
 	rp3d::Collider* m_pCollider = nullptr;
@@ -97,6 +98,7 @@ public:
 	static ISerializable *CreateInstance();
 
 	void SetShape(const glm::vec3 &halfExtents);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;
@@ -113,6 +115,7 @@ public:
 	static ISerializable *CreateInstance();
 
 	void SetShape(float radius);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;
@@ -129,6 +132,7 @@ public:
 	static ISerializable *CreateInstance();
 
 	void SetShape(float radius, float height);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;

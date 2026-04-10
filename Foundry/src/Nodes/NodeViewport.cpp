@@ -74,6 +74,11 @@ void NodeViewport::AddSkeletalMesh(NodeMeshAnimated3D const& mesh) const
 	m_pAnimatedPass->AddSkeletalMesh(*mesh.m_mesh);
 }
 
+void NodeViewport::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<NodeViewport>(script, *this);
+}
+
 void NodeViewport::UpdateViewport()
 {
 	glm::vec2 const& pos = m_transform.GetPosition();
@@ -100,3 +105,14 @@ void NodeViewport::Present() const
 }
 
 ISerializable* NodeViewport::CreateInstance() { return CreateNode<NodeViewport>("NodeViewport").release(); }
+
+uptr<Node> NodeViewport::Clone()
+{
+	uptr<NodeViewport> clone = Node::CreateNode<NodeViewport>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}

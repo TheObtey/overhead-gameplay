@@ -335,9 +335,7 @@ bool InspectorNodeProperties::DrawLuaScriptPicker(json& publicDataJson)
 								nodeType = nodeObject.GetType();
 							}
 						}
-
                         file << "---@type " << nodeType << "\n";
-                        file << "self = " << nodeType << "\n\n";
                         file << "function OnInit()\n";
                         file << "end\n\n";
                         file << "function OnUpdate(dt)\n";

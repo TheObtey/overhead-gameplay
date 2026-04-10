@@ -8,19 +8,7 @@ LuaScriptInstance::LuaScriptInstance(std::string const& scriptPath) :
 	m_stringPath(scriptPath)
 {
 	Logger::Log("Loading Lua Script : ", scriptPath);
-
-	m_enviro = {m_state, sol::create};
-	m_enviro["print"] = m_state["print"];
-	m_enviro["os"] = m_state["os"];
-	m_enviro["hook"] = m_state["hook"];
-	m_enviro["timer"] = m_state["timer"];
-	m_enviro["assert"] = m_state["assert"];
-
-	for (std::string const& name : ScriptingEngine::GetRegisteredTypesName())
-	{
-		m_enviro[name] = m_state[name];
-		Logger::Log("Loaded to Lua Environment : ", name);
-	}
+	m_enviro = {m_state, sol::create, m_state.globals()};
 }
 
 void LuaScriptInstance::CallScriptOnInit()

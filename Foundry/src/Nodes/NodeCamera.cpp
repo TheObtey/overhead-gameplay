@@ -67,6 +67,11 @@ void NodeCamera::Deserialize(SerializedObject const& datas)
     m_camera.UpdateCamera();
 }
 
+void NodeCamera::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+    AttachScript<NodeCamera>(script, *this);
+}
+
 ISerializable* NodeCamera::CreateInstance()
 {
     return CreateNode<NodeCamera>("NodeCamera").release();
@@ -88,4 +93,15 @@ void NodeCamera::UpdateCameraOwner(NodeViewport& newOwner)
         m_camera.UpdateCamera();
     };
     newOwner.SetCamera(this);
+}
+
+uptr<Node> NodeCamera::Clone()
+{
+	uptr<NodeCamera> clone = Node::CreateNode<NodeCamera>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
 }
