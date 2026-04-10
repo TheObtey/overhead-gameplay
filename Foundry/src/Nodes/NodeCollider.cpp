@@ -270,13 +270,19 @@ void NodeBoxCollider::Serialize(SerializedObject &datas) const
 void NodeBoxCollider::Deserialize(SerializedObject const &datas)
 {
 	glm::vec3 halfExtents{0.5f, 0.5f, 0.5f};
-
 	ClampedFloat HalfExtX = ClampedFloat(0.1f, -1.0f, halfExtents.x);
 	ClampedFloat HalfExtY = ClampedFloat(0.1f, -1.0f, halfExtents.y);
 	ClampedFloat HalfExtZ = ClampedFloat(0.1f, -1.0f, halfExtents.z);
+	try {
 	datas.GetPublicElement("HalfExtentsX", static_cast<ISerializable*>(&HalfExtX));
 	datas.GetPublicElement("HalfExtentsY", static_cast<ISerializable*>(&HalfExtY));
 	datas.GetPublicElement("HalfExtentsZ", static_cast<ISerializable*>(&HalfExtZ));
+	}
+	catch (...) {
+		datas.GetPublicElement("HalfExtentsX",&HalfExtX.value);
+		datas.GetPublicElement("HalfExtentsY",&HalfExtY.value);
+		datas.GetPublicElement("HalfExtentsZ",&HalfExtZ.value);
+	}
 
 	SetShape({HalfExtX.value,HalfExtY.value,HalfExtZ.value});
 
