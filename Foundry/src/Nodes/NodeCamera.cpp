@@ -67,6 +67,11 @@ void NodeCamera::Deserialize(SerializedObject const& datas)
     m_camera.UpdateCamera();
 }
 
+void NodeCamera::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+    AttachScript<NodeCamera>(script, *this);
+}
+
 ISerializable* NodeCamera::CreateInstance()
 {
     return CreateNode<NodeCamera>("NodeCamera").release();

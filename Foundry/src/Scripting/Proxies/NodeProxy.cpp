@@ -138,7 +138,8 @@ bool Proxy::HasParent() const
 
 SceneTreeProxy* Proxy::GetSceneTree() const
 {
-	return &m_pNode->GetSceneTree()->m_proxy;
+	SceneTreeProxy* prox = &m_pNode->GetSceneTree()->m_proxy;
+	return prox;
 }
 
 Proxy::operator Node&() const

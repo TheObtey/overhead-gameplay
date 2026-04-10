@@ -37,6 +37,9 @@ public:
     static ISerializable *CreateInstance();
     uptr<Node> Clone() override;
 
+protected:
+    void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
+
 private:
     uptr<Ore::Mesh> m_pMesh;
     std::vector<sptr<Ore::Texture>> m_textures;

@@ -5,7 +5,6 @@
 #include "glm/gtx/quaternion.hpp"
 #include "glm/glm.hpp"
 
-
 Node2D::Node2D(std::string const &name) : Node(name)
 {
 	OnParentChange += [&](Node& node)
@@ -25,11 +24,15 @@ void Node2D::Serialize(SerializedObject& datas) const
 	datas.AddPublicElement("Transform2D", static_cast<ISerializable const*>(&m_transform));
 }
 
-
 void Node2D::Deserialize(SerializedObject const& datas)
 {
 	Node::Deserialize(datas);
 	datas.GetPublicElement("Transform2D", static_cast<ISerializable*>(&m_transform));
+}
+
+void Node2D::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<Node2D>(script, *this);
 }
 
 ISerializable* Node2D::CreateInstance()

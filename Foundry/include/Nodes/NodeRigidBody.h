@@ -130,6 +130,8 @@ public:
 	uptr<Node> Clone() override;
 
 protected:
+	void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
+
 private:
 	// Node3D* m_pNode3D;
 	rp3d::RigidBody *m_pRigidBodyRP3D = nullptr;

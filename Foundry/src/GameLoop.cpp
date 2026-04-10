@@ -20,9 +20,7 @@ void GameLoop::StartGame(SceneTree& defaultTree)
     UpdateServers();
 
     m_pDefaultTree = &defaultTree;
-    uptr<Node> defaultScene = LoadScene();
-    m_pDefaultTree->m_pCurrentScene = defaultScene.get();
-    m_pDefaultTree->m_root->AddChild(defaultScene);
+    m_pDefaultTree->m_pCurrentScene = &LoadScene(defaultTree.GetRoot());
     UpdateServers();
 
     m_pDefaultTree->OnGameStarted();

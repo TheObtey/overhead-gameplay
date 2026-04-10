@@ -1,23 +1,19 @@
 #include "GameLoop.h"
 #include "SceneTree.h"
-#include "Scripting/Proxies/ActionMapProxy.h"
 #include "Scripting/Proxies/MathsProxy.h"
-#include "Nodes/NodeCamera.h"
-#include "Nodes/NodeMesh.h"
 #include "Nodes/NodeViewport.h"
 #include "Nodes/NodeWindow.h"
 #include "Servers/EngineServer.h"
 
-#include "Scripting/Lua/LuaScriptInstance.hpp"
-
-using namespace Ore;
-
-uptr<Node> LoadScene()
+Node& LoadScene(Node& root)
 {
+    uptr<NodeViewport> v = Node::CreateNode<NodeViewport>("MainViewport");
+    Node* viewport = v.get();
+    root.AddChild(std::move(v));
+
     uptr<Node> scene = Node::LoadNodeFromJSON<Node>("res/scenes/default.sc.json");
-    uptr<NodeViewport> viewport = Node::CreateNode<NodeViewport>("MainViewport");
     viewport->AddChild(std::move(scene));
-    return viewport;
+    return *viewport;
 }
 
 int main()

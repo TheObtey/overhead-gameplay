@@ -98,7 +98,6 @@ void Node3D::UpdateLocalTransform()
 	m_worldDirty = false;
 }
 
-
 glm::mat4x4 const& Node3D::GetWorldMatrix() const
 {
 	return m_worldTransform;
@@ -160,6 +159,11 @@ void Node3D::Deserialize(SerializedObject const& datas)
 {
 	Node::Deserialize(datas);
 	datas.GetPublicElement("Transform", static_cast<ISerializable*>(&m_transform));
+}
+
+void Node3D::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<Node3D>(script, *this);
 }
 
 ISerializable* Node3D::CreateInstance()

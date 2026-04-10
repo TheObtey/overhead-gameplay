@@ -21,6 +21,8 @@ protected:
     virtual bool IsVisible();
     void TryAttachToViewport();
 
+    void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
+
 protected:
     NodeViewport* m_pViewport = nullptr; //nearest viewport to render to
 };

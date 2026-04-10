@@ -70,6 +70,7 @@ public:
 
 protected:
 	virtual void DestroyShape() = 0;
+	void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
 	rp3d::Transform GetLocalRp3dTransform() const;
 
 	rp3d::Collider* m_pCollider = nullptr;
