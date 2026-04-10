@@ -74,6 +74,11 @@ void NodeViewport::AddSkeletalMesh(NodeMeshAnimated3D const& mesh) const
 	m_pAnimatedPass->AddSkeletalMesh(*mesh.m_mesh);
 }
 
+void NodeViewport::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<NodeViewport>(script, *this);
+}
+
 void NodeViewport::UpdateViewport()
 {
 	glm::vec2 const& pos = m_transform.GetPosition();

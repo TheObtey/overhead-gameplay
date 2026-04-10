@@ -17,7 +17,7 @@ public:
 
     virtual ~GameLoop() = default;
 
-    std::function<uptr<Node>()> LoadScene;
+    std::function<Node&(Node& root)> LoadScene;
 
 protected:
     virtual void InitServers();

@@ -26,6 +26,7 @@ public:
 private:
     void TryAttachToViewport();
     void UpdateCameraOwner(NodeViewport& newOwner);
+    void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
 
 protected:
     Ore::Camera m_camera;
