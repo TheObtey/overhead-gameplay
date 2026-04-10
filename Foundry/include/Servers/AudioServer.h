@@ -60,7 +60,10 @@ protected:
 private:
 	void FlushCommandsImpl() override {};
 	void BuildTasksImpl(TaskGraph& graph) override {};
-	void OnInitialize() override {}
+	void OnInitialize() override {};
+	void OnUnInitialize() override {};
+
+	friend Server<AudioServer>;
 };
 
 #endif

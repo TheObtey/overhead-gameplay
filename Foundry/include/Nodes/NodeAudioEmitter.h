@@ -40,6 +40,6 @@ protected:
 
 REGISTER_ISERIALIZABLE(NodeAudioEmitter, NodeAudioEmitter::CreateInstance);
 
-#include "Scripting/Proxies/NodeAudioEmitterProxy.inl"
+#include "Scripting/Proxies/NodeAudioEmitterProxy.h"
 
 #endif

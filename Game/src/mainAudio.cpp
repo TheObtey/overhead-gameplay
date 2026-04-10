@@ -18,8 +18,10 @@ uptr<Node> LoadScene()
 // Test LUA
 int main(int argc, char** argv)
 {
+    AudioServer::Init();
+
     uptr<Node> root = Node::CreateNode<NodeWindow>("Root");
-    uptr<Node> scene = Node::CreateNode<Node>("Scene");    //Load this with the default .st file
+    uptr<Node> scene = Node::CreateNode<Node>("Scene");
 
     uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/scripts/AudioTest.lua");
     Node::AttachScript(script, *scene);
@@ -30,6 +32,8 @@ int main(int argc, char** argv)
     GameLoop loop;
     loop.LoadScene = LoadScene;
     loop.StartGame(defaultSceneTree);
+
+    AudioServer::Shutdown();
 
     return 0;
 }
@@ -77,7 +81,7 @@ int main(int argc, char** argv)
 //	Logger::Log("listener x:" + std::to_string(audioListen->GetListenerPosition().x));
 //
 //    // --- Actions ---
-//    ActionMap actionMap;
+//   /* ActionMap actionMap;
 //
 //    uptr<Action> pauseAction = std::make_unique<Action>(ControlType::BUTTON, Ore::EventInput::KEY_P);
 //    pauseAction.get()->OnAction += [&](IControl& control)
@@ -179,7 +183,7 @@ int main(int argc, char** argv)
 //            newPos.x += 0.1f;
 //            audioListen->SetListenerPosition(newPos);
 //        };
-//    actionMap.Emplace("MoveRight", moveRight.get());
+//    actionMap.Emplace("MoveRight", moveRight.get());*/
 //
 //    GameLoop loop;
 //    loop.LoadScene = LoadScene;

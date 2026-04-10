@@ -31,6 +31,6 @@ protected:
 
 REGISTER_ISERIALIZABLE(NodeAudioListener, NodeAudioListener::CreateInstance);
 
-#include "Scripting/Proxies/NodeAudioListenerProxy.inl"
+#include "Scripting/Proxies/NodeAudioListenerProxy.h"
 
 #endif

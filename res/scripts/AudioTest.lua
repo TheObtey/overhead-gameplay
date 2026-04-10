@@ -8,8 +8,8 @@ local sfx
 
 function OnInit()
 	--- Audio Server ---
-	music = audio.CreateChannel("Music");
-	sfx = audio.CreateChannel("Sfx");
+	music = audioserver:CreateChannel("Music");
+	sfx =  audioserver:CreateChannel("Sfx");
 
 	--- Mixer ---
 	--mixer = audioMixer:new()
@@ -23,10 +23,12 @@ function OnInit()
 	audioEm2 = CreateNodeAudioEmitter("nodeaudioemitter")
     --audioEm2 = nodeaudioemitter:new("nodeaudioemitter")
 
-	audioEm:Load("res/freeman.mp3", music);
-	audioEm2:Load("res/applause.mp3", sfx);
+	audioEm:Load("freeman.mp3", music);
+	audioEm2:Load("applause.mp3", sfx);
 
-	audioEm2:SetSourcePosition({ x=100,y=0,z=0 }); --allways after load
+	local v = fmath.vec3:new(100,0,0)
+
+	audioEm2:SetSourcePosition(v); --allways after load
 
 	--audioEm->SetLoop(true);
 	audioEm2:SetLoop(true);
@@ -35,15 +37,15 @@ function OnInit()
 	audioEm2:Play();
 
 	--- Audio Listener ---
-	audioListen = nodeaudiolistener:new("nodeaudiolistener")
-	audioListen:SetListenerPosition({ x=0,y=0,z=0 });
+	audioListen = CreateNodeAudioListener("nodeaudiolistener")
+    v = fmath.vec3:new(0,0,0)
+	audioListen:SetListenerPosition(v);
 
 	print("audio1 x:".. tostring(audioEm:GetSourcePosition().x));
 	print("audio2 x:".. tostring(audioEm2:GetSourcePosition().x));
 	print("listener x:".. tostring(audioListen:GetListenerPosition().x));
 
 	--mixer:Shutdown();
-	audioServer:Shutdown();
 end
 
 function OnUpdate(dt) end

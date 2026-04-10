@@ -1,37 +1,20 @@
 #include "Scripting/Proxies/AudioServerProxy.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
 #include "Servers/AudioServer.h"
 
-AudioChannel* CreateChannel(const std::string& name)
-{ 
-	return AudioServer::CreateChannel(name);
-}
-void SetMasterVolume(float volume) 
-{ 
-	AudioServer::SetMasterVolume(volume);
-}
-float GetMasterVolume() 
-{
-	return AudioServer::GetMasterVolume();
-}
-void SetGroupVolume(AudioChannel* channel, float v)
-{ 
-	AudioServer::SetGroupVolume(channel, v);
-}
-float GetGroupVolume(AudioChannel* channel)
-{ 
-	return ma_sound_group_get_volume(&channel->GetGroup()); 
-}
 void AudioProxyBinding::Bind(Binder& binder)
 {
 	binder.BindClass<AudioChannel>("audiochannel", 
-		"GetName",&AudioChannel::GetName,
-		"GetGroup",&AudioChannel::GetGroup
+		"GetName",&AudioChannel::GetName
 		);
 
-	auto audioNameSpace = binder.GetOrCreateNamespace("audio");
-	audioNameSpace.set_function("CreateChannel", &CreateChannel);
-	audioNameSpace.set_function("SetMasterVolume", &SetMasterVolume);
-	audioNameSpace.set_function("GetMasterVolume", &GetMasterVolume);
-	audioNameSpace.set_function("SetGroupVolume", &SetGroupVolume);
-	audioNameSpace.set_function("GetGroupVolume", &GetGroupVolume);
+	auto audioNameSpace = binder.GetOrCreateNamespace("audioserver");
+
+	audioNameSpace.set_function("CreateChannel", &AudioServer::CreateChannel);
+	audioNameSpace.set_function("SetMasterVolume", &AudioServer::SetMasterVolume);
+	audioNameSpace.set_function("GetMasterVolume", &AudioServer::GetMasterVolume);
+	audioNameSpace.set_function("SetGroupVolume", &AudioServer::SetGroupVolume);
+	audioNameSpace.set_function("GetGroupVolume", &AudioServer::GetGroupVolume);
 }
+
+REGISTER_PROXY(AudioProxyBinding, AudioProxy);
