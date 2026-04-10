@@ -14,14 +14,27 @@
 
 namespace
 {
+
     std::filesystem::path const kScriptStockDir = "../Game/ScriptStock";
     std::filesystem::path const kTextureRootDir = "../Game/res/textures";
+    std::filesystem::path const kScriptStockLogicalDir = "ScriptStock";
+
     std::string const kDefaultTexturePath = "res/textures/Default.png";
 
     std::string NormalizeScriptPathForProject(std::filesystem::path const& inputPath)
     {
-        std::error_code ec;
+        if (inputPath.empty())
+            return {};
 
+        std::string const in = inputPath.generic_string();
+
+        if (in.rfind("ScriptStock/", 0) == 0)
+            return in;
+
+        if (in.rfind("../Game/ScriptStock/", 0) == 0)
+            return in.substr(std::string("../Game/").size());
+
+        std::error_code ec;
         std::filesystem::path stockAbs = std::filesystem::weakly_canonical(std::filesystem::absolute(kScriptStockDir), ec);
         if (ec)
         {
@@ -40,13 +53,14 @@ namespace
             candidateAbs = candidate;
         }
 
+        // Si le fichier est dans ScriptStock, on garde la sous-arborescence
         std::filesystem::path relToStock = std::filesystem::relative(candidateAbs, stockAbs, ec);
         if (!ec && !relToStock.empty())
         {
             std::string const relStr = relToStock.generic_string();
             if (!(relStr == ".." || relStr.rfind("../", 0) == 0))
             {
-                return (kScriptStockDir / relToStock).generic_string();
+                return (kScriptStockLogicalDir / relToStock).generic_string();
             }
         }
 
