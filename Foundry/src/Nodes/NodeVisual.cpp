@@ -46,3 +46,7 @@ uptr<Node> NodeVisual::Clone()
 	return clone;
 }
 
+void NodeVisual::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+    AttachScript<NodeVisual>(script, *this);
+}

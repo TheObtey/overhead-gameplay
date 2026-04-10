@@ -36,6 +36,9 @@ public:
 	Event<void(uint32, uint32)> OnViewportResize;
 	uptr<Node> Clone() override;
 
+protected:
+	void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
+
 private:
 	void UpdateViewport();
 	void TryAttachToWindow();
@@ -63,4 +66,3 @@ protected:
 REGISTER_ISERIALIZABLE(NodeViewport, NodeViewport::CreateInstance);
 
 #endif
-

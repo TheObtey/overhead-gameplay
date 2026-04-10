@@ -116,6 +116,8 @@ protected:
 	Node& operator=(Node const& other) = delete;
 	Node& operator=(Node&& other) noexcept = delete;
 
+	virtual void AttachScriptDeserialize(uptr<LuaScriptInstance>& script);
+
 	std::string m_name; //unique among siblings
 	std::string m_scriptPath;
 	Node* m_pOwner = nullptr;

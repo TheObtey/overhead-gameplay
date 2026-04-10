@@ -259,10 +259,7 @@ void Node::Serialize(SerializedObject& datas) const
 	{
 		datas.AddPrivateElementInArray("Children", static_cast<ISerializable const*>(m_children.at(m_childrenOrder[i]).get()));
 	}
-
 }
-
-
 
 void Node::Deserialize(SerializedObject const& datas)
 {
@@ -277,7 +274,7 @@ void Node::Deserialize(SerializedObject const& datas)
 	{
 		DEBUG("ATTACH " << m_scriptPath << std::endl);
 		uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>(m_scriptPath);
-		Node::AttachScript(script, *this);
+		AttachScriptDeserialize(script);
 	}
 
 	std::vector<ISerializable*> tempList = datas.GetPrivateArray<ISerializable*>("Children");
@@ -286,6 +283,11 @@ void Node::Deserialize(SerializedObject const& datas)
 		uptr<Node> pNode = uptr<Node>((Node*)tempList[i]);
 		AddChild(pNode);
 	}
+}
+
+void Node::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<Node>(script, *this);
 }
 
 ISerializable* Node::CreateInstance()
