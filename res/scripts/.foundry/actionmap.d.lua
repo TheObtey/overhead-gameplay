@@ -62,14 +62,6 @@ event = {}
 action = {}
 action.Event = {}
 
----@return action
-function action:new() end
-
----@param ctControlType controltype Type of Control to trigger the callback event
----@param eiEventInput eventinput Input ID (ex. KEY_A or GAMEPAD_TRIGGER)
----@return action
-function action:new(ctControlType, eiEventInput) end
-
 ---@param ctControlType controltype
 ---@param eiEventInput eventinput
 ---@return number
@@ -122,13 +114,9 @@ function stickcontrol:GetPos() end
 ---@class actionmap
 actionmap = {}
 
+---@param sName string action map name
 ---@return actionmap
-function actionmap:new() end
-
----@param sName string
----@param acAction action
----@return boolean
-function actionmap:Emplace(sName, acAction) end
+function actionmap:new(sName) end
 
 ---@param sName string
 ---@return boolean
@@ -144,3 +132,8 @@ function actionmap:Length() end
 ---@param sOldName string
 ---@param sNewName string
 function actionmap:Rename(sOldName, sNewName) end 
+
+---@param sName string action name
+---@param ctControlType controltype controltype
+---@param eiEventInput eventinput input ID
+function actionmap:CreateAction(sName, ctControlType, eiEventInput) end
