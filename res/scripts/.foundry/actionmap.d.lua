@@ -114,8 +114,9 @@ function stickcontrol:GetPos() end
 ---@class actionmap
 actionmap = {}
 
+---@param sName string action map name
 ---@return actionmap
-function actionmap:new() end
+function actionmap:new(sName) end
 
 ---@param sName string
 ---@return boolean
@@ -132,7 +133,7 @@ function actionmap:Length() end
 ---@param sNewName string
 function actionmap:Rename(sOldName, sNewName) end 
 
----@param sName string Action name
----@param ctControlType controltype
----@param eiEventInput eventinput
+---@param sName string action name
+---@param ctControlType controltype controltype
+---@param eiEventInput eventinput input ID
 function actionmap:CreateAction(sName, ctControlType, eiEventInput) end

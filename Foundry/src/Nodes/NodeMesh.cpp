@@ -21,13 +21,13 @@ NodeMesh::NodeMesh(std::string const &name) : NodeVisual(name)
     // problem here
     if (!s_IsInEditor)
         AddTextures(GraphicServer::GetDefaultTexture());
-    m_pMesh->SetTransform(m_transform.GetMatrix());
+    m_pMesh->SetTransform(m_worldTransform);
 }
 
 void NodeMesh::OnUpdate(double delta)
 {
     NodeVisual::OnUpdate(delta);
-    m_pMesh->SetTransform(m_transform.GetMatrix());
+    m_pMesh->SetTransform(m_worldTransform);
 
     if (IsVisible() && m_pViewport)
         m_pViewport->AddMesh(*this);
