@@ -62,13 +62,14 @@ event = {}
 action = {}
 action.Event = {}
 
----@param ctControlType controltype
----@param eiEventInput eventinput
----@return number
+---@param ctControlType controltype Type of control (ex BUTTON)
+---@param eiEventInput eventinput Input ID (ex KEY_SPACE == 32)
+---@return number the index of the added control
 function action:AddControl(ctControlType, eiEventInput) end
 
+---@param iIndex number
 ---@return icontrol
-function action:GetControl() end
+function action:GetControl(iIndex) end
 
 --------------------------------------------------------------------------------------------
 -- ButtonControl
@@ -114,9 +115,15 @@ function stickcontrol:GetPos() end
 ---@class actionmap
 actionmap = {}
 
----@param sName string action map name
+---@param sName string ActionMap name
 ---@return actionmap
 function actionmap:new(sName) end
+
+---@param sName string Action name
+---@param ctControlType controltype
+---@param eiEventInput eventinput
+---@return action returns instanciated Action
+function actionmap:CreateAction(sName, ctControlType, eiEventInput) end
 
 ---@param sName string
 ---@return boolean

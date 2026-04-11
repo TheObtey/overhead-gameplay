@@ -9,14 +9,17 @@ ActionMap::~ActionMap()
 		delete it->second;
 }
 
-bool ActionMap::Emplace(std::string_view const& name, Action* pAction)
+
+Action* ActionMap::CreateAction(std::string_view const& name, ControlType type, Ore::EventInput eventInput)
 {
 	if (m_actions.find(std::string(name)) != m_actions.end())
-		return false;
+		return nullptr;
+
+	Action* pAction = new Action(type, eventInput, this);
 
 	m_actions[std::string(name)] = pAction;
-	
-	return true;
+
+	return pAction;
 }
 
 bool ActionMap::Erase(std::string_view const& name)
@@ -40,9 +43,7 @@ Action* ActionMap::GetAction(std::string_view const& name)
 
 Action* ActionMap::operator[](std::string const& name)
 {
-	if (m_actions.find(std::string(name)) == m_actions.end())
-		return nullptr;
-	return m_actions[std::string(name)];
+	return GetAction(name);
 }
 
 uint32 ActionMap::Length() const
@@ -58,9 +59,3 @@ void ActionMap::Rename(std::string_view const& old, std::string_view const& name
 	m_actions[std::string(name)] = m_actions[std::string(old)];
 	m_actions.erase(m_actions.find(std::string(old)));
 }
-
-void ActionMap::CreateAction(std::string_view const& name, ControlType type, Ore::EventInput eventInput)
-{
-	Emplace(name, new Action(type, eventInput, this));
-}
-

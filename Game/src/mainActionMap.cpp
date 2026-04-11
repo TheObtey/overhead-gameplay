@@ -12,11 +12,11 @@
 
 #include "Scripting/Lua/LuaScriptInstance.hpp"
 
-uptr<Node> LoadScene()
+Node& LoadScene(Node& root)
 {
     uptr<Node> scene = Node::CreateNode<Node>("Scene");
 
-    return scene;
+    return *scene.get();
 }
 
 int main(int argc, char** argv)

@@ -27,7 +27,7 @@ Action::Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* p
 				return;
 			for (int i = 0; i  < m_controls.size(); i++)
 			{
-				if (in == m_controls[i]->GetEventInput() && ac == Ore::EventAction::PRESS)
+				if (in == m_controls[i]->GetEventInput() && ac == Ore::EventAction::HOLD)
  					std::invoke(Event, *m_controls[i]);
 			}
 		};

@@ -19,7 +19,7 @@ enum class ControlType : byte;
 class Action /*: public ISerializable*/
 {
 public:
-	Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* pActionMap = nullptr);
+	Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* pActionMap);
 	~Action();
 
 	uint32 AddControl(ControlType const& type, Ore::EventInput const& eventInput);
