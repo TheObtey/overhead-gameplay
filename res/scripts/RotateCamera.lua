@@ -34,9 +34,15 @@ function SetCurrentEntity(ndHit)
 end
 
 function CheckInteraction()
-    local hit = physics.Raycast(self:GetPosition(), self:GetLocalForward(), 100, 1)
+    local hit = physics.Raycast(self:GetPosition(), self:GetLocalForward())
+
+    if not hit then
+        print("hit doesn't found")
+        return
+    end
 
     if not hit.node then
+        print("Node doesn't found in the hit")
         return
     end
 
@@ -82,10 +88,12 @@ function OnInit()
     actionmap:GetAction("MOVE_UP").Event = MoveUp
 
     actionmap:GetAction("INTERACT").Event = TryInteract
+
+    timer.Create("RaycastDelay", 1, 100000, CheckInteraction)
+    
 end
 
 function OnUpdate(dt)
-    CheckInteraction()
 end
 
 function OnDestroy()

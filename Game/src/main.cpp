@@ -4,6 +4,7 @@
 #include "Nodes/NodeViewport.h"
 #include "Nodes/NodeWindow.h"
 #include "Servers/EngineServer.h"
+#include "Servers/PhysicsServer.h"
 
 Node& LoadScene(Node& root)
 {
@@ -11,13 +12,15 @@ Node& LoadScene(Node& root)
     Node* viewport = v.get();
     root.AddChild(std::move(v));
 
-    uptr<Node> scene = Node::LoadNodeFromJSON<Node>("res/scenes/default.sc.json");
+    uptr<Node> scene = Node::LoadNodeFromJSON<Node>("res/scenes/Test1.sc.json");
     viewport->AddChild(std::move(scene));
     return *viewport;
 }
 
 int main()
 {
+    PhysicsServer::Initialize();
+
     uptr<Node> root = Node::CreateNode<NodeWindow>("Window");
     SceneTree defaultSceneTree(root);
 
