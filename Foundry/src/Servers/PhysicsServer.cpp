@@ -603,90 +603,90 @@ void PhysicsServer::S_AddCollider(NodeCollider& collider, NodeRigidBody& rigidBo
 
 void PhysicsServer::S_ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->applyLocalForceAtCenterOfMass(glmToRp3d(force));
 }
 void PhysicsServer::S_ApplyLocalForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->applyLocalForceAtLocalPosition(glmToRp3d(force), glmToRp3d(point));
 }
 void PhysicsServer::S_ApplyLocalForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->applyLocalForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
 }
 
 void PhysicsServer::S_ApplyWorldForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->applyWorldForceAtCenterOfMass(glmToRp3d(force));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->applyWorldForceAtCenterOfMass(glmToRp3d(force));
 }
 void PhysicsServer::S_ApplyWorldForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->applyWorldForceAtLocalPosition(glmToRp3d(force), glmToRp3d(point));
 }
 void PhysicsServer::S_ApplyWorldForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->applyWorldForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->applyWorldForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
 }
 
 void PhysicsServer::S_ApplyLocalTorque(const glm::vec3& torque, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->applyLocalTorque(glmToRp3d(torque));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->applyLocalTorque(glmToRp3d(torque));
 }
 void PhysicsServer::S_ApplyWorldTorque(const glm::vec3& torque, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->applyWorldTorque(glmToRp3d(torque));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->applyWorldTorque(glmToRp3d(torque));
 }
 
 void PhysicsServer::S_SetLinearVelocity(const glm::vec3& velocity, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->setLinearVelocity(glmToRp3d(velocity));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->setLinearVelocity(glmToRp3d(velocity));
 }
 void PhysicsServer::S_SetAngularVelocity(const glm::vec3& velocity, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setAngularVelocity(glmToRp3d(velocity));
 }
 /// Set the linear decelerating factor
 void  PhysicsServer::S_SetLinearDamping(float linearDamping, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setLinearDamping(linearDamping);
 }
 /// Set the angular decelerating factor
 void  PhysicsServer::S_SetAngularDamping(float angularDamping, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setAngularDamping(angularDamping);
 }
 
 void PhysicsServer::S_ResetForces(NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->resetForce();
 }
 void PhysicsServer::S_ResetTorque(NodeRigidBody& rb)
 {
 
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->resetTorque();
 }
 
 void  PhysicsServer::S_SetMass(float mass, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setMass(mass);
 }
 void PhysicsServer::S_SetBodyType(RigidBodyType type, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner == nullptr) return;
+	if (rb.m_pNode3DParent == nullptr) return;
 	switch (type)
 	{
 	case RigidBodyType::STATIC:
@@ -706,27 +706,27 @@ void PhysicsServer::S_SetBodyType(RigidBodyType type, NodeRigidBody& rb)
 
 void PhysicsServer::S_LockLinearAxis(bool lockAxis[], NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setLinearLockAxisFactor(rp3d::Vector3{ lockAxis[0] == true ? 0.0f : 1.0f, lockAxis[1] == true ? 0.0f : 1.0f, lockAxis[2] == true ? 0.0f : 1.0f });
 }
 void PhysicsServer::S_LockAngularAxis(bool lockAxis[], NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setAngularLockAxisFactor(rp3d::Vector3{ lockAxis[0] == true ? 0.0f : 1.0f, lockAxis[1] == true ? 0.0f : 1.0f, lockAxis[2] == true ? 0.0f : 1.0f });
 }
 void PhysicsServer::S_SetSleepingEnabled(bool enabled, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setIsAllowedToSleep(enabled);
 }
 void PhysicsServer::S_SetSleepingState(bool isSleeping, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setIsSleeping(isSleeping);
 }
 void PhysicsServer::S_SetIsGravityEnabled(bool enabled, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->enableGravity(enabled);
 }
 
@@ -752,7 +752,7 @@ void PhysicsServer::S_Detach(NodeCollider& c)
 	if (c.m_pNodeRigidBody == nullptr) return;
 
 	auto& colliders = c.m_pNodeRigidBody->m_colliders;
-	colliders[c.m_indexInRigidBody] = nullptr;	
+	colliders[c.m_indexInRigidBody] = nullptr;
 	colliders.erase(colliders.begin() + c.m_indexInRigidBody);
 
 	c.m_indexInRigidBody = -1;
@@ -830,7 +830,7 @@ void  PhysicsServer::S_SetMassDensity(float v, NodeCollider& c)
 void PhysicsServer::S_SetIsTrigger(bool v, NodeCollider& c)
 {
 	if (!c.m_pCollider) return;
-	
+
 	c.m_pCollider->setIsTrigger(v); c.m_pCollider->setIsSimulationCollider(!v);
 }
 void PhysicsServer::S_SetIsSimulationCollider(bool v, NodeCollider& c)
