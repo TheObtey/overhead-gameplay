@@ -46,6 +46,8 @@ private:
 	ControlType m_type;
 	Ore::EventInput m_eventInput;
 	Action* m_pAction; 
+
+	friend Action;
 };
 
 class ButtonControl : public IControl
@@ -56,6 +58,7 @@ public:
 	~ButtonControl() = default;
 
 	ButtonState GetState() const;
+	void SetState(ButtonState state);
 
 private:
 	ButtonState m_state;
@@ -70,6 +73,7 @@ public:
 	~SliderControl() = default;
 
 	float GetPos() const;
+	void SetPos(float pos);
 
 private:
 	float m_pos;
@@ -84,6 +88,7 @@ public:
 	~StickControl() = default;
 
 	glm::vec2 GetPos() const;
+	void SetPos(glm::vec2 pos);
 
 private:
 	glm::vec2 m_pos;

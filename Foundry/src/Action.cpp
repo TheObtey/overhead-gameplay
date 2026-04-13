@@ -7,28 +7,44 @@ Action::Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* p
 {
 	AddControl(controlType, eventInput);
 
-	if (controlType == ControlType::STICK && eventInput == Ore::EventInput::MOUSE_MOVE)
-	{
-		Ore::EventManager::getCursorPos += [&](int32 x, int32 y)
-			{
-				if (m_pOwner == nullptr || m_pOwner->Active == false)
-					return;
-				for (int i = 0; i < m_controls.size(); i++)
-				{
-					if (m_controls[i]->GetEventInput() == Ore::EventInput::MOUSE_MOVE)
-						std::invoke(Event, *m_controls[i]);
-				}
-			};
-	}
+	Ore::EventManager::getCursorPos += [&](int32 x, int32 y)
+		{
+			if (m_pOwner == nullptr || m_pOwner->Active == false)
+				return;
 
+			for (int i = 0; i < m_controls.size(); i++)
+			{
+				if (m_controls[i]->GetEventInput() == Ore::EventInput::MOUSE_MOVE &&
+					m_controls[i]->GetControlType() == ControlType::STICK)
+				{
+					StickControl& stick = static_cast<StickControl&>(*m_controls[i]);
+					stick.SetPos({ x, y });
+					std::invoke(Event, *m_controls[i]);
+				}
+			}
+		};
+	
 	Ore::EventManager::getKey += [&](Ore::EventInput in, Ore::EventAction ac)
 		{
 			if (m_pOwner == nullptr || m_pOwner->Active == false)
 				return;
+			
 			for (int i = 0; i  < m_controls.size(); i++)
 			{
-				if (in == m_controls[i]->GetEventInput() && ac == Ore::EventAction::HOLD)
- 					std::invoke(Event, *m_controls[i]);
+				if (in == m_controls[i]->GetEventInput() && m_controls[i]->GetControlType() == ControlType::BUTTON)
+				{
+					ButtonControl& button = static_cast<ButtonControl&>(*m_controls[i]);
+					
+					if (ac == Ore::EventAction::PRESS)
+					{
+						button.SetState(ButtonState::DOWN);
+						std::invoke(Event, button);
+					}
+					else if (ac == Ore::EventAction::RELEASE)
+					{
+						button.SetState(ButtonState::UP);
+					}
+				}
 			}
 		};
 }

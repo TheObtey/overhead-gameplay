@@ -60,6 +60,11 @@ ButtonState ButtonControl::GetState() const
 	return m_state;
 }
 
+void ButtonControl::SetState(ButtonState state)
+{
+	m_state = state;
+}
+
 
 SliderControl::SliderControl(Ore::EventInput const& eventInput, Action* pAction) : IControl(ControlType::SLIDER, eventInput, pAction), m_pos(0.0f) {}
 
@@ -68,9 +73,22 @@ float SliderControl::GetPos() const
 	return m_pos;
 }
 
+void SliderControl::SetPos(float pos)
+{
+	// Normalize ici
+	m_pos = pos;
+}
+
+
 StickControl::StickControl(Ore::EventInput const& eventInput, Action* pAction) : IControl(ControlType::STICK, eventInput, pAction), m_pos(0.0f) {}
 
 glm::vec2 StickControl::GetPos() const
 {
 	return m_pos;
+}
+
+void StickControl::SetPos(glm::vec2 pos)
+{
+	// Normalize ici
+	m_pos = pos;
 }

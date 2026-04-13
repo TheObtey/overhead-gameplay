@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     uptr<Node> root = Node::CreateNode<NodeWindow>("Root");
     uptr<Node> scene = Node::CreateNode<Node>("Scene");    //Load this with the default .st file
 
-    uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/test.lua");
+    uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/scripts/test.lua");
     Node::AttachScript(script, *scene);
     root->AddChild(scene);
 
