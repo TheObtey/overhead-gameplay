@@ -63,7 +63,8 @@ void Node3D::UpdateWorldTransform()
 	m_worldPosition += parent->m_worldPosition;
 	m_worldPosition.w = 1.0f;
 
-	m_worldTransform = Maths::Scale(m_worldScale) * glm::toMat4(m_worldRotation) *  Maths::Translate(m_worldPosition);
+	m_worldTransform = Maths::Translate(m_worldPosition) * glm::toMat4(m_worldRotation) * Maths::Scale(m_worldScale)  ;
+
 }
 
 void Node3D::UpdateLocalTransform()

@@ -78,6 +78,8 @@ public:
 	void SetSleepingState(bool isSleeping)													{ m_pNode->SetSleepingState(isSleeping); }
 	void SetIsGravityEnabled(bool enabled)													{ m_pNode->SetIsGravityEnabled(enabled); }
 
+	Node3D::Proxy* GetNode3DParent()														{ return static_cast<Node3D::Proxy*>(&m_pNode->GetNode3DParent()->GetNodeProxy()); };
+
 private:
 	NodeRigidBody* m_pNode;
 };
@@ -141,7 +143,9 @@ struct NodeRigidBody::Proxy::ProxyBinding
 			"IsGravityEnabled", BIND(IsGravityEnabled),
 			"SetSleepingEnabled", BIND(SetSleepingEnabled),
 			"SetSleepingState", BIND(SetSleepingState),
-			"SetIsGravityEnabled", BIND(SetIsGravityEnabled)
+			"SetIsGravityEnabled", BIND(SetIsGravityEnabled),
+
+			"GetNode3DParent", BIND(GetNode3DParent)
 		);
 	};
 };
