@@ -9,7 +9,7 @@
 
 namespace Physics
 {
-	struct RaycastHit 
+	struct RaycastHit
 	{
 		glm::vec3 impactPos;
 		glm::vec3 normal;
@@ -38,28 +38,29 @@ namespace Physics
 	};
 
 	inline auto RaycastClosest = sol::overload(
-		[](const glm::vec3& origin, const glm::vec3& direction) 
+		[](const glm::vec3& origin, const glm::vec3& direction)
 		{
 			rp3d::Ray ray(glmToRp3d(origin), glmToRp3d(origin + direction * 100.0f));
 			HelperCallBack::RaycastCB cb;
 
 			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 0);
-
-			//if (cb.hits.empty())
-			//	return std::nullopt;
-
-			// Can't simply get the first hit returned because the lib doesn't guarantee the order of the hits
-			float minDist = 100.0f;
+			bool hasHit = !cb.hits.empty();
 			int closest = 0;
-			for (int i = 0; i < cb.hits.size(); i++)
+			if (hasHit)
 			{
-				if (cb.hits[i].dist < minDist)
+				// Can't simply get the first hit returned because the lib doesn't guarantee the order of the hits
+				float minDist = 100.0f;
+				for (int i = 0; i < cb.hits.size(); i++)
 				{
-					minDist = cb.hits[i].dist;
-					closest = i;
+					if (cb.hits[i].dist < minDist)
+					{
+						minDist = cb.hits[i].dist;
+						closest = i;
+					}
 				}
 			}
-			return std::optional<RaycastHit>(cb.hits[closest]);
+
+			return hasHit ? std::optional<RaycastHit>(cb.hits[closest]) : std::nullopt;
 		},
 		[](const glm::vec3& origin, const glm::vec3& direction, float maxDist)
 		{
@@ -68,21 +69,22 @@ namespace Physics
 
 			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 0);
 
-			//if (cb.hits.empty())
-			//	return std::nullopt;
-
-			// Can't simply get the first hit returned because the lib doesn't guarantee the order of the hits
-			float minDist = maxDist;
+			bool hasHit = !cb.hits.empty();
 			int closest = 0;
-			for (int i = 0; i < cb.hits.size(); i++)
+			if (hasHit)
 			{
-				if (cb.hits[i].dist < minDist)
+				// Can't simply get the first hit returned because the lib doesn't guarantee the order of the hits
+				float minDist = maxDist;
+				for (int i = 0; i < cb.hits.size(); i++)
 				{
-					minDist = cb.hits[i].dist;
-					closest = i;
+					if (cb.hits[i].dist < minDist)
+					{
+						minDist = cb.hits[i].dist;
+						closest = i;
+					}
 				}
 			}
-			return std::optional<RaycastHit>(cb.hits[closest]);
+			return hasHit ? std::optional<RaycastHit>(cb.hits[closest]) : std::nullopt;
 		},
 		[](const glm::vec3& origin, const glm::vec3& direction, float maxDist, uint16 mask)
 		{
@@ -91,21 +93,22 @@ namespace Physics
 
 			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, mask);
 
-			//if (cb.hits.empty())
-			//	return std::nullopt;
-
-			// Can't simply get the first hit returned because the lib doesn't guarantee the order of the hits
-			float minDist = maxDist;
+			bool hasHit = !cb.hits.empty();
 			int closest = 0;
-			for (int i = 0; i < cb.hits.size(); i++)
+			if (hasHit)
 			{
-				if (cb.hits[i].dist < minDist)
+				// Can't simply get the first hit returned because the lib doesn't guarantee the order of the hits
+				float minDist = maxDist;
+				for (int i = 0; i < cb.hits.size(); i++)
 				{
-					minDist = cb.hits[i].dist;
-					closest = i;
+					if (cb.hits[i].dist < minDist)
+					{
+						minDist = cb.hits[i].dist;
+						closest = i;
+					}
 				}
 			}
-			return std::optional<RaycastHit>(cb.hits[closest]);
+			return hasHit ? std::optional<RaycastHit>(cb.hits[closest]) : std::nullopt;
 		}
 	);
 
@@ -156,7 +159,7 @@ struct PhysicsProxyBinding
 		physics.set_function("Raycast", Physics::RaycastClosest);
 		physics.set_function("RaycastAll", Physics::RaycastAll);
 		physics.set_function("SetGravity", &PhysicsServer::SetGravity);
-		physics.set_function("GetGravity", &PhysicsServer::GetGravity); 
+		physics.set_function("GetGravity", &PhysicsServer::GetGravity);
 	}
 };
 
