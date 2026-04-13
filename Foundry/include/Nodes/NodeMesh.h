@@ -14,6 +14,8 @@ enum class MeshGeometrySourceType : uint8
 class NodeMesh : public NodeVisual
 {
 public:
+    class Proxy;
+
     explicit NodeMesh(std::string const &name);
     ~NodeMesh() override = default;
 
@@ -63,5 +65,7 @@ void NodeMesh::AddTextures(Args... textures)
 }
 
 REGISTER_ISERIALIZABLE(NodeMesh, NodeMesh::CreateInstance);
+
+#include "Scripting/Proxies/NodeMeshProxy.inl"
 
 #endif

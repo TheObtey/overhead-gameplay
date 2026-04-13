@@ -115,7 +115,7 @@ private:
 	void UpdateLocalTransform();
 
 protected:
-	bool IsTransformDirty() const { return m_transform.GetDirty() || (m_isParentNode3D && static_cast<Node3D*>(m_pOwner)->m_transform.GetDirty()); }
+	bool IsTransformDirty() const { return m_transform.GetDirty() || (m_isParentNode3D && static_cast<Node3D*>(m_pOwner)->m_localDirty); }
 	virtual void AttachScriptDeserialize(uptr<LuaScriptInstance>& script);
 
 protected:
