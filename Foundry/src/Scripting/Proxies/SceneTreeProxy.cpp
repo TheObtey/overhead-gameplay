@@ -1,5 +1,4 @@
 #include "Scripting/Proxies/SceneTreeProxy.h"
-#include "Registries/AutomaticRegisterProxy.hpp"
 #include "Servers/EngineServer.h"
 #include "SceneTree.h"
 
@@ -42,5 +41,3 @@ void SceneTreeProxyBinding::Bind(Binder &binder)
         "OnSceneChanged", &SceneTreeProxy::OnSceneChanged
     );
 }
-
-REGISTER_PROXY(SceneTreeProxyBinding, SceneTreeProxy_);
