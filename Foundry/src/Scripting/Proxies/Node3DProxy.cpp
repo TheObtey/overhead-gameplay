@@ -1,6 +1,5 @@
 #include "Servers/EngineServer.h"
 #include "Nodes/Node3D.h"
-#include "Registries/AutomaticRegisterProxy.hpp"
 
 using Proxy = Node3D::Proxy;
 
@@ -12,5 +11,3 @@ Proxy* Proxy::CreateNode3DProxy(std::string const& name)
 	EngineServer::RegisterUnattachedNode(nodeRigidBody);
 	return ptr;
 }
-
-REGISTER_PROXY(Proxy::ProxyBinding, Node3DProxy);

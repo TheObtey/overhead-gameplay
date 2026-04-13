@@ -125,7 +125,6 @@ public:
 	{
 		return m_pNode3DParent;
 	}
-		//{ return m_pOwner ? dynamic_cast<Node3D*>(m_pOwner) : nullptr; }
 
 #ifdef DEBUG_BUILD
 	glm::vec3 GetPosition() const
