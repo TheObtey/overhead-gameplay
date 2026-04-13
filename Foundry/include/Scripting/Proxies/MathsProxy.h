@@ -262,7 +262,7 @@ namespace MathsProxy
     );
 };
 
-struct Vec3ProxyBinding 
+struct MathsProxyBinding 
 {
     static void Bind(Binder& binder);
 };

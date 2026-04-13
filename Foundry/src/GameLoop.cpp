@@ -7,6 +7,7 @@
 #include "Servers/EngineServer.h"
 #include "Servers/GraphicServer.h"
 #include "Servers/PhysicsServer.h"
+#include "Scripting/RegisterProxies.h"
 
 void GameLoop::StartGame(SceneTree& defaultTree)
 {
@@ -67,6 +68,7 @@ void GameLoop::EndGame()
 
 void GameLoop::InitServers()
 {
+    RegisterProxies();
     EngineServer::Initialize();
     GraphicServer::Initialize();
     PhysicsServer::Initialize();
