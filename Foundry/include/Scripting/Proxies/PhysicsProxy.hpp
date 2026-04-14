@@ -43,7 +43,7 @@ namespace Physics
 			rp3d::Ray ray(glmToRp3d(origin), glmToRp3d(origin + direction * 100.0f));
 			HelperCallBack::RaycastCB cb;
 
-			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 0);
+			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 1);
 			bool hasHit = !cb.hits.empty();
 			int closest = 0;
 			if (hasHit)
@@ -67,7 +67,7 @@ namespace Physics
 			rp3d::Ray ray(glmToRp3d(origin), glmToRp3d(origin + direction * maxDist));
 			HelperCallBack::RaycastCB cb;
 
-			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 0);
+			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 1);
 
 			bool hasHit = !cb.hits.empty();
 			int closest = 0;
@@ -118,7 +118,7 @@ namespace Physics
 			rp3d::Ray ray(glmToRp3d(origin), glmToRp3d(origin + direction * 100.0f));
 			HelperCallBack::RaycastCB cb;
 
-			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 0);
+			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 1);
 
 			return cb.hits;
 		},
@@ -127,7 +127,7 @@ namespace Physics
 			rp3d::Ray ray(glmToRp3d(origin), glmToRp3d(origin + direction * maxDist));
 			HelperCallBack::RaycastCB cb;
 
-			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 0);
+			PhysicsServer::GetPhysicsWorld().raycast(ray, &cb, 1);
 
 			return cb.hits;
 		},
