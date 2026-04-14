@@ -72,7 +72,6 @@ public:
 	virtual void Serialize(SerializedObject& datas) const override;
 	virtual void Deserialize(SerializedObject const& datas) override;
 
-
 	std::string GetName();
 	void SetName(std::string const& name);
 	void SetScriptPath(std::string const& path);
