@@ -4,6 +4,7 @@ local oCameraRoot
 local oCamera
 local oMovementComponent
 local oLookComponent
+local oInteractEmitterComponent
 
 local function InitializeRigidbody(iBodyType, iMass, bGravityEnabled, tAngularAxisLock, iLinearDamping, iAngularDamping)
     self:SetBodyType(iBodyType or 2)
@@ -26,15 +27,20 @@ local function InitializeActionMap()
     acmPlayer:CreateAction("MOVE_BACKWARD", 1, 83)
     acmPlayer:CreateAction("MOVE_LEFT", 1, 81)
     acmPlayer:CreateAction("MOVE_RIGHT", 1, 68)
+    acmPlayer:CreateAction("ROTATE_LEFT", 1, 65)
+    acmPlayer:CreateAction("ROTATE_RIGHT", 1, 69)
     -- acmPlayer:CreateAction("LOOK", 3, 4080)
+    acmPlayer:CreateAction("INTERACT", 1, 70)
 end
 
-local function BindActions(oMovementComponent, oLookComponent)
+local function BindActions(oMovementComponent, oLookComponent, oInteractEmitterComponent)
     if oMovementComponent then
         acmPlayer:GetAction("MOVE_FORWARD").Event = oMovementComponent.MoveForward or function() print("PlayerBase: Move forward callback missing") end
         acmPlayer:GetAction("MOVE_BACKWARD").Event = oMovementComponent.MoveBackward or function() print("PlayerBase: Move backward callback missing") end
         acmPlayer:GetAction("MOVE_LEFT").Event = oMovementComponent.MoveLeft or function() print("PlayerBase: Move left callback missing") end
         acmPlayer:GetAction("MOVE_RIGHT").Event = oMovementComponent.MoveRight or function() print("PlayerBase: Move right callback missing") end
+        acmPlayer:GetAction("ROTATE_LEFT").Event = oMovementComponent.RotateLeft or function() print("PlayerBase: Rotate left callback missing") end
+        acmPlayer:GetAction("ROTATE_RIGHT").Event = oMovementComponent.RotateRight or function() print("PlayerBase: Rotate right callback missing") end
     else
         print("PlayerBase: MovementComponent missing")
     end
@@ -43,6 +49,12 @@ local function BindActions(oMovementComponent, oLookComponent)
         acmPlayer:GetAction("LOOK").Event = oLookComponent.OnMouseMoveCallback or function() print("PlayerBase: Mouse move callback missing") end
     else
         print("PlayerBase: LookComponent missing")
+    end
+
+    if oInteractEmitterComponent then
+        acmPlayer:GetAction("INTERACT").Event = oInteractEmitterComponent.TryInteract or function() print("PlayerBase: Interact callback missing") end
+    else
+        print("PlayerBase: InteractComponent missing")
     end
 end
 
@@ -65,8 +77,14 @@ function OnInit()
         oLookComponent:Setup(self, oCameraRoot, oCamera)
     end
 
+    oInteractEmitterComponent = self:GetNode("components/InteractEmitterComponent")
+
+    if oInteractEmitterComponent ~= nil then
+        oInteractEmitterComponent:Setup(self, 1.5)
+    end
+
     InitializeActionMap()
-    BindActions(oMovementComponent, _)
+    BindActions(oMovementComponent, _, oInteractEmitterComponent)
 end
 
 function OnUpdate(iDelta)

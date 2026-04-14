@@ -1,6 +1,6 @@
 -- Interaction behaviour
 function self:Interaction()
-    print("Test concluant")
+    print("Start animation")
 end
 
 function OnInit()
