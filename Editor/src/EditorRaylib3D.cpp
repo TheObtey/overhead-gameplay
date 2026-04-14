@@ -176,6 +176,7 @@ void EditorRaylib3D::AddDrawableObject(std::string const& name, Node* pNode)
 	if (pNode3D != nullptr && !m_loadedNode3D.contains(name))
 	{
 		m_loadedNode3D[name] = std::make_unique<Node3DElement>();
+
 		m_loadedNode3D[name]->gizmoTransform = RayGizmo::GizmoIdentity();
 		m_loadedNode3D[name]->gizmoTransform.translation = {
 			pNode3D->GetWorldPosition().x,
@@ -457,7 +458,9 @@ void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3
 
 			DrawableSubMesh subMesh;
 			subMesh.mesh = std::make_unique<Mesh>(m_mesh);
+
 			subMesh.localMatrix = GlmToMatrix(importedMesh.meshMatrix);
+	
 
 			if (drawable.loadedFbxDiffusePath.empty() && !importedMesh.textures.empty())
 			{
@@ -574,7 +577,8 @@ void EditorRaylib3D::Render()
 		for (DrawableSubMesh const& subMesh : drawable.meshes)
 		{
 			if (!subMesh.mesh) continue;
-			Matrix finalMatrix = MatrixMultiply( subMesh.localMatrix, drawable.worldMatrix);
+			// gauche a droite local * world
+			Matrix finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
 			DrawMesh(*subMesh.mesh.get(), drawable.material, finalMatrix);
 		}
 	}
