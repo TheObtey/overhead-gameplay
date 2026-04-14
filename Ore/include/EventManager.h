@@ -218,7 +218,7 @@ namespace Ore
 
 		inline static Event<void(EventInput, EventAction)> getKey = Event<void(EventInput, EventAction)>();
 		inline static Event<void(EventInput, EventAction)> getMouse = Event<void(EventInput, EventAction)>();
-		inline static Event<void(int32, int32)> getCursorPos = Event<void(int32, int32)>();
+		inline static Event<void(float, float)> getCursorPos = Event<void(float, float)>();
 	};
 }
 

@@ -8,6 +8,9 @@
 #include "Servers/GraphicServer.h"
 #include "Servers/PhysicsServer.h"
 #include "Scripting/RegisterProxies.h"
+#include "ActionMap.h"
+
+ActionMap* GameLoop::CurrentActionMap = nullptr;
 
 void GameLoop::StartGame(SceneTree& defaultTree)
 {
@@ -40,6 +43,9 @@ void GameLoop::LoopGame()
         TaskGraph graph;
         double const dt = clock.Reset();
         Node& root = m_pDefaultTree->GetRoot();
+
+        if (CurrentActionMap != nullptr)
+            ActionMap::PollInputs(CurrentActionMap);
 
         m_accumulator += dt;
         do
