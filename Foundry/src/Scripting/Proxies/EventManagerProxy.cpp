@@ -188,5 +188,3 @@ void EventManagerProxyBinding::Bind(Binder& binder)
         "Unknown", EventAction::UNKNOWN
     );
 }
-
-REGISTER_PROXY(EventManagerProxyBinding, EventManagerProxy);

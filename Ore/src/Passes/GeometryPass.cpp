@@ -30,7 +30,7 @@ void GeometryPass::Execute()
         if (m_meshes[i].get().GetIsActive() == false)
             continue;
 
-        m_program.SetUniform("model", glm::inverse(m_meshes[i].get().GetTransform()));
+        m_program.SetUniform("model", m_meshes[i].get().GetTransform());
         m_meshes[i].get().Draw(m_program);
     }
 

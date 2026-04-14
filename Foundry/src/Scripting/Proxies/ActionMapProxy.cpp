@@ -1,6 +1,5 @@
 #include "Scripting/Proxies/ActionMapProxy.h"
 #include "Registries/AutomaticRegisterProxy.hpp"
-#include "Scripting/Binder.h"
 #include "IControl.h"
 #include "Action.h"
 #include "ActionMap.h"
@@ -10,7 +9,7 @@
 #include <unordered_map>
 #include <string>
 
-void ActionMapProxyBinding::Bind(Binder& binder)	
+void ActionMapProxyBinding::Bind(Binder& binder)
 {
 	binder.BindEnum<ButtonState>("buttonstate",
 		"Up", ButtonState::UP,
@@ -70,6 +69,4 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 		"Rename", &ActionMap::Rename,
 		"Active", &ActionMap::Active
 	);
-	}
-
-REGISTER_PROXY(ActionMapProxyBinding, ActionMapProxy);
+}
