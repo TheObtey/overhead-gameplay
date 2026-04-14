@@ -1,5 +1,6 @@
 #include "Scripting/Binder.h"
 #include "Scripting/UserData.h"
+#include "Nodes/NodeTypes.h"
 
 #include <string>
 
@@ -52,6 +53,8 @@ public:
 	Proxy* GetParent() const;
 	bool HasParent() const;
 	SceneTreeProxy* GetSceneTree() const;
+	sol::object As(NodeTypes type, sol::this_state state);
+	bool Is(NodeTypes type);
 
 	Event<void()> OnSceneEnter;
 	Event<void(double)> OnUpdate;

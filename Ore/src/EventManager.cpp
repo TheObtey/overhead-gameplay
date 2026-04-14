@@ -101,5 +101,13 @@ void EventManager::GetMouseButtonCallBack(GLFWwindow *window, int button, int ac
 
 void EventManager::GetCursorPosCallBack(GLFWwindow *window, double xpos, double ypos)
 {
-    EventManager::getCursorPos(static_cast<int32>(xpos), static_cast<int32>(ypos));
+    int32 width = 0;
+    int32 height = 0;
+
+    glfwGetWindowSize(window, &width, &height);
+
+    float normalized_x = xpos / width;
+    float normalized_y = ypos / height;
+
+    EventManager::getCursorPos(static_cast<float>(normalized_x * 2 - 1.0f), static_cast<float>(-(normalized_y * 2 - 1.0f)));
 }

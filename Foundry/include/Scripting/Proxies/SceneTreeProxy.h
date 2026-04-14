@@ -5,6 +5,7 @@
 
 class Binder;
 class SceneTree;
+
 class SceneTreeProxy
 {
 using NodeProxy = Node::Proxy;
