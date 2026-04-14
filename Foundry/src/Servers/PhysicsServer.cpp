@@ -97,7 +97,7 @@ void PhysicsServer::S_CreateRigidBody(NodeRigidBody& rigidBody)
 	rigidBody.m_pRigidBodyRP3D->setAngularDamping(0.5f);
 	rigidBody.m_pRigidBodyRP3D->setMass(1.0f);
 	rigidBody.m_pRigidBodyRP3D->setIsAllowedToSleep(true);
-	rigidBody.m_pRigidBodyRP3D->setUserData(&rigidBody.m_pProxy);
+	rigidBody.m_pRigidBodyRP3D->setUserData(rigidBody.m_pProxy.get());
 	rigidBody.m_rigidBodyCreated = true;
 }
 void PhysicsServer::S_DestroyRigidBody(NodeRigidBody& rigidBody)
