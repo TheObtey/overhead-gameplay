@@ -1,7 +1,11 @@
-local parent
+local pEmitter
+local iMaxDistance
 local oCurrentEntity
-local maxDistance
+local oCompContainer
+local oIrcomp
+local vecForward
 
+-- Set the current node in front of the player
 local function SetCurrentEntity(ndHit)
     if oCurrentEntity == ndHit then
         return
@@ -10,69 +14,60 @@ local function SetCurrentEntity(ndHit)
     oCurrentEntity = ndHit
 end
 
+-- Do the raycast and analyze it
 local function CheckInteraction()
-    local hit = physics.Raycast(parent:GetPosition(), parent:GetLocalForward()*-1, 1)
+    --pEmitter:GetLocalForward()*-1
+    local hit = physics.Raycast(pEmitter:GetPosition(), vecForward, iMaxDistance)
 
     if not hit then
-        print("there is nothing there, clement")
         SetCurrentEntity(nil)
         return
     end
 
     if not hit.node then
-        print("Node not found in the hit")
         SetCurrentEntity(nil)
         return
     end
 
-    local ircomp = hit.node:FindChild("InteractRecieverComponent")
+    oCompContainer = hit.node:FindChild("components")
+    oIrcomp = oCompContainer:FindChild("InteractReceiverComponent")
 
-    if not ircomp then
-        print("This node doesn't have interact reciever component")
+    if not oIrcomp then
         SetCurrentEntity(hit.node)
         return
     end
 
-    if ircomp:CanInteract() then
-        print(ircomp:GetPrompt())
+    if oIrcomp:CanInteract() then
+        print(oIrcomp:GetPrompt())
     end
 
     SetCurrentEntity(hit.node)
 end
 
-local function TryInteract()
+-- Launch the interaction
+function self:TryInteract()
     if not oCurrentEntity then return end
 
-    local ircomp = oCurrentEntity:FindChild("InteractRecieverComponent")
+    oCompContainer = oCurrentEntity:FindChild("components")
+    oIrcomp = oCompContainer:FindChild("InteractReceiverComponent")
 
-    if not ircomp then
-        print("Cannot interact with"..oCurrentEntity:GetName())
-        return
-    end
+    if not oIrcomp then return end
 
-    if ircomp:CanInteract() then
-        ircomp:Interact()
-    else
-        print("Interactable, but not now because I decided so")
+    if oIrcomp:CanInteract() then
+        oIrcomp:Interact()
     end
 end
 
-local function InitActionMap()
-
-    actionmap:GetAction("INTERACT").Event = TryInteract
+--Set up the component
+function self:Setup(pNewEmitter, iNewMaxDistance)
+    pEmitter = pNewEmitter
+    iMaxDistance = iNewMaxDistance
+    vecForward = fmath.vec3:new(0, 0, -1)
+    timer.Create("RaycastDelay", 1.5, 1000000, CheckInteraction)
 end
 
-function OnInit() 
-    parent = self:GetNode3DParent()
-    InitActionMap()
+function OnInit()  end
 
-    timer.Create("RaycastDelay", 3, 100000, CheckInteraction)
-end
+function OnUpdate(dt) end
 
-function OnUpdate(dt)
-    
-end
-
-function OnDestroy()
-    
-end
+function OnDestroy() end
