@@ -604,10 +604,12 @@ void EditorRaylib3D::Render()
 void EditorRaylib3D::DrawViewPort()
 {
 	// Grille plus grande + léger offset en Y pour éviter le z-fighting
+	rlDisableDepthMask();
 	rlPushMatrix();
 	rlTranslatef(0.0f, -0.01f, 0.0f);
 	DrawGrid(200, 1.0f);
 	rlPopMatrix();
+	rlEnableDepthMask();
 
 	DrawLine3D({ 0, 0, 0 }, { 500, 0, 0 }, RED);
 	DrawLine3D({ 0, 0, 0 }, { 0, 500, 0 }, GREEN);
