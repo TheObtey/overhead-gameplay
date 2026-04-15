@@ -1,5 +1,6 @@
 
 local acmPlayer
+local oWindow
 local oCameraRoot
 local oCamera
 local oMovementComponent
@@ -18,7 +19,7 @@ local function InitializeRigidbody(iBodyType, iMass, bGravityEnabled, tAngularAx
     self:LockAngularAxis(x, y, z)
 
     self:SetLinearDamping(iLinearDamping or 1)
-    self:SetAngularDamping(iAngularDamping or 0.5)
+    self:SetAngularDamping(iAngularDamping or 10)
 end
 
 local function InitializeActionMap()
@@ -29,7 +30,8 @@ local function InitializeActionMap()
     acmPlayer:CreateAction("MOVE_RIGHT", 1, 68)
     acmPlayer:CreateAction("ROTATE_LEFT", 1, 65)
     acmPlayer:CreateAction("ROTATE_RIGHT", 1, 69)
-    -- acmPlayer:CreateAction("LOOK", 3, 4080)
+    acmPlayer:CreateAction("LOOK", 3, 4080)
+    acmPlayer:CreateAction("CHANGE_CURSOR_STATE", 1, 292)
     acmPlayer:CreateAction("INTERACT", 1, 70)
 end
 
@@ -46,7 +48,8 @@ local function BindActions(oMovementComponent, oLookComponent, oInteractEmitterC
     end
 
     if oLookComponent then
-        acmPlayer:GetAction("LOOK").Event = oLookComponent.OnMouseMoveCallback or function() print("PlayerBase: Mouse move callback missing") end
+        acmPlayer:GetAction("LOOK").Event = oLookComponent.HandleMouseLook or function() print("PlayerBase: Mouse move callback missing") end
+        acmPlayer:GetAction("CHANGE_CURSOR_STATE").Event = oLookComponent.OnCursorStateChangePress or function() print("PlayerBase: Cursor state change callback missing") end
     else
         print("PlayerBase: LookComponent missing")
     end
@@ -63,6 +66,7 @@ function OnInit()
 
     InitializeRigidbody()
 
+    oWindow = self:GetSceneTree():GetRoot()
     oCameraRoot = self:GetNode("CameraRoot")
     oCamera = self:GetNode("CameraRoot/Camera")
     oMovementComponent = self:GetNode("components/MovementComponent")
@@ -74,7 +78,7 @@ function OnInit()
     oLookComponent = self:GetNode("components/LookComponent")
 
     if oLookComponent ~= nil then
-        oLookComponent:Setup(self, oCameraRoot, oCamera)
+        oLookComponent:Setup(self, oWindow, oCameraRoot)
     end
 
     oInteractEmitterComponent = self:GetNode("components/InteractEmitterComponent")
@@ -84,7 +88,7 @@ function OnInit()
     end
 
     InitializeActionMap()
-    BindActions(oMovementComponent, _, oInteractEmitterComponent)
+    BindActions(oMovementComponent, oLookComponent, oInteractEmitterComponent)
 end
 
 function OnUpdate(iDelta)
