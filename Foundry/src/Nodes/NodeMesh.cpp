@@ -4,13 +4,36 @@
 #include "Servers/GraphicServer.h"
 #include "Serialization/SerializeObject.hpp"
 #include "Serialization/ISerializableEncaps.h"
+#include "AssetLoading/AssetLoader.h"
 
 namespace
 {
     sptr<Ore::Geometry> BuildPrimitiveGeometry(PrimitivesType const primitiveType)
     {
-        GeoInfo const &geoInfo = GeometryFactory::GetGeometry(primitiveType);
+        GeoInfo const& geoInfo = GeometryFactory::GetGeometry(primitiveType);
         return std::make_shared<Ore::Geometry>(geoInfo.m_vertices, geoInfo.m_indices);
+    }
+
+    std::filesystem::path ResolveRuntimeFbxPath(std::filesystem::path const& fbxPath)
+    {
+        if (fbxPath.empty())
+            return {};
+
+        if (fbxPath.is_absolute())
+            return fbxPath;
+
+        if (std::filesystem::exists(fbxPath))
+            return fbxPath;
+
+        std::filesystem::path const inResFbx = std::filesystem::path("res/fbx") / fbxPath.filename();
+        if (std::filesystem::exists(inResFbx))
+            return inResFbx;
+
+        std::filesystem::path const inGameResFbx = std::filesystem::path("../Game/res/fbx") / fbxPath.filename();
+        if (std::filesystem::exists(inGameResFbx))
+            return inGameResFbx;
+
+        return fbxPath;
     }
 }
 
@@ -63,8 +86,45 @@ void NodeMesh::SetFbxPath(std::filesystem::path const &fbxPath)
 {
     m_geometrySourceType = MeshGeometrySourceType::FBX;
     m_fbxPath = fbxPath;
-    /*TODO Re;ove Default and add fbx parsing + setting geometry logic here*/
-    m_pMesh->SetGeometry(GraphicServer::GetDefaultGeo());
+
+    if (s_IsInEditor)
+        return;
+
+    std::filesystem::path const resolvedPath = ResolveRuntimeFbxPath(m_fbxPath);
+    sptr<SceneData> scene = AssetLoader::LoadSceneFromFile(resolvedPath.string(), AssetLoader::FileType::FBX);
+
+    if (!scene || scene->allMesh.empty() || !scene->allMesh[0])
+    {
+        m_pMesh->SetGeometry(GraphicServer::GetDefaultGeo());
+        return;
+    }
+
+    SceneMesh const& importedMesh = *scene->allMesh[0];
+    if (importedMesh.vertices.empty() || importedMesh.indices.empty())
+    {
+        m_pMesh->SetGeometry(GraphicServer::GetDefaultGeo());
+        return;
+    }
+
+    sptr<Ore::Geometry> geometry = std::make_shared<Ore::Geometry>(importedMesh.vertices, importedMesh.indices);
+    m_pMesh->SetGeometry(geometry);
+
+    m_textures.clear();
+
+    if (!importedMesh.meshTextures.empty())
+    {
+        m_textures = importedMesh.meshTextures;
+    }
+    else if (!m_diffuseTexturePath.empty())
+    {
+        m_textures.push_back(std::make_shared<Ore::Texture>(m_diffuseTexturePath, Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE));
+    }
+    else
+    {
+        m_textures.push_back(std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE));
+    }
+
+    m_pMesh->SetTextures(m_textures);
 }
 
 void NodeMesh::Serialize(SerializedObject &datas) const

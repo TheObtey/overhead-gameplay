@@ -28,6 +28,7 @@ static void RegisterProxies()
 	AutomaticRegisterProxy::Register<Node2D::Proxy::ProxyBinding>();
 	AutomaticRegisterProxy::Register<Node3D::Proxy::ProxyBinding>();
 	AutomaticRegisterProxy::Register<NodeCamera::Proxy::ProxyBinding>();
+	AutomaticRegisterProxy::Register<NodeWindow::Proxy::ProxyBinding>();
 	AutomaticRegisterProxy::Register<NodeMesh::Proxy::ProxyBinding>();
 	AutomaticRegisterProxy::Register<NodeCollider::Proxy::ProxyBinding>();
 	AutomaticRegisterProxy::Register<NodeBoxCollider::Proxy::ProxyBinding>();

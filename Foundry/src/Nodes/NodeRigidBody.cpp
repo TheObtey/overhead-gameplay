@@ -183,8 +183,11 @@ void NodeRigidBody::Deserialize(SerializedObject const& datas)
 	datas.GetPublicElement("LockAngularX", &lockAngularX);
 	datas.GetPublicElement("LockAngularY", &lockAngularY);
 	datas.GetPublicElement("LockAngularZ", &lockAngularZ);
-
-	CreateRigidBody();
+	
+	if (m_rigidBodyCreated == false){
+		CreateRigidBody();
+		PhysicsServer::FlushCommands();
+	}
 
 	SetBodyType(static_cast<RigidBodyType>(bodyTypeValue));
 	SetMass(mass);

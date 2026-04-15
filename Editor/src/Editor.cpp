@@ -139,7 +139,7 @@ void Editor::Update(float deltaTime)
 	{
 		if (IsKeyDown(KEY_LEFT_SHIFT))
 		{
-			//m_editorImgui.ShowSaveAs();
+			m_editorImgui.ShowSaveAs(false);
 		}
 		else
 		{
@@ -332,6 +332,33 @@ void Editor::LoadDrawableObject(Node* pNode)
 void Editor::StartFoundry(std::string const& scenePath)
 {
 	(void)scenePath;
+	{
+		std::filesystem::path const sourceScriptsDir = "res/scripts";
+		std::filesystem::path const scriptStockDir = "ScriptStock";
+		std::error_code ec;
+
+		std::filesystem::create_directories(scriptStockDir, ec);
+		ec.clear();
+
+		if (std::filesystem::exists(sourceScriptsDir, ec) && std::filesystem::is_directory(sourceScriptsDir, ec))
+		{
+			std::filesystem::copy(
+				sourceScriptsDir,
+				scriptStockDir,
+				std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing,
+				ec);
+
+			if (ec)
+			{
+				std::cerr << "[Editor] Failed to sync res/scripts to ScriptStock: " << ec.message() << std::endl;
+			}
+		}
+		else
+		{
+			std::cerr << "[Editor] Scripts source folder not found: " << sourceScriptsDir << std::endl;
+		}
+	}
+
 
 	std::filesystem::path gameExePath;
 

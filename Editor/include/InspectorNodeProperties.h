@@ -17,19 +17,17 @@ using json = nlohmann::json;
 class InspectorNodeProperties
 {
 public:
-
     InspectorNodeProperties(EditorImGui* pImGuiEditor);
 
-
     void DrawWindow(bool windowState, Node* pSelectedNode);
-
     void SetWindow(int width, int height) { m_screenWidth = width; m_screenHeight = height; }
-
     void SetDirty() { m_isDirty = true; }
+
 private:
     bool DrawDatas(json& publicDataJson);
     bool DrawLuaScriptPicker(json& publicDataJson);
     bool DrawTexturePicker(json& publicDataJson);
+    bool DrawFbxPicker(json& publicDataJson);
 
 private:
     EditorImGui* m_pImguiEditor = nullptr;
@@ -52,6 +50,9 @@ private:
 
     bool m_showTextureBrowser = false;
     ImGui::FileBrowser m_textureBrowser;
+
+    bool m_showFbxBrowser = false;
+    ImGui::FileBrowser m_fbxBrowser;
 
     int m_fileBrowsingSizeX = 800;
     int m_fileBrowsingSizeY = 450;
