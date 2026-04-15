@@ -177,6 +177,8 @@ sol::object Proxy::As(NodeTypes const type, sol::this_state state)
 	case NodeTypes::NODE_WINDOW:
 		return sol::make_object_userdata(state, static_cast<NodeWindow::Proxy*>(this));
 	}
+
+	return sol::make_object_userdata(state, this);
 }
 
 bool Proxy::Is(NodeTypes type)
@@ -206,6 +208,8 @@ bool Proxy::Is(NodeTypes type)
 	case NodeTypes::NODE_WINDOW:
 		return dynamic_cast<NodeWindow*>(m_pNode) != nullptr;
 	}
+
+	return true;
 }
 
 Proxy::operator Node&() const
