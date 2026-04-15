@@ -53,7 +53,7 @@ function self:Setup(oNewRigidBody, iNewMoveSpeed)
     assert(oNewRigidBody ~= nil, "MovementComponent: Valid rigidbody must be provided")
 
     oRB = oNewRigidBody
-    iMoveSpeed = iNewMoveSpeed or 3000
+    iMoveSpeed = iNewMoveSpeed or 100
 
     print("MovementComponent Initialized")
 end

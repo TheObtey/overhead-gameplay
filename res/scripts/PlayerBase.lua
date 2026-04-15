@@ -5,6 +5,7 @@ local oCamera
 local oMovementComponent
 local oLookComponent
 local oInteractEmitterComponent
+local bHasKeyCard
 
 local function InitializeRigidbody(iBodyType, iMass, bGravityEnabled, tAngularAxisLock, iLinearDamping, iAngularDamping)
     self:SetBodyType(iBodyType or 2)
@@ -63,10 +64,12 @@ function OnInit()
 
     InitializeRigidbody()
 
+    bHasKeyCard = false
+
     oCameraRoot = self:GetNode("CameraRoot")
     oCamera = self:GetNode("CameraRoot/Camera")
     oMovementComponent = self:GetNode("components/MovementComponent")
-
+    
     if oMovementComponent ~= nil then
         oMovementComponent:Setup(self)
     end
