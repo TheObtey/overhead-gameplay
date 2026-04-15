@@ -166,7 +166,7 @@ function timer.RepsLeft(sTimerId)
     local tTimer = _getTimer(sTimerId)
     if not tTimer then return end
 
-    if tTimer.iReps == 0 then return 0 end
+    if tTimer.iReps == 0 then return -1 end
 
     return math.max(0, tTimer.iReps - tTimer.iRan)
 end
