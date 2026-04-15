@@ -15,6 +15,8 @@ end
 
 --Function to implement in the parent script
 function self:Interact()
+    if not oBase or not oBase:Is(NodeTypes.NODE_RIGIDBODY) then return end
+    if oBase.Interaction == nil then print(sName.."interaction func not implemented") return end
     oBase:Interaction()
 end
 
@@ -25,7 +27,7 @@ end
 
 function OnInit()
     oCompContainer = self:GetParent()
-    oBase = oCompContainer:GetParent()
+    oBase = oCompContainer:GetParent():As(NodeTypes.NODE_RIGIDBODY)
     sName = oBase:GetName()
 end
 
