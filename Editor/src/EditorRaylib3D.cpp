@@ -4,69 +4,112 @@
 
 #include <AssetLoading/EditorAssetLoader.h>
 #include <Debug.h>
+#include <Serialization/SerializeObject.hpp>
 
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <algorithm>
 #include <cmath>
 #include <filesystem>
 
 namespace
 {
-Mesh BuildRaylibMesh(GeoInfo const& geoInfo)
-{
-	Mesh mesh = {};
-	mesh.vertexCount = static_cast<int>(geoInfo.m_vertices.size());
-	mesh.triangleCount = static_cast<int>(geoInfo.m_indices.size() / 3);
-
-	mesh.vertices = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 3));
-	mesh.normals = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 3));
-	mesh.texcoords = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 2));
-
-	for (int i = 0; i < mesh.vertexCount; ++i)
+	Mesh BuildRaylibMesh(GeoInfo const& geoInfo)
 	{
-		mesh.vertices[i * 3 + 0] = geoInfo.m_vertices[i].position.x;
-		mesh.vertices[i * 3 + 1] = geoInfo.m_vertices[i].position.y;
-		mesh.vertices[i * 3 + 2] = geoInfo.m_vertices[i].position.z;
+		Mesh mesh = {};
+		mesh.vertexCount = static_cast<int>(geoInfo.m_vertices.size());
+		mesh.triangleCount = static_cast<int>(geoInfo.m_indices.size() / 3);
 
-		mesh.normals[i * 3 + 0] = geoInfo.m_vertices[i].normal.x;
-		mesh.normals[i * 3 + 1] = geoInfo.m_vertices[i].normal.y;
-		mesh.normals[i * 3 + 2] = geoInfo.m_vertices[i].normal.z;
+		mesh.vertices = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 3));
+		mesh.normals = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 3));
+		mesh.texcoords = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 2));
 
-		mesh.texcoords[i * 2 + 0] = geoInfo.m_vertices[i].texCoords.x;
-		mesh.texcoords[i * 2 + 1] = geoInfo.m_vertices[i].texCoords.y;
+		for (int i = 0; i < mesh.vertexCount; ++i)
+		{
+			mesh.vertices[i * 3 + 0] = geoInfo.m_vertices[i].position.x;
+			mesh.vertices[i * 3 + 1] = geoInfo.m_vertices[i].position.y;
+			mesh.vertices[i * 3 + 2] = geoInfo.m_vertices[i].position.z;
+
+			mesh.normals[i * 3 + 0] = geoInfo.m_vertices[i].normal.x;
+			mesh.normals[i * 3 + 1] = geoInfo.m_vertices[i].normal.y;
+			mesh.normals[i * 3 + 2] = geoInfo.m_vertices[i].normal.z;
+
+			mesh.texcoords[i * 2 + 0] = geoInfo.m_vertices[i].texCoords.x;
+			mesh.texcoords[i * 2 + 1] = geoInfo.m_vertices[i].texCoords.y;
+		}
+
+		mesh.indices = static_cast<unsigned short*>(MemAlloc(sizeof(unsigned short) * geoInfo.m_indices.size()));
+		for (size_t i = 0; i < geoInfo.m_indices.size(); ++i)
+		{
+			mesh.indices[i] = static_cast<unsigned short>(geoInfo.m_indices[i]);
+		}
+
+		UploadMesh(&mesh, false);
+		return mesh;
 	}
 
-	mesh.indices = static_cast<unsigned short*>(MemAlloc(sizeof(unsigned short) * geoInfo.m_indices.size()));
-	for (size_t i = 0; i < geoInfo.m_indices.size(); ++i)
+	std::filesystem::path ResolveEditorFbxPath(std::filesystem::path const& fbxPath)
 	{
-		mesh.indices[i] = static_cast<unsigned short>(geoInfo.m_indices[i]);
-	}
+		if (fbxPath.empty())
+			return {};
 
-	UploadMesh(&mesh, false);
-	return mesh;
-}
+		if (fbxPath.is_absolute() && std::filesystem::exists(fbxPath))
+			return fbxPath;
 
-std::filesystem::path ResolveEditorFbxPath(std::filesystem::path const& fbxPath)
-{
-	if (fbxPath.empty())
+		if (std::filesystem::exists(fbxPath))
+			return fbxPath;
+
+		std::filesystem::path const inResFbx = std::filesystem::path("res/fbx") / fbxPath.filename();
+		if (std::filesystem::exists(inResFbx))
+			return inResFbx;
+
+		std::filesystem::path const inGameResFbx = std::filesystem::path("../Game/res/fbx") / fbxPath.filename();
+		if (std::filesystem::exists(inGameResFbx))
+			return inGameResFbx;
+
 		return {};
+	}
 
-	if (fbxPath.is_absolute() && std::filesystem::exists(fbxPath))
-		return fbxPath;
+	float ReadPublicFloat(nlohmann::json const& publicData, char const* key, float fallback)
+	{
+		if (!publicData.contains(key))
+			return fallback;
 
-	if (std::filesystem::exists(fbxPath))
-		return fbxPath;
+		nlohmann::json const& v = publicData[key];
 
-	std::filesystem::path const inResFbx = std::filesystem::path("res/fbx") / fbxPath.filename();
-	if (std::filesystem::exists(inResFbx))
-		return inResFbx;
+		if (v.is_number_float() || v.is_number_integer())
+			return v.get<float>();
 
-	std::filesystem::path const inGameResFbx = std::filesystem::path("../Game/res/fbx") / fbxPath.filename();
-	if (std::filesystem::exists(inGameResFbx))
-		return inGameResFbx;
+		if (v.is_object())
+		{
+			if (v.contains("value") && (v["value"].is_number_float() || v["value"].is_number_integer()))
+				return v["value"].get<float>();
 
-	return {};
-}
+			if (v.contains("PUBLIC_DATAS") && v["PUBLIC_DATAS"].contains("value"))
+			{
+				nlohmann::json const& value = v["PUBLIC_DATAS"]["value"];
+				if (value.is_number_float() || value.is_number_integer())
+					return value.get<float>();
+			}
+		}
+		return fallback;
+	}
+
+	void DrawMeshWires(Mesh mesh, Matrix const& worldMatrix, Color color)
+	{
+		Model model = LoadModelFromMesh(mesh);
+
+		rlPushMatrix();
+		float16 mat = MatrixToFloatV(worldMatrix);
+		rlMultMatrixf(mat.v);
+
+		DrawModelWires(model, { 0.0f, 0.0f, 0.0f }, 1.0f, color);
+
+		rlPopMatrix();
+
+		UnloadModel(model);
+	}
+
 }
 
 bool AreMatrixEqual(Matrix const& m1, Matrix const& m2)
@@ -217,6 +260,15 @@ void EditorRaylib3D::AddDrawableObject(Node* pNode)
 			pNode3D->GetWorldRotationQuaternion().w
 		};
 		m_loadedNode3D[pNode]->worldMatrix = RayGizmo::GizmoToMatrix(m_loadedNode3D[pNode]->gizmoTransform);
+		if (NodeCamera* camera = dynamic_cast<NodeCamera*>(pNode))
+			m_debugCameras.insert(camera);
+		if (NodeBoxCollider* box = dynamic_cast<NodeBoxCollider*>(pNode))
+			m_debugBoxColliders.insert(box);
+		if (NodeSphereCollider* sphere = dynamic_cast<NodeSphereCollider*>(pNode))
+			m_debugSphereColliders.insert(sphere);
+		if (NodeCapsuleCollider* capsule = dynamic_cast<NodeCapsuleCollider*>(pNode))
+			m_debugCapsuleColliders.insert(capsule);
+
 	}
 
 	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNode);
@@ -340,42 +392,41 @@ void EditorRaylib3D::UpdateElementName(std::string const& oldName, Node* pNode)
 	(void)pNode;
 	// No-op: les maps sont indexées par Node*, pas par nom.
 }
-
 void EditorRaylib3D::RemoveDrawableElement(Node* pNode)
 {
 	if (pNode == nullptr) return;
+
+	if (NodeCamera* camera = dynamic_cast<NodeCamera*>(pNode))
+		m_debugCameras.erase(camera);
+	if (NodeBoxCollider* box = dynamic_cast<NodeBoxCollider*>(pNode))
+		m_debugBoxColliders.erase(box);
+	if (NodeSphereCollider* sphere = dynamic_cast<NodeSphereCollider*>(pNode))
+		m_debugSphereColliders.erase(sphere);
+	if (NodeCapsuleCollider* capsule = dynamic_cast<NodeCapsuleCollider*>(pNode))
+		m_debugCapsuleColliders.erase(capsule);
 
 	if (m_loadedMeshes.contains(pNode))
 	{
 		auto& drawable = m_loadedMeshes[pNode];
 		if (drawable->hasTexture)
-		{
 			UnloadTexture(drawable->diffuseTexture);
-		}
+
 		UnloadMaterial(drawable->material);
 
 		for (DrawableSubMesh& subMesh : drawable->meshes)
 		{
 			if (subMesh.mesh)
-			{
 				UnloadMesh(*subMesh.mesh.get());
-			}
 		}
 
 		m_loadedMeshes.erase(pNode);
 	}
 
-	if (m_loadedNode3D.contains(pNode))
-	{
-		m_loadedNode3D.erase(pNode);
-	}
+	m_loadedNode3D.erase(pNode);
 
 	if (m_pSelectedObject == pNode)
-	{
 		m_pSelectedObject = nullptr;
-	}
 }
-
 void EditorRaylib3D::ClearWindow()
 {
 	for (auto& [node, drawable] : m_loadedMeshes)
@@ -392,9 +443,17 @@ void EditorRaylib3D::ClearWindow()
 			}
 		}
 	}
+
 	m_loadedMeshes.clear();
 	m_loadedNode3D.clear();
+	m_debugCameras.clear();
+	m_debugBoxColliders.clear();
+	m_debugSphereColliders.clear();
+	m_debugCapsuleColliders.clear();
+
 	m_pSelectedObject = nullptr;
+
+	ReleaseDebugPrimitiveModels();
 }
 
 void EditorRaylib3D::Instanciate3DMesh(Node* pNodeMesh3D)
@@ -557,9 +616,198 @@ void EditorRaylib3D::UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableEle
 	}
 }
 
+void EditorRaylib3D::DrawCameraFrustumWire(NodeCamera const& cameraNode)
+{
+	SerializedObject so;
+	cameraNode.Serialize(so);
+	nlohmann::json const& pub = so.GetJson()["PUBLIC_DATAS"];
+
+	float const fovDeg = ReadPublicFloat(pub, "FOV", 45.0f);
+	float const nearPlane = ReadPublicFloat(pub, "NearPlane", 0.1f);
+	float const farPlane = ReadPublicFloat(pub, "FarPlane", 100.0f);
+	float const aspect = ReadPublicFloat(pub, "AspectRatio", 16.0f / 9.0f);
+
+	glm::vec3 const pos = cameraNode.GetWorldPosition();
+	glm::quat const q = cameraNode.GetWorldRotationQuaternion();
+
+	glm::vec3 const forward = q * glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 const up = q * glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 const right = q * glm::vec3(1.0f, 0.0f, 0.0f);
+
+	float const fovRad = DEG2RAD * fovDeg;
+	float const nearH = tanf(fovRad * 0.5f) * nearPlane;
+	float const nearW = nearH * aspect;
+	float const farH = tanf(fovRad * 0.5f) * farPlane;
+	float const farW = farH * aspect;
+
+	glm::vec3 const nc = pos + forward * nearPlane;
+	glm::vec3 const fc = pos + forward * farPlane;
+
+	glm::vec3 const ntl = nc + up * nearH - right * nearW;
+	glm::vec3 const ntr = nc + up * nearH + right * nearW;
+	glm::vec3 const nbl = nc - up * nearH - right * nearW;
+	glm::vec3 const nbr = nc - up * nearH + right * nearW;
+
+	glm::vec3 const ftl = fc + up * farH - right * farW;
+	glm::vec3 const ftr = fc + up * farH + right * farW;
+	glm::vec3 const fbl = fc - up * farH - right * farW;
+	glm::vec3 const fbr = fc - up * farH + right * farW;
+
+	auto V = [](glm::vec3 const& v) { return Vector3{ v.x, v.y, v.z }; };
+
+	Color const c = SKYBLUE;
+	DrawLine3D(V(ntl), V(ntr), c); DrawLine3D(V(ntr), V(nbr), c);
+	DrawLine3D(V(nbr), V(nbl), c); DrawLine3D(V(nbl), V(ntl), c);
+
+	DrawLine3D(V(ftl), V(ftr), c); DrawLine3D(V(ftr), V(fbr), c);
+	DrawLine3D(V(fbr), V(fbl), c); DrawLine3D(V(fbl), V(ftl), c);
+
+	DrawLine3D(V(ntl), V(ftl), c); DrawLine3D(V(ntr), V(ftr), c);
+	DrawLine3D(V(nbl), V(fbl), c); DrawLine3D(V(nbr), V(fbr), c);
+}
+
+void EditorRaylib3D::DrawBoxColliderWire(NodeBoxCollider const& colliderNode)
+{
+	EnsureDebugPrimitiveModels();
+
+	SerializedObject so;
+	colliderNode.Serialize(so);
+	nlohmann::json const& pub = so.GetJson()["PUBLIC_DATAS"];
+
+	float const halfExtX = ReadPublicFloat(pub, "HalfExtentsX", 0.5f);
+	float const halfExtY = ReadPublicFloat(pub, "HalfExtentsY", 0.5f);
+	float const halfExtZ = ReadPublicFloat(pub, "HalfExtentsZ", 0.5f);
+
+	Node3D* anchor = dynamic_cast<Node3D*>(colliderNode.GetParent());
+
+	glm::vec3 parentPos{ 0.0f, 0.0f, 0.0f };
+	glm::quat parentRot{ 1.0f, 0.0f, 0.0f, 0.0f };
+	if (anchor != nullptr)
+	{
+		parentPos = anchor->GetWorldPosition();
+		parentRot = anchor->GetWorldRotationQuaternion();
+	}
+
+	glm::vec3 const localPos = colliderNode.GetLocalPosition();
+	glm::quat const localRot = colliderNode.GetLocalRotation();
+
+	glm::mat4 const parentTR = glm::translate(glm::mat4(1.0f), parentPos) * glm::mat4_cast(parentRot);
+	glm::mat4 const localTR = glm::translate(glm::mat4(1.0f), localPos) * glm::mat4_cast(localRot);
+
+	Matrix const world = GlmToMatrix(localTR * parentTR);
+	Matrix const scale = MatrixScale(halfExtX * 2.0f, halfExtY * 2.0f, halfExtZ * 2.0f);
+	Matrix const finalMatrix = MatrixMultiply(scale, world);
+
+	DrawWireModelWithMatrix(m_debugBoxModel, finalMatrix, ORANGE);
+}
+
+void EditorRaylib3D::DrawSphereColliderWire(NodeSphereCollider const& colliderNode)
+{
+	EnsureDebugPrimitiveModels();
+
+	SerializedObject so;
+	colliderNode.Serialize(so);
+	nlohmann::json const& pub = so.GetJson()["PUBLIC_DATAS"];
+
+	float const radius = ReadPublicFloat(pub, "Radius", 0.5f);
+
+	Node3D* anchor = dynamic_cast<Node3D*>(colliderNode.GetParent());
+
+	glm::vec3 parentPos{ 0.0f, 0.0f, 0.0f };
+	glm::quat parentRot{ 1.0f, 0.0f, 0.0f, 0.0f };
+	if (anchor != nullptr)
+	{
+		parentPos = anchor->GetWorldPosition();
+		parentRot = anchor->GetWorldRotationQuaternion();
+	}
+
+	glm::vec3 const localPos = colliderNode.GetLocalPosition();
+	glm::quat const localRot = colliderNode.GetLocalRotation();
+
+	glm::mat4 const parentTR = glm::translate(glm::mat4(1.0f), parentPos) * glm::mat4_cast(parentRot);
+	glm::mat4 const localTR = glm::translate(glm::mat4(1.0f), localPos) * glm::mat4_cast(localRot);
+
+	Matrix const world = GlmToMatrix(localTR * parentTR);
+	Matrix const scale = MatrixScale(radius * 2.0f, radius * 2.0f, radius * 2.0f);
+	Matrix const finalMatrix = MatrixMultiply(scale, world);
+
+	DrawWireModelWithMatrix(m_debugSphereModel, finalMatrix, ORANGE);
+}
+
+void EditorRaylib3D::DrawCapsuleColliderWire(NodeCapsuleCollider const& colliderNode)
+{
+	EnsureDebugPrimitiveModels();
+
+	SerializedObject so;
+	colliderNode.Serialize(so);
+	nlohmann::json const& pub = so.GetJson()["PUBLIC_DATAS"];
+
+	float const radius = ReadPublicFloat(pub, "Radius", 0.5f);
+	float const height = ReadPublicFloat(pub, "Height", 1.0f);
+
+	Node3D* anchor = dynamic_cast<Node3D*>(colliderNode.GetParent());
+
+	glm::vec3 parentPos{ 0.0f, 0.0f, 0.0f };
+	glm::quat parentRot{ 1.0f, 0.0f, 0.0f, 0.0f };
+	if (anchor != nullptr)
+	{
+		parentPos = anchor->GetWorldPosition();
+		parentRot = anchor->GetWorldRotationQuaternion();
+	}
+
+	glm::vec3 const localPos = colliderNode.GetLocalPosition();
+	glm::quat const localRot = colliderNode.GetLocalRotation();
+
+	glm::mat4 const parentTR = glm::translate(glm::mat4(1.0f), parentPos) * glm::mat4_cast(parentRot);
+	glm::mat4 const localTR = glm::translate(glm::mat4(1.0f), localPos) * glm::mat4_cast(localRot);
+
+	Matrix const world = GlmToMatrix(localTR * parentTR);
+
+	float const sxz = radius * 2.0f;
+	float const sy = (height + 2.0f * radius) * 0.5f; // capsule unitaire factory: r=0.5, h=1 -> hauteur totale 2
+	Matrix const scale = MatrixScale(sxz, sy, sxz);
+	Matrix const finalMatrix = MatrixMultiply(scale, world);
+
+	DrawWireModelWithMatrix(m_debugCapsuleModel, finalMatrix, ORANGE);
+}
+void EditorRaylib3D::DrawDebugOverlays()
+{
+	for (NodeCamera* camera : m_debugCameras)
+	{
+		if (camera == nullptr) continue;
+		if (!m_loadedNode3D.contains(static_cast<Node*>(camera))) continue;
+		DrawCameraFrustumWire(*camera);
+	}
+
+	for (NodeBoxCollider* box : m_debugBoxColliders)
+	{
+		if (box == nullptr) continue;
+		if (!m_loadedNode3D.contains(static_cast<Node*>(box))) continue;
+		DrawBoxColliderWire(*box);
+	}
+
+	for (NodeSphereCollider* sphere : m_debugSphereColliders)
+	{
+		if (sphere == nullptr) continue;
+		if (!m_loadedNode3D.contains(static_cast<Node*>(sphere))) continue;
+		DrawSphereColliderWire(*sphere);
+	}
+
+	for (NodeCapsuleCollider* capsule : m_debugCapsuleColliders)
+	{
+		if (capsule == nullptr) continue;
+		if (!m_loadedNode3D.contains(static_cast<Node*>(capsule))) continue;
+		DrawCapsuleColliderWire(*capsule);
+	}
+}
+
 void EditorRaylib3D::Render()
 {
 	BeginMode3D(m_camera);
+	rlEnableDepthTest();
+	rlEnableDepthMask();
+
+	DrawViewPort();
 
 	for (auto it = m_loadedMeshes.begin(); it != m_loadedMeshes.end(); ++it)
 	{
@@ -568,26 +816,26 @@ void EditorRaylib3D::Render()
 		for (DrawableSubMesh const& subMesh : drawable.meshes)
 		{
 			if (!subMesh.mesh) continue;
-			// gauche a droite local * world
-			Matrix finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
+			Matrix const finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
 			DrawMesh(*subMesh.mesh.get(), drawable.material, finalMatrix);
 		}
 	}
 
-	DrawViewPort();
+
+	DrawDebugOverlays();
 
 	if (m_pSelectedObject != nullptr && m_loadedNode3D.contains(m_pSelectedObject))
 	{
+		rlDisableDepthMask();
 		RayGizmo::SetGizmoSize(m_gizmoSize);
 
 		rlDisableDepthTest();
-
 		if (RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), &m_loadedNode3D[m_pSelectedObject]->gizmoTransform))
 		{
 			m_loadedNode3D[m_pSelectedObject]->gizmoUpdated = true;
 		}
-
 		rlEnableDepthTest();
+		rlEnableDepthMask();
 	}
 
 	EndMode3D();
@@ -595,11 +843,12 @@ void EditorRaylib3D::Render()
 
 void EditorRaylib3D::DrawViewPort()
 {
-	// Grille plus grande + léger offset en Y pour éviter le z-fighting
+	rlDisableDepthMask();
 	rlPushMatrix();
 	rlTranslatef(0.0f, -0.01f, 0.0f);
 	DrawGrid(200, 1.0f);
 	rlPopMatrix();
+	rlEnableDepthMask();
 
 	DrawLine3D({ 0, 0, 0 }, { 500, 0, 0 }, RED);
 	DrawLine3D({ 0, 0, 0 }, { 0, 500, 0 }, GREEN);
@@ -651,4 +900,54 @@ void EditorRaylib3D::SetCameraOnAxis(RaylibAxis axis)
 
 void EditorRaylib3D::Shutdown()
 {
+	ReleaseDebugPrimitiveModels();
+}
+
+void EditorRaylib3D::EnsureDebugPrimitiveModels()
+{
+	if (m_debugPrimitiveModelsReady)
+		return;
+
+	Mesh boxMesh = BuildRaylibMesh(GeometryFactory::GetGeometry(PrimitivesType::CUBE));
+	Mesh sphereMesh = BuildRaylibMesh(GeometryFactory::GetGeometry(PrimitivesType::SPHERE));
+	Mesh capsuleMesh = BuildRaylibMesh(GeometryFactory::GetGeometry(PrimitivesType::CAPSULE));
+
+	m_debugBoxModel = LoadModelFromMesh(boxMesh);
+	m_debugSphereModel = LoadModelFromMesh(sphereMesh);
+	m_debugCapsuleModel = LoadModelFromMesh(capsuleMesh);
+
+	m_debugPrimitiveModelsReady = true;
+}
+
+void EditorRaylib3D::ReleaseDebugPrimitiveModels()
+{
+	if (!m_debugPrimitiveModelsReady)
+		return;
+
+	UnloadModel(m_debugBoxModel);
+	UnloadModel(m_debugSphereModel);
+	UnloadModel(m_debugCapsuleModel);
+
+	m_debugBoxModel = {};
+	m_debugSphereModel = {};
+	m_debugCapsuleModel = {};
+	m_debugPrimitiveModelsReady = false;
+}
+
+void EditorRaylib3D::DrawWireModelWithMatrix(Model const& model, Matrix const& matrix, Color color) const
+{
+	rlPushMatrix();
+	float16 mat = MatrixToFloatV(matrix);
+	rlMultMatrixf(mat.v);
+
+	float const prevLineWidth = rlGetLineWidth();
+	rlDrawRenderBatchActive();
+	rlSetLineWidth(2.0f); // 1.0f = default, essaie 1.5f/2.0f/2.5f
+
+	DrawModelWires(model, { 0.0f, 0.0f, 0.0f }, 1.0f, color);
+
+	rlDrawRenderBatchActive();
+	rlSetLineWidth(prevLineWidth);
+
+	rlPopMatrix();
 }

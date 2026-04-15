@@ -8,6 +8,7 @@
 #include <Define.h>
 #include <raylib.h>
 #include <raymath.h>
+#include <unordered_set>
 using json = nlohmann::json;
 
 struct DrawableSubMesh
@@ -67,10 +68,12 @@ public:
 	void UpdateDrawableElement(Node* pNode);
 	void UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableElement& drawable);
 	std::string ResolveEditorTexturePath(std::filesystem::path const& logicalPath);
-
 	void UpdateElementName(std::string const& oldName, Node* pNode);
 	void RemoveDrawableElement(Node* pNode);
-	void ClearWindow();
+	void ClearWindow(); 
+	
+	
+
 
 	void SetTranslateGizmo(bool state);
 	void SetScaleGizmo(bool state);
@@ -98,7 +101,12 @@ public:
 
 private:
 	void DrawViewPort();
-	
+	void DrawDebugOverlays();
+	void DrawCameraFrustumWire(NodeCamera const& cameraNode);
+	void DrawBoxColliderWire(NodeBoxCollider const& colliderNode);
+	void DrawSphereColliderWire(NodeSphereCollider const& colliderNode);
+	void DrawCapsuleColliderWire(NodeCapsuleCollider const& colliderNode);
+
 	void Instanciate3DMesh(Node* nodeMesh3D);
 	void InstanciateCollider3D();
 	void InstanciateLight();
@@ -118,8 +126,22 @@ private:
 	std::unordered_map<Node*, uptr<Node3DElement>> m_loadedNode3D;
 	Node* m_pSelectedObject = nullptr;
 
+	std::unordered_set<NodeCamera*> m_debugCameras;
+	std::unordered_set<NodeBoxCollider*> m_debugBoxColliders;
+	std::unordered_set<NodeSphereCollider*> m_debugSphereColliders;
+	std::unordered_set<NodeCapsuleCollider*> m_debugCapsuleColliders;
+
 	GizmoFlags m_gizmoFlags;
 	bool m_gizmoDirty = false;
+
+	void EnsureDebugPrimitiveModels();
+	void ReleaseDebugPrimitiveModels();
+	void DrawWireModelWithMatrix(Model const& model, Matrix const& matrix, Color color) const;
+
+	Model m_debugBoxModel = {};
+	Model m_debugSphereModel = {};
+	Model m_debugCapsuleModel = {};
+	bool m_debugPrimitiveModelsReady = false;
 };
 
 #endif // __EDITOR_RAYLIB3D__H_

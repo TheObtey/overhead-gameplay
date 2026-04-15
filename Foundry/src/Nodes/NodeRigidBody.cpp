@@ -52,7 +52,7 @@ void NodeRigidBody::SetNode3DParent(Node3D* owner)
 }
 void NodeRigidBody::OnUpdate(double delta)
 {
-	Node::OnUpdate(delta);
+	Node3D::OnUpdate(delta);
 	if (m_rigidBodyCreated == false) return;
 
 	Node3D* parent = static_cast<Node3D*>(m_pNode3DParent);
