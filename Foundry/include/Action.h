@@ -5,27 +5,26 @@
 //#include "Serialization/ISerializable.h"
 #include "IControl.h"
 
-
-#include <glm/glm.hpp>
 #include <vector>
-#include <iostream>
 #include <functional>
-
 
 class ActionMap;
 enum class ControlType : byte;
 
-
 class Action /*: public ISerializable*/
 {
 public:
-	Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* pActionMap = nullptr);
+	Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* pActionMap);
 	~Action();
 
 	uint32 AddControl(ControlType const& type, Ore::EventInput const& eventInput);
 	IControl& GetControl(uint32 index);
 
 	std::function<void(IControl&)> Event;
+
+private:
+	void HandleCursorMove(float newX, float newY);
+	void HandleKeyDown(Ore::EventInput in, Ore::EventAction ac);
 
 private:
 	std::vector<IControl*> m_controls;

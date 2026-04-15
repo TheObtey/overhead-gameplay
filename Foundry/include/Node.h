@@ -16,9 +16,8 @@
 #include <sstream>
 #include <vector>
 
-
-class SceneTree;
 class SerializedObject;
+class SceneTree;
 
 template <typename T>
 concept NodeType = std::is_base_of_v<Node, T>;
@@ -57,7 +56,7 @@ public:
 	uint32 GetChildCount() const;
 
 	template <NodeType T>
-	T& GetNode(std::string const& path);
+	OptionalRef<T> GetNode(std::string const& path);
 
 	template <NodeType T>
 	OptionalRef<T> FindFirstParentOfType();
@@ -72,7 +71,6 @@ public:
 	virtual std::unique_ptr<Node> Clone();
 	virtual void Serialize(SerializedObject& datas) const override;
 	virtual void Deserialize(SerializedObject const& datas) override;
-
 
 	std::string GetName();
 	void SetName(std::string const& name);
@@ -133,7 +131,7 @@ protected:
 private:
     void AttachChildImmediate(std::unique_ptr<Node>& child);
 	void NotifyHierarchyChanged();
-
+	Node* ParseFirstNode(std::string const& path);
 
     friend class EngineServer;
 	friend class SceneTree;
@@ -197,18 +195,20 @@ OptionalRef<T> Node::FindChild()
 }
 
 template <NodeType T>
-T& Node::GetNode(std::string const& path)
+OptionalRef<T> Node::GetNode(std::string const& path)
 {
     std::stringstream ss(path);
     std::string token;
 
     //TODO Add this when scene tree is done
-    //Node* pNode = path[0] == '/' ? m_pSceneTree.root : this;
+	Node* pNode = ParseFirstNode(path);
 
-    Node* pNode = this;
     while(std::getline(ss, token, '/'))
     {
-        pNode = pNode->m_children[token].get();
+    	if (token == "") continue;
+    	if (pNode->m_children.contains(token))
+			pNode = pNode->m_children[token].get();
+    	else return {};
     }
 
     return *static_cast<T*>(pNode);

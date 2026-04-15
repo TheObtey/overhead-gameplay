@@ -109,6 +109,11 @@ void Node::NotifyHierarchyChanged()
 		node->OnHierarchyChanged();
 }
 
+Node* Node::ParseFirstNode(std::string const& path)
+{
+	return path[0] == '/' ? m_pSceneTree->m_pCurrentScene : this;
+}
+
 void Node::AddChild(std::unique_ptr<Node>& child)
 {
     AddChild(std::move(child));
