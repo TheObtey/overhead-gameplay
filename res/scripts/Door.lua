@@ -18,17 +18,15 @@ function self:Interaction()
         z = vecFromPos.z
     }
 
-    local vecTargetPos = oTarget:GetPosition()
+    local vecTargetPos = oTarget:GetWorldPosition()
     local tTo = 
     {
         x = vecTargetPos.x,
         y = vecTargetPos.y,
         z = vecTargetPos.z
     }
-
-    print(tFrom.x, tFrom.y, tFrom.z)
     print(tTo.x, tTo.y, tTo.z)
-    --tween.Create("lerp", tFrom, tTo, 3, ease.In.Back, doShit)
+    tween.Create("Tween:Door:translation", tFrom, tTo, 3, ease.In.Back, doShit)
 end
 
 function OnInit()
