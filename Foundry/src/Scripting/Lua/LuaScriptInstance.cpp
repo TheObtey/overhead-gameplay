@@ -33,8 +33,6 @@ void LuaScriptInstance::CallScriptOnUpdate(double dt)
 		sol::error err = result;
 		Logger::LogWithLevel(LogLevel::ERROR, "Lua script error : ", err.what());
 	}
-
-	m_timerUpdateFunc(dt);
 }
 
 void LuaScriptInstance::CallScriptOnPhysicsUpdate(double dt)

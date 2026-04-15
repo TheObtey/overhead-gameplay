@@ -58,6 +58,7 @@ void GameLoop::LoopGame()
 
         //PhysicsServer::UpdatePhysicsWorld(dt);
         root.Update(dt);
+        ScriptingEngine::Update(dt);
         UpdateServers();
         BuildTasksGraph(graph);
 
