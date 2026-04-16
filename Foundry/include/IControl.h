@@ -20,10 +20,12 @@ enum class ControlType : byte
 	UNDEFINED = 0
 };
 
-enum class ButtonState : bool
+enum class ButtonState
 {
-	UP = false,
-	DOWN = true
+	PRESSED,
+	HOLD,
+	RELEASED,
+	NONE
 };
 
 
@@ -42,10 +44,16 @@ public:
 
 	void SetAction(Action* pAction);
 
+	bool IsPressed();
+	bool IsReleased();
+	bool IsHold();
+
 private:
 	ControlType m_type;
 	Ore::EventInput m_eventInput;
 	Action* m_pAction; 
+
+	friend Action;
 };
 
 class ButtonControl : public IControl
@@ -53,9 +61,10 @@ class ButtonControl : public IControl
 public:
 	ButtonControl() = default;
 	ButtonControl(Ore::EventInput const& eventInput, Action* pAction);
-	~ButtonControl() = default;
+	~ButtonControl() override = default;
 
 	ButtonState GetState() const;
+	void SetState(ButtonState state);
 
 private:
 	ButtonState m_state;
@@ -67,9 +76,10 @@ class SliderControl : public IControl
 public:
 	SliderControl() = default;
 	SliderControl(Ore::EventInput const& eventInput, Action* pAction);
-	~SliderControl() = default;
+	~SliderControl() override = default;
 
 	float GetPos() const;
+	void SetPos(float pos);
 
 private:
 	float m_pos;
@@ -81,9 +91,10 @@ class StickControl : public IControl
 public:
 	StickControl() = default;
 	StickControl(Ore::EventInput const& eventInput, Action* pAction);
-	~StickControl() = default;
+	~StickControl() override = default;
 
 	glm::vec2 GetPos() const;
+	void SetPos(glm::vec2 pos);
 
 private:
 	glm::vec2 m_pos;

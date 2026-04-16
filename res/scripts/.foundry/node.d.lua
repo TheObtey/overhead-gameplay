@@ -1,10 +1,25 @@
 ---@meta
 
+---@enum NodeTypes
+NodeTypes = {
+    NODE = 1,
+    NODE2D = 2,
+    NODE3D = 3,
+    NODE_CAMERA = 4,
+    NODE_MESH = 5,
+    NODE_ANIMATED_MESH = 6,
+    NODE_COLLIDER = 7,
+    NODE_RIGIDBODY = 8,
+    NODE_VIEWPORT = 9,
+    NODE_VISUAL = 10,
+    NODE_WINDOW = 11
+}
+
 --========================
 -- NODE
 --========================
 
----@class node 
+---@class node
 local node = {}
 
 -- Constructor (factory)

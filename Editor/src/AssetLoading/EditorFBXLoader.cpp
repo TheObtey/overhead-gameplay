@@ -63,15 +63,6 @@ void EditorFBXLoader::BuildMeshes(aiScene const* pScene, std::string const& sour
 
 	std::function<void(aiNode const*, glm::mat4 const&)> collectNodeTransforms;
 
-	//float unitScale = 1.0f;
-
-	//if (pScene->mMetaData && pScene->mMetaData->HasKey(AI_METADATA_GLOBAL_UNIT_SCALE))
-	//{
-	//	double scale = 1.0;
-	//	pScene->mMetaData->Get(AI_METADATA_GLOBAL_UNIT_SCALE, scale);
-	//	unitScale = static_cast<float>(scale);
-	//}
-
 	collectNodeTransforms = [&](aiNode const* pNode, glm::mat4 const& parentWorld)
 	{
 		if (!pNode) return;
@@ -247,7 +238,7 @@ std::string EditorFBXLoader::ExtractEmbeddedTexture(aiScene const* pScene, std::
 	std::string ext = pTex->achFormatHint;
 	if (ext.empty()) ext = "bin";
 
-	std::filesystem::path outDir = "../Game/res/textures";
+	std::filesystem::path outDir = "res/textures";
 	std::filesystem::create_directories(outDir);
 
 	std::filesystem::path outPath = outDir / ("editor_embedded_" + std::to_string(meshIndex) + "_" + std::to_string(type) + "." + ext);

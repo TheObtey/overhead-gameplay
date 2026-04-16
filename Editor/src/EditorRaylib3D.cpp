@@ -176,6 +176,7 @@ void EditorRaylib3D::AddDrawableObject(std::string const& name, Node* pNode)
 	if (pNode3D != nullptr && !m_loadedNode3D.contains(name))
 	{
 		m_loadedNode3D[name] = std::make_unique<Node3DElement>();
+
 		m_loadedNode3D[name]->gizmoTransform = RayGizmo::GizmoIdentity();
 		m_loadedNode3D[name]->gizmoTransform.translation = {
 			pNode3D->GetWorldPosition().x,
@@ -457,7 +458,9 @@ void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3
 
 			DrawableSubMesh subMesh;
 			subMesh.mesh = std::make_unique<Mesh>(m_mesh);
+
 			subMesh.localMatrix = GlmToMatrix(importedMesh.meshMatrix);
+	
 
 			if (drawable.loadedFbxDiffusePath.empty() && !importedMesh.textures.empty())
 			{
@@ -565,7 +568,6 @@ void EditorRaylib3D::UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableEle
 void EditorRaylib3D::Render()
 {
 	BeginMode3D(m_camera);
-	DrawViewPort();
 
 	for (auto it = m_loadedMeshes.begin(); it != m_loadedMeshes.end(); ++it)
 	{
@@ -574,10 +576,13 @@ void EditorRaylib3D::Render()
 		for (DrawableSubMesh const& subMesh : drawable.meshes)
 		{
 			if (!subMesh.mesh) continue;
-			Matrix finalMatrix = MatrixMultiply( subMesh.localMatrix, drawable.worldMatrix);
+			// gauche a droite local * world
+			Matrix finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
 			DrawMesh(*subMesh.mesh.get(), drawable.material, finalMatrix);
 		}
 	}
+
+	DrawViewPort();
 
 	if (m_loadedNode3D.contains(m_selectedObject))
 	{
@@ -598,7 +603,14 @@ void EditorRaylib3D::Render()
 
 void EditorRaylib3D::DrawViewPort()
 {
-	DrawGrid(20, 1.0f);
+	// Grille plus grande + léger offset en Y pour éviter le z-fighting
+	rlDisableDepthMask();
+	rlPushMatrix();
+	rlTranslatef(0.0f, -0.01f, 0.0f);
+	DrawGrid(200, 1.0f);
+	rlPopMatrix();
+	rlEnableDepthMask();
+
 	DrawLine3D({ 0, 0, 0 }, { 500, 0, 0 }, RED);
 	DrawLine3D({ 0, 0, 0 }, { 0, 500, 0 }, GREEN);
 	DrawLine3D({ 0, 0, 0 }, { 0, 0, 500 }, BLUE);

@@ -4,6 +4,7 @@
 #include "Nodes/NodeViewport.h"
 #include "Nodes/NodeWindow.h"
 #include "Servers/EngineServer.h"
+#include "Servers/PhysicsServer.h"
 
 Node& LoadScene(Node& root)
 {
@@ -18,6 +19,8 @@ Node& LoadScene(Node& root)
 
 int main()
 {
+    PhysicsServer::Initialize();
+
     uptr<Node> root = Node::CreateNode<NodeWindow>("Window");
     SceneTree defaultSceneTree(root);
 

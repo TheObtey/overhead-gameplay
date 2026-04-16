@@ -52,12 +52,40 @@ void IControl::SetAction(Action* pAction)
 	m_pAction = pAction;
 }
 
+bool IControl::IsPressed()
+{
+	if (m_type != ControlType::BUTTON) return false;
 
-ButtonControl::ButtonControl(Ore::EventInput const& eventInput, Action* pAction) : IControl(ControlType::BUTTON, eventInput, pAction), m_state(ButtonState::UP) {}
+	ButtonControl* btn = static_cast<ButtonControl*>(this);
+	return btn->GetState() == ButtonState::PRESSED;
+}
+
+bool IControl::IsReleased()
+{
+	if (m_type != ControlType::BUTTON) return false;
+
+	ButtonControl* btn = static_cast<ButtonControl*>(this);
+	return btn->GetState() == ButtonState::RELEASED;
+}
+
+bool IControl::IsHold()
+{
+	if (m_type != ControlType::BUTTON) return false;
+
+	ButtonControl* btn = static_cast<ButtonControl*>(this);
+	return btn->GetState() == ButtonState::HOLD;
+}
+
+ButtonControl::ButtonControl(Ore::EventInput const& eventInput, Action* pAction) : IControl(ControlType::BUTTON, eventInput, pAction), m_state(ButtonState::NONE) {}
 
 ButtonState ButtonControl::GetState() const
 {
 	return m_state;
+}
+
+void ButtonControl::SetState(ButtonState state)
+{
+	m_state = state;
 }
 
 
@@ -68,9 +96,21 @@ float SliderControl::GetPos() const
 	return m_pos;
 }
 
+void SliderControl::SetPos(float pos)
+{
+	m_pos = pos;
+}
+
+
 StickControl::StickControl(Ore::EventInput const& eventInput, Action* pAction) : IControl(ControlType::STICK, eventInput, pAction), m_pos(0.0f) {}
 
 glm::vec2 StickControl::GetPos() const
 {
 	return m_pos;
+}
+
+void StickControl::SetPos(glm::vec2 pos)
+{
+
+	m_pos = pos;
 }

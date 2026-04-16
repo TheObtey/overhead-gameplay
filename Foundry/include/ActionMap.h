@@ -15,7 +15,7 @@ class Action;
 
 
 /// <summary>
-/// ActionMap is a custom container made to store Action objects, with each Action representing a Callback specified to a group of inputs
+/// ActionMap is a custom container made to store Action objects, with each Action detaining a Callback made to be called by a group of inputs
 /// </summary>
 class ActionMap
 {
@@ -29,8 +29,7 @@ public:
 	ActionMap(ActionMap&& other) = delete;
 	void operator=(ActionMap&& other) = delete;
 
-
-	bool	Emplace(std::string_view const& name, Action* pAction);
+	Action*	CreateAction(std::string_view const& name, ControlType type, Ore::EventInput eventInput);
 	bool	Erase(std::string_view const& name);
 
 	Action*	GetAction(std::string_view const& name);
@@ -39,9 +38,9 @@ public:
 	uint32	Length() const;
 	void	Rename(std::string_view const& old, std::string_view const& name);
 
-	void	CreateAction(std::string_view const& name, ControlType type, Ore::EventInput eventInput);
 
-	bool	Active = true;
+	static void PollInputs(ActionMap* actionMap);
+	static void SetCurrentActionMap(ActionMap* actionMap);
 
 protected:
 	std::string_view m_name;

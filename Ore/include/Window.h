@@ -11,6 +11,14 @@ namespace Ore
 class Window : public IWindow
 {
 public:
+
+    enum class CursorState : int32
+    {
+        FREE = GLFW_CURSOR_NORMAL,
+        HIDDEN = GLFW_CURSOR_HIDDEN,
+        LOCKED = GLFW_CURSOR_DISABLED
+    };
+
     Window(int width, int height, std::string name, bool enableTransparency = false, bool visible = true);
     ~Window();
 
@@ -30,6 +38,8 @@ public:
     void SetDecoration(bool hasDecoration) override;
     void SetIcon(std::string const& path) override; 
     void SetSize(uint16 width, uint16 height) override;
+    void SetCursorState(CursorState state);
+
     static void FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height);
     void Open() override;
 
@@ -37,6 +47,7 @@ private:
     static std::unordered_map<GLFWwindow*, Window*> s_windows;
     GLFWwindow* m_pWindow;
     std::vector<Viewport*> m_viewports;
+    CursorState m_currentCursorState = CursorState::FREE;
 
     friend class Viewport;
     friend class EventManager;

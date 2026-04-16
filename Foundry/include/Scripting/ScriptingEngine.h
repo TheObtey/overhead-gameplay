@@ -11,6 +11,7 @@ class ScriptingEngine
 {
 public:
 	static ScriptEngine& GetScriptEngine() { return Instance().m_scriptEngine; }
+	static void Update(double dt);
 
 protected:
   	ScriptingEngine();

@@ -182,9 +182,9 @@ namespace Ore
 
 	enum class EventAction
 	{
-		PRESS = GLFW_PRESS,
 		RELEASE = GLFW_RELEASE,
-		HOLD,
+		PRESS = GLFW_PRESS,
+		HOLD = 2,
 		DOUBLE_CLICK,
 		WHEEL_UP,
 		WHEEL_DOWN,
@@ -218,7 +218,7 @@ namespace Ore
 
 		inline static Event<void(EventInput, EventAction)> getKey = Event<void(EventInput, EventAction)>();
 		inline static Event<void(EventInput, EventAction)> getMouse = Event<void(EventInput, EventAction)>();
-		inline static Event<void(int32, int32)> getCursorPos = Event<void(int32, int32)>();
+		inline static Event<void(float, float)> getCursorPos = Event<void(float, float)>();
 	};
 }
 

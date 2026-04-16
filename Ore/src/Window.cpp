@@ -101,6 +101,8 @@ void Window::Present()
 {
 	glfwSwapBuffers(m_pWindow);
 	glfwPollEvents();
+	if (m_currentCursorState == CursorState::LOCKED)
+		glfwSetCursorPos(m_pWindow, m_width / 2, m_height / 2);
 }
 
 void Window::SetSize(uint16 width, uint16 height)
@@ -110,6 +112,12 @@ void Window::SetSize(uint16 width, uint16 height)
 
     glfwSetWindowSize(m_pWindow, m_width, m_height);
 	glfwSetWindowAspectRatio(m_pWindow, m_width, m_height);
+}
+
+void Window::SetCursorState(CursorState state)
+{
+	m_currentCursorState = state;
+	glfwSetInputMode(m_pWindow, GLFW_CURSOR, static_cast<int32>(state));
 }
 
 void Window::FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height)

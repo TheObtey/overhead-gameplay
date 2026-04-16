@@ -2,18 +2,18 @@
 
 --------------------------------------------------------------------------------------------
 -- ButtonState
----@enum buttonstate
-buttonstate = {
-    UP = false,
-    DOWN = true
+---@enum ButtonState
+ButtonState = {
+    PRESSED = 0,
+    RELEASED = 1,
+    HOLD = 1
 }
 
 --------------------------------------------------------------------------------------------
 -- ControlType
----@enum controltype
-controltype = {
+---@enum ControlType
+ControlType = {
     BUTTON = 1,
-    SLIDER = 2,
     STICK = 3,
 
     UNDEFINED = 0
@@ -24,11 +24,6 @@ controltype = {
 ---@class icontrol
 icontrol = {}
 
----@param ctType controltype
----@param eiEventInput eventinput
----@return icontrol
-function icontrol:new(ctType, eiEventInput) end
-
 ---@return controltype
 function icontrol:GetControlType() end
 
@@ -37,23 +32,15 @@ function icontrol:GetEventInput() end
 
 ---@param icIControl icontrol
 ---@return boolean
-function icontrol:Read(icIControl) end
+function icontrol:ReadAsBool(icIControl) end
 
 ---@param icIControl icontrol
 ---@return number
-function icontrol:Read(icIControl) end
+function icontrol:ReadAsFloat(icIControl) end
 
 ---@param icIControl icontrol
 ---@return vec2
-function icontrol:Read(icIControl) end
-
----@param acAction action
-function icontrol:SetAction(acAction) end
-
---------------------------------------------------------------------------------------------
--- Event
----@class event
-event = {}
+function icontrol:ReadAsVec2(icIControl) end
 
 --------------------------------------------------------------------------------------------
 -- Action
@@ -62,13 +49,14 @@ event = {}
 action = {}
 action.Event = {}
 
----@param ctControlType controltype
----@param eiEventInput eventinput
----@return number
+---@param ctControlType controltype Type of control (ex BUTTON)
+---@param eiEventInput eventinput Input ID (ex KEY_SPACE == 32)
+---@return number the index of the added control
 function action:AddControl(ctControlType, eiEventInput) end
 
+---@param iIndex number
 ---@return icontrol
-function action:GetControl() end
+function action:GetControl(iIndex) end
 
 --------------------------------------------------------------------------------------------
 -- ButtonControl
@@ -84,19 +72,6 @@ function buttoncontrol:new(eiEventInput, acAction) end
 function buttoncontrol:GetState() end
 
 --------------------------------------------------------------------------------------------
--- SliderControl
----@class slidercontrol
-slidercontrol = {}
-
----@param eiEventInput eventinput
----@param acAction action
----@return slidercontrol
-function slidercontrol:new(eiEventInput, acAction) end
-
----@return number
-function slidercontrol:GetPos() end
-
---------------------------------------------------------------------------------------------
 -- StickControl
 ---@class stickcontrol
 stickcontrol = {}
@@ -106,7 +81,7 @@ stickcontrol = {}
 ---@return stickcontrol
 function stickcontrol:new(eiEventInput, acAction) end
 
----@return vec2 
+---@return vec2
 function stickcontrol:GetPos() end
 
 --------------------------------------------------------------------------------------------
@@ -114,16 +89,22 @@ function stickcontrol:GetPos() end
 ---@class actionmap
 actionmap = {}
 
----@param sName string action map name
+---@param sName string ActionMap name
 ---@return actionmap
 function actionmap:new(sName) end
+
+---@param sName string Action name
+---@param ctControlType ControlType
+---@param eiEventInput EventInput
+---@return action returns instanciated Action
+function actionmap:CreateAction(sName, ctControlType, eiEventInput) end
 
 ---@param sName string
 ---@return boolean
 function actionmap:Erase(sName) end
 
 ---@param sName string
----@return boolean
+---@return action
 function actionmap:GetAction(sName) end
 
 ---@return number
@@ -131,9 +112,9 @@ function actionmap:Length() end
 
 ---@param sOldName string
 ---@param sNewName string
-function actionmap:Rename(sOldName, sNewName) end 
+function actionmap:Rename(sOldName, sNewName) end
 
 ---@param sName string action name
----@param ctControlType controltype controltype
----@param eiEventInput eventinput input ID
+---@param ctControlType ControlType controltype
+---@param eiEventInput EventInput input ID
 function actionmap:CreateAction(sName, ctControlType, eiEventInput) end
