@@ -16,7 +16,6 @@ enum SceneNodeType
 {
 	GLOBAL,
 	MESH,
-	BONE,
 };
 
 struct SceneNode
