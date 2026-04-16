@@ -72,3 +72,88 @@ ISerializable* SVec4::CreateInstance()
 {
 	return static_cast<ISerializable*>(std::make_unique<SVec4>(glm::vec4()).release());
 }
+
+
+// VEC4
+ClampedInt::ClampedInt(int _min, int _max, int _value) : min(_min), max(_max), value(_value)
+{
+	if (max < min)
+		value = _value > min ? _value : min;
+	else if (min > max)
+		value = _value < max ? _value : max;
+	else
+		value = std::clamp(_value, min, max);
+}
+
+void ClampedInt::SetValue(int _value)
+{
+	if (max < min)
+		value = _value > min ? _value : min;
+	else if (min > max)
+		value = _value < max ? _value : max;
+	else
+		value = std::clamp(_value, min, max);
+}
+
+void ClampedInt::Serialize(SerializedObject& datas) const
+{
+	datas.SetType("ClampedInt");
+	datas.AddPrivateElement("min", &min);
+	datas.AddPrivateElement("max", &max);
+	datas.AddPublicElement("value", &value);
+}
+void ClampedInt::Deserialize(SerializedObject const& datas)
+{
+	datas.GetPrivateElement("min", &min);
+	datas.GetPrivateElement("max", &max);
+	int val = 0;
+	datas.GetPublicElement("value", &val);
+	SetValue(val);
+}
+
+ISerializable* ClampedInt::CreateInstance()
+{
+	return static_cast<ISerializable*>(std::make_unique<ClampedInt>(0,0,0).release());
+}
+
+ClampedFloat::ClampedFloat(float _min, float _max, float _value) : min(_min), max(_max), value(_value)
+{
+	if (max < min)
+		value = _value > min ? _value : min;
+	else if (min > max)
+		value = _value < max ? _value : max;
+	else
+		value = std::clamp(_value, min, max);
+}
+
+void ClampedFloat::SetValue(float _value)
+{
+	if (max < min)
+		value = _value > min ? _value : min;
+	else if (min > max)
+		value = _value < max ? _value : max;
+	else
+		value = std::clamp(_value, min, max);
+}
+
+
+void ClampedFloat::Serialize(SerializedObject& datas) const
+{
+	datas.SetType("ClampedInt");
+	datas.AddPrivateElement("min", &min);
+	datas.AddPrivateElement("max", &max);
+	datas.AddPublicElement("value", &value);
+}
+void ClampedFloat::Deserialize(SerializedObject const& datas)
+{
+	datas.GetPrivateElement("min", &min);
+	datas.GetPrivateElement("max", &max);
+	float val = 0.0f;
+	datas.GetPublicElement("value", &val);
+	SetValue(val);
+}
+
+ISerializable* ClampedFloat::CreateInstance()
+{
+	return static_cast<ISerializable*>(std::make_unique<ClampedFloat>(0.0f, 0.0f, 0.0f).release());
+}

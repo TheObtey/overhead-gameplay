@@ -15,10 +15,13 @@ public:
     virtual void Deserialize(SerializedObject const& datas) override;
 
     static ISerializable* CreateInstance();
+    uptr<Node> Clone() override;
 
 protected:
     virtual bool IsVisible();
     void TryAttachToViewport();
+
+    void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
 
 protected:
     NodeViewport* m_pViewport = nullptr; //nearest viewport to render to

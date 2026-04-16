@@ -14,24 +14,24 @@ public:
 
 	class Proxy;
 
-	NodeCollider(std::string const &name);
+	NodeCollider(std::string const& name);
 	~NodeCollider() override;
 
-	void AttachToRigidBody(NodeRigidBody *rigidBody);
+	void AttachToRigidBody(NodeRigidBody* rigidBody);
 	void Detach();
 	bool IsAttached() const { return m_pCollider != nullptr; }
 
 	// Engine
 	////////////////////////////////////////////////////////////
-	virtual void Serialize(SerializedObject &datas) const override;
-	virtual void Deserialize(SerializedObject const &datas) override;
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
 
 	// =========== Local transform (offset from RigidBody) ===========
 
-	void SetLocalPosition(const glm::vec3 &pos);
-	void SetLocalRotation(const glm::quat &rot);
-	glm::vec3 const &GetLocalPosition() const { return m_localPosition; }
-	glm::quat const &GetLocalRotation() const { return m_localRotation; }
+	void SetLocalPosition(const glm::vec3& pos);
+	void SetLocalRotation(const glm::quat& rot);
+	glm::vec3 const& GetLocalPosition() const { return m_localPosition; }
+	glm::quat const& GetLocalRotation() const { return m_localRotation; }
 
 	// =========== Material ===========
 
@@ -62,24 +62,25 @@ public:
 
 	// =========== RP3D Events ===========
 
-	void ContactEvent(NodeCollider &other);
-	void TriggerEvent(NodeCollider &other);
+	void ContactEvent(NodeCollider& other);
+	void TriggerEvent(NodeCollider& other);
 
-	Event<void(NodeCollider &, const NodeRigidBody &data)> OnContact;
-	Event<void(NodeCollider &, const NodeRigidBody &data)> OnTrigger;
+	Event<void(NodeCollider&, const NodeRigidBody& data)> OnContact;
+	Event<void(NodeCollider&, const NodeRigidBody& data)> OnTrigger;
 
 protected:
 	virtual void DestroyShape() = 0;
+	void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
 	rp3d::Transform GetLocalRp3dTransform() const;
 
 	rp3d::Collider* m_pCollider = nullptr;
 	rp3d::CollisionShape* m_pShape = nullptr;
 	rp3d::RigidBody* m_pRigidBodyRP3D = nullptr;
 
-	NodeRigidBody *m_pNodeRigidBody = nullptr;
+	NodeRigidBody* m_pNodeRigidBody = nullptr;
 
-	glm::vec3 m_localPosition{0.0f, 0.0f, 0.0f};
-	glm::quat m_localRotation{1.0f, 0.0f, 0.0f, 0.0f};
+	glm::vec3 m_localPosition{ 0.0f, 0.0f, 0.0f };
+	glm::quat m_localRotation{ 1.0f, 0.0f, 0.0f, 0.0f };
 
 	int m_indexInRigidBody = -1;
 
@@ -90,13 +91,14 @@ class NodeBoxCollider : public NodeCollider
 {
 public:
 	class Proxy;
-	NodeBoxCollider(std::string const &name) : NodeCollider(name) {};
+	NodeBoxCollider(std::string const& name) : NodeCollider(name) {};
 	~NodeBoxCollider() override {};
-	virtual void Serialize(SerializedObject &datas) const override;
-	virtual void Deserialize(SerializedObject const &datas) override;
-	static ISerializable *CreateInstance();
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	static ISerializable* CreateInstance();
 
-	void SetShape(const glm::vec3 &halfExtents);
+	void SetShape(const glm::vec3& halfExtents);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;
@@ -106,13 +108,14 @@ class NodeSphereCollider : public NodeCollider
 {
 public:
 	class Proxy;
-	NodeSphereCollider(std::string const &name) : NodeCollider(name) {};
+	NodeSphereCollider(std::string const& name) : NodeCollider(name) {};
 	~NodeSphereCollider() override {};
-	virtual void Serialize(SerializedObject &datas) const override;
-	virtual void Deserialize(SerializedObject const &datas) override;
-	static ISerializable *CreateInstance();
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	static ISerializable* CreateInstance();
 
 	void SetShape(float radius);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;
@@ -122,13 +125,14 @@ class NodeCapsuleCollider : public NodeCollider
 {
 public:
 	class Proxy;
-	NodeCapsuleCollider(std::string const &name) : NodeCollider(name) {};
+	NodeCapsuleCollider(std::string const& name) : NodeCollider(name) {};
 	~NodeCapsuleCollider() override {};
-	virtual void Serialize(SerializedObject &datas) const override;
-	virtual void Deserialize(SerializedObject const &datas) override;
-	static ISerializable *CreateInstance();
+	virtual void Serialize(SerializedObject& datas) const override;
+	virtual void Deserialize(SerializedObject const& datas) override;
+	static ISerializable* CreateInstance();
 
 	void SetShape(float radius, float height);
+	uptr<Node> Clone() override;
 
 private:
 	virtual void DestroyShape() override;

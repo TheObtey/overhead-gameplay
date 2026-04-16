@@ -1,5 +1,3 @@
-
-
 class NodeCollider::Proxy : public Node3D::Proxy
 {
 public:
@@ -78,5 +76,4 @@ struct NodeCollider::Proxy::ProxyBinding
 	};
 };
 
-REGISTER_PROXY(NodeCollider::Proxy::ProxyBinding, NodeColliderProxy);
 

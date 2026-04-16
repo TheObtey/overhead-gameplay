@@ -13,13 +13,16 @@
 #include <Logger.hpp>
 #include <Nodes/NodeMeshAnimated3D.h>
 #include <Nodes/Node3D.h>
+#include <Nodes/NodeCollider.h>
 #include <Nodes/NodeCamera.h>
 #include <Nodes/NodeWindow.h>
 #include <Nodes/NodeViewport.h>
 #include <Servers/AnimationServer.h>
 #include <Servers/GraphicServer.h>
 #include <Servers/EngineServer.h>
+#include <Servers/PhysicsServer.h>
 #include <GameLoop.h>
+#include <algorithm>
 
 namespace rl
 {
@@ -28,6 +31,7 @@ namespace rl
 
 uptr<Node> LoadScene()
 {
+
     uptr<Node> scene = Node::CreateNode<Node>("Scene");
 
     uptr<Node> nViewport = Node::CreateNode<NodeViewport>("Viewport");
@@ -55,6 +59,10 @@ uptr<Node> LoadScene()
 }
 int main()
 {
+    uptr<NodeBoxCollider> b = Node::CreateNode<NodeBoxCollider>("aa");
+    b->SetShape({ 0.10f,1.0f,1.0f });
+    PhysicsServer::FlushCommands();
+
     uptr<Node> root = Node::CreateNode<NodeWindow>("Window");
     SceneTree sTree(root);
 

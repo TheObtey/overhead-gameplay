@@ -29,6 +29,9 @@ public:
 	virtual void Deserialize(SerializedObject const& datas) override;
 
 protected:
+	void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
+
+protected:
 	uptr<Ore::Mesh> m_mesh;
 	std::map<std::string, uptr<Animation>> m_linkedAnimations;
 	std::vector<sptr<Ore::Texture>> m_textures;

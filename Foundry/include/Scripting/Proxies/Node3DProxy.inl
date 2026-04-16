@@ -145,4 +145,3 @@ struct Node3D::Proxy::ProxyBinding
 	};
 };
 
-REGISTER_PROXY(Node3D::Proxy::ProxyBinding, Node3DProxy);

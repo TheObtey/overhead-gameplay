@@ -69,5 +69,3 @@ BindProxy(Node2D::Proxy,
 		"SetWorldRotationAngle", BIND(SetWorldRotationAngle),
 		"SetWorldPosition", BIND(SetWorldPosition));
 );
-
-REGISTER_PROXY(Node2D::Proxy::ProxyBinding, Node2DProxy);

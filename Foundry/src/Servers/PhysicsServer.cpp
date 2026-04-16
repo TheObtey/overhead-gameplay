@@ -1,11 +1,41 @@
 #include "Servers/PhysicsServer.h"
-//#include "Nodes/NodeRigidBody.h"
 #include "Nodes/NodeCollider.h"
 #include "Debug.h"
 
-//reactphysics3d::PhysicsWorld* PhysicsServer::m_pPhysicsWorld = nullptr;
-//reactphysics3d::PhysicsCommon PhysicsServer::m_physicsCommon;
+void PhysicsEvents::onContact(const rp3d::CollisionCallback::CallbackData& data)
+{
+	uint32 nbPairs = data.getNbContactPairs();
+	for (int i = 0; i < nbPairs; i++)
+	{
+		ContactPair pair = data.getContactPair(i);
+		auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
+		auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
+		b1->ContactEvent(*b2);
+		b2->ContactEvent(*b1);
 
+		//auto eventType = pair.getEventType();
+		//if (eventType == ContactPair::EventType::ContactStart)
+		//	DEBUG("Start Contact\n");
+		//else if (eventType == ContactPair::EventType::ContactStay)
+		//	DEBUG("In Contact\n");
+		//else if (eventType == ContactPair::EventType::ContactExit)
+		//	DEBUG("Got out of Contact\n");
+	}
+}
+
+
+void PhysicsEvents::onTrigger(const rp3d::OverlapCallback::CallbackData& data)
+{
+	uint32 nbPairs = data.getNbOverlappingPairs();
+	for (int i = 0; i < nbPairs; i++)
+	{
+		rp3d::OverlapCallback::OverlapPair pair = data.getOverlappingPair(i);
+		auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
+		auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
+		b1->TriggerEvent(*b2);
+		b2->TriggerEvent(*b1);
+	}
+}
 
 PhysicsServer::PhysicsServer() : Server()
 {
@@ -67,7 +97,7 @@ void PhysicsServer::S_CreateRigidBody(NodeRigidBody& rigidBody)
 	rigidBody.m_pRigidBodyRP3D->setAngularDamping(0.5f);
 	rigidBody.m_pRigidBodyRP3D->setMass(1.0f);
 	rigidBody.m_pRigidBodyRP3D->setIsAllowedToSleep(true);
-	rigidBody.m_pRigidBodyRP3D->setUserData(&rigidBody.m_pProxy);
+	rigidBody.m_pRigidBodyRP3D->setUserData(rigidBody.m_pProxy.get());
 	rigidBody.m_rigidBodyCreated = true;
 }
 void PhysicsServer::S_DestroyRigidBody(NodeRigidBody& rigidBody)
@@ -573,90 +603,90 @@ void PhysicsServer::S_AddCollider(NodeCollider& collider, NodeRigidBody& rigidBo
 
 void PhysicsServer::S_ApplyLocalForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->applyLocalForceAtCenterOfMass(glmToRp3d(force));
 }
 void PhysicsServer::S_ApplyLocalForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->applyLocalForceAtLocalPosition(glmToRp3d(force), glmToRp3d(point));
 }
 void PhysicsServer::S_ApplyLocalForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->applyLocalForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
 }
 
 void PhysicsServer::S_ApplyWorldForceAtCenterOfMass(const glm::vec3& force, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->applyWorldForceAtCenterOfMass(glmToRp3d(force));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->applyWorldForceAtCenterOfMass(glmToRp3d(force));
 }
 void PhysicsServer::S_ApplyWorldForceAtLocalPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->applyWorldForceAtLocalPosition(glmToRp3d(force), glmToRp3d(point));
 }
 void PhysicsServer::S_ApplyWorldForceAtWorldPosition(const glm::vec3& force, const glm::vec3& point, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->applyWorldForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->applyWorldForceAtWorldPosition(glmToRp3d(force), glmToRp3d(point));
 }
 
 void PhysicsServer::S_ApplyLocalTorque(const glm::vec3& torque, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->applyLocalTorque(glmToRp3d(torque));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->applyLocalTorque(glmToRp3d(torque));
 }
 void PhysicsServer::S_ApplyWorldTorque(const glm::vec3& torque, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->applyWorldTorque(glmToRp3d(torque));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->applyWorldTorque(glmToRp3d(torque));
 }
 
 void PhysicsServer::S_SetLinearVelocity(const glm::vec3& velocity, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
-		rb.m_pRigidBodyRP3D->setLinearVelocity(glmToRp3d(velocity));
+	if (rb.m_pNode3DParent == nullptr) return;
+	rb.m_pRigidBodyRP3D->setLinearVelocity(glmToRp3d(velocity));
 }
 void PhysicsServer::S_SetAngularVelocity(const glm::vec3& velocity, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setAngularVelocity(glmToRp3d(velocity));
 }
 /// Set the linear decelerating factor
 void  PhysicsServer::S_SetLinearDamping(float linearDamping, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setLinearDamping(linearDamping);
 }
 /// Set the angular decelerating factor
 void  PhysicsServer::S_SetAngularDamping(float angularDamping, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setAngularDamping(angularDamping);
 }
 
 void PhysicsServer::S_ResetForces(NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->resetForce();
 }
 void PhysicsServer::S_ResetTorque(NodeRigidBody& rb)
 {
 
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->resetTorque();
 }
 
 void  PhysicsServer::S_SetMass(float mass, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setMass(mass);
 }
 void PhysicsServer::S_SetBodyType(RigidBodyType type, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner == nullptr) return;
+	if (rb.m_pNode3DParent == nullptr) return;
 	switch (type)
 	{
 	case RigidBodyType::STATIC:
@@ -676,27 +706,27 @@ void PhysicsServer::S_SetBodyType(RigidBodyType type, NodeRigidBody& rb)
 
 void PhysicsServer::S_LockLinearAxis(bool lockAxis[], NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setLinearLockAxisFactor(rp3d::Vector3{ lockAxis[0] == true ? 0.0f : 1.0f, lockAxis[1] == true ? 0.0f : 1.0f, lockAxis[2] == true ? 0.0f : 1.0f });
 }
 void PhysicsServer::S_LockAngularAxis(bool lockAxis[], NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setAngularLockAxisFactor(rp3d::Vector3{ lockAxis[0] == true ? 0.0f : 1.0f, lockAxis[1] == true ? 0.0f : 1.0f, lockAxis[2] == true ? 0.0f : 1.0f });
 }
 void PhysicsServer::S_SetSleepingEnabled(bool enabled, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setIsAllowedToSleep(enabled);
 }
 void PhysicsServer::S_SetSleepingState(bool isSleeping, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->setIsSleeping(isSleeping);
 }
 void PhysicsServer::S_SetIsGravityEnabled(bool enabled, NodeRigidBody& rb)
 {
-	if (rb.m_pOwner)
+	if (rb.m_pNode3DParent == nullptr) return;
 		rb.m_pRigidBodyRP3D->enableGravity(enabled);
 }
 
@@ -722,10 +752,9 @@ void PhysicsServer::S_Detach(NodeCollider& c)
 	if (c.m_pNodeRigidBody == nullptr) return;
 
 	auto& colliders = c.m_pNodeRigidBody->m_colliders;
-	colliders[c.m_indexInRigidBody] = nullptr;	
+	colliders[c.m_indexInRigidBody] = nullptr;
 	colliders.erase(colliders.begin() + c.m_indexInRigidBody);
 
-	c.m_pNodeRigidBody->m_pRigidBodyRP3D->removeCollider(c.m_pCollider);
 	c.m_indexInRigidBody = -1;
 
 
@@ -733,6 +762,7 @@ void PhysicsServer::S_Detach(NodeCollider& c)
 	{
 		colliders[i]->m_indexInRigidBody = i;
 	}
+	c.m_pNodeRigidBody->m_pRigidBodyRP3D->removeCollider(c.m_pCollider);
 }
 
 void PhysicsServer::S_DestroyShape(NodeCollider& c)
@@ -800,7 +830,7 @@ void  PhysicsServer::S_SetMassDensity(float v, NodeCollider& c)
 void PhysicsServer::S_SetIsTrigger(bool v, NodeCollider& c)
 {
 	if (!c.m_pCollider) return;
-	
+
 	c.m_pCollider->setIsTrigger(v); c.m_pCollider->setIsSimulationCollider(!v);
 }
 void PhysicsServer::S_SetIsSimulationCollider(bool v, NodeCollider& c)

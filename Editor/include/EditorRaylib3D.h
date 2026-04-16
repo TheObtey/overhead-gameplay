@@ -17,6 +17,11 @@ struct DrawableElement
 	Matrix worldMatrix; // Raylib Draw
 	Transform gizmoTransform; // Gizmo Transform
 	bool gizmoUpdated = false;
+
+	Material material = {};
+	Texture2D diffuseTexture = {};
+	bool hasTexture = false;
+	std::string loadedDiffusePath;
 };
 
 struct Node3DElement
@@ -51,7 +56,10 @@ public:
 
 	void AddDrawableObject(std::string const& name, Node* pNode);
 	void UpdateDrawableElement(Node* pNode);
-	void UpdateElementName(std::string const& oldName,Node* pNode);
+	void UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableElement& drawable);
+	std::string ResolveEditorTexturePath(std::filesystem::path const& logicalPath);
+
+		void UpdateElementName(std::string const& oldName, Node* pNode);
 	void RemoveDrawableElement(std::string const& elementName);
 	void ClearWindow();
 

@@ -14,7 +14,6 @@ struct AutomaticRegisterProxy
     {
         Binder B(ScriptingEngine::GetScriptEngine());
         T::Bind(B);
-        ScriptingEngine::RegisterTypeNames(B.GetRegisteredTypesName());
         return true;
     }
 };

@@ -68,10 +68,14 @@ public:
 	template <typename T>
 	void GetPublicElementInDictionary(std::string const& dictionaryName, std::string const& elementName, T* outVariable) const;
 
+	template <typename T>
+	bool TryGetPublicElement(std::string const& elementName, T* outVariable) const;
 
-	json const& GetJson() {return m_elementsInSerializedObject;}
+	template <typename T>
+	bool TryGetPrivateElement(std::string const& elementName, T* outVariable) const;
+
+	json const& GetJson() { return m_elementsInSerializedObject; }
 	void SetJson(json const& json) { m_elementsInSerializedObject = json; } // Check d'error
-
 private:
 	json m_elementsInSerializedObject;
 	friend class EditorSerializer;
@@ -461,6 +465,38 @@ inline void SerializedObject::GetPublicElement<glm::vec4>(std::string const& ele
 	*outVariable = { sVar.x,sVar.y, sVar.z, sVar.w };
 }
 
+// Try GET PUBLIC ELEMENT
+template <typename T>
+inline bool SerializedObject::TryGetPublicElement(std::string const& elementName, T* outVariable) const
+{
+	auto itPublic = m_elementsInSerializedObject.find("PUBLIC_DATAS");
+	if (itPublic == m_elementsInSerializedObject.end() || !itPublic->is_object())
+		return false;
+
+	auto itElem = itPublic->find(elementName);
+	if (itElem == itPublic->end() || itElem->is_null())
+		return false;
+
+	*outVariable = itElem->get<T>();
+	return true;
+}
+
+// Try GET PRIVATE ELEMENT
+template <typename T>
+inline bool SerializedObject::TryGetPrivateElement(std::string const& elementName, T* outVariable) const
+{
+	auto itPrivate = m_elementsInSerializedObject.find("PRIVATE_DATAS");
+	if (itPrivate == m_elementsInSerializedObject.end() || !itPrivate->is_object())
+		return false;
+
+	auto itElem = itPrivate->find(elementName);
+	if (itElem == itPrivate->end() || itElem->is_null())
+		return false;
+
+	*outVariable = itElem->get<T>();
+	return true;
+}
+
 // GET PUBLIC Dictionary
 template <typename T>
 inline void SerializedObject::GetPublicElementInDictionary(std::string const& dictionaryName, std::string const& elementName, T* outVariable) const
@@ -495,7 +531,6 @@ inline void SerializedObject::GetPublicElementInDictionary<glm::vec4>(std::strin
 	GetPublicElementInDictionary(dictionaryName, elementName, static_cast<ISerializable*>(&sVar));
 	*outVariable = { sVar.x,sVar.y, sVar.z, sVar.w };
 }
-
 
 // GET PUBLIC ARRAY
 template <typename T>

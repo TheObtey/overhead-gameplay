@@ -1,7 +1,7 @@
 ---@meta
 
----@enum gamepadid
-gamepadid = {
+---@enum GamepadID
+GamepadID = {
     GAMEPAD_1  = 0,
     GAMEPAD_2  = 1,
     GAMEPAD_3  = 2,
@@ -22,8 +22,8 @@ gamepadid = {
     GAMEPAD_MAX = 16
 }
 
----@enum eventinput
-eventinput = {
+---@enum EventInput
+EventInput = {
     KEY_A = 65,
     KEY_M = 77,
     KEY_SEMICOLON = 59,
@@ -34,7 +34,7 @@ eventinput = {
 
     KEY_B = 66,
     KEY_C = 67,
-    KEY_D = 68, 
+    KEY_D = 68,
     KEY_E = 69,
     KEY_F = 70,
     KEY_G = 71,
@@ -64,9 +64,9 @@ eventinput = {
     KEY_8 = 56,
     KEY_9 = 57,
 
-    KEY_APOSTROPHE = 39, 
+    KEY_APOSTROPHE = 39,
     KEY_MINUS = 45,
-    KEY_PERIOD = 46,        
+    KEY_PERIOD = 46,
     KEY_SLASH         = 47,
     KEY_EQUAL         = 61,
     KEY_ESCAPE        = 256,
@@ -169,21 +169,4 @@ eventinput = {
     GAMEPAD_LEFT_Y            = 3,
     GAMEPAD_RIGHT_X           = 4,
     GAMEPAD_RIGHT_Y           = 5
-}
-
----@enum eventaction
-eventaction = {
-    PRESS = 1,
-    RELEASE = 0,
-    HOLD = 1,
-    DOUBLE_CLICK = 2,
-    WHEEL_UP = 3,
-    WHEEL_DOWN = 4,
-    MOVE = 5,
-    DRAG = 6,
-    FOCUS = 7,
-    BLUR = 8,
-    CHANGE = 9,
-
-    UNKNOWN = 10
 }

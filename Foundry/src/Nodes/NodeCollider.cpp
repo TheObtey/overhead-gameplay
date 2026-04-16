@@ -3,17 +3,18 @@
 
 #include "Servers/PhysicsServer.h"
 
-NodeCollider::NodeCollider(std::string const &name) : Node3D(name)
+NodeCollider::NodeCollider(std::string const& name) : Node3D(name)
 {
 	// OnSceneEnter.Subscribe([this](Node& self)
 	//	{
 	//
 	//
 	//	});
-	OnParentChange.Subscribe([this](Node &self)
-							 {
+	OnParentChange.Subscribe([this](Node& self)
+		{
 			if (auto* rigidBody = dynamic_cast<NodeRigidBody*>(m_pOwner))
-				AttachToRigidBody(rigidBody); });
+				AttachToRigidBody(rigidBody); 
+		});
 
 	// OnSceneLeave.Subscribe([this](Node& self)
 	//	{
@@ -35,23 +36,23 @@ NodeCollider::~NodeCollider()
 rp3d::Transform NodeCollider::GetLocalRp3dTransform() const
 {
 	return rp3d::Transform(
-		{m_localPosition.x, m_localPosition.y, m_localPosition.z},
-		{m_localRotation.w, m_localRotation.x, m_localRotation.y, m_localRotation.z});
+		{ m_localPosition.x, m_localPosition.y, m_localPosition.z },
+		{ m_localRotation.w, m_localRotation.x, m_localRotation.y, m_localRotation.z });
 }
 
-void NodeCollider::SetLocalPosition(const glm::vec3 &pos)
+void NodeCollider::SetLocalPosition(const glm::vec3& pos)
 {
 	if (m_pCollider)
 		PhysicsServer::SetLocalPosition(pos, *this);
 }
 
-void NodeCollider::SetLocalRotation(const glm::quat &rot)
+void NodeCollider::SetLocalRotation(const glm::quat& rot)
 {
 	if (m_pCollider)
 		PhysicsServer::SetLocalRotation(rot, *this);
 }
 
-void NodeCollider::AttachToRigidBody(NodeRigidBody *rigidBody)
+void NodeCollider::AttachToRigidBody(NodeRigidBody* rigidBody)
 {
 	PhysicsServer::AttachToRigidBody(rigidBody, *this);
 }
@@ -146,13 +147,13 @@ uint16_t NodeCollider::GetCollisionBitsMask() const
 	return m_pCollider ? m_pCollider->getCollideWithMaskBits() : 0xFFFF;
 }
 
-void NodeCollider::Serialize(SerializedObject &datas) const
+void NodeCollider::Serialize(SerializedObject& datas) const
 {
 	Node3D::Serialize(datas);
 	datas.SetType("NodeCollider");
 
 	glm::vec3 localPosition = m_localPosition;
-	glm::vec4 localRotation{m_localRotation.x, m_localRotation.y, m_localRotation.z, m_localRotation.w};
+	glm::vec4 localRotation{ m_localRotation.x, m_localRotation.y, m_localRotation.z, m_localRotation.w };
 
 	float bounciness = GetBounciness();
 	float friction = GetFrictionCoefficient();
@@ -175,14 +176,14 @@ void NodeCollider::Serialize(SerializedObject &datas) const
 	datas.AddPublicElement("CollideWithMaskBits", &collideWithMaskBits);
 }
 
-void NodeCollider::Deserialize(SerializedObject const &datas)
+void NodeCollider::Deserialize(SerializedObject const& datas)
 {
 	Node3D::Deserialize(datas);
 
 	glm::vec3 localPosition = m_localPosition;
 	datas.GetPublicElement("LocalPosition", &localPosition);
 
-	glm::vec4 localRotationVec{m_localRotation.x, m_localRotation.y, m_localRotation.z, m_localRotation.w};
+	glm::vec4 localRotationVec{ m_localRotation.x, m_localRotation.y, m_localRotation.z, m_localRotation.w };
 	datas.GetPublicElement("LocalRotation", &localRotationVec);
 	glm::quat localRotation(localRotationVec.w, localRotationVec.x, localRotationVec.y, localRotationVec.z);
 
@@ -229,50 +230,67 @@ void NodeCollider::Deserialize(SerializedObject const &datas)
 	SetCollideWithMaskBits(collideWithMaskBits);
 }
 
-void NodeCollider::ContactEvent(NodeCollider &other)
+void NodeCollider::ContactEvent(NodeCollider& other)
 {
 	OnContact(*this, *other.m_pNodeRigidBody);
 }
-void NodeCollider::TriggerEvent(NodeCollider &other)
+void NodeCollider::TriggerEvent(NodeCollider& other)
 {
 	OnTrigger(*this, *other.m_pNodeRigidBody);
 }
 
-void NodeBoxCollider::SetShape(const glm::vec3 &halfExtents)
+void NodeBoxCollider::SetShape(const glm::vec3& halfExtents)
 {
 	PhysicsServer::SetBoxShape(halfExtents, *this);
 }
 void NodeBoxCollider::DestroyShape()
 {
-	PhysicsServer::GetPhysicsCommon().destroyBoxShape(static_cast<rp3d::BoxShape *>(m_pShape));
+	PhysicsServer::GetPhysicsCommon().destroyBoxShape(static_cast<rp3d::BoxShape*>(m_pShape));
 }
 
-void NodeBoxCollider::Serialize(SerializedObject &datas) const
+void NodeBoxCollider::Serialize(SerializedObject& datas) const
 {
 	NodeCollider::Serialize(datas);
 	datas.SetType("NodeBoxCollider");
 
-	glm::vec3 halfExtents{0.5f, 0.5f, 0.5f};
+	glm::vec3 halfExtents{ 0.5f, 0.5f, 0.5f };
 	if (m_pShape)
 	{
-		auto *boxShape = static_cast<rp3d::BoxShape *>(m_pShape);
+		auto* boxShape = static_cast<rp3d::BoxShape*>(m_pShape);
 		auto he = boxShape->getHalfExtents();
-		halfExtents = {he.x, he.y, he.z};
+		halfExtents = { he.x, he.y, he.z };
 	}
-
-	datas.AddPublicElement("HalfExtents", &halfExtents);
+	ClampedFloat HalfExtX = ClampedFloat(0.1f, -1.0f, halfExtents.x);
+	ClampedFloat HalfExtY = ClampedFloat(0.1f, -1.0f, halfExtents.y);
+	ClampedFloat HalfExtZ = ClampedFloat(0.1f, -1.0f, halfExtents.z);
+	datas.AddPublicElement("HalfExtentsX", static_cast<ISerializable*>(&HalfExtX));
+	datas.AddPublicElement("HalfExtentsY", static_cast<ISerializable*>(&HalfExtY));
+	datas.AddPublicElement("HalfExtentsZ", static_cast<ISerializable*>(&HalfExtZ));
 }
 
-void NodeBoxCollider::Deserialize(SerializedObject const &datas)
+void NodeBoxCollider::Deserialize(SerializedObject const& datas)
 {
-	glm::vec3 halfExtents{0.5f, 0.5f, 0.5f};
-	datas.GetPublicElement("HalfExtents", &halfExtents);
-	SetShape(halfExtents);
+	glm::vec3 halfExtents{ 0.5f, 0.5f, 0.5f };
+	ClampedFloat HalfExtX = ClampedFloat(0.1f, -1.0f, halfExtents.x);
+	ClampedFloat HalfExtY = ClampedFloat(0.1f, -1.0f, halfExtents.y);
+	ClampedFloat HalfExtZ = ClampedFloat(0.1f, -1.0f, halfExtents.z);
+	try {
+		datas.GetPublicElement("HalfExtentsX", static_cast<ISerializable*>(&HalfExtX));
+		datas.GetPublicElement("HalfExtentsY", static_cast<ISerializable*>(&HalfExtY));
+		datas.GetPublicElement("HalfExtentsZ", static_cast<ISerializable*>(&HalfExtZ));
+	}
+	catch (...) {
+		datas.GetPublicElement("HalfExtentsX", &HalfExtX.value);
+		datas.GetPublicElement("HalfExtentsY", &HalfExtY.value);
+		datas.GetPublicElement("HalfExtentsZ", &HalfExtZ.value);
+	}
+
+	SetShape({ HalfExtX.value,HalfExtY.value,HalfExtZ.value });
 
 	NodeCollider::Deserialize(datas);
 }
 
-ISerializable *NodeBoxCollider::CreateInstance()
+ISerializable* NodeBoxCollider::CreateInstance()
 {
 	return CreateNode<NodeBoxCollider>("NodeBoxCollider").release();
 }
@@ -284,22 +302,22 @@ void NodeSphereCollider::SetShape(float radius)
 
 void NodeSphereCollider::DestroyShape()
 {
-	PhysicsServer::GetPhysicsCommon().destroySphereShape(static_cast<rp3d::SphereShape *>(m_pShape));
+	PhysicsServer::GetPhysicsCommon().destroySphereShape(static_cast<rp3d::SphereShape*>(m_pShape));
 }
 
-void NodeSphereCollider::Serialize(SerializedObject &datas) const
+void NodeSphereCollider::Serialize(SerializedObject& datas) const
 {
 	NodeCollider::Serialize(datas);
 	datas.SetType("NodeSphereCollider");
 
 	float radius = 0.5f;
 	if (m_pShape)
-		radius = static_cast<rp3d::SphereShape *>(m_pShape)->getRadius();
+		radius = static_cast<rp3d::SphereShape*>(m_pShape)->getRadius();
 
 	datas.AddPublicElement("Radius", &radius);
 }
 
-void NodeSphereCollider::Deserialize(SerializedObject const &datas)
+void NodeSphereCollider::Deserialize(SerializedObject const& datas)
 {
 	float radius = 0.5f;
 	datas.GetPublicElement("Radius", &radius);
@@ -308,7 +326,12 @@ void NodeSphereCollider::Deserialize(SerializedObject const &datas)
 	NodeCollider::Deserialize(datas);
 }
 
-ISerializable *NodeSphereCollider::CreateInstance()
+void NodeCollider::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
+{
+	AttachScript<NodeCollider>(script, *this);
+}
+
+ISerializable* NodeSphereCollider::CreateInstance()
 {
 	return CreateNode<NodeSphereCollider>("NodeSphereCollider").release();
 }
@@ -320,10 +343,10 @@ void NodeCapsuleCollider::SetShape(float radius, float height)
 
 void NodeCapsuleCollider::DestroyShape()
 {
-	PhysicsServer::GetPhysicsCommon().destroyCapsuleShape(static_cast<rp3d::CapsuleShape *>(m_pShape));
+	PhysicsServer::GetPhysicsCommon().destroyCapsuleShape(static_cast<rp3d::CapsuleShape*>(m_pShape));
 }
 
-void NodeCapsuleCollider::Serialize(SerializedObject &datas) const
+void NodeCapsuleCollider::Serialize(SerializedObject& datas) const
 {
 	NodeCollider::Serialize(datas);
 	datas.SetType("NodeCapsuleCollider");
@@ -332,7 +355,7 @@ void NodeCapsuleCollider::Serialize(SerializedObject &datas) const
 	float height = 1.0f;
 	if (m_pShape)
 	{
-		auto *capsule = static_cast<rp3d::CapsuleShape *>(m_pShape);
+		auto* capsule = static_cast<rp3d::CapsuleShape*>(m_pShape);
 		radius = capsule->getRadius();
 		height = capsule->getHeight();
 	}
@@ -341,7 +364,7 @@ void NodeCapsuleCollider::Serialize(SerializedObject &datas) const
 	datas.AddPublicElement("Height", &height);
 }
 
-void NodeCapsuleCollider::Deserialize(SerializedObject const &datas)
+void NodeCapsuleCollider::Deserialize(SerializedObject const& datas)
 {
 	float radius = 0.5f;
 	float height = 1.0f;
@@ -352,7 +375,40 @@ void NodeCapsuleCollider::Deserialize(SerializedObject const &datas)
 	NodeCollider::Deserialize(datas);
 }
 
-ISerializable *NodeCapsuleCollider::CreateInstance()
+ISerializable* NodeCapsuleCollider::CreateInstance()
 {
 	return CreateNode<NodeCapsuleCollider>("NodeCapsuleCollider").release();
+}
+
+uptr<Node> NodeBoxCollider::Clone()
+{
+	uptr<NodeBoxCollider> clone = Node::CreateNode<NodeBoxCollider>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}
+
+uptr<Node> NodeSphereCollider::Clone()
+{
+	uptr<NodeSphereCollider> clone = Node::CreateNode<NodeSphereCollider>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
+}
+
+uptr<Node> NodeCapsuleCollider::Clone()
+{
+	uptr<NodeCapsuleCollider> clone = Node::CreateNode<NodeCapsuleCollider>(GetName());
+
+	SerializedObject datas;
+	Serialize(datas);
+	clone->Deserialize(datas);
+
+	return clone;
 }

@@ -16,7 +16,7 @@ Transform3D::Transform3D() :
 void Transform3D::UpdateTransform()
 {
 	if (m_isDirty == false) return;
-	m_transform = Maths::Scale(m_scale) * m_rotationMatrix * Maths::Translate(m_position);
+	m_transform = Maths::Translate(m_position) * m_rotationMatrix * Maths::Scale(m_scale);
 	m_isDirty = false;
 }
 

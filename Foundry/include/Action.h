@@ -1,32 +1,34 @@
 #ifndef FOUNDRY_ACTION_H__
 #define FOUNDRY_ACTION_H__
 
-#include "Define.h"
-#include "Event.hpp"
-#include "EventManager.h"
+
+//#include "Serialization/ISerializable.h"
 #include "IControl.h"
 
 #include <vector>
+#include <functional>
 
 class ActionMap;
 enum class ControlType : byte;
 
-
 class Action /*: public ISerializable*/
 {
 public:
-	Action();
-	Action(ControlType controlType, Ore::EventInput eventInput);
-
+	Action(ControlType controlType, Ore::EventInput eventInput, ActionMap* pActionMap);
 	~Action();
 
 	uint32 AddControl(ControlType const& type, Ore::EventInput const& eventInput);
-	IControl* GetControl(uint32 index);
+	IControl& GetControl(uint32 index);
 
-	Event<void(IControl&)> OnAction;
+	std::function<void(IControl&)> Event;
+
+private:
+	void HandleCursorMove(float newX, float newY);
+	void HandleKeyDown(Ore::EventInput in, Ore::EventAction ac);
 
 private:
 	std::vector<IControl*> m_controls;
+	ActionMap* m_pOwner;
 
 	friend ActionMap;
 };

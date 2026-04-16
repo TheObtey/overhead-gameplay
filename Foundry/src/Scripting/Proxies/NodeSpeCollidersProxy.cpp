@@ -2,7 +2,6 @@
 #include "Nodes/NodeCollider.h"
 
 using ProxyB = NodeBoxCollider::Proxy;
-
 ProxyB* ProxyB::CreateNodeBoxColliderProxy(std::string const& name)
 {
 	uptr<NodeBoxCollider> node = Node::CreateNode<NodeBoxCollider>(name);
@@ -12,8 +11,8 @@ ProxyB* ProxyB::CreateNodeBoxColliderProxy(std::string const& name)
 	return ptr;
 }
 
-using ProxyS = NodeSphereCollider::Proxy;
 
+using ProxyS = NodeSphereCollider::Proxy;
 ProxyS* ProxyS::CreateNodeSphereColliderProxy(std::string const& name)
 {
 	uptr<NodeSphereCollider> node = Node::CreateNode<NodeSphereCollider>(name);
@@ -23,8 +22,8 @@ ProxyS* ProxyS::CreateNodeSphereColliderProxy(std::string const& name)
 	return ptr;
 }
 
-using ProxyC = NodeCapsuleCollider::Proxy;
 
+using ProxyC = NodeCapsuleCollider::Proxy;
 ProxyC* ProxyC::CreateNodeCapsuleColliderProxy(std::string const& name)
 {
 	uptr<NodeCapsuleCollider> node = Node::CreateNode<NodeCapsuleCollider>(name);

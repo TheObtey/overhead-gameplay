@@ -4,8 +4,6 @@
 #include <random>
 
 #include "Define.h"
-#include "Registries/AutomaticRegisterProxy.hpp"
-#include "Scripting/Binder.h"
 
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
@@ -13,6 +11,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 #include <sol/sol.hpp>
+
+class Binder;
 
 namespace MathsProxy
 {
@@ -262,11 +262,10 @@ namespace MathsProxy
     );
 };
 
-struct Vec3ProxyBinding 
+struct MathsProxyBinding 
 {
     static void Bind(Binder& binder);
 };
 
-REGISTER_PROXY(Vec3ProxyBinding, Vec3Proxy);
 
 #endif

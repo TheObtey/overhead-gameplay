@@ -59,6 +59,7 @@ public:
 
 	void ResetViewRoot();
 	void ResetSelectedNode();
+	void NotifyNodeWillBeDeleted(Node* pNode);
 
 	EditorCommand& GetCommand() { return m_command; }
 	void SetCommand(EditorCommand const& command) { m_command = command; }

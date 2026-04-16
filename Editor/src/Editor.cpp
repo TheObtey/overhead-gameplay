@@ -241,10 +241,9 @@ void Editor::CreateNode(std::string const& type, std::string const& name, Node* 
 	ISerializable* outObject = AutomaticRegisterISerializable<ISerializable>::create(type);
 	uptr<Node> newNode = uptr<Node>(static_cast<Node*>(outObject));
 	newNode.get()->SetName(name);
-
-
 	if (pParent)
 	{
+
 		pParent->AddChild(newNode);
 		DEBUG( "[Editor] Node '" << name << "' added as child of '" 
 		          << pParent->GetName() << "'" << std::endl);
@@ -275,6 +274,8 @@ void Editor::DeleteNode(Node* pNode)
 	if (!pNode) return;
 
 	std::string const nodeName = pNode->GetName();
+
+	m_editorImgui.NotifyNodeWillBeDeleted(pNode);
 	RemoveDrawableRecursive(pNode);
 
 	if (pNode->GetParent())
@@ -330,13 +331,8 @@ void Editor::LoadDrawableObject(Node* pNode)
 
 void Editor::StartFoundry(std::string const& scenePath)
 {
-	if (!std::filesystem::exists(scenePath))
-	{
-		std::cerr << "[Editor] Scene file not found: " << scenePath << std::endl;
-		return;
-	}
+	(void)scenePath;
 
-	std::filesystem::path absoluteScenePath = std::filesystem::absolute(scenePath);
 	std::filesystem::path gameExePath;
 
 #if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
@@ -345,10 +341,10 @@ void Editor::StartFoundry(std::string const& scenePath)
 	gameExePath = "../Game/Game";
 #elif OPERATING_SYSTEM == OPERATING_SYSTEM_MACOS
 	gameExePath = "../Game/Game.app/Contents/MacOS/Game";
-    if (!std::filesystem::exists(gameExePath))
-    {
-        gameExePath = "../Game/Game";
-    }
+	if (!std::filesystem::exists(gameExePath))
+	{
+		gameExePath = "../Game/Game";
+	}
 #else
     #error "Unsupported platform for launching the game."
 #endif
@@ -362,32 +358,21 @@ void Editor::StartFoundry(std::string const& scenePath)
 
 	std::filesystem::path absoluteGamePath = std::filesystem::absolute(gameExePath);
 
-	ScriptPathMap scriptMap = CopyScriptIntoGame(absoluteScenePath, absoluteGamePath);
-
-	std::filesystem::path playSceneDir = absoluteGamePath.parent_path() / "Overhead" / "SceneTrees";
-	std::filesystem::create_directories(playSceneDir);
-
-	std::filesystem::path playScenePath = playSceneDir / absoluteScenePath.filename();
-	if (!WritePlayScene(playScenePath, scriptMap))
-	{
-		return;
-	}
-
 	std::string command;
 
 #if OPERATING_SYSTEM == OPERATING_SYSTEM_WINDOWS
-	command = "start \"Foundry Game\" \"" + absoluteGamePath.string() + "\" \"" + playScenePath.string() + "\"";
+	command = "start \"Foundry Game\" \"" + absoluteGamePath.string() + "\"";
 #elif OPERATING_SYSTEM == OPERATING_SYSTEM_LINUX || OPERATING_SYSTEM == OPERATING_SYSTEM_MACOS
-	command = "\"" + absoluteGamePath.string() + "\" \"" + playScenePath.string() + "\" &";
+	command = "\"" + absoluteGamePath.string() + "\" &";
 #else
     #error "Unsupported platform for launching the game."
 #endif
 
-	DEBUG( "[Editor] Executing: " << command << std::endl);
+	DEBUG("[Editor] Executing: " << command << std::endl);
 	int result = std::system(command.c_str());
 
 	if (result == 0)
-		DEBUG( "[Editor] Game launched successfully" << std::endl);
+		DEBUG("[Editor] Game launched successfully" << std::endl);
 	else
 		std::cerr << "[Editor] Failed to launch game (error code: " << result << ")" << std::endl;
 }
@@ -431,15 +416,32 @@ Editor::ScriptPathMap Editor::CopyScriptIntoGame(std::filesystem::path const& sc
 
 	for (std::filesystem::path const& scriptPath : scripts)
 	{
-		std::filesystem::path resolvedPath = scriptPath;
-		if (resolvedPath.is_relative())
+		std::filesystem::path resolvedPath;
+		bool found = false;
+
+		auto tryResolve = [&](std::filesystem::path const& candidate)
 		{
-			resolvedPath = std::filesystem::absolute(scenePath.parent_path() / resolvedPath);
+			if (!found && std::filesystem::exists(candidate))
+			{
+				resolvedPath = std::filesystem::weakly_canonical(candidate);
+				found = true;
+			}
+		};
+
+		if (scriptPath.is_absolute())
+		{
+			tryResolve(scriptPath);
+		}
+		else
+		{
+			tryResolve(std::filesystem::absolute(scriptPath));
+			tryResolve(std::filesystem::absolute(scenePath.parent_path() / scriptPath));
+			tryResolve(std::filesystem::absolute(gameExePath.parent_path() / scriptPath));
 		}
 
-		if (!std::filesystem::exists(resolvedPath))
+		if (!found)
 		{
-			std::cerr << "[Editor] Lua script not found: " << resolvedPath << std::endl;
+			std::cerr << "[Editor] Lua script not found: " << scriptPath << std::endl;
 			continue;
 		}
 

@@ -121,21 +121,28 @@ public:
 	void SetSleepingState(bool isSleeping);
 	void SetIsGravityEnabled(bool enabled);
 
+	Node3D* GetNode3DParent()
+	{
+		return m_pNode3DParent;
+	}
+
 #ifdef DEBUG_BUILD
 	glm::vec3 GetPosition() const
 	{
 		return rp3dToGlm(m_pRigidBodyRP3D->getTransform().getPosition());
 	}
 #endif
+	uptr<Node> Clone() override;
 
 protected:
+	void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
+
 private:
-	// Node3D* m_pNode3D;
+	Node3D* m_pNode3DParent = this;
 	rp3d::RigidBody *m_pRigidBodyRP3D = nullptr;
 
 	std::vector<NodeCollider *> m_colliders;
 	bool m_rigidBodyCreated = false;
-	// std::vector<uptr<NodeCollider>> m_colliders;
 
 	friend class PhysicsServer;
 };

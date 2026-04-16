@@ -112,6 +112,11 @@ void Window::SetSize(uint16 width, uint16 height)
 	glfwSetWindowAspectRatio(m_pWindow, m_width, m_height);
 }
 
+void Window::SetCursorState(CursorState state) const
+{
+	glfwSetInputMode(m_pWindow, GLFW_CURSOR, static_cast<int32>(state));
+}
+
 void Window::FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height)
 {
     Window* pCurrentWindow = s_windows[pWindow];

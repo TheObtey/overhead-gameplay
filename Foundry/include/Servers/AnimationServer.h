@@ -4,12 +4,10 @@
 #include "Server.hpp"
 #include "AnimationStructs.h"
 
-#include <Passes/AnimatedPass.h>
-#include <glm/glm.hpp>
 #include <Define.h>
 
 class Animation;
-class Ore::Mesh;
+namespace Ore { class Mesh; }
 
 template <>
 struct Command<class AnimationServer>

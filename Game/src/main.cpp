@@ -1,25 +1,27 @@
-////////////////////////////////////////////////////
-// CMake Generator by Alexandre Glatz
-// https://github.com/AlexandreGlatz/cmake-generator
-////////////////////////////////////////////////////
-
-#include "Define.h"
-#include "Scripting/Lua/LuaBindings.h"
+#include "GameLoop.h"
+#include "SceneTree.h"
+#include "Scripting/Proxies/MathsProxy.h"
+#include "Nodes/NodeViewport.h"
+#include "Nodes/NodeWindow.h"
 #include "Servers/EngineServer.h"
 
-#include <Registries/AutomaticRegister.hpp>
-#include <memory>
+Node& LoadScene(Node& root)
+{
+    uptr<NodeViewport> v = Node::CreateNode<NodeViewport>("MainViewport");
+    Node* viewport = v.get();
+    root.AddChild(std::move(v));
+
+    uptr<Node> scene = Node::LoadNodeFromJSON<Node>("res/scenes/default.sc.json");
+    viewport->AddChild(std::move(scene));
+    return *viewport;
+}
 
 int main()
 {
-	uptr<Node> node = Node::CreateNode<Node>("C++Node");
-	uptr<Node> child = Node::CreateNode<Node>("child");
+    uptr<Node> root = Node::CreateNode<NodeWindow>("Window");
+    SceneTree defaultSceneTree(root);
 
-	//uptr<LuaScriptInstance> script = std::make_unique<LuaScriptInstance>("res/test.lua");
-	//Node::AttachScript(script, *node);
-
-	node->AddChild(child);
-	node->Update(10.0f);
-
-	EngineServer::FlushCommands();
+    GameLoop loop;
+    loop.LoadScene = LoadScene;
+    loop.StartGame(defaultSceneTree);
 }

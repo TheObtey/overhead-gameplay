@@ -7,6 +7,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <cmath>
+#include <filesystem>
 
 namespace
 {
@@ -17,11 +18,21 @@ Mesh BuildRaylibMesh(GeoInfo const& geoInfo)
 	mesh.triangleCount = static_cast<int>(geoInfo.m_indices.size() / 3);
 
 	mesh.vertices = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 3));
+	mesh.normals = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 3));
+	mesh.texcoords = static_cast<float*>(MemAlloc(sizeof(float) * mesh.vertexCount * 2));
+
 	for (int i = 0; i < mesh.vertexCount; ++i)
 	{
 		mesh.vertices[i * 3 + 0] = geoInfo.m_vertices[i].position.x;
 		mesh.vertices[i * 3 + 1] = geoInfo.m_vertices[i].position.y;
 		mesh.vertices[i * 3 + 2] = geoInfo.m_vertices[i].position.z;
+
+		mesh.normals[i * 3 + 0] = geoInfo.m_vertices[i].normal.x;
+		mesh.normals[i * 3 + 1] = geoInfo.m_vertices[i].normal.y;
+		mesh.normals[i * 3 + 2] = geoInfo.m_vertices[i].normal.z;
+
+		mesh.texcoords[i * 2 + 0] = geoInfo.m_vertices[i].texCoords.x;
+		mesh.texcoords[i * 2 + 1] = geoInfo.m_vertices[i].texCoords.y;
 	}
 
 	mesh.indices = static_cast<unsigned short*>(MemAlloc(sizeof(unsigned short) * geoInfo.m_indices.size()));
@@ -286,6 +297,8 @@ void EditorRaylib3D::UpdateDrawableElement(Node* pNode)
 	}
 
 	DrawableElement& drawable = *m_loadedMeshes[name].get();
+	UpdateDrawableTexture(*pNodeMesh, drawable);
+
 	if (m_loadedNode3D.contains(name))
 	{
 		drawable.worldMatrix = m_loadedNode3D[name]->worldMatrix;
@@ -320,9 +333,16 @@ void EditorRaylib3D::RemoveDrawableElement(std::string const& elementName)
 {
 	if (m_loadedMeshes.contains(elementName))
 	{
-		if (m_loadedMeshes[elementName] && m_loadedMeshes[elementName]->mesh)
+		auto& drawable = m_loadedMeshes[elementName];
+		if (drawable->hasTexture)
 		{
-			UnloadMesh(*m_loadedMeshes[elementName]->mesh);
+			UnloadTexture(drawable->diffuseTexture);
+		}
+		UnloadMaterial(drawable->material);
+
+		if (drawable->mesh)
+		{
+			UnloadMesh(*drawable->mesh);
 		}
 		m_loadedMeshes.erase(elementName);
 	}
@@ -364,7 +384,8 @@ void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3
 		m_loadedMeshes[name]->mesh = std::make_unique<Mesh>(m_mesh);
 		m_loadedMeshes[name]->primitiveType = pNodeMesh->GetPrimitiveType();
 		m_loadedMeshes[name]->worldMatrix = MatrixIdentity();
-
+		m_loadedMeshes[name]->material = LoadMaterialDefault();
+		UpdateDrawableTexture(*pNodeMesh, *m_loadedMeshes[name]);
 		if (m_loadedNode3D.contains(name))
 		{
 			m_loadedMeshes[name]->worldMatrix = m_loadedNode3D[name]->worldMatrix;
@@ -391,6 +412,55 @@ void EditorRaylib3D::InstanciateLight()
 {
 }
 
+std::string EditorRaylib3D::ResolveEditorTexturePath(std::filesystem::path const& logicalPath)
+{
+	if (logicalPath.empty())
+		return "../Game/res/textures/Default.png";
+
+	if (logicalPath.is_absolute())
+		return logicalPath.string();
+
+	std::filesystem::path p = logicalPath;
+	std::string const s = p.generic_string();
+
+	if (s.rfind("res/textures/", 0) == 0)
+		return ("../Game/" + s);
+
+	return ("../Game/res/textures/" + p.filename().generic_string());
+}
+
+
+void EditorRaylib3D::UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableElement& drawable)
+{
+	std::filesystem::path wanted = nodeMesh.GetDiffuseTexturePath();
+	if (wanted.empty())
+		wanted = "res/textures/Default.png";
+
+	std::string const resolved = ResolveEditorTexturePath(wanted);
+	if (resolved == drawable.loadedDiffusePath)
+		return;
+
+	if (drawable.hasTexture)
+	{
+		UnloadTexture(drawable.diffuseTexture);
+		drawable.hasTexture = false;
+	}
+
+	Texture2D tex = LoadTexture(resolved.c_str());
+	if (tex.id == 0)
+	{
+		tex = LoadTexture("../Game/res/textures/Default.png");
+	}
+
+	if (tex.id != 0)
+	{
+		drawable.diffuseTexture = tex;
+		drawable.hasTexture = true;
+		drawable.loadedDiffusePath = resolved;
+		SetMaterialTexture(&drawable.material, MATERIAL_MAP_DIFFUSE, drawable.diffuseTexture);
+	}
+}
+
 void EditorRaylib3D::Render()
 {
 	BeginMode3D(m_camera);
@@ -398,17 +468,22 @@ void EditorRaylib3D::Render()
 
 	for (std::map<std::string, uptr<DrawableElement>>::iterator it = m_loadedMeshes.begin(); it != m_loadedMeshes.end(); it++)
 	{
-		DrawMesh(*it->second->mesh.get(), m_defaultMaterial, it->second->worldMatrix);
+		DrawMesh(*it->second->mesh.get(), it->second->material, it->second->worldMatrix);
 	}
 
 	if (m_loadedNode3D.contains(m_selectedObject))
 	{
 		RayGizmo::SetGizmoSize(m_gizmoSize);
 
+		// Gizmo toujours au-dessus de la géométrie
+		rlDisableDepthTest();
+
 		if (RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), &m_loadedNode3D[m_selectedObject]->gizmoTransform))
 		{
 			m_loadedNode3D[m_selectedObject]->gizmoUpdated = true;
 		}
+
+		rlEnableDepthTest();
 	}
 
 	EndMode3D();

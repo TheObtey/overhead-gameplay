@@ -3,6 +3,8 @@
 
 #include "SceneTree.h"
 
+class ActionMap;
+
 //TODO Move in a config file
 #define PHYSICS_DT 1.0/60.0
 
@@ -17,7 +19,9 @@ public:
 
     virtual ~GameLoop() = default;
 
-    std::function<uptr<Node>()> LoadScene;
+    std::function<Node& (Node& root)> LoadScene;
+
+    static ActionMap* CurrentActionMap;
 
 protected:
     virtual void InitServers();

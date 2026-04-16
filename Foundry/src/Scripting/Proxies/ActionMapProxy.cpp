@@ -1,27 +1,38 @@
 #include "Scripting/Proxies/ActionMapProxy.h"
+#include "Registries/AutomaticRegisterProxy.hpp"
+#include "IControl.h"
+#include "Action.h"
+#include "ActionMap.h"
+#include "Event.hpp"
 
-void ActionMapProxyBinding::Bind(Binder& binder)	
+#include <string_view>
+#include <unordered_map>
+#include <string>
+
+void ActionMapProxyBinding::Bind(Binder& binder)
 {
-	binder.BindEnum<ButtonState>("buttonstate",
-		"Up", ButtonState::UP,
-		"Down", ButtonState::DOWN
+	binder.BindEnum<ButtonState>("ButtonState",
+		"PRESSED", ButtonState::PRESSED,
+		"HOLD", ButtonState::HOLD,
+		"RELEASED", ButtonState::RELEASED
 	);
 
-	binder.BindEnum<ControlType>("controltype",
-		"Button", ControlType::BUTTON,
-		"Slider", ControlType::SLIDER,
-		"Stick", ControlType::STICK
+	binder.BindEnum<ControlType>("ControlType",
+		"BUTTON", ControlType::BUTTON,
+		"SLIDER", ControlType::SLIDER,
+		"STICK", ControlType::STICK
 	);
-
 
 	binder.BindClass<IControl>("icontrol",
 		sol::constructors<IControl(), IControl(ControlType const&, Ore::EventInput const&, Action*)>(),
+		"IsPressed", &IControl::IsPressed,
+		"IsReleased", &IControl::IsReleased,
+		"IsHold", &IControl::IsHold,
 		"GetControlType", &IControl::GetControlType,
 		"GetEventInput", &IControl::GetEventInput,
 		"ReadAsBool", &IControl::Read<bool>,
 		"ReadAsFloat", &IControl::Read<float>,
-		"ReadAsVec2", &IControl::Read<glm::vec2>,
-		"SetAction", &IControl::SetAction
+		"ReadAsVec2", &IControl::Read<glm::vec2>
 	);
 
 	binder.BindClass<ButtonControl>("buttoncontrol",
@@ -42,24 +53,20 @@ void ActionMapProxyBinding::Bind(Binder& binder)
 		"GetPos", &StickControl::GetPos
 	);
 
-
-
 	binder.BindClass<Action>("action",
-		sol::constructors<Action(), Action(ControlType, Ore::EventInput)>(),
-		"Event", &Action::OnAction,
+		"Event", &Action::Event,
 		"AddControl", &Action::AddControl,
 		"GetControl", &Action::GetControl
 	);
 
-
 	binder.BindClass<ActionMap>("actionmap",
-		sol::constructors<ActionMap()>(),
+		sol::constructors<ActionMap(std::string const&)>(),
 		sol::meta_function::index, &ActionMap::operator[],
-		"Emplace", &ActionMap::Emplace,
+		"CreateAction", &ActionMap::CreateAction,
 		"Erase", &ActionMap::Erase,
 		"GetAction", &ActionMap::GetAction,
 		"Length", &ActionMap::Length,
 		"Rename", &ActionMap::Rename,
-		"Active", &ActionMap::Active
+		"SetCurrentActionMap", &ActionMap::SetCurrentActionMap
 	);
-	}
+}

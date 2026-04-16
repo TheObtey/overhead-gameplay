@@ -1,11 +1,11 @@
 #include "Scripting/Proxies/SceneTreeProxy.h"
-#include "SceneTree.h"
 #include "Servers/EngineServer.h"
+#include "SceneTree.h"
 
 SceneTreeProxy::SceneTreeProxy(SceneTree *tree) : m_sceneTree(tree)
 {
-    tree->OnGameStarted += [&]()    { if (OnGameStarted)  OnGameStarted(); };
-    tree->OnGameEnded += [&]()      { if (OnGameEnded)    OnGameEnded(); };
+    tree->OnGameStarted  += [&]()   { if (OnGameStarted)  OnGameStarted(); };
+    tree->OnGameEnded    += [&]()   { if (OnGameEnded)    OnGameEnded(); };
     tree->OnSceneChanged += [&]()   { if (OnSceneChanged) OnSceneChanged(); };
 }
 

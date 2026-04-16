@@ -11,4 +11,3 @@ Proxy* Proxy::CreateNode3DProxy(std::string const& name)
 	EngineServer::RegisterUnattachedNode(nodeRigidBody);
 	return ptr;
 }
-

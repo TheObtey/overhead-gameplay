@@ -3,10 +3,10 @@
 
 #include "Define.h"
 #include "Event.hpp"
-#include "Scripting/Lua/LuaScriptInstance.hpp"
-#include "Serialization/ISerializable.h"
 #include "Serialization/json.hpp"
-#include "Registries/AutomaticRegister.hpp"
+#include "Serialization/ISerializable.h"
+#include "Serialization/SerializeObject.hpp"
+#include "Scripting/Lua/LuaScriptInstance.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -16,10 +16,8 @@
 #include <sstream>
 #include <vector>
 
-#include "Serialization/SerializeObject.hpp"
-
-class SceneTree;
 class SerializedObject;
+class SceneTree;
 
 template <typename T>
 concept NodeType = std::is_base_of_v<Node, T>;
@@ -58,7 +56,7 @@ public:
 	uint32 GetChildCount() const;
 
 	template <NodeType T>
-	T& GetNode(std::string const& path);
+	OptionalRef<T> GetNode(std::string const& path);
 
 	template <NodeType T>
 	OptionalRef<T> FindFirstParentOfType();
@@ -73,7 +71,6 @@ public:
 	virtual std::unique_ptr<Node> Clone();
 	virtual void Serialize(SerializedObject& datas) const override;
 	virtual void Deserialize(SerializedObject const& datas) override;
-
 
 	std::string GetName();
 	void SetName(std::string const& name);
@@ -96,6 +93,7 @@ public:
 
 	static void SetStatusEditor(bool inEditor) { s_IsInEditor = inEditor; }
 	static ISerializable* CreateInstance();
+	static std::string BuildDuplicateName(Node& parent, std::string const& sourceName);
 
 	//====Event======
 	Event<void(Node&)> OnSceneEnter;
@@ -116,6 +114,8 @@ protected:
 	Node& operator=(Node const& other) = delete;
 	Node& operator=(Node&& other) noexcept = delete;
 
+	virtual void AttachScriptDeserialize(uptr<LuaScriptInstance>& script);
+
 	std::string m_name; //unique among siblings
 	std::string m_scriptPath;
 	Node* m_pOwner = nullptr;
@@ -131,7 +131,7 @@ protected:
 private:
     void AttachChildImmediate(std::unique_ptr<Node>& child);
 	void NotifyHierarchyChanged();
-
+	Node* ParseFirstNode(std::string const& path);
 
     friend class EngineServer;
 	friend class SceneTree;
@@ -195,18 +195,20 @@ OptionalRef<T> Node::FindChild()
 }
 
 template <NodeType T>
-T& Node::GetNode(std::string const& path)
+OptionalRef<T> Node::GetNode(std::string const& path)
 {
     std::stringstream ss(path);
     std::string token;
 
     //TODO Add this when scene tree is done
-    //Node* pNode = path[0] == '/' ? m_pSceneTree.root : this;
+	Node* pNode = ParseFirstNode(path);
 
-    Node* pNode = this;
     while(std::getline(ss, token, '/'))
     {
-        pNode = pNode->m_children[token].get();
+    	if (token == "") continue;
+    	if (pNode->m_children.contains(token))
+			pNode = pNode->m_children[token].get();
+    	else return {};
     }
 
     return *static_cast<T*>(pNode);

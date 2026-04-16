@@ -14,6 +14,8 @@ enum class MeshGeometrySourceType : uint8
 class NodeMesh : public NodeVisual
 {
 public:
+    class Proxy;
+
     explicit NodeMesh(std::string const &name);
     ~NodeMesh() override = default;
 
@@ -30,11 +32,17 @@ public:
     MeshGeometrySourceType GetGeometrySourceType() const { return m_geometrySourceType; }
     PrimitivesType GetPrimitiveType() const { return m_primitiveType; }
     std::filesystem::path const &GetFbxPath() const { return m_fbxPath; }
+    void SetDiffuseTexturePath(std::filesystem::path const& path) { m_diffuseTexturePath = path; }
+    std::filesystem::path const& GetDiffuseTexturePath() const { return m_diffuseTexturePath; }
 
     template <typename... Args>
     void AddTextures(Args... textures);
 
     static ISerializable *CreateInstance();
+    uptr<Node> Clone() override;
+
+protected:
+    void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
 
 private:
     uptr<Ore::Mesh> m_pMesh;
@@ -43,6 +51,8 @@ private:
     MeshGeometrySourceType m_geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
     PrimitivesType m_primitiveType = PrimitivesType::CUBE;
     std::filesystem::path m_fbxPath{};
+
+    std::filesystem::path m_diffuseTexturePath{};
 
     friend class NodeViewport;
 };
@@ -55,5 +65,7 @@ void NodeMesh::AddTextures(Args... textures)
 }
 
 REGISTER_ISERIALIZABLE(NodeMesh, NodeMesh::CreateInstance);
+
+#include "Scripting/Proxies/NodeMeshProxy.inl"
 
 #endif
