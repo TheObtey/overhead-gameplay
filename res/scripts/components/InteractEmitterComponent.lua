@@ -16,8 +16,8 @@ end
 
 -- Do the raycast and analyze it
 local function CheckInteraction()
-    --pEmitter:GetLocalForward()*-1
-    local oHit = physics.Raycast(pEmitter:GetPosition(), pEmitter:GetLocalForward()*-1, iMaxDistance)
+    --pEmitter:GetLocalForward()*-1 a remplacer à la place de vecForward quand GetLocalForward sera fix
+    local oHit = physics.Raycast(pEmitter:GetPosition(), vecForward, iMaxDistance)
 
     if not oHit then
         SetCurrentEntity(nil)
@@ -29,9 +29,7 @@ local function CheckInteraction()
         return
     end
 
-    oCompContainer = oHit.node:FindChild("InteractReceiverComponent")
-    if oCompContainer then print("oeoeoe") end
---components
+    oCompContainer = oHit.node:FindChild("components")
     oIrcomp = oCompContainer:FindChild("InteractReceiverComponent")
 
     if not oIrcomp then
