@@ -1,3 +1,4 @@
+local self = self
 local bCanInteract = true
 local oCompContainer
 local oBase

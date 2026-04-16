@@ -38,7 +38,11 @@ local function CheckInteraction()
     end
 
     if oIrcomp:CanInteract() then
-        print(oIrcomp:GetPrompt())
+        if not oHit or not oHit.GetPrompt then 
+            print(oIrcomp:GetPrompt())
+        else
+            print(oHit:GetPrompt())
+        end
     end
 
     SetCurrentEntity(oHit.node)
