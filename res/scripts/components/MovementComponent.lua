@@ -1,43 +1,27 @@
 ---@class node
-local self = self
+self = self
 
 local iMoveSpeed
 local oRB
 
-function self:MoveForward(icForward) print("move forward")
+self.MoveForward = function(icForward)
     if not oRB then return end
-
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -iMoveSpeed))
-
-    print(oRB:GetPosition().x, oRB:GetPosition().y, oRB:GetPosition().z)
-    print("\n\n")
 end
 
-function self:MoveBackward(icBackward) print("move backward")
+self.MoveBackward = function(icBackward)
     if not oRB then return end
-
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, iMoveSpeed))
-
-    print(oRB:GetPosition().x, oRB:GetPosition().y, oRB:GetPosition().z)
-    print("\n\n")
 end
 
-function self:MoveLeft(icLeft) print("move left")
+self.MoveLeft = function(icLeft)
     if not oRB then return end
-
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-iMoveSpeed, 0, 0))
-
-    print(oRB:GetPosition().x, oRB:GetPosition().y, oRB:GetPosition().z)
-    print("\n\n")
 end
 
-function self:MoveRight(icRight) print("move right")
+self.MoveRight = function(icRight)
     if not oRB then return end
-
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(iMoveSpeed, 0, 0))
-
-    print(oRB:GetPosition().x, oRB:GetPosition().y, oRB:GetPosition().z)
-    print("\n\n")
 end
 
 function self:SetMoveSpeed(iNewMoveSpeed)
@@ -56,10 +40,4 @@ function self:Setup(oNewRigidBody, iNewMoveSpeed)
     iMoveSpeed = iNewMoveSpeed or 100
 
     print("MovementComponent Initialized")
-end
-
-function OnInit()
-end
-
-function OnUpdate(iDelta)
 end
