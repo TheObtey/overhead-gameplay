@@ -10,15 +10,15 @@ end
 
 -- Sine
 function ease.In.Sine(iT)
-    return 1 - math.cos((iT * math.pi) / 2)
+    return 1 - fmath.Cos((iT * fmath.Pi) / 2)
 end
 
 function ease.Out.Sine(iT)
-    return math.sin((iT * math.pi) / 2)
+    return fmath.Sin((iT * fmath.Pi) / 2)
 end
 
 function ease.InOut.Sine(iT)
-    return -(math.cos(math.pi * iT) - 1) / 2
+    return -(fmath.Cos(fmath.Pi * iT) - 1) / 2
 end
 
 -- Quad
@@ -123,20 +123,20 @@ end
 
 -- Circ
 function ease.In.Circ(iT)
-    return 1 - math.sqrt(1 - iT * iT)
+    return 1 - fmath.Sqrt(1 - iT * iT)
 end
 
 function ease.Out.Circ(iT)
-    return math.sqrt(1 - (iT - 1) ^ 2)
+    return fmath.Sqrt(1 - (iT - 1) ^ 2)
 end
 
 function ease.InOut.Circ(iT)
 
     if iT < 0.5 then
-        return (1 - math.sqrt(1 - (2 * iT) ^ 2)) / 2
+        return (1 - fmath.Sqrt(1 - (2 * iT) ^ 2)) / 2
     end
 
-    return (math.sqrt(1 - (-2 * iT + 2) ^ 2) + 1) / 2
+    return (fmath.Sqrt(1 - (-2 * iT + 2) ^ 2) + 1) / 2
 
 end
 
@@ -199,15 +199,15 @@ function ease.InOut.Bounce(iT)
 end
 
 -- Elastic
-local iC4 = (2 * math.pi) / 3
-local iC5 = (2 * math.pi) / 4.5
+local iC4 = (2 * fmath.Pi) / 3
+local iC5 = (2 * fmath.Pi) / 4.5
 
 function ease.In.Elastic(iT)
 
     if iT == 0 then return 0 end
     if iT == 1 then return 1 end
 
-    return -2 ^ (10 * iT - 10) * math.sin((iT * 10 - 10.75) * iC4)
+    return -2 ^ (10 * iT - 10) * fmath.Sin((iT * 10 - 10.75) * iC4)
 
 end
 
@@ -216,7 +216,7 @@ function ease.Out.Elastic(iT)
     if iT == 0 then return 0 end
     if iT == 1 then return 1 end
 
-    return 2 ^ (-10 * iT) * math.sin((iT * 10 - 0.75) * iC4) + 1
+    return 2 ^ (-10 * iT) * fmath.Sin((iT * 10 - 0.75) * iC4) + 1
 
 end
 
@@ -227,11 +227,11 @@ function ease.InOut.Elastic(iT)
 
     if iT < 0.5 then
         return -(2 ^ (20 * iT - 10) *
-            math.sin((20 * iT - 11.125) * iC5)) / 2
+            fmath.Sin((20 * iT - 11.125) * iC5)) / 2
     end
 
     return (2 ^ (-20 * iT + 10) *
-        math.sin((20 * iT - 11.125) * iC5)) / 2 + 1
+        fmath.Sin((20 * iT - 11.125) * iC5)) / 2 + 1
 
 end
 

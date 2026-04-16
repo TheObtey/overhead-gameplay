@@ -7,7 +7,6 @@
 #include "Servers/EngineServer.h"
 #include "Servers/GraphicServer.h"
 #include "Servers/PhysicsServer.h"
-#include "Scripting/RegisterProxies.h"
 #include "ActionMap.h"
 
 ActionMap* GameLoop::CurrentActionMap = nullptr;
@@ -58,6 +57,7 @@ void GameLoop::LoopGame()
 
         //PhysicsServer::UpdatePhysicsWorld(dt);
         root.Update(dt);
+        ScriptingEngine::Update(dt);
         UpdateServers();
         BuildTasksGraph(graph);
 
@@ -74,7 +74,6 @@ void GameLoop::EndGame()
 
 void GameLoop::InitServers()
 {
-    RegisterProxies();
     EngineServer::Initialize();
     GraphicServer::Initialize();
     PhysicsServer::Initialize();
