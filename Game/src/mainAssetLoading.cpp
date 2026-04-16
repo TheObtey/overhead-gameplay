@@ -22,11 +22,8 @@
 #include <Servers/EngineServer.h>
 #include <GameLoop.h>
 #include <algorithm>
+#include <EditorSerializer.h>
 
-namespace rl
-{
-	#include "raylib.h"
-}
 
 Node& LoadScene(Node& node)
 {
@@ -45,7 +42,7 @@ Node& LoadScene(Node& node)
 
     uptr<Node> pNode = AssetLoader::CreateNodesFromScene(*Scene4);
 
-    pNode->
+    EditorSerializer::SaveNode("HubScene.nd",pNode);
 
     nViewport->AddChild(nCamera);
     nViewport->AddChild(pNode);

@@ -21,8 +21,6 @@ public:
 
 private:
 	static uptr<Node> LoadChild(SceneData const& scene, SceneNode& selfNode);
-
-	static void LoadMesh(NodeMesh& node, SceneNode& datas, SceneMesh& mesh);
 	static void LoadNode3D(Node3D& node, SceneNode& datas);
 	//static void LoadAnimatedMesh(NodeMeshAnimated& root, SceneNode& selfNode);
 };

@@ -35,6 +35,7 @@ struct SceneNode
 struct SceneMesh
 {
 	// Geometry
+	std::string name;
  	std::vector<Ore::Vertex> vertices;
 	std::vector<uint32> indices;
 
@@ -48,6 +49,7 @@ struct SceneMesh
 struct SceneData
 {
 	sptr<SceneNode> rootNode;
+	std::filesystem::path path;
 	bool isAnimated = false;
 	std::vector<sptr<SceneNode>> allNode;
 	std::vector<sptr<Ore::Light>> alllights;

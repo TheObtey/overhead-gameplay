@@ -5,6 +5,7 @@
 #include "NodeVisual.h"
 #include "GeometryFactory.h"
 
+struct SceneMesh;
 enum class MeshGeometrySourceType : uint8
 {
     PRIMITIVE,
@@ -29,6 +30,7 @@ public:
     void SetActive(bool isActive) const;
     void SetPrimitive(PrimitivesType primitiveType);
     void SetFbxPath(std::filesystem::path const &fbxPath);
+    void SetFromSceneMesh(SceneMesh const & sceneMesh, std::filesystem::path const& fbxPath);
     MeshGeometrySourceType GetGeometrySourceType() const { return m_geometrySourceType; }
     PrimitivesType GetPrimitiveType() const { return m_primitiveType; }
     std::filesystem::path const &GetFbxPath() const { return m_fbxPath; }

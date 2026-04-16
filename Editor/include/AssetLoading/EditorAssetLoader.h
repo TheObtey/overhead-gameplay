@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 struct EditorTextureRef
 {
@@ -35,6 +36,8 @@ public:
 	};
 
 	static sptr<EditorSceneData> LoadSceneFromFile(std::string const& path, FileType type);
+
+	inline static std::map<std::string, sptr<EditorSceneData>> m_loadedScenes = {};
 };
 
 #endif // EDITOR_ASSET_LOADING_EDITOR_ASSET_LOADER_H__

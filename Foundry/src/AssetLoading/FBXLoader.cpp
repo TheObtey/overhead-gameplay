@@ -70,6 +70,7 @@ sptr<SceneData> FBXLoader::LoadFile(std::string const& path)
         return nullptr;
     }    
     SceneData uScene = {};
+    uScene.path = path;
     Material allTextures = {};
     std::map<std::string, glm::mat4> bonesTransforms;
     uint32 nodeCount = 0;
@@ -91,6 +92,7 @@ void FBXLoader::BuildNodeMesh(aiScene const* pScene, aiNode const* pNode, sptr<S
             SceneNode newMesh = {};
             newMesh.MeshIndex = pNode->mMeshes[i];
             newMesh.type = SceneNodeType::MESH;
+            newMesh.name = std::string(pNode->mName.C_Str()) + "_Child_" + std::to_string(i);
             newMesh.parent = parentIndex;
             sptr<SceneNode> newSptrNode = std::make_shared<SceneNode>(newMesh);
             outScene.allNode.push_back(newSptrNode);
@@ -155,6 +157,7 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material&
         sMesh.meshMatrix =  outScene.allNode[nodeIdx]->transform;
         sMesh.vertices = vertices;
         sMesh.indices = indices;
+        sMesh.name = "Mesh_" + outScene.allNode[nodeIdx]->name;
         if (pMesh->HasBones())
         {
             BuildBones(bonesTransform,pMesh,sMesh);

@@ -5,6 +5,7 @@
 #include "Serialization/SerializeObject.hpp"
 #include "Serialization/ISerializableEncaps.h"
 #include "AssetLoading/AssetLoader.h"
+#include "AssetLoading/AssetsStructs.h"
 
 namespace
 {
@@ -72,6 +73,17 @@ void NodeMesh::SetActive(bool isActive) const
     m_pMesh->SetActive(isActive);
 }
 
+void NodeMesh::SetFromSceneMesh(SceneMesh const& sceneMesh, std::filesystem::path const& fbxPath)
+{
+    m_geometrySourceType = MeshGeometrySourceType::FBX;
+    sptr<Ore::Geometry> geo = std::make_shared<Ore::Geometry>(sceneMesh.vertices, sceneMesh.indices);
+    m_pMesh->SetGeometry(geo);
+    SetName(sceneMesh.name);
+    m_textures = sceneMesh.meshTextures;
+    m_pMesh->SetTextures(m_textures);
+    m_fbxPath = fbxPath;
+}
+
 void NodeMesh::SetPrimitive(PrimitivesType primitiveType)
 {
     m_geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
@@ -136,6 +148,7 @@ void NodeMesh::Serialize(SerializedObject &datas) const
     datas.AddPublicElement("IsActive", &isActive);
 
     int const geometrySourceType = static_cast<int>(m_geometrySourceType);
+
     ClampedInt primitiveTypeClamped = ClampedInt(0, 3, static_cast<uint32>(m_primitiveType));
     std::string const fbxPath = m_fbxPath.string();
     std::string const diffusePath = m_diffuseTexturePath.string();

@@ -21,14 +21,6 @@ sptr<SceneData> AssetLoader::LoadSceneFromFile(std::string const& path, AssetLoa
 	return nullptr;
 }
 
-void AssetLoader::LoadMesh(NodeMesh& node, SceneNode& datas, SceneMesh& mesh)
-{
-	sptr<Ore::Geometry> geo = std::make_shared<Ore::Geometry>(mesh.vertices, mesh.indices);
-	node.SetGeometry(geo);
-	node.SetName(datas.name);
-	//node.SetDiffuseTexturePath(); EUH TEXTURES ??
-	// Set Matrix ??
-}
 void AssetLoader::LoadNode3D(Node3D& node, SceneNode& datas)
 {
 	node.SetName(datas.name);
@@ -48,7 +40,7 @@ uptr<Node> AssetLoader::LoadChild(SceneData const& scene, SceneNode& selfNode)
 		else
 		{
 			pNode = Node::CreateNode<NodeMesh>("NewNode");
-			AssetLoader::LoadMesh(*dynamic_cast<NodeMesh*>(pNode.get()), node, *scene.allMesh[node.MeshIndex]);
+			dynamic_cast<NodeMesh*>(pNode.get())->SetFromSceneMesh(*scene.allMesh[node.MeshIndex],scene.path);
 		}
 		break;
 	case GLOBAL:
