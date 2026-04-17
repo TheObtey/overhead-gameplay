@@ -16,32 +16,36 @@ end
 
 -- Do the raycast and analyze it
 local function CheckInteraction()
-    --pEmitter:GetLocalForward()*-1
-    local hit = physics.Raycast(pEmitter:GetPosition(), vecForward, iMaxDistance)
+    --pEmitter:GetLocalForward()*-1 a remplacer à la place de vecForward quand GetLocalForward sera fix
+    local oHit = physics.Raycast(pEmitter:GetPosition(), vecForward, iMaxDistance)
 
-    if not hit then
+    if not oHit then
         SetCurrentEntity(nil)
         return
     end
 
-    if not hit.node then
+    if not oHit.node then
         SetCurrentEntity(nil)
         return
     end
 
-    oCompContainer = hit.node:FindChild("components")
+    oCompContainer = oHit.node:FindChild("components")
     oIrcomp = oCompContainer:FindChild("InteractReceiverComponent")
 
     if not oIrcomp then
-        SetCurrentEntity(hit.node)
+        SetCurrentEntity(oHit.node)
         return
     end
 
     if oIrcomp:CanInteract() then
-        print(oIrcomp:GetPrompt())
+        if not oHit or not oHit.GetPrompt then 
+            print(oIrcomp:GetPrompt())
+        else
+            print(oHit:GetPrompt())
+        end
     end
 
-    SetCurrentEntity(hit.node)
+    SetCurrentEntity(oHit.node)
 end
 
 -- Launch the interaction
@@ -63,7 +67,7 @@ function self:Setup(pNewEmitter, iNewMaxDistance)
     pEmitter = pNewEmitter
     iMaxDistance = iNewMaxDistance
     vecForward = fmath.vec3:new(0, 0, -1)
-    timer.Create("RaycastDelay", 1.5, 1000000, CheckInteraction)
+    timer.Create("RaycastDelay", 3, 0, CheckInteraction)
 end
 
 function OnInit()  end
