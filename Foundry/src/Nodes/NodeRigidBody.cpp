@@ -50,6 +50,7 @@ void NodeRigidBody::SetNode3DParent(Node3D* owner)
 
 	PhysicsServer::CreateRigidBody(*this);
 }
+
 void NodeRigidBody::OnUpdate(double delta)
 {
 	Node3D::OnUpdate(delta);
@@ -73,7 +74,15 @@ void NodeRigidBody::OnUpdate(double delta)
 		t.setPosition({ pos.x,pos.y,pos.z });
 		t.setOrientation({ rot.x, rot.y, rot.z, rot.w });
 		m_pRigidBodyRP3D->setTransform(t);
-		SetIsPrioOverRigidBody(false);
+		if (test == false)
+		{
+			test = true;
+		}
+		else if (test)
+		{
+			SetIsPrioOverRigidBody(false);
+			test = false;
+		}
 		return;
 	}
 }
@@ -185,8 +194,8 @@ void NodeRigidBody::Deserialize(SerializedObject const& datas)
 	datas.GetPublicElement("LockAngularX", &lockAngularX);
 	datas.GetPublicElement("LockAngularY", &lockAngularY);
 	datas.GetPublicElement("LockAngularZ", &lockAngularZ);
-	
-	if (m_rigidBodyCreated == false){
+
+	if (m_rigidBodyCreated == false) {
 		CreateRigidBody();
 		PhysicsServer::FlushCommands();
 	}

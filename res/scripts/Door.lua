@@ -18,7 +18,7 @@ local function UpdateTranslation(tValue)
 end
 
 --Action behaviour
-function self:DoAction()
+function self.DoAction()
     if bIsOpen == true then
         bIsOpen = false
         tween.Create("Tween:Door:translation", tTargetPos, tOriginPos, 2, ease.Out.Back, UpdateTranslation, void)
@@ -27,6 +27,8 @@ function self:DoAction()
         tween.Create("Tween:Door:translation", tOriginPos, tTargetPos, 2, ease.Out.Back , UpdateTranslation, void)
     end
 end
+
+function self:Interaction() self.DoAction() end
 
 function OnInit()
     oTarget = self:GetNode("/SceneRoot/targets/door"):As(NodeTypes.NODE3D)

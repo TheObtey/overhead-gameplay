@@ -16,7 +16,9 @@ end
 
 -- Do the raycast and analyze it
 local function CheckInteraction()
-    --pEmitter:GetLocalForward()*-1 a remplacer à la place de vecForward quand GetLocalForward sera fix
+    vecForward = pEmitter:GetLocalForward()
+    vecForward.z = vecForward.z * -1
+-- print("Vec forward : {"..vecForward.x..vecForward.y..vecForward.z.."}")
     local oHit = physics.Raycast(pEmitter:GetPosition(), vecForward, iMaxDistance)
 
     if not oHit then
@@ -30,6 +32,7 @@ local function CheckInteraction()
     end
 
     oCompContainer = oHit.node:FindChild("components")
+    if not oCompContainer then return end
     oIrcomp = oCompContainer:FindChild("InteractReceiverComponent")
 
     if not oIrcomp then
@@ -38,7 +41,7 @@ local function CheckInteraction()
     end
 
     if oIrcomp:CanInteract() then
-        if not oHit or not oHit.GetPrompt then 
+        if not oHit or not oHit.GetPrompt then
             print(oIrcomp:GetPrompt())
         else
             print(oHit:GetPrompt())
@@ -49,16 +52,20 @@ local function CheckInteraction()
 end
 
 -- Launch the interaction
-function self:TryInteract()
+-- function self:TryInteract()
+self.TryInteract = function(icInteract)
     if not oCurrentEntity then return end
+    if icInteract:IsPressed() then
+        oCompContainer = oCurrentEntity:FindChild("components")
+        oIrcomp = oCompContainer:FindChild("InteractReceiverComponent")
 
-    oCompContainer = oCurrentEntity:FindChild("components")
-    oIrcomp = oCompContainer:FindChild("InteractReceiverComponent")
+        if not oIrcomp then return end
 
-    if not oIrcomp then return end
+        if oIrcomp:CanInteract() then
+            oIrcomp:Interact()
+        end
 
-    if oIrcomp:CanInteract() then
-        oIrcomp:Interact()
+        oCurrentEntity:ResetForces()
     end
 end
 
@@ -66,11 +73,11 @@ end
 function self:Setup(pNewEmitter, iNewMaxDistance)
     pEmitter = pNewEmitter
     iMaxDistance = iNewMaxDistance
-    vecForward = fmath.vec3:new(0, 0, -1)
-    timer.Create("RaycastDelay", 3, 0, CheckInteraction)
+    
+    timer.Create("RaycastDelay", 1.5, 0, CheckInteraction)
 end
 
-function OnInit()  end
+function OnInit() end
 
 function OnUpdate(dt) end
 
