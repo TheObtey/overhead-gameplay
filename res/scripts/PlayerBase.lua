@@ -23,8 +23,8 @@ local function InitializeRigidbody(iBodyType, iMass, bGravityEnabled, tAngularAx
     local y = type(tAngularAxisLock[2]) == "boolean" and tAngularAxisLock[2] or false
     local z = type(tAngularAxisLock[3]) == "boolean" and tAngularAxisLock[3] or true
     self:LockAngularAxis(x, y, z)
-    self:SetFrictionCoefficient(0, 100)
-    self:SetLinearDamping(iLinearDamping or 1)
+    -- self:SetFrictionCoefficient(0, 1)
+    self:SetLinearDamping(iLinearDamping or 0)
     self:SetAngularDamping(iAngularDamping or 10)
 end
 
@@ -41,6 +41,7 @@ local function InitializeActionMap()
     acmPlayer:CreateAction("CHANGE_CURSOR_STATE", 1, 292)
     acmPlayer:CreateAction("INTERACT", 1, EventInput.KEY_F)
     acmPlayer:CreateAction("TEST", 1, EventInput.KEY_G)
+    acmPlayer:CreateAction("GRAVITY_GUN", 1, EventInput.KEY_N)
 end
 
 -- self.TestSetPos =  function(icGkey)
@@ -53,6 +54,17 @@ end
 --     self:SetLocalPosition(fmath.vec3:new(-5,2,5))
 --     print("------- Pos Set")
 -- end
+self.GravityGun = function(icLeftCLick)
+    if not oRB then return end
+    print("--- GRABBING OBJECT ---")
+    if icLeftCLick:IsPressed() then
+    local vecForward = pEmitter:GetLocalForward()
+    vecForward.z = vecForward.z * -1
+    local oHit = physics.Raycast(pEmitter:GetPosition(), vecForward, 15)
+    end    
+end
+
+
 local function BindActions(oMovementComponent, oLookComponent, oInteractEmitterComponent)
     if oMovementComponent then
         acmPlayer:GetAction("MOVE_FORWARD").Event  = oMovementComponent.MoveForward or
@@ -81,6 +93,8 @@ local function BindActions(oMovementComponent, oLookComponent, oInteractEmitterC
 
     -- acmPlayer:GetAction("TEST_SETPOS").Event  = self.TestSetPos or
     --         function() print("BUG TEST SET POS") end
+        -- acmPlayer:GetAction("GRAVITY_GUN").Event  = self.GravityGun or
+        --     function() print("______________BUG TEST GRAVITY_GUN") end
 
     if oLookComponent then
         acmPlayer:GetAction("LOOK").Event                = oLookComponent.HandleMouseLook or
@@ -94,6 +108,8 @@ local function BindActions(oMovementComponent, oLookComponent, oInteractEmitterC
     if oInteractEmitterComponent then
         acmPlayer:GetAction("INTERACT").Event = oInteractEmitterComponent.TryInteract or
             function() print("PlayerBase: Interact callback missing") end
+        acmPlayer:GetAction("GRAVITY_GUN").Event = oInteractEmitterComponent.TryGrabb or
+            function() print("PlayerBase: Gravity Gun callback Try grabb missing") end
     else
         print("PlayerBase: InteractComponent missing")
     end

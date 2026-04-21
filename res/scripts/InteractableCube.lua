@@ -16,10 +16,13 @@ function self:Interaction()
     end
     print("P_Name :" .. oPlayer:GetName())
     -- oPlayer:AddChild(self)
-
+    local vec = self:GetWorldPosition()
+    local vecP = oPlayer:As(NodeTypes.NODE3D):GetWorldPosition()
+    local res =  vec - vecP
+-- fmath.Length(Res) 
     self:Reparent(oPlayer, true)
     print("Name sphere = " .. self:GetName())
-    self:SetLocalPosition(fmath.vec3:new(0,0,-2))
+    self:SetLocalPosition(res)
     local vec = self:GetPosition()
     print("pos before sphere : {" .. vec.x .. ", " .. vec.y .. ", " .. vec.z .. "}")
     local vec2 = self:GetPosition()
@@ -33,7 +36,7 @@ end
 function OnInit()
 
     self:SetBodyType(2)
-    self:SetLocalPosition(fmath.vec3:new(10,10,10))
+
     self:SetIsGravityEnabled(false)
     oRoot = self:GetParent();
     oPlayer = self:GetParent():FindChild("Player"):As(NodeTypes.NODE_RIGIDBODY)
@@ -58,7 +61,7 @@ function OnUpdate(dt)
     --         bB = !bB
     --     end 
     --     end
-    self:SetIsGravityEnabled(true)
+    -- self:SetIsGravityEnabled(true)
     -- local vec = self:GetTotalForce()
     -- local vecP = oPlayer:GetTotalForce()
     -- print(self:GetName().." Forces : {" .. vec.x .. ", ".. vec.y .. ", ".. vec.z .. "}")

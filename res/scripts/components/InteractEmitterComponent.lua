@@ -15,11 +15,11 @@ local function SetCurrentEntity(ndHit)
 end
 
 -- Do the raycast and analyze it
-local function CheckInteraction()
+local function CheckInteraction(origin, forward, distance)
     vecForward = pEmitter:GetLocalForward()
     vecForward.z = vecForward.z * -1
 -- print("Vec forward : {"..vecForward.x..vecForward.y..vecForward.z.."}")
-    local oHit = physics.Raycast(pEmitter:GetPosition(), vecForward, iMaxDistance)
+    local oHit = physics.Raycast(origin or pEmitter:GetPosition(), forward or vecForward, distance or iMaxDistance)
 
     if not oHit then
         SetCurrentEntity(nil)
@@ -69,12 +69,31 @@ self.TryInteract = function(icInteract)
     end
 end
 
+self.TryGrabb = function(icInteract)
+    if icInteract:IsPressed() then
+        print("____ TRY  GRABB _____")
+        CheckInteraction(_, _, 15)
+        
+        if not oCurrentEntity then print("No grabbable in sight") return end
+        
+        oCompContainer = oCurrentEntity:FindChild("components")
+        oIrcomp = oCompContainer:FindChild("InteractReceiverComponent")
+
+        if not oIrcomp then return end
+
+        if oIrcomp:CanInteract() then
+            oIrcomp:Interact()
+        end
+
+        oCurrentEntity:ResetForces()
+    end
+end
 --Set up the component
 function self:Setup(pNewEmitter, iNewMaxDistance)
     pEmitter = pNewEmitter
     iMaxDistance = iNewMaxDistance
     
-    timer.Create("RaycastDelay", 1.5, 0, CheckInteraction)
+    timer.Create("RaycastDelay", 1, 0, CheckInteraction)
 end
 
 function OnInit() end
