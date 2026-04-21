@@ -1,8 +1,8 @@
 #ifndef RHI_ITEXTURE_OBJECT__H_
 #define RHI_ITEXTURE_OBJECT__H_
 
-#include "IObject.h"
 #include "Define.h"
+#include "IObject.h"
 
 namespace Ore
 {

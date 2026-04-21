@@ -11,8 +11,7 @@ TextureObject::TextureObject(uint32 id, TextureType type)
 }
 
 void TextureObject::Bind()
-{
-    glBindTexture(static_cast<uint32>(m_type), m_id);
+{ glBindTexture(static_cast<uint32>(m_type), m_id);
 }
 
 void TextureObject::GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::filesystem::path const& path)

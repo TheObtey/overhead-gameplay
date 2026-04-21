@@ -11,6 +11,7 @@ enum class BufferType
 {
     BUFFER = GL_ARRAY_BUFFER, 
     BUFFER_ELEMENT = GL_ELEMENT_ARRAY_BUFFER,
+    BUFFER_INDIRECT = GL_DRAW_INDIRECT_BUFFER,
 };
 
 template<typename T>

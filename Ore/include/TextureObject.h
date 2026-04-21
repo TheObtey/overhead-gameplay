@@ -1,7 +1,6 @@
 #ifndef ORE_TEXTURE_OBJECT__H_
 #define ORE_TEXTURE_OBJECT__H_
 
-#include "Define.h"
 #include "ITextureObject.h"
 
 #include <glad/glad.h>

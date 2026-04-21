@@ -10,7 +10,7 @@ namespace Ore
 struct Image final: public UIElement
 {
     Image() = default;
-    Image(sptr<Texture> _pTexture)
+    Image(uint32 x, uint32 y, uint32 width, uint32 height, sptr<Texture> _pTexture) : UIElement(x, y, width, height)
     {
         pTexture = _pTexture;
     }
@@ -22,7 +22,6 @@ struct Image final: public UIElement
     }
     
     uptr<Geometry> pGeometry = nullptr;
-    sptr<Texture> pTexture = nullptr; 
 };
 }
 #endif

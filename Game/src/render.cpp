@@ -7,6 +7,8 @@
 #include "Logger.hpp"
 #include "Program.h"
 #include "Shader.h"
+#include "Passes/UIPass.h"
+#include "UIElements/Image.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -32,8 +34,10 @@ int main()
     sptr<Geometry> cube     = std::make_shared<Geometry>(vertices, indices);
 
     sptr<Texture> diffuse   = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
-    sptr<Texture> specular  = std::make_shared<Texture>("res/textures/defaultSpecular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+    sptr<Texture> specular  = std::make_shared<Texture>("res/textures/defaultSpecular.png", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     sptr<Texture> normal    = std::make_shared<Texture>("res/textures/defaultNormal.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+
+    sptr<Texture> ui        = std::make_shared<Texture>("res/textures/bib.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
 
     std::vector<sptr<Texture>> textures;
     textures.push_back(diffuse);
@@ -66,6 +70,7 @@ int main()
 
     Program geometryProgram;
     Program lightProgram;
+    Program UIProgram;
 
     Shader geoFrag(ShaderType::TYPE_FRAGMENT);
     geoFrag.Load("res/shaders/GBuffer.frag");
@@ -96,14 +101,31 @@ int main()
     lightProgram.SetUniform("gNormal", 1);
     lightProgram.SetUniform("gAlbedoSpec", 2);
 
+    Shader uiFrag(ShaderType::TYPE_FRAGMENT);
+    uiFrag.Load("res/shaders/UIPass.frag");
+    Shader uiVert(ShaderType::TYPE_VERTEX);
+    uiVert.Load("res/shaders/UIPass.vert");
+
+    UIProgram.AddShader(uiFrag);
+    UIProgram.AddShader(uiVert);
+    UIProgram.Load();
+
+    uiFrag.Unload();
+    uiVert.Unload();  
+
+
     GeometryPass geoPass(geometryProgram, camera.get());
     LightPass lightPass(lightProgram, lights, camera.get());
+    UIPass uiPass(UIProgram, camera.get());
 
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
-    float fact = 1.0f;
-    float inf = 0.0f;
+    viewport.AddPass(&uiPass);
 
+    Image image(10, 10, 1, 1, ui);
+    Image image1(0, 0, 1, 1, diffuse);
+    Image image2(10, 1, 1, 1, ui);
+    Image image3(1, 10, 1, 1, ui);
     while (window.IsOpen())
     {
         window.Clear();
@@ -119,6 +141,10 @@ int main()
 
         //geoPass.AddMesh(mesh);
         geoPass.AddMesh(mesh);
+        uiPass.AddUIElement(image);
+        uiPass.AddUIElement(image1);
+        uiPass.AddUIElement(image2);
+        uiPass.AddUIElement(image3);
         viewport.Present();
         window.Present();
     }

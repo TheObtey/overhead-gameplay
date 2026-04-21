@@ -3,16 +3,18 @@
 
 #include "Define.h"
 #include "Program.h"
+#include "Texture.h"
 
 #include <glm/glm.hpp>
+
 namespace Ore
 {
 struct UIElement
 {
     UIElement() = default;
-    UIElement(uint32 _width, uint32 _height, uint32 _x, uint32 _y)
+    UIElement(uint32 _x, uint32 _y, uint32 _width, uint32 _height)
     {
-        width = _width, height = _height, x = _x, y = _y;
+        x = _x, y = _y, width = _width, height = _height;
     }
 
     UIElement(glm::uvec2 position, glm::uvec2 size)
@@ -26,6 +28,8 @@ struct UIElement
     uint32 height = 10;
     uint32 x = 0;
     uint32 y = 0;
+
+    sptr<Texture> pTexture;
 };
 }
 #endif
