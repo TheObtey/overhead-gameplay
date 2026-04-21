@@ -12,7 +12,7 @@ namespace Ore
 		virtual ~FontFace() = default;
 
 		virtual void SetSize(uint32 width, uint32 height) = 0;
-		virtual void LoadChar() = 0;
+		virtual void LoadChars() = 0;
 	};
 }
 

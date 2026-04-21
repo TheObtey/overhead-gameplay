@@ -20,7 +20,7 @@ namespace Ore
 		~FTFontFace() override;
 
 		void SetSize(uint32 width, uint32 height) override;
-		void LoadChar() override;
+		void LoadChars() override;
 		TextureObject GetTextureObject() {return m_texture;}
 
 		static constexpr uint32 BitmapSize = 1024;

@@ -28,7 +28,7 @@ namespace Ore
 		}
 
 		FTFontFace::SetSize(0, 40);
-		FTFontFace::LoadChar();
+		FTFontFace::LoadChars();
 		Logger::LogWithLevel(LogLevel::DEBUG, "Created font atlas for : ", path);
 	}
 
@@ -48,7 +48,7 @@ namespace Ore
 		FT_Set_Pixel_Sizes(m_face, width, height);
 	}
 
-	void FTFontFace::LoadChar()
+	void FTFontFace::LoadChars()
 	{
 		//generate a 1024*1024 textures
 		glGenTextures(1, &m_bitmap);
@@ -61,6 +61,7 @@ namespace Ore
 		m_texture.AddParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		m_texture.AddParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glClearTexImage(m_bitmap, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
 
 		int32 advanceX = 0;
 		int32 advanceY = 0;
@@ -71,6 +72,13 @@ namespace Ore
 			{
 				Logger::LogWithLevel(LogLevel::ERROR, "ERROR::FREETYTPE: Failed to load Glyph");
 				return;
+			}
+
+			if (advanceX + m_face->glyph->advance.x >= BitmapSize)
+			{
+				advanceX = 0;
+				advanceY += maxGlyphHeight;
+				maxGlyphHeight = 0;
 			}
 
 			int32 glyphHeight = m_face->glyph->bitmap.rows;
@@ -87,15 +95,10 @@ namespace Ore
 			);
 
 			if (glyphHeight > maxGlyphHeight) maxGlyphHeight = glyphHeight;
+			//maxGlyphHeight = std::max(glyphHeight, maxGlyphHeight);
 
 			// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
 			advanceX += m_face->glyph->advance.x >> 6;  // bitshift by 6 to get value in pixels (2^6 = 64)
-			if (advanceX >= BitmapSize)
-			{
-				advanceX = 0;
-				advanceY += glyphHeight;
-				maxGlyphHeight = 0;
-			}
 		}
 
 		//GLuint buffID;

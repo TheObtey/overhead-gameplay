@@ -14,7 +14,7 @@
 using namespace Ore;
 int main()
 {
-    Window window(1920, 1080, "ORE ORE OREORE ORE ORE OREORE OREORE", false, true);
+    Window window(1920, 1080, "HELLO", false, true);
     window.Open();
     Viewport viewport(0, 0, 1920, 1080, Color::SKY_BLUE);
     window.AddViewport(viewport);
@@ -23,7 +23,8 @@ int main()
     vertices.push_back({ glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f) });
     vertices.push_back({ glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f) });
     vertices.push_back({ glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f) });
-    vertices.push_back({ glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f) });
+    vertices.push_back({
+        glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f) });
 
     std::vector<uint32> indices = {
         0,1,2,

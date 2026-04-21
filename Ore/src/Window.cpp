@@ -77,7 +77,8 @@ void Window::Open()
 		return;
 	}
 
-    Logger::LogWithLevel(LogLevel::WARNING, "OpenGL Version : ", glGetString(GL_VERSION));
+    Logger::LogWithLevel(LogLevel::WARNING,  "OpenGL Version : ", glGetString(GL_VERSION));
+	Logger::LogWithLevel(LogLevel::WARNING,  "Renderer : ", glGetString(GL_RENDERER));
 
     glEnable(GL_DEPTH_TEST);
 #ifdef DEBUG_BUILD
