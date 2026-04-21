@@ -27,7 +27,7 @@ namespace Ore
 			return;
 		}
 
-		FTFontFace::SetSize(0, 80);
+		FTFontFace::SetSize(0, 40);
 		FTFontFace::LoadChar();
 		Logger::LogWithLevel(LogLevel::DEBUG, "Created font atlas for : ", path);
 	}
@@ -55,13 +55,16 @@ namespace Ore
 
 		m_texture = TextureObject(m_bitmap, TextureType::TYPE_2D);
 		m_texture.Bind();
-		m_texture.GenerateTexture(DataType::UBYTE, 2048, 32, GL_RED, GL_RED);
+		m_texture.GenerateTexture(DataType::UBYTE, BitmapSize, BitmapSize, GL_RED, GL_RED);
 		m_texture.AddParameters(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_texture.AddParameters(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		m_texture.AddParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		m_texture.AddParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		int32 advanceX = 0;
+		int32 advanceY = 0;
+		int32 maxGlyphHeight = 0;
 		for (uint8 c = 32; c < 128; c++)
 		{
 			if (FT_Load_Char(m_face, c, FT_LOAD_RENDER))
@@ -70,22 +73,29 @@ namespace Ore
 				return;
 			}
 
-			m_texture.Bind();
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			int32 glyphHeight = m_face->glyph->bitmap.rows;
 			glTexSubImage2D(
 				GL_TEXTURE_2D,
 				0,
 				advanceX,
-				0,
+				advanceY,
 				 m_face->glyph->bitmap.width,
-				m_face->glyph->bitmap.rows,
+				glyphHeight,
 				GL_RED,
 				GL_UNSIGNED_BYTE,
 				m_face->glyph->bitmap.buffer
 			);
 
+			if (glyphHeight > maxGlyphHeight) maxGlyphHeight = glyphHeight;
+
 			// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
 			advanceX += m_face->glyph->advance.x >> 6;  // bitshift by 6 to get value in pixels (2^6 = 64)
+			if (advanceX >= BitmapSize)
+			{
+				advanceX = 0;
+				advanceY += glyphHeight;
+				maxGlyphHeight = 0;
+			}
 		}
 
 		//GLuint buffID;

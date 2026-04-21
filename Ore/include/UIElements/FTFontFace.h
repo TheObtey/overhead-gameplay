@@ -23,6 +23,8 @@ namespace Ore
 		void LoadChar() override;
 		TextureObject GetTextureObject() {return m_texture;}
 
+		static constexpr uint32 BitmapSize = 1024;
+
 	private:
 		static FT_Library s_ftLibrary;
 		static int32 s_refcount;

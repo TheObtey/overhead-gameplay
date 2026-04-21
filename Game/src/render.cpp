@@ -35,7 +35,7 @@ int main()
     sptr<Texture> diffuse   = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
     sptr<Texture> specular  = std::make_shared<Texture>("res/textures/defaultSpecular.png", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     sptr<Texture> normal    = std::make_shared<Texture>("res/textures/defaultNormal.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
-    FTFontFace fontFace("res/fonts/arial.ttf");
+    FTFontFace fontFace("res/fonts/Roboto-Medium.ttf");
 
     sptr<Texture> font = std::make_shared<Texture>(fontFace.GetTextureObject(), TextureMaterialType::DIFFUSE);
     std::vector<sptr<Texture>> textures;
