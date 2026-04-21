@@ -3,6 +3,7 @@
 
 #include <Define.h>
 #include <Expected.hpp>
+#include <map>
 #include "AssetLoading/AssetsStructs.h"
 
 class Node;
@@ -23,6 +24,8 @@ private:
 	static uptr<Node> LoadChild(SceneData const& scene, SceneNode& selfNode);
 	static void LoadNode3D(Node3D& node, SceneNode& datas);
 	//static void LoadAnimatedMesh(NodeMeshAnimated& root, SceneNode& selfNode);
+
+	inline static std::map<std::string, sptr<SceneData>> m_loadedScenes = {};
 };
 
 

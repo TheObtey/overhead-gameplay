@@ -36,6 +36,7 @@ struct SceneMesh
 {
 	// Geometry
 	std::string name;
+	uint32 ID;
  	std::vector<Ore::Vertex> vertices;
 	std::vector<uint32> indices;
 

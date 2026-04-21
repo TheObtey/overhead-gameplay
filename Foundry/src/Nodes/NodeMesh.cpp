@@ -82,6 +82,7 @@ void NodeMesh::SetFromSceneMesh(SceneMesh const& sceneMesh, std::filesystem::pat
     m_textures = sceneMesh.meshTextures;
     m_pMesh->SetTextures(m_textures);
     m_fbxPath = fbxPath;
+    m_meshIDInSceneFBX = sceneMesh.ID;
 }
 
 void NodeMesh::SetPrimitive(PrimitivesType primitiveType)
@@ -152,7 +153,7 @@ void NodeMesh::Serialize(SerializedObject &datas) const
     ClampedInt primitiveTypeClamped = ClampedInt(0, 3, static_cast<uint32>(m_primitiveType));
     std::string const fbxPath = m_fbxPath.string();
     std::string const diffusePath = m_diffuseTexturePath.string();
-
+    datas.AddPrivateElement("IdInFBX", &m_meshIDInSceneFBX);
     datas.AddPublicElement("GeometrySourceType", &geometrySourceType);
     datas.AddPublicElement("PrimitiveType", static_cast<ISerializable*>(&primitiveTypeClamped));
     datas.AddPublicElement("FbxPath", &fbxPath);
@@ -218,7 +219,7 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
     {
         textureCount = 1;
     }
-
+    datas.GetPrivateElement("IdInFBX", &m_meshIDInSceneFBX);
     datas.GetPublicElement("FbxPath", &fbxPath);
     m_geometrySourceType = static_cast<MeshGeometrySourceType>(geometrySourceType);
     m_primitiveType = static_cast<PrimitivesType>(primitiveTypeClamped.value);
@@ -231,7 +232,14 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
     }
     else
     {
-        SetFbxPath(m_fbxPath);
+
+        if (!s_IsInEditor)
+        {
+            Logger::Log("SceneMeshLoading");
+            SetFromSceneMesh(*AssetLoader::LoadSceneFromFile(m_fbxPath.string(), AssetLoader::FileType::FBX)->allMesh[m_meshIDInSceneFBX], m_fbxPath);
+        }
+        //else
+        //    ...
     }
 
     bool isActive = true;

@@ -171,6 +171,7 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material&
             LoadDefaultsTextures(textures);
         sMesh.meshTextures = textures;
         outScene.allMesh.push_back(std::make_shared<SceneMesh>(sMesh));
+        sMesh.ID = outScene.allMesh.size() - 1;
     }
 }
 

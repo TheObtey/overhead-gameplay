@@ -9,10 +9,13 @@
 
 sptr<SceneData> AssetLoader::LoadSceneFromFile(std::string const& path, AssetLoader::FileType type)
 {
+	if (AssetLoader::m_loadedScenes.contains(path))
+		return m_loadedScenes[path];
 	switch (type)
 	{
 	case AssetLoader::FBX:
-		return FBXLoader::LoadFile(path);
+		m_loadedScenes[path] = FBXLoader::LoadFile(path);
+		return m_loadedScenes[path];
 	default:
 		Logger::LogWithLevel(LogLevel::ERROR, "Unable to load " + path + ". Extension File not supported");
 		return nullptr;

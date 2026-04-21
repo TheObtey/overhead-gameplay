@@ -1,9 +1,11 @@
 #ifndef FOUNDRY_NODEMESH__H_
 #define FOUNDRY_NODEMESH__H_
 
+
 #include "Mesh.h"
 #include "NodeVisual.h"
 #include "GeometryFactory.h"
+
 
 struct SceneMesh;
 enum class MeshGeometrySourceType : uint8
@@ -68,6 +70,7 @@ private:
     MeshGeometrySourceType m_geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
     PrimitivesType m_primitiveType = PrimitivesType::CUBE;
     std::filesystem::path m_fbxPath{};
+    uint32 m_meshIDInSceneFBX;
 
     std::vector<SerializedTexturesData> m_texturesPaths;
     std::filesystem::path m_diffuseTexturePath{};

@@ -37,13 +37,13 @@ Node& LoadScene(Node& node)
     static_cast<NodeCamera*>(nCamera.get())->AddLocalYaw(1.0f);
 
     //sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_3.fbx", AssetLoader::FileType::FBX);
-    sptr<SceneData> Scene4 = AssetLoader::LoadSceneFromFile("res/Assets/Comptoire_textures.fbx", AssetLoader::FileType::FBX);
+    sptr<SceneData> Scene4 = AssetLoader::LoadSceneFromFile("res/Assets/Test_staff_room.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene2 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene3 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Bones.fbx", AssetLoader::FileType::FBX);
 
     uptr<Node> pNode = AssetLoader::CreateNodesFromScene(*Scene4);
     static_cast<Node3D*>(pNode.get())->SetLocalPosition({ 0.0f,0.0f,0.f });
-    EditorSerializer::SaveNode("TestComptoire.nd",pNode);
+    EditorSerializer::SaveNode("StaffRoom.nd",pNode);
 
     nViewport->AddChild(nCamera);
     nViewport->AddChild(pNode);
@@ -56,7 +56,7 @@ int main()
 {
     uptr<Node> root = Node::CreateNode<NodeWindow>("Window");
     SceneTree sTree(root);
-
+    std::cout << "je suis main asset loading" << std::endl;
     GameLoop loop;
     loop.LoadScene = LoadScene;
     loop.StartGame(sTree);

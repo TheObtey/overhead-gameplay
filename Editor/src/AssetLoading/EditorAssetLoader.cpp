@@ -2,6 +2,7 @@
 #include "AssetLoading/EditorFBXLoader.h"
 
 #include <Logger.hpp>
+
 #include <Node.h>
 #include <Nodes/Node3D.h>
 #include <Nodes/NodeMesh.h>
@@ -50,7 +51,6 @@ sptr<EditorSceneData> EditorAssetLoader::LoadSceneFromFile(std::string const& pa
 uptr<Node> EditorAssetLoader::CreateNodesFromScene(EditorSceneData const& scene, std::string const& sourceFbxPath)
 {
 	uptr<Node3D> root = Node::CreateNode<Node3D>("ImportedFBX");
-
 	for (uint32 i = 0; i < static_cast<uint32>(scene.meshes.size()); ++i)
 	{
 		EditorSceneMeshData const& meshData = scene.meshes[i];
@@ -59,8 +59,7 @@ uptr<Node> EditorAssetLoader::CreateNodesFromScene(EditorSceneData const& scene,
 		meshNode->SetFbxPath(sourceFbxPath);
 
 		ApplyMatrixToNode(*meshNode, meshData.meshMatrix);
-
-		root->AddChild(meshNode);
+		root->AddChild(std::move(meshNode));
 	}
 
 	return std::move(root);
