@@ -70,7 +70,7 @@ private:
     MeshGeometrySourceType m_geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
     PrimitivesType m_primitiveType = PrimitivesType::CUBE;
     std::filesystem::path m_fbxPath{};
-    uint32 m_meshIDInSceneFBX;
+    uint32 m_meshIDInSceneFBX = 0;
 
     std::vector<SerializedTexturesData> m_texturesPaths;
     std::filesystem::path m_diffuseTexturePath{};

@@ -32,25 +32,32 @@ void FBXLoader::LoadTextures(FBXLoader::Material& materials,std::vector<sptr<Ore
 {
     for (std::map<Ore::TextureMaterialType, std::string>::iterator it = materials.textures[matIndex].begin(); it != materials.textures[matIndex].end(); ++it)
     {
-        sptr<Ore::Texture> text = std::make_shared<Ore::Texture>(Ore::Texture(it->second, Ore::TextureType::TYPE_2D, it->first));
-        vect.push_back(text);
+        vect.push_back(std::make_shared<Ore::Texture>(Ore::Texture(it->second, Ore::TextureType::TYPE_2D, it->first)));
     }
 }
 
-void FBXLoader::LoadDefaultsTextures(std::vector<sptr<Ore::Texture>>& vect)
+void FBXLoader::LoadDefaultsTextures(SceneMesh& mesh)
 {
     if (FBXLoader::m_defaultTextures.size() != 0)
     {
-        vect = FBXLoader::m_defaultTextures;
+        mesh.meshTextures = FBXLoader::m_defaultTextures;
+        mesh.paths.push_back("res/textures/diffuse.jpg");
+        mesh.paths.push_back("res/textures/specular.jpg");
+        mesh.paths.push_back("res/textures/NormalMap.png");
         return;
     }
 
     sptr<Ore::Texture> text = std::make_shared<Ore::Texture>("res/textures/NormalMap.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::NORMAL);
+    mesh.paths.push_back("res/textures/NormalMap.png");
     FBXLoader::m_defaultTextures.push_back(text);
     sptr<Ore::Texture> text2 = std::make_shared<Ore::Texture>("res/textures/diffuse.jpg", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE);
+    mesh.paths.push_back("res/textures/diffuse.jpg");
     FBXLoader::m_defaultTextures.push_back(text2);
     sptr<Ore::Texture> text3 = std::make_shared<Ore::Texture>("res/textures/specular.jpg", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::SPECULAR);
+    mesh.paths.push_back("res/textures/specular.jpg");
     FBXLoader::m_defaultTextures.push_back(text3);
+
+    mesh.meshTextures = FBXLoader::m_defaultTextures;
 }
 
 sptr<SceneData> FBXLoader::LoadFile(std::string const& path)
@@ -162,14 +169,20 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material&
         {
             BuildBones(bonesTransform,pMesh,sMesh);
         }
-        std::vector<sptr<Ore::Texture>> textures = {};
+
         if (outMat.textures.size() > 0 && pMesh->mMaterialIndex < outMat.textures.size())
         {
-            LoadTextures(outMat, textures, pMesh->mMaterialIndex);
+            for (std::map<Ore::TextureMaterialType, std::string>::iterator it = outMat.textures[pMesh->mMaterialIndex].begin(); it != outMat.textures[pMesh->mMaterialIndex].end(); ++it)
+            {
+                sptr<Ore::Texture> test = std::make_shared<Ore::Texture>(it->second, Ore::TextureType::TYPE_2D, it->first);
+                sMesh.meshTextures.push_back(test);
+                sMesh.paths.push_back(it->second);
+            }
         }
         else
-            LoadDefaultsTextures(textures);
-        sMesh.meshTextures = textures;
+        {
+            LoadDefaultsTextures(sMesh);
+        }
         outScene.allMesh.push_back(std::make_shared<SceneMesh>(sMesh));
         sMesh.ID = outScene.allMesh.size() - 1;
     }
@@ -212,7 +225,7 @@ void FBXLoader::LoadEmbeddedTexture(std::string const& path, std::string& outPat
         return;
     }
     std::string textureName = "embedded_" + std::to_string(matIndex) + std::to_string(static_cast<uint32>(type)) + "." + ext;
-    std::string fullPath = "res/Textures/" + textureName;
+    std::string fullPath = "res/textures/" + textureName;
     std::ofstream file(fullPath, std::ios::binary);
     file.write((const char*)pText->pcData, pText->mWidth);
     outPath = fullPath;
@@ -253,7 +266,7 @@ void FBXLoader::BuildMaterials(aiScene const* pScene, Material& outMat)
                 continue;
             }
             std::filesystem::path tempPath = path;
-            std::string newPath = "res/Textures/" + tempPath.filename().string();
+            std::string newPath = "res/textures/" + tempPath.filename().string();
             outMat.textures.push_back({});
             outMat.textures[i][static_cast<Ore::TextureMaterialType>(c)] = newPath;
         }

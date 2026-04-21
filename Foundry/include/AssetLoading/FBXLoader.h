@@ -46,7 +46,7 @@ private:
 
 
 	static void LoadTextures(FBXLoader::Material& materials,std::vector<sptr<Ore::Texture>>& vect, uint32 matIndex);
-	static void LoadDefaultsTextures(std::vector<sptr<Ore::Texture>>& vect);
+	static void LoadDefaultsTextures(SceneMesh& mesh);
 private:
 	static uint8 m_sTexTypes[];
 	inline static std::vector<sptr<Ore::Texture>> m_defaultTextures = {};

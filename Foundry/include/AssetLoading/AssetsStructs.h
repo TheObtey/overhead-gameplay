@@ -41,6 +41,7 @@ struct SceneMesh
 	std::vector<uint32> indices;
 
 	std::vector<sptr<Ore::Texture>> meshTextures;
+	std::vector<std::string> paths;
 	std::vector<glm::mat4> bonesOffest;
 	std::vector<glm::mat4> bonesTransform;
 	glm::mat4 meshMatrix;
