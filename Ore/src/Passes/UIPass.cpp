@@ -30,10 +30,10 @@ UIPass::UIPass(Program& program, Camera* pcamera) : Pass(program, pcamera)
     
     Vertex quadVertices[4] = 
     {
-        {glm::vec3(-0.05f,  0.05f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-        {glm::vec3( 0.05f,  0.05f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-        {glm::vec3( 0.05f, -0.05f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-        {glm::vec3(-0.05f, -0.05f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)}
+        {glm::vec3( 0.0f,  0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+        {glm::vec3( 1.0f,  0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+        {glm::vec3( 1.0f,  1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
+        {glm::vec3( 0.0f,  1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)}
     };
 
     uint8 quadIndices[6] = 
@@ -66,24 +66,13 @@ void UIPass::Execute()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
     m_program.Use();
-    //m_program.SetUniform("viewProj", m_pCamera->GetViewProjMatrix());
+    m_program.SetUniform("resolution", glm::vec2(m_screenWidth, m_screenHeight));
 
     int32 i = 0;
     for(UIElement const& element : m_elements)
     {
-        std::string indexStr = std::to_string(i);
-
-        glm::vec2 offset = {element.x / 100.0f, element.y / 100.0f};
-        glm::vec2 size = {element.width, element.height};
-
-        m_program.SetUniform("offsets[" + indexStr + "]", offset);
-        m_program.SetUniform("sizes[" + indexStr + "]", size);
-
-        m_program.SetUniform("textures[" + indexStr + "]", i);
-        glActiveTexture(GL_TEXTURE0 + i);
-        element.pTexture->GetTextureObject().Bind();
-
-        i++;
+        element.Draw(m_program, i);
+        ++i;
     }
 
     m_pVertexArray->Bind();

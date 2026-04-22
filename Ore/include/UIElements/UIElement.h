@@ -22,7 +22,7 @@ struct UIElement
         x = position.x, y = position.y, width = size.x, width = size.y;
     }
 
-    virtual void Draw(Program& program) = 0;
+    virtual void Draw(Program& program, int32& index) const = 0;
 
     uint32 width = 10;
     uint32 height = 10;

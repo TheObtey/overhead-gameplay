@@ -122,10 +122,10 @@ int main()
     viewport.AddPass(&lightPass);
     viewport.AddPass(&uiPass);
 
-    Image image(10, 10, 1, 1, ui);
-    Image image1(0, 0, 1, 1, diffuse);
-    Image image2(10, 1, 1, 1, ui);
-    Image image3(1, 10, 1, 1, ui);
+    Image image(10, 100, 1000, 1000, diffuse);
+    Image image1(0, 0, 100, 100, diffuse);
+    Image image2(10, 1, 100, 100, ui);
+    Image image3(1, 10, 100, 100, ui);
     while (window.IsOpen())
     {
         window.Clear();

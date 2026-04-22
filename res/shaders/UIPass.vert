@@ -4,16 +4,28 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
 out vec2 uv; 
+flat out int id;
+
+uniform vec2 resolution;
 
 uniform vec2 offsets[64];
 uniform vec2 sizes[64];
+uniform vec2 uvPos[64][4];
+uniform vec2 uvSize[64];
+uniform int textureId[64];
+
 
 void main()
 {
-    vec2 position = offsets[gl_InstanceID]; 
-    vec2 size = sizes[gl_InstanceID];
-    uv = aTexCoords;
+    vec2 pixelPos = aPos.xy * sizes[gl_InstanceID];
+    pixelPos += offsets[gl_InstanceID];
 
-    gl_Position = vec4(aPos.xy * size + position, 0.0, 1.0);
+    vec2 normalizedPos = (2.0 * pixelPos - resolution) / resolution;
+    normalizedPos.y *= -1.0;
+
+    uv = uvPos[gl_InstanceID][gl_VertexID];
+    id = textureId[gl_InstanceID];
+
+    gl_Position = vec4(normalizedPos, 0.0, 1.0);
 }
 
