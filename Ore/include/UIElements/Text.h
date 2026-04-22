@@ -12,8 +12,10 @@ class Text : public UIElement
 {
 public:
     Text() = default;
-    Text(std::string const& _text, sptr<FontFace>& _face) : m_text(_text), m_pFontFace(face) {}
+    Text(std::string const& _text, sptr<FontFace>& _face) : m_text(_text), m_pFontFace(_face) {}
     ~Text() = default;
+
+    void Draw(Program& program, int32 &index) override;
 
 private:
     std::string m_text;

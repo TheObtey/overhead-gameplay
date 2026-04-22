@@ -11,6 +11,7 @@ namespace Ore
 	struct Character
 	{
 		uint32 atlasId;
+		glm::ivec2 uvPos;
 		glm::ivec2 charSize;
 		glm::ivec2 charBearing;
 		uint32 advance; //Offset to the next glyph
@@ -28,6 +29,8 @@ namespace Ore
 	protected:
 		uint32 m_bitmap = 0;
 		std::unordered_map<char, Character> m_loadedCharacters {};
+
+		friend class Text;
 	};
 }
 
