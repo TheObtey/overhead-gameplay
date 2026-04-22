@@ -17,6 +17,9 @@ Window::Window(int width, int height, std::string name, bool enableTransparency,
 	glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, enableTransparency);
     glfwWindowHint(GLFW_VISIBLE, visible);
+#ifdef DEBUG_BUILD
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT,true);
+#endif
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -82,7 +85,7 @@ void Window::Open()
 
     glEnable(GL_DEPTH_TEST);
 #ifdef DEBUG_BUILD
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT,true);
+	glfwSetWindowTitle(m_pWindow, reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(Ore::MessageCallback, 0);
 #endif

@@ -2,10 +2,8 @@
 #define ORE_FTFONTFACE__H_
 
 #include "FontFace.h"
-
-#include <ft2build.h>
-
 #include "TextureObject.h"
+#include <ft2build.h>
 
 #include FT_FREETYPE_H  
 
@@ -14,7 +12,7 @@ namespace Ore
 	class FTFontFace : public FontFace
 	{
 	public:
-		FTFontFace(std::filesystem::path path);
+		FTFontFace(std::filesystem::path const& path);
 		FTFontFace(FTFontFace const& other);
 		FTFontFace(FTFontFace&& other) noexcept;
 		~FTFontFace() override;
@@ -26,10 +24,12 @@ namespace Ore
 		static constexpr uint32 BitmapSize = 1024;
 
 	private:
+		void GenerateAtlasTexture();
+
+	private:
 		static FT_Library s_ftLibrary;
 		static int32 s_refcount;
 		FT_Face m_face{};
-		uint32 m_bitmap = 0;
 		TextureObject m_texture;
 	};
 }
