@@ -9,13 +9,14 @@
 #include "Shader.h"
 #include "Passes/UIPass.h"
 #include "UIElements/Image.h"
+#include "UIElements/FTFontFace.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace Ore;
 int main()
 {
-    Window window(1920, 1080, "ORE ORE OREORE ORE ORE OREORE OREORE", false, true);
+    Window window(1920, 1080, "HELLO", false, true);
     window.Open();
     Viewport viewport(0, 0, 1920, 1080, Color::SKY_BLUE);
     window.AddViewport(viewport);
@@ -24,7 +25,8 @@ int main()
     vertices.push_back({ glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f) });
     vertices.push_back({ glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f) });
     vertices.push_back({ glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f) });
-    vertices.push_back({ glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f) });
+    vertices.push_back({
+        glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f) });
 
     std::vector<uint32> indices = {
         0,1,2,
@@ -36,11 +38,13 @@ int main()
     sptr<Texture> diffuse   = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
     sptr<Texture> specular  = std::make_shared<Texture>("res/textures/defaultSpecular.png", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     sptr<Texture> normal    = std::make_shared<Texture>("res/textures/defaultNormal.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+    FTFontFace fontFace("res/fonts/Roboto-Medium.ttf");
 
     sptr<Texture> ui        = std::make_shared<Texture>("res/textures/bib.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
 
+    sptr<Texture> font = std::make_shared<Texture>(fontFace.GetTextureObject(), TextureMaterialType::DIFFUSE);
     std::vector<sptr<Texture>> textures;
-    textures.push_back(diffuse);
+    textures.push_back(font);
     textures.push_back(specular);
     textures.push_back(normal);
 
@@ -118,6 +122,7 @@ int main()
     LightPass lightPass(lightProgram, lights, camera.get());
     UIPass uiPass(UIProgram, camera.get());
 
+
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
     viewport.AddPass(&uiPass);
@@ -126,6 +131,7 @@ int main()
     Image image1(0, 0, 100, 100, diffuse);
     Image image2(10, 1, 100, 100, ui);
     Image image3(1, 10, 100, 100, ui);
+
     while (window.IsOpen())
     {
         window.Clear();

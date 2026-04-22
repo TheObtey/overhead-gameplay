@@ -38,15 +38,19 @@ public:
     void SetDecoration(bool hasDecoration) override;
     void SetIcon(std::string const& path) override; 
     void SetSize(uint16 width, uint16 height) override;
-    void SetCursorState(CursorState state) const;
+    void SetCursorState(CursorState state);
 
     static void FrameBufferResizeCallback(GLFWwindow* pWindow, int width, int height);
     void Open() override;
 
 private:
+    void InitFreeType();
+
+private:
     static std::unordered_map<GLFWwindow*, Window*> s_windows;
     GLFWwindow* m_pWindow;
     std::vector<Viewport*> m_viewports;
+    CursorState m_currentCursorState = CursorState::FREE;
 
     friend class Viewport;
     friend class EventManager;

@@ -7,15 +7,25 @@
 #include <Serialization/json.hpp>
 #include <Define.h>
 #include <raylib.h>
-
+#include <raymath.h>
 using json = nlohmann::json;
+
+struct DrawableSubMesh
+{
+	uptr<Mesh> mesh;
+	Matrix localMatrix = MatrixIdentity();
+};
 
 struct DrawableElement
 {
-	uptr<Mesh> mesh;
+	std::vector<DrawableSubMesh> meshes;
+	MeshGeometrySourceType geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
 	PrimitivesType primitiveType = PrimitivesType::CUBE;
-	Matrix worldMatrix; // Raylib Draw
-	Transform gizmoTransform; // Gizmo Transform
+	std::string loadedFbxPath;
+	std::string loadedFbxDiffusePath;
+
+	Matrix worldMatrix;
+	Transform gizmoTransform;
 	bool gizmoUpdated = false;
 
 	Material material = {};
@@ -43,7 +53,6 @@ ENUM_CLASS_FLAGS(GizmoFlags);
 
 class EditorRaylib3D
 {
-
 public:
 	EditorRaylib3D();
 	~EditorRaylib3D();
@@ -59,7 +68,7 @@ public:
 	void UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableElement& drawable);
 	std::string ResolveEditorTexturePath(std::filesystem::path const& logicalPath);
 
-		void UpdateElementName(std::string const& oldName, Node* pNode);
+	void UpdateElementName(std::string const& oldName, Node* pNode);
 	void RemoveDrawableElement(std::string const& elementName);
 	void ClearWindow();
 

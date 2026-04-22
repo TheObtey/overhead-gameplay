@@ -2,22 +2,24 @@
 #define ORE_TEXT__H_
 
 #include "UIElement.h"
+#include "UIElements/FontFace.h"
 
 #include <filesystem>
 
 namespace Ore
 {
-struct Text : public UIElement
+class Text : public UIElement
 {
+public:
     Text() = default;
-    Text(std::string _text, std::filesystem::path _fontPath, uint32 _fontSize)
-    {
-        text = _text, fontPath = _fontPath, fontSize = _fontSize;
-    }
+    Text(std::string const& _text, sptr<FontFace>& _face) : m_text(_text), m_pFontFace(_face) {}
+    ~Text() = default;
 
-    std::string text;
-    std::filesystem::path fontPath;
-    uint32 fontSize;
+    void Draw(Program& program, int32 &index) override;
+
+private:
+    std::string m_text;
+    sptr<FontFace> m_pFontFace;
 };
 }
 #endif

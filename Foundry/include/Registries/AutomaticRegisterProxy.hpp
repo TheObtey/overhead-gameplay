@@ -10,9 +10,9 @@
 struct AutomaticRegisterProxy
 {
     template <typename T>
-    static bool Register()
+    static bool Register(ScriptEngine& engine)
     {
-        Binder B(ScriptingEngine::GetScriptEngine());
+        Binder B(engine);
         T::Bind(B);
         return true;
     }

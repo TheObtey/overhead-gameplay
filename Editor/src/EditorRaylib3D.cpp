@@ -2,7 +2,8 @@
 #include "Editor.h"
 #include "NewGizmo.hpp"
 
-#include <GeometryFactory.h>
+#include <AssetLoading/EditorAssetLoader.h>
+#include <Debug.h>
 
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -43,6 +44,28 @@ Mesh BuildRaylibMesh(GeoInfo const& geoInfo)
 
 	UploadMesh(&mesh, false);
 	return mesh;
+}
+
+std::filesystem::path ResolveEditorFbxPath(std::filesystem::path const& fbxPath)
+{
+	if (fbxPath.empty())
+		return {};
+
+	if (fbxPath.is_absolute() && std::filesystem::exists(fbxPath))
+		return fbxPath;
+
+	if (std::filesystem::exists(fbxPath))
+		return fbxPath;
+
+	std::filesystem::path const inResFbx = std::filesystem::path("res/fbx") / fbxPath.filename();
+	if (std::filesystem::exists(inResFbx))
+		return inResFbx;
+
+	std::filesystem::path const inGameResFbx = std::filesystem::path("../Game/res/fbx") / fbxPath.filename();
+	if (std::filesystem::exists(inGameResFbx))
+		return inGameResFbx;
+
+	return {};
 }
 }
 
@@ -153,6 +176,7 @@ void EditorRaylib3D::AddDrawableObject(std::string const& name, Node* pNode)
 	if (pNode3D != nullptr && !m_loadedNode3D.contains(name))
 	{
 		m_loadedNode3D[name] = std::make_unique<Node3DElement>();
+
 		m_loadedNode3D[name]->gizmoTransform = RayGizmo::GizmoIdentity();
 		m_loadedNode3D[name]->gizmoTransform.translation = {
 			pNode3D->GetWorldPosition().x,
@@ -175,14 +199,8 @@ void EditorRaylib3D::AddDrawableObject(std::string const& name, Node* pNode)
 
 	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNode);
 	if (pNodeMesh == nullptr) return;
-	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX) return;
 
 	Instanciate3DMesh(name, pNode);
-	//if (dynamic_cast<NodeLight*>(pNode) != nullptr)
-	//{
-	//	//DrawLight();
-	//}
-	//else
 }
 
 Node* EditorRaylib3D::FindNode3DWorldMatrix(Node* pNode, Matrix& outMatrix)
@@ -270,42 +288,52 @@ void EditorRaylib3D::UpdateDrawableElement(Node* pNode)
 	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNode);
 	if (pNodeMesh == nullptr) return;
 
-	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX)
-	{
-		if (m_loadedMeshes.contains(name))
-		{
-			if (m_loadedMeshes[name] && m_loadedMeshes[name]->mesh)
-			{
-				UnloadMesh(*m_loadedMeshes[name]->mesh);
-			}
-			m_loadedMeshes.erase(name);
-		}
-		return;
-	}
-
 	if (!m_loadedMeshes.contains(name))
 	{
 		Instanciate3DMesh(name, pNode);
 		if (!m_loadedMeshes.contains(name)) return;
 	}
 
-	if (m_loadedMeshes[name]->primitiveType != pNodeMesh->GetPrimitiveType())
+	bool needRecreate = false;
+	DrawableElement& drawable = *m_loadedMeshes[name].get();
+
+	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::PRIMITIVE)
+	{
+		needRecreate =
+			(drawable.geometrySourceType != MeshGeometrySourceType::PRIMITIVE) ||
+			(drawable.primitiveType != pNodeMesh->GetPrimitiveType());
+	}
+	else
+	{
+		std::filesystem::path const resolvedPath = ResolveEditorFbxPath(pNodeMesh->GetFbxPath());
+		if (resolvedPath.empty())
+		{
+			RemoveDrawableElement(name);
+			return;
+		}
+
+		needRecreate =
+			(drawable.geometrySourceType != MeshGeometrySourceType::FBX) ||
+			(drawable.loadedFbxPath != resolvedPath.string());
+	}
+
+	if (needRecreate)
 	{
 		RemoveDrawableElement(name);
-		AddDrawableObject(name, pNode);
+		Instanciate3DMesh(name, pNode);
 		if (!m_loadedMeshes.contains(name)) return;
 	}
 
-	DrawableElement& drawable = *m_loadedMeshes[name].get();
-	UpdateDrawableTexture(*pNodeMesh, drawable);
+	DrawableElement& updatedDrawable = *m_loadedMeshes[name].get();
+	UpdateDrawableTexture(*pNodeMesh, updatedDrawable);
 
 	if (m_loadedNode3D.contains(name))
 	{
-		drawable.worldMatrix = m_loadedNode3D[name]->worldMatrix;
+		updatedDrawable.worldMatrix = m_loadedNode3D[name]->worldMatrix;
 	}
 	else if (pNode3D != nullptr)
 	{
-		drawable.worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
+		updatedDrawable.worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
 	}
 }
 
@@ -340,10 +368,14 @@ void EditorRaylib3D::RemoveDrawableElement(std::string const& elementName)
 		}
 		UnloadMaterial(drawable->material);
 
-		if (drawable->mesh)
+		for (DrawableSubMesh& subMesh : drawable->meshes)
 		{
-			UnloadMesh(*drawable->mesh);
+			if (subMesh.mesh)
+			{
+				UnloadMesh(*subMesh.mesh.get());
+			}
 		}
+
 		m_loadedMeshes.erase(elementName);
 	}
 
@@ -357,9 +389,15 @@ void EditorRaylib3D::ClearWindow()
 {
 	for (auto& [name, drawable] : m_loadedMeshes)
 	{
-		if (drawable && drawable->mesh)
+		if (drawable)
 		{
-			UnloadMesh(*drawable->mesh);
+			for (DrawableSubMesh& subMesh : drawable->meshes)
+			{
+				if (subMesh.mesh)
+				{
+					UnloadMesh(*subMesh.mesh.get());
+				}
+			}	
 		}
 	}
 	m_loadedMeshes.clear();
@@ -369,35 +407,92 @@ void EditorRaylib3D::Instanciate3DMesh(std::string const& name, Node* pNodeMesh3
 {
 	NodeMesh* pNodeMesh = dynamic_cast<NodeMesh*>(pNodeMesh3D);
 	if (pNodeMesh == nullptr) return;
-	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::FBX) return;
 
 	if (m_loadedMeshes.find(name) != m_loadedMeshes.end())
 	{
-		// ERROR
+		return;
 	}
-	else
+
+	m_loadedMeshes[name] = std::make_unique<DrawableElement>();
+	DrawableElement& drawable = *m_loadedMeshes[name].get();
+	drawable.worldMatrix = MatrixIdentity();
+	drawable.material = LoadMaterialDefault();
+
+	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::PRIMITIVE)
 	{
 		GeoInfo const& geoInfo = GeometryFactory::GetGeometry(pNodeMesh->GetPrimitiveType());
 		Mesh m_mesh = BuildRaylibMesh(geoInfo);
 
-		m_loadedMeshes[name] = std::make_unique<DrawableElement>();
-		m_loadedMeshes[name]->mesh = std::make_unique<Mesh>(m_mesh);
-		m_loadedMeshes[name]->primitiveType = pNodeMesh->GetPrimitiveType();
-		m_loadedMeshes[name]->worldMatrix = MatrixIdentity();
-		m_loadedMeshes[name]->material = LoadMaterialDefault();
-		UpdateDrawableTexture(*pNodeMesh, *m_loadedMeshes[name]);
-		if (m_loadedNode3D.contains(name))
+		DrawableSubMesh subMesh;
+		subMesh.mesh = std::make_unique<Mesh>(m_mesh);
+		subMesh.localMatrix = MatrixIdentity();
+
+		drawable.meshes.push_back(std::move(subMesh));
+		drawable.geometrySourceType = MeshGeometrySourceType::PRIMITIVE;
+		drawable.primitiveType = pNodeMesh->GetPrimitiveType();
+		drawable.loadedFbxPath.clear();
+		drawable.loadedFbxDiffusePath.clear();
+	}
+	else
+	{
+		std::filesystem::path const resolvedPath = ResolveEditorFbxPath(pNodeMesh->GetFbxPath());
+		if (resolvedPath.empty())
 		{
-			m_loadedMeshes[name]->worldMatrix = m_loadedNode3D[name]->worldMatrix;
+			m_loadedMeshes.erase(name);
+			return;
 		}
-		else
+
+		sptr<EditorSceneData> scene = EditorAssetLoader::LoadSceneFromFile(resolvedPath.string(), EditorAssetLoader::FBX);
+		if (!scene || scene->meshes.empty())
 		{
-			Matrix world = {};
-			Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNodeMesh3D, world));
-			if (pNode3D != nullptr)
+			m_loadedMeshes.erase(name);
+			return;
+		}
+
+		for (EditorSceneMeshData const& importedMesh : scene->meshes)
+		{
+			if (importedMesh.geometry.m_vertices.empty() || importedMesh.geometry.m_indices.empty())
+				continue;
+
+			Mesh m_mesh = BuildRaylibMesh(importedMesh.geometry);
+
+			DrawableSubMesh subMesh;
+			subMesh.mesh = std::make_unique<Mesh>(m_mesh);
+
+			subMesh.localMatrix = GlmToMatrix(importedMesh.meshMatrix);
+	
+
+			if (drawable.loadedFbxDiffusePath.empty() && !importedMesh.textures.empty())
 			{
-				m_loadedMeshes[name]->worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
+				drawable.loadedFbxDiffusePath = importedMesh.textures[0].path;
 			}
+
+			drawable.meshes.push_back(std::move(subMesh));
+		}
+
+		if (drawable.meshes.empty())
+		{
+			m_loadedMeshes.erase(name);
+			return;
+		}
+
+		drawable.geometrySourceType = MeshGeometrySourceType::FBX;
+		drawable.loadedFbxPath = resolvedPath.string();
+	}
+
+	UpdateDrawableTexture(*pNodeMesh, drawable);
+
+	if (m_loadedNode3D.contains(name))
+	{
+		drawable.worldMatrix = m_loadedNode3D[name]->worldMatrix;
+	}
+	else
+	{
+		Matrix world = {};
+		Node3D* pNode3D = static_cast<Node3D*>(FindNode3DWorldMatrix(pNodeMesh3D, world));
+		if (pNode3D != nullptr)
+		{
+			drawable.worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
 		}
 	}
 }
@@ -434,7 +529,16 @@ void EditorRaylib3D::UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableEle
 {
 	std::filesystem::path wanted = nodeMesh.GetDiffuseTexturePath();
 	if (wanted.empty())
-		wanted = "res/textures/Default.png";
+	{
+		if (drawable.geometrySourceType == MeshGeometrySourceType::FBX && !drawable.loadedFbxDiffusePath.empty())
+		{
+			wanted = drawable.loadedFbxDiffusePath;
+		}
+		else
+		{
+			wanted = "res/textures/Default.png";
+		}
+	}
 
 	std::string const resolved = ResolveEditorTexturePath(wanted);
 	if (resolved == drawable.loadedDiffusePath)
@@ -464,18 +568,26 @@ void EditorRaylib3D::UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableEle
 void EditorRaylib3D::Render()
 {
 	BeginMode3D(m_camera);
-	DrawViewPort();
 
-	for (std::map<std::string, uptr<DrawableElement>>::iterator it = m_loadedMeshes.begin(); it != m_loadedMeshes.end(); it++)
+	for (auto it = m_loadedMeshes.begin(); it != m_loadedMeshes.end(); ++it)
 	{
-		DrawMesh(*it->second->mesh.get(), it->second->material, it->second->worldMatrix);
+		DrawableElement& drawable = *it->second.get();
+
+		for (DrawableSubMesh const& subMesh : drawable.meshes)
+		{
+			if (!subMesh.mesh) continue;
+			// gauche a droite local * world
+			Matrix finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
+			DrawMesh(*subMesh.mesh.get(), drawable.material, finalMatrix);
+		}
 	}
+
+	DrawViewPort();
 
 	if (m_loadedNode3D.contains(m_selectedObject))
 	{
 		RayGizmo::SetGizmoSize(m_gizmoSize);
 
-		// Gizmo toujours au-dessus de la géométrie
 		rlDisableDepthTest();
 
 		if (RayGizmo::DrawGizmo3D(static_cast<int>(m_gizmoFlags), &m_loadedNode3D[m_selectedObject]->gizmoTransform))
@@ -491,7 +603,14 @@ void EditorRaylib3D::Render()
 
 void EditorRaylib3D::DrawViewPort()
 {
-	DrawGrid(20, 1.0f);
+	// Grille plus grande + léger offset en Y pour éviter le z-fighting
+	rlDisableDepthMask();
+	rlPushMatrix();
+	rlTranslatef(0.0f, -0.01f, 0.0f);
+	DrawGrid(200, 1.0f);
+	rlPopMatrix();
+	rlEnableDepthMask();
+
 	DrawLine3D({ 0, 0, 0 }, { 500, 0, 0 }, RED);
 	DrawLine3D({ 0, 0, 0 }, { 0, 500, 0 }, GREEN);
 	DrawLine3D({ 0, 0, 0 }, { 0, 0, 500 }, BLUE);

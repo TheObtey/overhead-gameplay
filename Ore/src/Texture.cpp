@@ -17,6 +17,7 @@ void Texture::Load(std::filesystem::path const& path, TextureType const type, Te
     m_materialType = materialType;
 
     GLuint textureId;
+
     glGenTextures(1, &textureId);
 
     m_textureObject = TextureObject(textureId, type);

@@ -53,6 +53,11 @@ void NodeWindow::SetIcon(std::string const &path) const
     m_pWindow->SetIcon(path);
 }
 
+void NodeWindow::SetCursorState(Ore::Window::CursorState cursorState) const
+{
+    m_pWindow->SetCursorState(cursorState);
+}
+
 ISerializable* NodeWindow::CreateInstance()
 {
     return CreateNode<NodeWindow>("NodeWindow").release();

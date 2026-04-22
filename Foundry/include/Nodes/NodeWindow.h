@@ -11,7 +11,8 @@
 class NodeWindow : public Node2D
 {
 public:
-    //class Proxy
+    class Proxy;
+
     explicit NodeWindow(std::string const& name);
     ~NodeWindow() override;
 
@@ -23,6 +24,7 @@ public:
     void RemoveViewport(NodeViewport const& viewport);
     void SetDecoration(bool decoration) const;
     void SetIcon(std::string const& path) const;
+    void SetCursorState(Ore::Window::CursorState cursorState) const;
 
     static ISerializable* CreateInstance();
     uptr<Node> Clone() override;
@@ -42,5 +44,7 @@ private:
 };
 
 REGISTER_ISERIALIZABLE(NodeWindow, NodeWindow::CreateInstance);
+
+#include "Scripting/Proxies/NodeWindowProxy.inl"
 
 #endif
