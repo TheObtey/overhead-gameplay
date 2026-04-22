@@ -44,7 +44,7 @@ struct SceneMesh
 	std::vector<std::string> paths;
 	std::vector<glm::mat4> bonesOffest;
 	std::vector<glm::mat4> bonesTransform;
-	glm::mat4 meshMatrix;
+	glm::mat4 meshMatrix = glm::mat4(1.0f);
 	std::vector<uint32> animationlinked;
 };
 

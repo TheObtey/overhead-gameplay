@@ -60,6 +60,7 @@ public:
 
     std::vector<SerializedTexturesData> const& GetTexturePaths() const {return m_texturesPaths;}
 
+    glm::mat4x4 m_meshlocalTransform{ 1.0f };
 protected:
     void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
 

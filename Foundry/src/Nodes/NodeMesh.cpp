@@ -51,7 +51,7 @@ NodeMesh::NodeMesh(std::string const &name) : NodeVisual(name)
 void NodeMesh::OnUpdate(double delta)
 {
     NodeVisual::OnUpdate(delta);
-    m_pMesh->SetTransform(m_worldTransform);
+    m_pMesh->SetTransform( m_worldTransform * m_meshlocalTransform);
 
     if (IsVisible() && m_pViewport)
         m_pViewport->AddMesh(*this);
@@ -80,6 +80,8 @@ void NodeMesh::SetFromSceneMesh(SceneMesh const& sceneMesh, std::filesystem::pat
     m_pMesh->SetGeometry(geo);
     SetName(sceneMesh.name);
     m_textures = sceneMesh.meshTextures;
+    m_meshlocalTransform = sceneMesh.meshMatrix;
+    //SetLocalPosition({sceneMesh.meshMatrix[3][0],sceneMesh.meshMatrix[3][1], sceneMesh.meshMatrix[3][2]});
     bool hasNormal = false;
     for (uint8 i = 0; i < m_textures.size(); ++i)
     {
@@ -294,7 +296,8 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
 
         m_pMesh->SetTextures(m_textures);
     }
-    m_pMesh->SetTransform(m_transform.GetMatrix());
+    Update(1);
+    m_pMesh->SetTransform(m_meshlocalTransform * m_transform.GetMatrix());
 }
 
 void NodeMesh::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
