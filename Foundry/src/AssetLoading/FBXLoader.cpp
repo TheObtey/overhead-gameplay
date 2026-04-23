@@ -68,11 +68,39 @@ glm::mat4x4 AIMatrixToGLMMatrix(aiMatrix4x4 const& matrix)
     return glm::transpose(out);
 }
 
+std::string FBXLoader::NormalizeTexturePath(std::string const& path)
+{
+    std::filesystem::path p(path);
+    return p.lexically_normal().generic_string();
+}
+
+sptr<Ore::Texture> FBXLoader::GetSharedTexture(std::string const& path, Ore::TextureMaterialType materialType)
+{
+    std::string const normalizedPath = NormalizeTexturePath(path);
+    std::string const cacheKey = normalizedPath + "#" + std::to_string(static_cast<uint32>(materialType));
+
+    auto it = m_textureCache.find(cacheKey);
+    if (it != m_textureCache.end())
+    {
+        sptr<Ore::Texture> shared = it->second.lock();
+        if (shared)
+            return shared;
+
+        m_textureCache.erase(it);
+    }
+
+    sptr<Ore::Texture> created = std::make_shared<Ore::Texture>(normalizedPath, Ore::TextureType::TYPE_2D, materialType);
+    m_textureCache[cacheKey] = created;
+    return created;
+}
+
 void FBXLoader::LoadTextures(FBXLoader::Material& materials, std::vector<sptr<Ore::Texture>>& vect, uint32 matIndex)
 {
     for (std::map<Ore::TextureMaterialType, std::string>::iterator it = materials.textures[matIndex].begin(); it != materials.textures[matIndex].end(); ++it)
     {
-        vect.push_back(std::make_shared<Ore::Texture>(Ore::Texture(it->second, Ore::TextureType::TYPE_2D, it->first)));
+        sptr<Ore::Texture> texture = GetSharedTexture(it->second, it->first);
+        if (texture)
+            vect.push_back(texture);
     }
 }
 
@@ -87,15 +115,26 @@ void FBXLoader::LoadDefaultsTextures(SceneMesh& mesh)
         return;
     }
 
-    sptr<Ore::Texture> text = std::make_shared<Ore::Texture>("res/textures/NormalMap.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::NORMAL);
-    mesh.paths.push_back("res/textures/NormalMap.png");
-    FBXLoader::m_defaultTextures.push_back(text);
-    sptr<Ore::Texture> text2 = std::make_shared<Ore::Texture>("res/textures/diffuse.jpg", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE);
-    mesh.paths.push_back("res/textures/diffuse.jpg");
-    FBXLoader::m_defaultTextures.push_back(text2);
-    sptr<Ore::Texture> text3 = std::make_shared<Ore::Texture>("res/textures/specular.jpg", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::SPECULAR);
-    mesh.paths.push_back("res/textures/specular.jpg");
-    FBXLoader::m_defaultTextures.push_back(text3);
+    sptr<Ore::Texture> text = GetSharedTexture("res/textures/NormalMap.png", Ore::TextureMaterialType::NORMAL);
+    if (text)
+    {
+        mesh.paths.push_back("res/textures/NormalMap.png");
+        FBXLoader::m_defaultTextures.push_back(text);
+    }
+
+    sptr<Ore::Texture> text2 = GetSharedTexture("res/textures/diffuse.jpg", Ore::TextureMaterialType::DIFFUSE);
+    if (text2)
+    {
+        mesh.paths.push_back("res/textures/diffuse.jpg");
+        FBXLoader::m_defaultTextures.push_back(text2);
+    }
+
+    sptr<Ore::Texture> text3 = GetSharedTexture("res/textures/specular.jpg", Ore::TextureMaterialType::SPECULAR);
+    if (text3)
+    {
+        mesh.paths.push_back("res/textures/specular.jpg");
+        FBXLoader::m_defaultTextures.push_back(text3);
+    }
 
     mesh.meshTextures = FBXLoader::m_defaultTextures;
 }
@@ -259,9 +298,12 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material&
         {
             for (std::map<Ore::TextureMaterialType, std::string>::iterator it = outMat.textures[pMesh->mMaterialIndex].begin(); it != outMat.textures[pMesh->mMaterialIndex].end(); ++it)
             {
-                sptr<Ore::Texture> test = std::make_shared<Ore::Texture>(it->second, Ore::TextureType::TYPE_2D, it->first);
-                sMesh.meshTextures.push_back(test);
-                sMesh.paths.push_back(it->second);
+                sptr<Ore::Texture> sharedTexture = GetSharedTexture(it->second, it->first);
+                if (sharedTexture)
+                {
+                    sMesh.meshTextures.push_back(sharedTexture);
+                    sMesh.paths.push_back(it->second);
+                }
             }
         }
         else
