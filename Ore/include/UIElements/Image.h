@@ -35,6 +35,7 @@ struct Image final: public UIElement
         glActiveTexture(GL_TEXTURE0 + index);
         pTexture->GetTextureObject().Bind();
         program.SetUniform("textureId[" + indexStr + "]", index);
+        index++;
     }
 
     uptr<Geometry> pGeometry = nullptr;

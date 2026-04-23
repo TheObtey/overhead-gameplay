@@ -110,7 +110,7 @@ namespace Ore
 
 			Character character = {
 				m_bitmap,
-				{advanceX, advanceY},
+				{advanceX / static_cast<float>(BitmapSize), advanceY / static_cast<float>(BitmapSize)},
 				{ glyphWidth, glyphHeight},
 				{m_face->glyph->bitmap_left, m_face->glyph->bitmap_top},
 				static_cast<uint32>(m_face->glyph->advance.x >> 6)

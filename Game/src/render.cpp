@@ -10,6 +10,7 @@
 #include "Passes/UIPass.h"
 #include "UIElements/Image.h"
 #include "UIElements/FTFontFace.h"
+#include "UIElements/Text.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -127,10 +128,18 @@ int main()
     viewport.AddPass(&lightPass);
     viewport.AddPass(&uiPass);
 
-    Image image(10, 100, 1000, 1000, diffuse);
+    //Image image(10, 100, 1000, 1000, diffuse);
     Image image1(0, 0, 100, 100, diffuse);
     Image image2(10, 1, 100, 100, ui);
     Image image3(1, 10, 100, 100, ui);
+
+    sptr<FontFace> roboto = std::make_shared<FTFontFace>("res/fonts/Roboto-Medium.ttf");
+    roboto->SetSize(80, 20);
+    Text text("The Quick Brown fox jumps over the lazy dog", roboto); 
+    text.x = 20;
+    text.y = 20;
+    text.width = 50;
+    text.height = 50;
 
     while (window.IsOpen())
     {
@@ -147,10 +156,11 @@ int main()
 
         //geoPass.AddMesh(mesh);
         geoPass.AddMesh(mesh);
-        uiPass.AddUIElement(image);
-        uiPass.AddUIElement(image1);
-        uiPass.AddUIElement(image2);
-        uiPass.AddUIElement(image3);
+        //uiPass.AddUIElement(image);
+        //uiPass.AddUIElement(image1);
+        //uiPass.AddUIElement(image2);
+        //uiPass.AddUIElement(image3);
+        uiPass.AddUIElement(text);
         viewport.Present();
         window.Present();
     }

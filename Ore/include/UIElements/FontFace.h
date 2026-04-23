@@ -11,9 +11,9 @@ namespace Ore
 	struct Character
 	{
 		uint32 atlasId;
-		glm::ivec2 uvPos;
-		glm::ivec2 charSize;
-		glm::ivec2 charBearing;
+		glm::vec2 uvPos;
+		glm::vec2 charSize;
+		glm::vec2 charBearing;
 		uint32 advance; //Offset to the next glyph
 	};
 

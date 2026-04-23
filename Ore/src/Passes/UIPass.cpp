@@ -20,8 +20,7 @@ UIPass::UIPass(Program& program) : Pass(program)
 
 UIPass::UIPass(Program& program, Camera* pcamera) : Pass(program, pcamera)
 {
-    glEnable(GL_BLEND);  
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
 
@@ -30,10 +29,10 @@ UIPass::UIPass(Program& program, Camera* pcamera) : Pass(program, pcamera)
     
     Vertex quadVertices[4] = 
     {
-        {glm::vec3( 0.0f,  0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-        {glm::vec3( 1.0f,  0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-        {glm::vec3( 1.0f,  1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-        {glm::vec3( 0.0f,  1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)}
+        {glm::vec3( 0.0f,  1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+        {glm::vec3( 1.0f,  1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+        {glm::vec3( 1.0f,  0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
+        {glm::vec3( 0.0f,  0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)}
     };
 
     uint8 quadIndices[6] = 
@@ -63,6 +62,8 @@ UIPass::UIPass(Program& program, Camera* pcamera) : Pass(program, pcamera)
 void UIPass::Execute()
 {
     if (m_pCamera == nullptr) return;
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
     m_program.Use();
@@ -72,11 +73,10 @@ void UIPass::Execute()
     for(UIElement const& element : m_elements)
     {
         element.Draw(m_program, i);
-        ++i;
     }
 
     m_pVertexArray->Bind();
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0, m_elements.size());
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0, i);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
