@@ -54,7 +54,7 @@ function self:TryInteract()
     if not oIrcomp then return end
 
     if oIrcomp:CanInteract() then
-        oIrcomp:Interact()
+        oIrcomp:Interact(pEmitter)
     end
 end
 

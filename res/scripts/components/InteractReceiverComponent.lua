@@ -14,8 +14,8 @@ function self:CanInteract()
 end
 
 --Function to implement in the parent script
-function self:Interact()
-    oBase:Interaction()
+function self:Interact(oEmitter)
+    oBase:Interaction(oEmitter)
 end
 
 --Return the prompt to show when the raycast point to the node
