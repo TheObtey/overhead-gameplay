@@ -7,7 +7,7 @@ node3d = {}
 ---@return node3d
 function CreateNode3D(name) end
 
----@return fmaths.vec3
+---@return fmath.vec3
 function node3d:GetPosition() end
 function node3d:GetX() end
 function node3d:GetY() end
@@ -34,7 +34,7 @@ function node3d:GetLocalUp() end
 function node3d:GetLocalForward() end
 
 function node3d:GetWorldMatrix() end
----@return fmaths.vec3
+---@return fmath.vec3
 function node3d:GetWorldPosition() end
 function node3d:GetWorldScale() end
 --- Pitch, Yaw, Roll / x, y, z									
@@ -45,8 +45,9 @@ function node3d:GetWorldRotationQuaternion() end
 
 --- =========== Setters ===========
 
----@param pos fmaths.vec3
-function node3d:SetLocalPosition(pos) end
+---@overload fun(pos:fmath.vec3)
+---@overload fun(posX:number, posY:number, posZ:number)
+function node3d:SetLocalPosition(posX,posY,posZ) end
 
 ---@param x number
 function node3d:SetLocalX(x) end
@@ -57,43 +58,47 @@ function node3d:SetLocalY(y) end
 ---@param z number
 function node3d:SetLocalZ(z) end
 
----@param x number
----@param y number
----@param z number
-function node3d:SetLocalRotationDeg(x, y, z) end
+---@overload fun(rotDeg:fmath.vec3)
+---@overload fun(rX:number, rY:number, rZ:number)
+function node3d:SetLocalRotationDeg(rX, rY, rZ) end
 
----@param pitch number
----@param yaw number
----@param roll number
-function node3d:SetLocalRotationRad(pitch, yaw, roll) end
+---@overload fun(rotRad:fmath.vec3)
+---@overload fun(rX:number, rY:number, rZ:number)
+function node3d:SetLocalRotationRad(rX, rY, rZ) end
 
 ---@param rot fmath.vec4
 function node3d:SetLocalRotationQuat(rot) end
 
----@param scale fmaths.vec3
-function node3d:SetScale(scale) end
+---@overload fun(scale:fmath.vec3)
+---@overload fun(sX:number, sY:number, sZ:number)
+function node3d:SetScale(sX, sY, sZ) end
 
----@param worldPos fmaths.vec3
-function node3d:SetWorldPosition(worldPos) end
+---@overload fun(pos:fmath.vec3)
+---@overload fun(posX:number, posY:number, posZ:number)
+function node3d:SetWorldPosition(posX,posY,posZ) end
 
----@param worldScale fmaths.vec3
-function node3d:SetWorldScale(worldScale) end
+---@overload fun(scale:fmath.vec3)
+---@overload fun(sX:number, sY:number, sZ:number)
+function node3d:SetWorldScale(sX,sY,sZ) end
 
 --- Angles in Degrees
----@param worldRot fmaths.vec3
-function node3d:SetWorldRotation(worldRot) end
+---@overload fun(angle:fmath.vec3)
+---@overload fun(rX:number, rY:number, rZ:number)
+function node3d:SetWorldRotation(rX, rY, rZ) end
 
 --- Angles in Radians
----@param worldRotQuat fmath:vec4 { w, x, y, z }
+---@param worldRotQuat fmath.vec4 { w, x, y, z }
 function node3d:SetWorldRotationQuaternion(worldRotQuat) end
 
 --- =========== Adders ===========
 
----@param scale fmaths.vec3
-function node3d:AddScale(scale) end
+---@overload fun(scale:fmath.vec3)
+---@overload fun(sX:number, sY:number, sZ:number)
+function node3d:AddScale(sX,sY,sZ) end
 
----@param pos fmaths.vec3
-function node3d:AddLocalPosition(pos) end
+---@overload fun(pos:fmath.vec3)
+---@overload fun(posX:number, posY:number, posZ:number)
+function node3d:AddLocalPosition(posX,posY,posZ) end
 
 ---@param x number
 function node3d:AddLocalX(x) end
