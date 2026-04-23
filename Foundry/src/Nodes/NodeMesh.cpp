@@ -5,6 +5,7 @@
 #include "Serialization/SerializeObject.hpp"
 #include "Serialization/ISerializableEncaps.h"
 #include "AssetLoading/AssetLoader.h"
+#include "AssetLoading/EditorAssetLoader.h"
 #include "AssetLoading/AssetsStructs.h"
 
 namespace
@@ -71,6 +72,16 @@ void NodeMesh::SetGeometry(sptr<Ore::Geometry> const &geometry) const
 void NodeMesh::SetActive(bool isActive) const
 {
     m_pMesh->SetActive(isActive);
+}
+
+void NodeMesh::SetFromEditorSceneMesh(EditorSceneMeshData const& sceneMesh, std::filesystem::path const& fbxPath)
+{
+    m_geometrySourceType = MeshGeometrySourceType::FBX;
+    //SetName(sceneMesh.name);
+
+    m_meshlocalTransform = sceneMesh.meshMatrix;
+    m_meshIDInSceneFBX = sceneMesh.ID;
+    m_fbxPath = fbxPath;
 }
 
 void NodeMesh::SetFromSceneMesh(SceneMesh const& sceneMesh, std::filesystem::path const& fbxPath)
@@ -262,14 +273,14 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
     }
     else
     {
-
         if (!s_IsInEditor)
         {
             Logger::Log("SceneMeshLoading");
             SetFromSceneMesh(*AssetLoader::LoadSceneFromFile(m_fbxPath.string(), AssetLoader::FileType::FBX)->allMesh[m_meshIDInSceneFBX], m_fbxPath);
         }
-        //else
-        //    ...
+        else {
+            SetFromEditorSceneMesh(EditorAssetLoader::LoadSceneFromFile(m_fbxPath.string(), EditorAssetLoader::FileType::FBX)->meshes[m_meshIDInSceneFBX], m_fbxPath);
+		}
     }
 
     bool isActive = true;

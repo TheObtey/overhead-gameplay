@@ -892,8 +892,8 @@ void EditorRaylib3D::Render()
 		{
 			if (!subMesh.mesh)
 				continue;
-			Matrix const finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
-			DrawMesh(*subMesh.mesh.get(), drawable.material, finalMatrix);
+			//Matrix const finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
+			DrawMesh(*subMesh.mesh.get(), drawable.material, drawable.worldMatrix /*finalMatrix*/);
 		}
 	}
 

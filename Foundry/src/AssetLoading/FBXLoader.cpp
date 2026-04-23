@@ -155,6 +155,7 @@ sptr<SceneData> FBXLoader::LoadFile(std::string const& path)
         Logger::LogWithLevel(LogLevel::ERROR, "Failed Loading " + path + " file");
         return nullptr;
     }
+
     SceneData uScene = {};
     uScene.path = path;
     Material allTextures;

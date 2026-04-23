@@ -15,11 +15,11 @@ namespace
 {
 	void ApplyMatrixToNode(Node3D& node, glm::mat4 const& matrix)
 	{
-		glm::vec3 scale = glm::vec3(1.0f);
-		glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-		glm::vec3 translation = glm::vec3(0.0f);
-		glm::vec3 skew = glm::vec3(0.0f);
-		glm::vec4 perspective = glm::vec4(0.0f);
+		glm::vec3 scale(1.0f);
+		glm::quat rotation;
+		glm::vec3 translation;
+		glm::vec3 skew;
+		glm::vec4 perspective;
 
 		if (glm::decompose(matrix, scale, rotation, translation, skew, perspective))
 		{
@@ -30,37 +30,59 @@ namespace
 	}
 }
 
-sptr<EditorSceneData> EditorAssetLoader::LoadSceneFromFile(std::string const& path, EditorAssetLoader::FileType type)
+sptr<EditorSceneData> EditorAssetLoader::LoadSceneFromFile(std::string const& path, FileType type)
 {
-	if (EditorAssetLoader::m_loadedScenes.contains(path))
+	if (m_loadedScenes.contains(path))
 		return m_loadedScenes[path];
 
-	sptr<EditorSceneData> sptrScene = nullptr;
 	switch (type)
 	{
-	case EditorAssetLoader::FBX:
-		sptrScene = EditorFBXLoader::LoadFile(path);
-		m_loadedScenes[path] = sptrScene;
-		return sptrScene;
+	case FBX:
+		m_loadedScenes[path] = EditorFBXLoader::LoadFile(path);
+		return m_loadedScenes[path];
 	default:
-		Logger::LogWithLevel(LogLevel::ERROR, "[EditorAssetLoader] Unsupported file type for: " + path);
-		return sptrScene;
+		Logger::LogWithLevel(LogLevel::ERROR, "[EditorAssetLoader] Unsupported file type: " + path);
+		return nullptr;
 	}
+}
+
+uptr<Node> EditorAssetLoader::BuildNode(EditorSceneData const& scene, int index, std::string const& fbxPath)
+{
+	auto const& n = scene.nodes[index];
+
+	uptr<Node> node;
+
+
+
+	if (n.meshIndex >= 0)
+	{
+		auto meshNode = Node::CreateNode<NodeMesh>(n.name);
+		meshNode->SetFromEditorSceneMesh(
+			scene.meshes[n.meshIndex],
+			fbxPath
+		);
+		ApplyMatrixToNode(*meshNode, scene.meshes[n.meshIndex].meshMatrix);
+		node = std::move(meshNode);
+	}
+	else
+	{
+		auto node3D = Node::CreateNode<Node3D>(n.name);
+		ApplyMatrixToNode(*node3D, n.transform);
+		node = std::move(node3D);
+	}
+
+	for (int child : n.children)
+	{
+		node->AddChild(BuildNode(scene, child, fbxPath));
+	}
+
+	return node;
 }
 
 uptr<Node> EditorAssetLoader::CreateNodesFromScene(EditorSceneData const& scene, std::string const& sourceFbxPath)
 {
-	uptr<Node3D> root = Node::CreateNode<Node3D>("ImportedFBX");
-	for (uint32 i = 0; i < static_cast<uint32>(scene.meshes.size()); ++i)
-	{
-		EditorSceneMeshData const& meshData = scene.meshes[i];
+	if (scene.rootNode < 0)
+		return nullptr;
 
-		uptr<NodeMesh> meshNode = Node::CreateNode<NodeMesh>("Mesh_" + std::to_string(i));
-		meshNode->SetFbxPath(sourceFbxPath);
-
-		ApplyMatrixToNode(*meshNode, meshData.meshMatrix);
-		root->AddChild(std::move(meshNode));
-	}
-
-	return std::move(root);
+	return BuildNode(scene, scene.rootNode, sourceFbxPath);
 }

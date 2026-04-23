@@ -8,6 +8,7 @@
 
 
 struct SceneMesh;
+struct EditorSceneMeshData;
 enum class MeshGeometrySourceType : uint8
 {
     PRIMITIVE,
@@ -45,6 +46,7 @@ public:
     void SetActive(bool isActive) const;
     void SetPrimitive(PrimitivesType primitiveType);
     void SetFbxPath(std::filesystem::path const &fbxPath);
+    void SetFromEditorSceneMesh(EditorSceneMeshData const & sceneMesh, std::filesystem::path const& fbxPath);
     void SetFromSceneMesh(SceneMesh const & sceneMesh, std::filesystem::path const& fbxPath);
     MeshGeometrySourceType GetGeometrySourceType() const { return m_geometrySourceType; }
     PrimitivesType GetPrimitiveType() const { return m_primitiveType; }
