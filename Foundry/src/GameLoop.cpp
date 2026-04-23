@@ -6,6 +6,7 @@
 #include "Nodes/NodeWindow.h"
 #include "Servers/EngineServer.h"
 #include "Servers/GraphicServer.h"
+#include "Servers/AudioServer.h"
 #include "Servers/PhysicsServer.h"
 #include "ActionMap.h"
 
@@ -76,6 +77,7 @@ void GameLoop::InitServers()
 {
     EngineServer::Initialize();
     GraphicServer::Initialize();
+    AudioServer::Initialize();
     PhysicsServer::Initialize();
 }
 

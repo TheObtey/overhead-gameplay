@@ -6,6 +6,7 @@
 #include "Scripting/Proxies/PhysicsProxy.hpp"
 #include "Scripting/Proxies/MathsProxy.h"
 #include "Scripting/Proxies/SceneTreeProxy.h"
+#include "Scripting/Proxies/AudioServerProxy.h"
 #include "Node.h"
 #include "Nodes/Node2D.h"
 #include "Nodes/Node3D.h"
@@ -14,6 +15,8 @@
 #include "Nodes/NodeWindow.h"
 #include "Nodes/NodeCollider.h"
 #include "Nodes/NodeRigidBody.h"
+#include "Nodes/NodeAudioEmitter.h"
+#include "Nodes/NodeAudioListener.h"
 
 #include "Registries/AutomaticRegisterProxy.hpp"
 
@@ -36,6 +39,9 @@ static void RegisterProxies(ScriptEngine& engine)
 	AutomaticRegisterProxy::Register<NodeSphereCollider::Proxy::ProxyBinding>(engine);
 	AutomaticRegisterProxy::Register<NodeCapsuleCollider::Proxy::ProxyBinding>(engine);
 	AutomaticRegisterProxy::Register<NodeRigidBody::Proxy::ProxyBinding>(engine);
+	AutomaticRegisterProxy::Register<AudioProxyBinding>(engine);
+	AutomaticRegisterProxy::Register<NodeAudioEmitter::Proxy::ProxyBinding>(engine);
+	AutomaticRegisterProxy::Register<NodeAudioListener::Proxy::ProxyBinding>(engine);
 };
 
 
