@@ -48,13 +48,13 @@ void GameLoop::LoopGame()
             ActionMap::PollInputs(CurrentActionMap);
 
         m_accumulator += dt;
-        do
+        
+        while (m_accumulator > PHYSICS_DT)
         {
             m_accumulator -= PHYSICS_DT;
             root.PhysicsUpdate(PHYSICS_DT);
             PhysicsServer::UpdatePhysicsWorld(PHYSICS_DT); // !! si update fait ici, il semble beaucoup trop rapide !!
         }
-        while (m_accumulator > PHYSICS_DT);
 
         //PhysicsServer::UpdatePhysicsWorld(dt);
         root.Update(dt);
