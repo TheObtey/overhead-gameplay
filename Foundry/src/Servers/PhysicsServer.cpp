@@ -57,17 +57,17 @@ void PhysicsServer::Initialize() // ajouter tous les params ?
 {
 	rp3d::PhysicsWorld::WorldSettings settings;
 	settings.worldName = "MainWorld";
-	settings.defaultVelocitySolverNbIterations = 60;         // Default is 6
-	settings.defaultPositionSolverNbIterations = 30;         // Default is 3
+	settings.defaultVelocitySolverNbIterations = 60;        // Default is 6
+	settings.defaultPositionSolverNbIterations = 30;        // Default is 3
 	settings.isSleepingEnabled = true;                      // Default is true
-	settings.gravity = rp3d::Vector3(0, -9.81, 0);          // Default is(0, -9.81, 0)
+	settings.gravity = rp3d::Vector3(0, 0, 0);				// Default is(0, -9.81, 0)
 	settings.defaultTimeBeforeSleep = 1.0f;                 // Default is 1.0f
 	settings.cosAngleSimilarContactManifold = 0.95;         // Default is 0.95
 	settings.defaultSleepLinearVelocity = 0.02;             // Default is 0.02
 	settings.defaultSleepAngularVelocity = 3.0 * pi / 180;  // Default is 3.0 * (PI / 180.0)
 	settings.restitutionVelocityThreshold = 0.5;            // Default is 0.5
-	settings.defaultFrictionCoefficient = 0.3;              // Default is 0.3
-	settings.defaultBounciness = 0.5f;                      // Default is 0.5f
+	settings.defaultFrictionCoefficient = 0.6;              // Default is 0.3
+	settings.defaultBounciness = 0.0f;                      // Default is 0.5f
 	settings.persistentContactDistanceThreshold = 0.03;     // Default is 0.03
 
 	Instance().m_pPhysicsWorld = Instance().m_physicsCommon.createPhysicsWorld(settings);

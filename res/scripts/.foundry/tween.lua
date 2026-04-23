@@ -46,14 +46,15 @@ local function _ease(fcEase, iProgress)
 end
 
 -- Creates a named tween
-function tween.Create(sTweenId, tFrom, tTo, iDuration, fcEase, fcCallback)
+function tween.Create(sTweenId, tFrom, tTo, iDuration, fcEase, fcUpdateCallback, fcFinishCallback)
     assert(type(sTweenId) == "string", "tween.Create: id must be a string")
     assert(type(tFrom) == "table", "tween.Create: from must be a table")
     assert(type(tTo) == "table", "tween.Create: to must be a table")
     assert(#tFrom == #tTo, "tween.Create: from and to must have the same size")
     assert(type(iDuration) == "number" and iDuration >= 0, "tween.Create: duration must be a positive number")
-    assert(type(fcCallback) == "function", "tween.Create: valid function expected")
-    
+    assert(type(fcUpdateCallback) == "function", "tween.Create: valid update function expected")
+    assert(type(fcFinishCallback) == "function", "tween.Create: valid finish function expected")
+
     tween._tweens[sTweenId] = {
         sId = sTweenId,
         tFrom = _deepCopy(tFrom),
@@ -61,20 +62,22 @@ function tween.Create(sTweenId, tFrom, tTo, iDuration, fcEase, fcCallback)
         iDuration = iDuration,
         iElapsed = 0,
         fcEase = fcEase,
-        fcCallback = fcCallback,
+        fcUpdateCallback = fcUpdateCallback,
+        fcFinishCallback = fcFinishCallback,
         bPaused = false
     }
 
     if iDuration == 0 then
-        fcCallback(_deepCopy(tTo))
+        fcUpdateCallback(_deepCopy(tTo))
+        fcFinishCallback()
         tween._tweens[sTweenId] = nil
     end
 end
 
 -- Craetes an anonymous tween and returns its id
-function tween.Simple(tFrom, tTo, iDuration, fcEase, fcCallback)
+function tween.Simple(tFrom, tTo, iDuration, fcEase, fcUpdateCallback, fcFinishCallback)
     local sTweenId = _newId()
-    tween.Create(sTweenId, tFrom, tTo, iDuration, fcEase, fcCallback)
+    tween.Create(sTweenId, tFrom, tTo, iDuration, fcEase, fcUpdateCallback, fcFinishCallback)
 
     return sTweenId
 end
@@ -135,7 +138,7 @@ function tween.Progress(sTweenId)
 
     if tTween.iDuration == 0 then return 1 end
 
-    return math.min(tTween.iElapsed / tTween.iDuration, 1)
+    return fmath.Min(tTween.iElapsed / tTween.iDuration, 1)
 end
 
 -- Gets time left before completion
@@ -145,7 +148,20 @@ function tween.TimeLeft(sTweenId)
     local tTween = _getTween(sTweenId)
     if not tTween then return end
 
-    return math.max(0, tTween.iDuration - tTween.iElapsed)
+    return fmath.Max(0, tTween.iDuration - tTween.iElapsed)
+end
+
+-- Returns the given value rounded with the specified amount of decimals
+function tween.Round(iValue, iDecimals)
+    iDecimals = iDecimals or 0
+    local iMultiplier = 10 ^ iDecimals
+    local iHalf = 0.50000000000008
+
+    if iValue > 0 then
+        return fmath.Floor(iValue * iMultiplier + iHalf) / iMultiplier
+    else
+        return fmath.Ceil(iValue * iMultiplier - iHalf) / iMultiplier
+    end
 end
 
 -- Ticks tweens using delta time
@@ -171,9 +187,10 @@ function tween.Tick(iDt)
                 iEasedProgress
             )
 
-            tTween.fcCallback(tValue)
+            tTween.fcUpdateCallback(tValue)
 
             if iProgress >= 1 then
+                tTween.fcFinishCallback()
                 tween._tweens[sTweenId] = nil
             end
         end

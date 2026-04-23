@@ -143,7 +143,7 @@ private:
 
 	std::vector<NodeCollider *> m_colliders;
 	bool m_rigidBodyCreated = false;
-
+	bool test = false;
 	friend class PhysicsServer;
 };
 
