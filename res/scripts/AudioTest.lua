@@ -13,11 +13,23 @@ local function InitializeActionMap()
     acmPlayer:CreateAction("VOLUME_DOWN", 1, EventInput.KEY_X)
 end
 
+self.AddVolume = function(icX)
+    if icX:IsPressed() then
+        audioserver.SetMasterVolume(1)
+    end
+end
+
+self.DownVolume = function(icW)
+    if icW:IsPressed() then
+        audioserver.SetMasterVolume(0)
+    end
+end
+
 local function BindActions()
     if audioserver then
-       acmPlayer:GetAction("VOLUME_UP").Event     = audioserver:SetMasterVolume(1.0) or
+       acmPlayer:GetAction("VOLUME_UP").Event     = self.AddVolume or
            function() print("PlayerBase: VOLUME_UP callback missing") end
-       acmPlayer:GetAction("VOLUME_DOWN").Event   = audioserver:SetMasterVolume(0.01) or
+       acmPlayer:GetAction("VOLUME_DOWN").Event   = self.DownVolume or
            function() print("PlayerBase: VOLUME_DOWN callback missing") end
     else
         print("PlayerBase: audioserver missing")
@@ -25,15 +37,13 @@ local function BindActions()
 end
 
 function OnInit()
+	print("audio init !");
+
 	--- Audio Server ---
 	music = audioserver.CreateChannel("Music");
 	sfx =  audioserver.CreateChannel("Sfx");
 
 	--- Mixer ---
-	--mixer = audioMixer:new()
-
-	--mixer.AddDelay(sfx, 0.3f, 0.4f, 0.3f);
-	--mixer:AddReverb(music, 0.85, 0.3);
 
 	-- Audio Emitter
     --audioEm  = nodeaudioemitter:new("nodeaudioemitter")
@@ -66,9 +76,6 @@ function OnInit()
 	-- ACTIONS
 	InitializeActionMap()
     BindActions()
-
-	audioserver.SetMasterVolume(1)
-	--mixer:Shutdown();
 end
 
 function OnUpdate(dt) end
