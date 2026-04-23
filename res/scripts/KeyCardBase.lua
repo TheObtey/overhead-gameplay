@@ -1,19 +1,31 @@
-local oPlayerBaseComponent
+---@type Node
+self = self
+
+local bIsPickedUp
 
 -- Recuperation de la KeyCard
-function self:Interaction()
-    print("Interacted with KeyCard")
-    if oPlayerBaseComponent ~= nil and oPlayerBaseComponent.bHasKeyCard == false then
-        oPlayerBaseComponent.bHasKeyCard = true
-        print("Player got keycard")
-        print(oPlayerBaseComponent.bHasKeyCard)
+function self:Interaction(pEmitter)
+    if pEmitter == nil then
+        return
     end
 
+    local oInventoryComponent = pEmitter:GetNode("components/InventoryComponent")
+
+    if oInventoryComponent == nil then
+        return
+    end
+
+    if bIsPickedUp then
+        return
+    end
+
+    oInventoryComponent:AddItem("KeyCard")
+    bIsPickedUp = true
 end
 
 
 function OnInit()
-    print(self:GetNode("/SceneRoot/Player"):GetName())
+    bIsPickedUp = false
 end
 
 function OnUpdate(dt)
