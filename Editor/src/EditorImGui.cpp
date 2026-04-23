@@ -756,7 +756,7 @@ void EditorImGui::SaveSceneNoSpecialisation()
 void EditorImGui::SelectedNode(Node* pNode)
 {
 	m_pSelectedNode = pNode;
-	m_pRaylibEditor->SetSelectedNode(pNode->GetName());
+	m_pRaylibEditor->SetSelectedNode(pNode);
 	if (pNode)
 	{
 		DEBUG("[EditorImGui] Selected: " << pNode->GetName() << std::endl);
@@ -936,7 +936,7 @@ void EditorImGui::NotifyNodeWillBeDeleted(Node* pNode)
 	if (m_pSelectedNode != nullptr && isInsideDeletedSubtree(m_pSelectedNode))
 	{
 		m_pSelectedNode = nullptr;
-		m_pRaylibEditor->SetSelectedNode("");
+		m_pRaylibEditor->SetSelectedNode(nullptr);
 	}
 
 	if (m_pViewRoot != nullptr && isInsideDeletedSubtree(m_pViewRoot))
