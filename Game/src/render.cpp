@@ -133,7 +133,7 @@ int main()
     Image image2(10, 1, 100, 100, ui);
     Image image3(1, 10, 100, 100, ui);
 
-    sptr<FontFace> roboto = std::make_shared<FTFontFace>("res/fonts/Roboto-Medium.ttf", 50);
+    sptr<FontFace> roboto = std::make_shared<FTFontFace>("res/fonts/FuzzyBubbles-Bold.ttf", 50);
     Text text("The Quick Brown fox jumps over the lazy dog", roboto); 
     text.x = 20;
     text.y = 399;
