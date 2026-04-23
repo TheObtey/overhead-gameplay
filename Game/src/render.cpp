@@ -39,7 +39,7 @@ int main()
     sptr<Texture> diffuse   = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
     sptr<Texture> specular  = std::make_shared<Texture>("res/textures/defaultSpecular.png", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     sptr<Texture> normal    = std::make_shared<Texture>("res/textures/defaultNormal.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
-    FTFontFace fontFace("res/fonts/Roboto-Medium.ttf");
+    FTFontFace fontFace("res/fonts/Roboto-Medium.ttf", 50);
 
     sptr<Texture> ui        = std::make_shared<Texture>("res/textures/bib.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
 
@@ -133,14 +133,22 @@ int main()
     Image image2(10, 1, 100, 100, ui);
     Image image3(1, 10, 100, 100, ui);
 
-    sptr<FontFace> roboto = std::make_shared<FTFontFace>("res/fonts/Roboto-Medium.ttf");
-    roboto->SetSize(80, 20);
+    sptr<FontFace> roboto = std::make_shared<FTFontFace>("res/fonts/Roboto-Medium.ttf", 50);
     Text text("The Quick Brown fox jumps over the lazy dog", roboto); 
     text.x = 20;
     text.y = 399;
     text.width = 50;
     text.height = 50;
-    text.scale = 2;
+    text.scale = 1.0f;
+
+    sptr<FontFace> roboto2 = std::make_shared<FTFontFace>("res/fonts/Roboto-Medium.ttf", 18);
+    Text text2("Petit text", roboto2);
+    text2.x = 200;
+    text2.y = 500;
+    text2.width = 50;
+    text2.height = 50;
+    text2.scale = 1.0f;
+    text2.color = Color{0.0f, 1.0f, 0.0f, 1.0f};
 
     while (window.IsOpen())
     {
@@ -161,6 +169,7 @@ int main()
         //uiPass.AddUIElement(image1);
         //uiPass.AddUIElement(image2);
         //uiPass.AddUIElement(image3);
+        uiPass.AddUIElement(text2);
         uiPass.AddUIElement(text);
         viewport.Present();
         window.Present();

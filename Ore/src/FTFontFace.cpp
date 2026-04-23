@@ -11,7 +11,7 @@ namespace Ore
 	FT_Library FTFontFace::s_ftLibrary;
 	int32 FTFontFace::s_refcount = 0;
 
-	FTFontFace::FTFontFace(std::filesystem::path const& path)
+	FTFontFace::FTFontFace(std::filesystem::path const& path, uint32 size)
 	{
 		if (s_refcount == 0 && FT_Init_FreeType(&s_ftLibrary))
 		{
@@ -27,7 +27,7 @@ namespace Ore
 			return;
 		}
 
-		FTFontFace::SetSize(0, 40);
+		FTFontFace::SetSize(0, size);
 		FTFontFace::LoadChars();
 		Logger::LogWithLevel(LogLevel::DEBUG, "Created font atlas for : ", path);
 	}
@@ -115,7 +115,7 @@ namespace Ore
 				static_cast<uint32>(m_face->glyph->advance.x >> 6)
 			};
 
-			advanceX += m_face->glyph->advance.x >> 6;  // bitshift by 6 to get value in pixels (2^6 = 64)
+			advanceX += (m_face->glyph->advance.x >> 6) + 1;  // bitshift by 6 to get value in pixels (2^6 = 64)
 			m_loadedCharacters[c] = character;
 		}
 		FT_Done_Face(m_face);

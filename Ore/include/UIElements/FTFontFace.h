@@ -12,7 +12,7 @@ namespace Ore
 	class FTFontFace : public FontFace
 	{
 	public:
-		FTFontFace(std::filesystem::path const& path);
+		FTFontFace(std::filesystem::path const& path, uint32 size);
 		FTFontFace(FTFontFace const& other);
 		FTFontFace(FTFontFace&& other) noexcept;
 		~FTFontFace() override;
