@@ -106,16 +106,16 @@ namespace Ore
 			);
 			maxGlyphHeightRow = std::max(glyphHeight, maxGlyphHeightRow);
 			// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-			advanceX += m_face->glyph->advance.x >> 6;  // bitshift by 6 to get value in pixels (2^6 = 64)
 
 			Character character = {
-				m_bitmap,
+	 			m_bitmap,
 				{advanceX / static_cast<float>(BitmapSize), advanceY / static_cast<float>(BitmapSize)},
 				{ glyphWidth, glyphHeight},
 				{m_face->glyph->bitmap_left, m_face->glyph->bitmap_top},
 				static_cast<uint32>(m_face->glyph->advance.x >> 6)
 			};
 
+			advanceX += m_face->glyph->advance.x >> 6;  // bitshift by 6 to get value in pixels (2^6 = 64)
 			m_loadedCharacters[c] = character;
 		}
 		FT_Done_Face(m_face);

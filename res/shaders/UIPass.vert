@@ -5,6 +5,7 @@ layout (location = 2) in vec2 aTexCoords;
 
 out vec2 uv; 
 flat out int id;
+flat out int instanceId;
 
 uniform vec2 resolution;
 
@@ -25,6 +26,7 @@ void main()
 
     uv = uvPos[gl_InstanceID][gl_VertexID];
     id = textureId[gl_InstanceID];
+    instanceId = gl_InstanceID;
 
     gl_Position = vec4(normalizedPos, 0.0, 1.0);
 }

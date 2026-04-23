@@ -137,9 +137,10 @@ int main()
     roboto->SetSize(80, 20);
     Text text("The Quick Brown fox jumps over the lazy dog", roboto); 
     text.x = 20;
-    text.y = 20;
+    text.y = 399;
     text.width = 50;
     text.height = 50;
+    text.scale = 2;
 
     while (window.IsOpen())
     {

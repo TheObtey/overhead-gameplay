@@ -29,14 +29,14 @@ public:
             Character const& character = m_pFontFace->GetCharacter(c);
 
             glm::vec2 uvs[4] = {
-             {character.uvPos.x, character.uvPos.y},
+             {character.uvPos.x, character.uvPos.y + character.charSize.y / 1024.0f},
+             {character.uvPos.x + character.charSize.x / 1024.0f, character.uvPos.y + character.charSize.y / 1024.0f},
              {character.uvPos.x + character.charSize.x / 1024.0f, character.uvPos.y},
-             {character.uvPos.x + character.charSize.x, character.uvPos.y + character.charSize.y},
-             {character.uvPos.x, character.uvPos.y + character.charSize.y},
+             {character.uvPos.x, character.uvPos.y},
             };
 
-            glm::vec2 pos = {x + character.charBearing.x + currentOffset , y - (character.charSize.y - character.charBearing.y)};
-            currentOffset += character.advance;
+            glm::vec2 pos = {x + character.charBearing.x * scale + currentOffset , y - character.charBearing.y  * scale};
+            currentOffset += character.advance * scale;
             //size
             //texture
 
@@ -46,8 +46,10 @@ public:
             program.SetUniform("uvPos["+strIndex+"][3]", uvs[3]);
 
             program.SetUniform("offsets["+strIndex+"]", pos);
-            program.SetUniform("sizes["+strIndex+"]", glm::vec2(character.charSize.x, character.charSize.y));
+            program.SetUniform("sizes["+strIndex+"]", glm::vec2(character.charSize.x, character.charSize.y) * scale);
             program.SetUniform("textureId["+strIndex+"]", textureIndex);
+            program.SetUniform("isText["+strIndex+"]", true);
+            program.SetUniform("tint["+strIndex+"]", color);
 
             index++;
         }

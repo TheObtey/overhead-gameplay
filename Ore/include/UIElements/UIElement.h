@@ -28,6 +28,8 @@ struct UIElement
     uint32 height = 10;
     uint32 x = 0;
     uint32 y = 0;
+    float scale = 1;
+    Color color = Color::SKY_BLUE;
 
     sptr<Texture> pTexture;
 };
