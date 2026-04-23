@@ -32,8 +32,10 @@ public:
 	void UpdateWorld() { m_pNode2D->UpdateWorld(); }
 
 	void SetWorldScale(glm::vec3 const& _scale) { m_pNode2D->SetWorldScale(_scale); }
+	void SetWorldScale(float const _scaleX, float const _scaleY, float const _scaleZ) { m_pNode2D->SetWorldScale({ _scaleX, _scaleY, _scaleZ }); }
 	void SetWorldRotationAngle(float const _rot) { m_pNode2D->SetWorldRotationAngle(_rot); }
 	void SetWorldPosition(glm::vec3 const& _pos) { m_pNode2D->SetWorldPosition(_pos); }
+	void SetWorldPosition(float const _posX, float const _posY, float const _posZ) { m_pNode2D->SetWorldPosition({ _posX, _posY, _posZ }); }
 
 private:
 	Node2D* m_pNode2D;
@@ -65,7 +67,10 @@ BindProxy(Node2D::Proxy,
 		"SetStatism", BIND(SetStatism),
 		"IsStatic", BIND(IsStatic),
 
-		"SetWorldScale", BIND(SetWorldScale),
+		"SetWorldScale", OVERLOAD(Proxy, void, glm::vec3 const&)(BIND(SetWorldScale)),
+		"SetWorldScale", OVERLOAD(Proxy, void, float, float, float)(BIND(SetWorldScale)),
 		"SetWorldRotationAngle", BIND(SetWorldRotationAngle),
-		"SetWorldPosition", BIND(SetWorldPosition));
+		"SetWorldPosition", OVERLOAD(Proxy, void, glm::vec3 const&)(BIND(SetWorldPosition)),
+		"SetWorldPosition", OVERLOAD(Proxy, void, float, float, float)(BIND(SetWorldPosition))
+	);
 );

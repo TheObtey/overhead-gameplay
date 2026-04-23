@@ -48,21 +48,29 @@ public:
 	// =========== Setters ===========
 
 	void SetLocalPosition(glm::vec3 const pos)						{ m_pNode->SetLocalPosition(pos); }
+	void SetLocalPosition(float posX,float posY,float posZ)			{ m_pNode->SetLocalPosition({posX,posY,posZ}); }
 	void SetLocalX(float const x)									{ m_pNode->SetLocalX(x); }
 	void SetLocalY(float const y)									{ m_pNode->SetLocalY(y); }
 	void SetLocalZ(float const z)									{ m_pNode->SetLocalZ(z); }
 
 	void SetLocalRotationDeg(glm::vec3 const& rotation)				{ m_pNode->SetLocalRotationDeg(rotation); }
+	void SetLocalRotationDeg(float rotationX, float rotationY, float rotationZ) { m_pNode->SetLocalRotationDeg({ rotationX, rotationY, rotationZ }); }
 	void SetLocalRotationRad(glm::vec3 const& rotation)				{ m_pNode->SetLocalRotationRad(rotation); }
+	void SetLocalRotationRad(float rotationX, float rotationY, float rotationZ) { m_pNode->SetLocalPosition({ rotationX, rotationY, rotationZ }); }
+
 	// { w, x, y, z }
 	void SetLocalRotationQuat(glm::quat rot)						{ m_pNode->SetLocalRotationQuat(rot); }
 
 	void SetScale(glm::vec3 const scale)							{ m_pNode->SetScale(scale); }
+	void SetScale(float scaleX, float scaleY, float scaleZ)			{ m_pNode->SetScale({scaleX, scaleY, scaleZ }); }
 
 	void SetWorldPosition(glm::vec3 const& worldPos)				{ m_pNode->SetWorldPosition(worldPos); }
+	void SetWorldPosition(float worldPosX, float worldPosY, float worldPosZ) { m_pNode->SetWorldPosition({ worldPosX, worldPosY, worldPosZ }); }
 	void SetWorldScale(glm::vec3 const& worldScale)					{ m_pNode->SetWorldScale(worldScale); }
+	void SetWorldScale(float worldScaleX, float worldScaleY, float worldScaleZ)	{ m_pNode->SetWorldScale({ worldScaleX, worldScaleY, worldScaleZ }); }
 	// -- Angles in Degrees
 	void SetWorldRotation(glm::vec3 const& worldRot)				{ m_pNode->SetWorldRotation(worldRot); }
+	void SetWorldRotation(float worldRotX, float worldRotY, float worldRotZ) { m_pNode->SetWorldRotation({ worldRotX, worldRotY, worldRotZ }); }
 	// { w, x, y, z }
 	// -- Angles in Radians
 	void SetWorldRotationQuaternion(glm::quat const& worldRotQuat)	{ m_pNode->SetWorldRotationQuaternion(worldRotQuat); }
@@ -70,12 +78,15 @@ public:
 	// =========== Adders ===========
 
 	void AddScale(glm::vec3 const scale)							{ m_pNode->AddScale(scale); }
+	void AddScale(float scaleX,float scaleY,float scaleZ)			{ m_pNode->AddScale({ scaleX, scaleY, scaleZ }); }
 	void AddLocalPosition(glm::vec3 const pos)						{ m_pNode->AddLocalPosition(pos); }
+	void AddLocalPosition(float posX,float posY,float posZ)			{ m_pNode->AddLocalPosition({ posX, posY, posZ }); }
 	void AddLocalX(float const x)									{ m_pNode->AddLocalX(x); }
 	void AddLocalY(float const y)									{ m_pNode->AddLocalY(y); }
 	void AddLocalZ(float const z)									{ m_pNode->AddLocalZ(z); }
 	// -- Angles in Radians
 	void AddLocalRotation(glm::vec3 const rot)						{ m_pNode->AddLocalRotation(rot); }
+	void AddLocalRotation(float rotX, float rotY, float rotZ)		{ m_pNode->AddLocalRotation({ rotX, rotY, rotZ }); }
 	// -- Angles in Radians
 	void AddLocalYaw(float const yaw)								{ m_pNode->AddLocalYaw(yaw); }
 	// -- Angles in Radians
@@ -119,25 +130,35 @@ struct Node3D::Proxy::ProxyBinding
 			"GetWorldScale", BIND(GetWorldScale),
 			"GetWorldRotation", BIND(GetWorldRotation),
 			"GetWorldRotationQuaternion", BIND(GetWorldRotationQuaternion),
-			"SetLocalPosition", BIND(SetLocalPosition),
+			"SetLocalPosition", OVERLOAD(Node3D::Proxy, void, const glm::vec3)		(BIND(SetLocalPosition)),
+			"SetLocalPosition", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(SetLocalPosition)),
 			"SetLocalX", BIND(SetLocalX),
 			"SetLocalY", BIND(SetLocalY),
 			"SetLocalZ", BIND(SetLocalZ),
-			"SetLocalRotationDeg", BIND(SetLocalRotationDeg),
-			"SetLocalRotationRad", BIND(SetLocalRotationRad),
+			"SetLocalRotationDeg", OVERLOAD(Node3D::Proxy, void, glm::vec3 const&)		(BIND(SetLocalRotationDeg)),
+			"SetLocalRotationDeg", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(SetLocalRotationDeg)),
+			"SetLocalRotationRad", OVERLOAD(Node3D::Proxy, void, glm::vec3 const&)		(BIND(SetLocalRotationRad)),
+			"SetLocalRotationRad", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(SetLocalRotationRad)),
 			"SetLocalRotationQuat", BIND(SetLocalRotationQuat),
-			"SetScale", BIND(SetScale),
-			"SetWorldPosition", BIND(SetWorldPosition),
-			"SetWorldScale", BIND(SetWorldScale),
-			"SetWorldRotation", BIND(SetWorldRotation),
+			"SetScale", OVERLOAD(Node3D::Proxy, void, glm::vec3 const)		(BIND(SetScale)),
+			"SetScale", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(SetScale)),
+			"SetWorldPosition", OVERLOAD(Node3D::Proxy, void, glm::vec3 const&)		(BIND(SetWorldPosition)),
+			"SetWorldPosition", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(SetWorldPosition)),
+			"SetWorldScale", OVERLOAD(Node3D::Proxy, void, glm::vec3 const&)		(BIND(SetWorldScale)),
+			"SetWorldScale", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(SetWorldScale)),
+			"SetWorldRotation", OVERLOAD(Node3D::Proxy, void, glm::vec3 const&)		(BIND(SetWorldRotation)),
+			"SetWorldRotation", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(SetWorldRotation)),
 			"SetWorldRotationQuaternion", BIND(SetWorldRotationQuaternion),
 
-			"AddScale", BIND(AddScale),
-			"AddLocalPosition", BIND(AddLocalPosition),
+			"AddScale", OVERLOAD(Node3D::Proxy, void, glm::vec3 const)		(BIND(AddScale)),
+			"AddScale", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(AddScale)),
+			"AddLocalPosition", OVERLOAD(Node3D::Proxy, void, glm::vec3 const)		(BIND(AddLocalPosition)),
+			"AddLocalPosition", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(AddLocalPosition)),
 			"AddLocalX", BIND(AddLocalX),
 			"AddLocalY", BIND(AddLocalY),
 			"AddLocalZ", BIND(AddLocalZ),
-			"AddLocalRotation", BIND(AddLocalRotation),
+			"AddLocalRotation", OVERLOAD(Node3D::Proxy, void, glm::vec3 const)		(BIND(AddLocalRotation)),
+			"AddLocalRotation", OVERLOAD(Node3D::Proxy, void, float, float, float)		(BIND(AddLocalRotation)),
 			"AddLocalYaw", BIND(AddLocalYaw),
 			"AddLocalPitch", BIND(AddLocalPitch),
 			"AddLocalRoll", BIND(AddLocalRoll)
