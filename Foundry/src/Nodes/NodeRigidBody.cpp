@@ -50,14 +50,17 @@ void NodeRigidBody::SetNode3DParent(Node3D* owner)
 
 	PhysicsServer::CreateRigidBody(*this);
 }
+
 void NodeRigidBody::OnUpdate(double delta)
 {
-	Node::OnUpdate(delta);
+	Node3D::OnUpdate(delta);
 	if (m_rigidBodyCreated == false) return;
+	if (m_pRigidBodyRP3D->isActive() == false) return;
 
 	Node3D* parent = static_cast<Node3D*>(m_pNode3DParent);
+	if (parent == nullptr) return;
 
-	if (m_pRigidBodyRP3D->getType() == rp3d::BodyType::DYNAMIC)
+	if (m_pRigidBodyRP3D->getType() == rp3d::BodyType::DYNAMIC && !parent->IsPrioOverRigidBody())
 	{
 		auto& pos = m_pRigidBodyRP3D->getTransform().getPosition();
 		auto& rot = m_pRigidBodyRP3D->getTransform().getOrientation();
@@ -66,12 +69,21 @@ void NodeRigidBody::OnUpdate(double delta)
 	}
 	else
 	{
-		auto pos = parent->GetWorldPosition();
-		auto& rot = parent->GetWorldRotationQuaternion();
+		auto pos = GetWorldPosition();
+		auto& rot = GetWorldRotationQuaternion();
 		rp3d::Transform t;
 		t.setPosition({ pos.x,pos.y,pos.z });
 		t.setOrientation({ rot.x, rot.y, rot.z, rot.w });
 		m_pRigidBodyRP3D->setTransform(t);
+		if (test == false)
+		{
+			test = true;
+		}
+		else if (test)
+		{
+			test = false;
+		}
+			SetIsPrioOverRigidBody(false);
 		return;
 	}
 }
@@ -183,8 +195,8 @@ void NodeRigidBody::Deserialize(SerializedObject const& datas)
 	datas.GetPublicElement("LockAngularX", &lockAngularX);
 	datas.GetPublicElement("LockAngularY", &lockAngularY);
 	datas.GetPublicElement("LockAngularZ", &lockAngularZ);
-	
-	if (m_rigidBodyCreated == false){
+
+	if (m_rigidBodyCreated == false) {
 		CreateRigidBody();
 		PhysicsServer::FlushCommands();
 	}

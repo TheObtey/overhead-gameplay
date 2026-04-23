@@ -70,20 +70,19 @@ public:
 
 	// =========== Setters ===========
 
-	void SetLocalPosition(glm::vec3 const pos)		{ m_transform.SetPosition(glm::vec4(pos, 1.0f)); }
-	void SetLocalX(float const x)					{ m_transform.SetX(x); }
-	void SetLocalY(float const y)					{ m_transform.SetY(y); }
-	void SetLocalZ(float const z)					{ m_transform.SetZ(z); }
+	void SetLocalPosition(glm::vec3 const pos)		{ m_Node3DOverrideRigidBody = true; m_transform.SetPosition(glm::vec4(pos, 1.0f)); }
+	void SetLocalX(float const x)					{ m_Node3DOverrideRigidBody = true; m_transform.SetX(x); }
+	void SetLocalY(float const y)					{ m_Node3DOverrideRigidBody = true; m_transform.SetY(y); }
+	void SetLocalZ(float const z)					{ m_Node3DOverrideRigidBody = true; m_transform.SetZ(z); }
 
-	void SetLocalRotationDeg(float x, float y, float z)				{ m_transform.SetRotationDeg(x, y, z); }
-	void SetLocalRotationDeg(glm::vec3 const& rotation)				{ m_transform.SetRotationDeg(rotation.x, rotation.y, rotation.z); }
-	void SetLocalRotationRad(float pitch, float yaw, float roll)	{ m_transform.SetRotationRad(pitch, yaw, roll); }
-	void SetLocalRotationRad(glm::vec3 const& rotation)				{ m_transform.SetRotationRad(rotation.x, rotation.y, rotation.z); }
+	void SetLocalRotationDeg(float x, float y, float z)				{ m_Node3DOverrideRigidBody = true; m_transform.SetRotationDeg(x, y, z); }
+	void SetLocalRotationDeg(glm::vec3 const& rotation)				{ m_Node3DOverrideRigidBody = true; m_transform.SetRotationDeg(rotation.x, rotation.y, rotation.z); }
+	void SetLocalRotationRad(float pitch, float yaw, float roll)	{ m_Node3DOverrideRigidBody = true; m_transform.SetRotationRad(pitch, yaw, roll); }
+	void SetLocalRotationRad(glm::vec3 const& rotation)				{ m_Node3DOverrideRigidBody = true; m_transform.SetRotationRad(rotation.x, rotation.y, rotation.z); }
 	// { w, x, y, z }
-	void SetLocalRotationQuat(glm::quat rot)						{ m_transform.SetRotationQuat(rot); }
+	void SetLocalRotationQuat(glm::quat rot)						{ m_Node3DOverrideRigidBody = true; m_transform.SetRotationQuat(rot); }
 
-	void SetScale(glm::vec3 const scale)			{ m_transform.SetScale(glm::vec4(scale, 1.0f)); }
-
+	void SetScale(glm::vec3 const scale)			{ m_Node3DOverrideRigidBody = true; m_transform.SetScale(glm::vec4(scale, 1.0f)); }
 	void SetWorldPosition(glm::vec3 const& worldPos);
 	void SetWorldScale(glm::vec3 const& worldScale);
 	// -- Angles in Degrees
@@ -94,21 +93,23 @@ public:
 
 	// =========== Adders ===========
 
-	void AddScale(glm::vec3 const scale)			{ m_transform.AddScale(glm::vec4(scale, 1.0f)); }
-	void AddLocalPosition(glm::vec3 const pos)		{ m_transform.AddPosition(glm::vec4(pos, 1.0f)); }
-	void AddLocalX(float const x)					{ m_transform.AddX(x); }
-	void AddLocalY(float const y)					{ m_transform.AddY(y); }
-	void AddLocalZ(float const z)					{ m_transform.AddZ(z); }
+	void AddScale(glm::vec3 const scale)			{ m_Node3DOverrideRigidBody = true; m_transform.AddScale(glm::vec4(scale, 1.0f)); }
+	void AddLocalPosition(glm::vec3 const pos)		{ m_Node3DOverrideRigidBody = true; m_transform.AddPosition(glm::vec4(pos, 1.0f)); }
+	void AddLocalX(float const x)					{ m_Node3DOverrideRigidBody = true; m_transform.AddX(x); }
+	void AddLocalY(float const y)					{ m_Node3DOverrideRigidBody = true; m_transform.AddY(y); }
+	void AddLocalZ(float const z)					{ m_Node3DOverrideRigidBody = true; m_transform.AddZ(z); }
 	// -- Angles in Radians							
-	void AddLocalRotation(glm::vec3 const rot)		{ m_transform.AddRotation(glm::vec4(rot, 1.0f)); }
+	void AddLocalRotation(glm::vec3 const rot)		{ m_Node3DOverrideRigidBody = true; m_transform.AddRotation(glm::vec4(rot, 1.0f)); }
 	// -- Angles in Radians							
-	void AddLocalYaw(float const yaw)				{ m_transform.AddYaw(yaw); }
+	void AddLocalYaw(float const yaw)				{ m_Node3DOverrideRigidBody = true; m_transform.AddYaw(yaw); }
 	// -- Angles in Radians							
-	void AddLocalPitch(float const pitch)			{ m_transform.AddPitch(pitch); }
+	void AddLocalPitch(float const pitch)			{ m_Node3DOverrideRigidBody = true; m_transform.AddPitch(pitch); }
 	// -- Angles in Radians							
-	void AddLocalRoll(float const roll)				{ m_transform.AddRoll(roll); }
+	void AddLocalRoll(float const roll)				{ m_Node3DOverrideRigidBody = true; m_transform.AddRoll(roll); }
 	uptr<Node> Clone() override;
 
+	bool IsPrioOverRigidBody() const { return m_Node3DOverrideRigidBody; }
+	void SetIsPrioOverRigidBody(bool value) { m_Node3DOverrideRigidBody = value; }
 private:
 	void CheckParentTransform();
 	void UpdateWorldTransform();
@@ -129,6 +130,9 @@ protected:
 	bool m_isParentNode3D = false;
 	bool m_worldDirty : 1 = true;
 	bool m_localDirty : 1 = true;
+	bool m_Node3DOverrideRigidBody = true;
+	glm::vec3 m_prevWorldPosition{ 0.0f };
+	bool m_keepWorldTransformOnReparent = false;
 };
 
 REGISTER_ISERIALIZABLE(Node3D, Node3D::CreateInstance);

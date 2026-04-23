@@ -67,6 +67,8 @@ public:
 	Node* GetSelectedNode() { return m_pSelectedNode; }
 	Node* GetSceneRoot() { return m_pSceneRoot; }
 
+	void ShowLoadPopup() { m_showLoadPopup = true; }
+
 private:
 	void DrawMenuBar();
 	void DrawHierarchyPanel();
