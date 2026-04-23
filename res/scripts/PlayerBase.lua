@@ -5,7 +5,7 @@ local oCamera
 local oMovementComponent
 local oLookComponent
 local oInteractEmitterComponent
-local bHasKeyCard
+local oInventoryComponent
 
 local function InitializeRigidbody(iBodyType, iMass, bGravityEnabled, tAngularAxisLock, iLinearDamping, iAngularDamping)
     self:SetBodyType(iBodyType or 2)
@@ -64,14 +64,13 @@ function OnInit()
 
     InitializeRigidbody()
 
-    bHasKeyCard = false
-
     oCameraRoot = self:GetNode("CameraRoot")
     oCamera = self:GetNode("CameraRoot/Camera")
     oMovementComponent = self:GetNode("components/MovementComponent")
-    
+    oInventoryComponent = self:GetNode("components/InventoryComponent")
+
     if oMovementComponent ~= nil then
-        oMovementComponent:Setup(self)
+        oMovementComponent:Setup(self, 300)
     end
 
     oLookComponent = self:GetNode("components/LookComponent")
@@ -84,6 +83,10 @@ function OnInit()
 
     if oInteractEmitterComponent ~= nil then
         oInteractEmitterComponent:Setup(self, 1.5)
+    end
+
+    if oInventoryComponent ~= nil then
+        oInventoryComponent:Setup(self)
     end
 
     InitializeActionMap()
