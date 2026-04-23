@@ -62,8 +62,7 @@ UIPass::UIPass(Program& program, Camera* pcamera) : Pass(program, pcamera)
 void UIPass::Execute()
 {
     if (m_pCamera == nullptr) return;
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
     m_program.Use();

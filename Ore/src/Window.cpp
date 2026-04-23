@@ -84,6 +84,8 @@ void Window::Open()
 	Logger::LogWithLevel(LogLevel::WARNING,  "Renderer : ", glGetString(GL_RENDERER));
 
     glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #ifdef DEBUG_BUILD
 	glfwSetWindowTitle(m_pWindow, reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     glEnable(GL_DEBUG_OUTPUT);

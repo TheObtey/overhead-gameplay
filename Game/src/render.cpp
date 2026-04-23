@@ -39,15 +39,14 @@ int main()
     sptr<Texture> diffuse   = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
     sptr<Texture> specular  = std::make_shared<Texture>("res/textures/defaultSpecular.png", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
     sptr<Texture> normal    = std::make_shared<Texture>("res/textures/defaultNormal.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
-    FTFontFace fontFace("res/fonts/Roboto-Medium.ttf", 50);
-
     sptr<Texture> ui        = std::make_shared<Texture>("res/textures/bib.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
+    sptr<Texture> opacity   = std::make_shared<Texture>("res/textures/opacity.png", TextureType::TYPE_2D, TextureMaterialType::OPACITY);
 
-    sptr<Texture> font = std::make_shared<Texture>(fontFace.GetTextureObject(), TextureMaterialType::DIFFUSE);
     std::vector<sptr<Texture>> textures;
-    textures.push_back(font);
+    textures.push_back(diffuse);
     textures.push_back(specular);
     textures.push_back(normal);
+    textures.push_back(opacity);
 
     Mesh mesh(cube, textures, glm::scale(glm::mat4(1.0f), glm::vec3(1.f)));
     Mesh mesh1(cube, textures, glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
@@ -116,7 +115,15 @@ int main()
     UIProgram.Load();
 
     uiFrag.Unload();
-    uiVert.Unload();  
+    uiVert.Unload();
+
+    sptr<FontFace> font = std::make_shared<FTFontFace>("res/fonts/FuzzyBubbles-Bold.ttf", 20);
+    Text text("Bonjour le monde !", font);
+    text.color = Color::SKY_BLUE;
+    text.x = 200;
+    text.y = 300;
+    text.width = 20;
+    text.height = 20;
 
 
     GeometryPass geoPass(geometryProgram, camera.get());
@@ -127,28 +134,8 @@ int main()
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
     viewport.AddPass(&uiPass);
-
-    //Image image(10, 100, 1000, 1000, diffuse);
-    Image image1(0, 0, 100, 100, diffuse);
-    Image image2(10, 1, 100, 100, ui);
-    Image image3(1, 10, 100, 100, ui);
-
-    sptr<FontFace> roboto = std::make_shared<FTFontFace>("res/fonts/FuzzyBubbles-Bold.ttf", 50);
-    Text text("The Quick Brown fox jumps over the lazy dog", roboto); 
-    text.x = 20;
-    text.y = 399;
-    text.width = 50;
-    text.height = 50;
-    text.scale = 1.0f;
-
-    sptr<FontFace> roboto2 = std::make_shared<FTFontFace>("res/fonts/Roboto-Medium.ttf", 18);
-    Text text2("Petit text", roboto2);
-    text2.x = 200;
-    text2.y = 500;
-    text2.width = 50;
-    text2.height = 50;
-    text2.scale = 1.0f;
-    text2.color = Color{0.0f, 1.0f, 0.0f, 1.0f};
+    float fact = 1.0f;
+    float inf = 0.0f;
 
     while (window.IsOpen())
     {
@@ -169,7 +156,6 @@ int main()
         //uiPass.AddUIElement(image1);
         //uiPass.AddUIElement(image2);
         //uiPass.AddUIElement(image3);
-        uiPass.AddUIElement(text2);
         uiPass.AddUIElement(text);
         viewport.Present();
         window.Present();

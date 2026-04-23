@@ -13,8 +13,6 @@ void main()
 {
     if (isText[id] == true)
         fragColor = tint[id] * vec4(1.0f, 1.0f, 1.0f, texture(textures[id], uv).r);
-
-    //fragColor = tint * vec4(1.0f, 1.0f, 1.0f, texture(textures[id], uv).r);
     else
         fragColor = tint[id] * texture(textures[id], uv);
 }
