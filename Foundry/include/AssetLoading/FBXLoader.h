@@ -47,12 +47,9 @@ private:
 	static void LoadDefaultsTextures(SceneMesh& mesh);
 
 	static std::string NormalizeTexturePath(std::string const& path);
-	static sptr<Ore::Texture> GetSharedTexture(std::string const& path, Ore::TextureMaterialType materialType);
 private:
 	static uint8 m_sTexTypes[];
 	inline static std::vector<sptr<Ore::Texture>> m_defaultTextures = {};
-	inline static std::unordered_map<std::string, std::weak_ptr<Ore::Texture>> m_textureCache = {};
-
 };
 
 

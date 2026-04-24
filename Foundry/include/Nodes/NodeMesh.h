@@ -48,6 +48,7 @@ public:
     void SetFbxPath(std::filesystem::path const &fbxPath);
     void SetFromEditorSceneMesh(EditorSceneMeshData const & sceneMesh, std::filesystem::path const& fbxPath);
     void SetFromSceneMesh(SceneMesh const & sceneMesh, std::filesystem::path const& fbxPath);
+    void SetTexturesPaths(SceneMesh const& sceneMesh);
     MeshGeometrySourceType GetGeometrySourceType() const { return m_geometrySourceType; }
     PrimitivesType GetPrimitiveType() const { return m_primitiveType; }
     std::filesystem::path const &GetFbxPath() const { return m_fbxPath; }

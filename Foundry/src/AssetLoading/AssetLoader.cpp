@@ -38,13 +38,8 @@ uptr<Node> AssetLoader::LoadChild(SceneData const& scene, SceneNode& selfNode)
 	switch (node.type)
 	{
 	case MESH:
-		if (scene.allMesh[node.MeshIndex]->bonesOffest.size() != 0)
-			pNode = Node::CreateNode<NodeMesh>("NewNode"); // Animated
-		else
-		{
-			pNode = Node::CreateNode<NodeMesh>("NewNode");
-			dynamic_cast<NodeMesh*>(pNode.get())->SetFromSceneMesh(*scene.allMesh[node.MeshIndex],scene.path);
-		}
+		pNode = Node::CreateNode<NodeMesh>("NewNode");
+		dynamic_cast<NodeMesh*>(pNode.get())->SetFromSceneMesh(*scene.allMesh[node.MeshIndex],scene.path);
 		break;
 	case GLOBAL:
 		pNode = Node::CreateNode<Node3D>("NewNode");
@@ -72,3 +67,12 @@ uptr<Node> AssetLoader::CreateNodesFromScene(SceneData const& scene)
 	return std::move(LoadChild(scene, *scene.rootNode));
 }
 
+sptr<Ore::Texture> AssetLoader::GetSharedTexture(std::string const& path, Ore::TextureMaterialType materialType)
+{
+	if (m_textureCache.contains(path))
+		return m_textureCache[path];
+
+	sptr<Ore::Texture> created = std::make_shared<Ore::Texture>(path, Ore::TextureType::TYPE_2D, materialType);
+	m_textureCache[path] = created;
+	return created;
+}

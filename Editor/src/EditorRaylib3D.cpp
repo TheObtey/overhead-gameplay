@@ -520,16 +520,16 @@ void EditorRaylib3D::Instanciate3DMesh(Node *pNodeMesh3D)
 
 		Mesh m_mesh = BuildRaylibMesh(scene->meshes[pNodeMesh->GetMeshID()].geometry);
 
-		DrawableSubMesh subMesh;
-		subMesh.mesh = std::make_unique<Mesh>(m_mesh);
-		subMesh.localMatrix = GlmToMatrix(scene->meshes[pNodeMesh->GetMeshID()].meshMatrix);
+		DrawableSubMesh drawableMesh;
+		drawableMesh.mesh = std::make_unique<Mesh>(m_mesh);
+		drawableMesh.localMatrix = GlmToMatrix(scene->meshes[pNodeMesh->GetMeshID()].meshMatrix);
 
 		if (drawable.loadedFbxDiffusePath.empty() && !scene->meshes[pNodeMesh->GetMeshID()].textures.empty())
 		{
 			drawable.loadedFbxDiffusePath = scene->meshes[pNodeMesh->GetMeshID()].textures[0].path;
 		}
 
-		drawable.meshes.push_back(std::move(subMesh));
+		drawable.meshes.push_back(std::move(drawableMesh));
 
 		if (drawable.meshes.empty())
 		{
@@ -549,12 +549,7 @@ void EditorRaylib3D::Instanciate3DMesh(Node *pNodeMesh3D)
 	}
 	else
 	{
-		Matrix world = {};
-		Node3D *pNode3D = static_cast<Node3D *>(FindNode3DWorldMatrix(pNodeMesh3D, world));
-		if (pNode3D != nullptr)
-		{
-			drawable.worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
-		}
+		drawable.worldMatrix = GlmToMatrix(pNodeMesh->GetWorldMatrix());
 	}
 }
 
@@ -682,7 +677,7 @@ void EditorRaylib3D::DrawCameraFrustumWire(NodeCamera const &cameraNode)
 	cameraNode.Serialize(so);
 	nlohmann::json const &pub = so.GetJson()["PUBLIC_DATAS"];
 
-	float const fovDeg = ReadPublicFloat(pub, "FOV", 45.0f);
+	float const fovRad = ReadPublicFloat(pub, "FOV", 45.0f);
 	float const nearPlane = ReadPublicFloat(pub, "NearPlane", 0.1f);
 	float const farPlane = ReadPublicFloat(pub, "FarPlane", 100.0f);
 	float const aspect = ReadPublicFloat(pub, "AspectRatio", 16.0f / 9.0f);
@@ -694,7 +689,6 @@ void EditorRaylib3D::DrawCameraFrustumWire(NodeCamera const &cameraNode)
 	glm::vec3 const up = q * glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 const right = q * glm::vec3(1.0f, 0.0f, 0.0f);
 
-	float const fovRad = DEG2RAD * fovDeg;
 	float const nearH = tanf(fovRad * 0.5f) * nearPlane;
 	float const nearW = nearH * aspect;
 	float const farH = tanf(fovRad * 0.5f) * farPlane;
