@@ -1,7 +1,6 @@
 #ifndef ORE_TEXTURE_OBJECT__H_
 #define ORE_TEXTURE_OBJECT__H_
 
-#include "Define.h"
 #include "ITextureObject.h"
 
 #include <glad/glad.h>
@@ -31,7 +30,7 @@ public:
     void Bind() override;
 
     void GenerateTextureFromImage(DataType type, uint32& width, uint32& height, std::filesystem::path const& path = "");
-    void GenerateTexture(DataType type, uint32 const& width, uint32 const& height, uint32 rgbType);
+    void GenerateTexture(DataType type, uint32 const& width, uint32 const& height, uint32 rgbType, uint32 format = GL_RGBA);
     void AddParameters(uint32 parameter, uint32 value) override;
     void AttachToFrameBuffer(uint32 frameBuffer, uint32 attachment) override;
     void InitializeTextureView(uint32 origTexture, TextureType format, uint32 minLevels, uint32 numlevels, uint32 minLayer, uint32 numLayers);

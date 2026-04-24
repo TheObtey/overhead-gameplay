@@ -9,6 +9,7 @@ class Texture final : public ITexture
 {
 public:
     Texture(std::filesystem::path const& path, TextureType type, TextureMaterialType materialType);
+    Texture(TextureObject const& textureObject, TextureMaterialType const& materialType) {m_textureObject = textureObject, m_materialType = materialType;}
     ~Texture();
 
     void Load(std::filesystem::path const& path, Ore::TextureType type, TextureMaterialType materialType) override;
