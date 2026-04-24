@@ -132,7 +132,6 @@ protected:
 	bool m_localDirty : 1 = true;
 	bool m_Node3DOverrideRigidBody = true;
 	glm::vec3 m_prevWorldPosition{ 0.0f };
-	bool m_keepWorldTransformOnReparent = false;
 };
 
 REGISTER_ISERIALIZABLE(Node3D, Node3D::CreateInstance);

@@ -1,10 +1,21 @@
-local pEmitter
+local oPlayer
 local pRootNode
 local iMaxDistance
 local oCurrentEntity
 local oCompContainer
 local oGGunTargetComp
 local vecForward
+
+self.refHeldObject = nil
+
+self.bIsHoldingObject = 0
+
+self.SetHoldingObj = function(value)
+    self.bIsHoldingObject = value
+end
+self.GetHoldingObj = function()
+    return self.bIsHoldingObject
+end
 
 -- Set the current node in front of the player
 local function SetCurrentEntity(ndHit)
@@ -16,13 +27,13 @@ local function SetCurrentEntity(ndHit)
 end
 -- Do the raycast and analyze it
 local function CheckInteraction(origin, forward, distance)
-    pEmitter = pRootNode:FindChild("Player"):As(NodeTypes.NODE_RIGIDBODY)
-    if not pEmitter then print("No emitter found with name 'Player'") return end
-    vecForward = pEmitter:GetLocalForward()
+    if not oPlayer then print("No emitter found with name 'Player'") return else print("Emitter in CheckInteraction GGun OK") end
+    vecForward = oPlayer:GetLocalForward()
+    
     vecForward.z = vecForward.z * -1
-    vecForward.x = vecForward.x * pEmitter.gravity
-   
-    local oHit = physics.Raycast(origin or pEmitter.Pos, forward or vecForward, distance or iMaxDistance)
+    vecForward.x = vecForward.x * oPlayer.gravity
+    
+    local oHit = physics.Raycast(origin or oPlayer.Pos, forward or vecForward, distance or iMaxDistance)
     
     if not oHit then
         SetCurrentEntity(nil)
@@ -33,17 +44,24 @@ local function CheckInteraction(origin, forward, distance)
         SetCurrentEntity(nil)
         return
     end
-    local raycasted = oHit.node:As(NodeTypes.NODE_RIGIDBODY)
+    local raycasted = oHit.node
     vecForward = raycasted:GetLocalForward()
     vecForward.z = vecForward.z * -1
-   
-    
+
+    -- print("oCompContainer lookup...")
+    -- print("oHitNode = ".. tostring(oHit.node))
+    -- print("oHitNode name = ".. oHit.node:GetName())
     oCompContainer = oHit.node:FindChild("components")
-    if not oCompContainer then return end
+    if not oCompContainer then print("oCompContainer NOT FOUND ")return end
+    -- print("oCompContainer : " .. oCompContainer:GetName())
     oGGunTargetComp = oCompContainer:FindChild("GGunTargetComponent")
+
+    -- oCompContainer = oHit.node:FindChild("components")
+    -- oGGunTargetComp = oCompContainer:FindChild("GGunTargetComponent")
 
     if not oGGunTargetComp then
         SetCurrentEntity(oHit.node)
+        print("not oGGunTargetComp")
         return
     end
 
@@ -62,73 +80,76 @@ end
 local bUsingGGun = false
 self.Use = function(icInteract)
     if icInteract:IsPressed() then
-        -- local oPlayer = self:GetParent():GetParent():As(NodeTypes.NODE_RIGIDBODY)
         local oPlayer = pRootNode:FindChild("Player"):As(NodeTypes.NODE_RIGIDBODY)
         bUsingGGun = true
-        print("")
-        print("Problem name : " .. self:GetName())
-        print("Parent name : " .. self:GetParent():GetName())
-        if self:GetParent():GetParent() then
-            print("Parent-parent name : " .. self:GetParent():GetParent():GetName())
-            if self:GetParent():GetParent():GetParent() then
-                print("Parent-parent-parent name : " .. self:GetParent():GetParent():GetParent():GetName())
-                end
-        end
-        print("*******  STARTING Interaction  *******")
-
-        print("Player name : " .. oPlayer:GetName())
-        print("Player World pos : {" .. oPlayer:GetWorldPosition().x .. ", " .. oPlayer:GetWorldPosition().y .. ", " .. oPlayer:GetWorldPosition().z .. "}")
-        print("Player Local pos : {" .. oPlayer:GetPosition().x .. ", " .. oPlayer:GetPosition().y .. ", " .. oPlayer:GetPosition().z .. "}")
-        print("Player pos TEST : {" .. oPlayer.Pos.x .. ", " .. oPlayer.Pos.y .. ", " .. oPlayer.Pos.z .. "}")
+        -- DEBUG
+        -- print("")
+        -- print("Problem name : " .. self:GetName())
+        -- print("Parent name : " .. self:GetParent():GetName())
+        -- if self:GetParent():GetParent() then
+        --     print("Parent-parent name : " .. self:GetParent():GetParent():GetName())
+        --     if self:GetParent():GetParent():GetParent() then
+        --         print("Parent-parent-parent name : " .. self:GetParent():GetParent():GetParent():GetName())
+        --         end
+        -- end
+        -- print("*******  STARTING Interaction  *******")
+        -- print("Player name : " .. oPlayer:GetName())
+        -- print("Player World pos : {" .. oPlayer:GetWorldPosition().x .. ", " .. oPlayer:GetWorldPosition().y .. ", " .. oPlayer:GetWorldPosition().z .. "}")
+        -- print("Player Local pos : {" .. oPlayer:GetPosition().x .. ", " .. oPlayer:GetPosition().y .. ", " .. oPlayer:GetPosition().z .. "}")
+        -- print("Player pos TEST : {" .. oPlayer.Pos.x .. ", " .. oPlayer.Pos.y .. ", " .. oPlayer.Pos.z .. "}")
         -- if oPlayer.refHeldObject then
         -- print("Player is hodling obj with name : "..oPlayer.refHeldObject:GetName())
         -- else
         -- print("Player is hodling obj with name : NONE")
         -- end
-        print("____ TRY  GRABB _____")
-        if oPlayer.refHeldObject == nil then
+        -- print("____ TRY  GRABB _____")
+
+        if self.refHeldObject == nil then
+            print("No ref to held obj")
+            print("refHeldObject : " .. tostring(self.refHeldObject))
             CheckInteraction(_, _, 15)
         else
-            oCurrentEntity = oPlayer.refHeldObject
+            oCurrentEntity = self.refHeldObject
         end
-
+        
         if not oCurrentEntity then
             print("No grabbable in sight")
             return
         end
-
+        
+        -- DEBUG
+        -- print("oCurrentEntity après raycast : " .. oCurrentEntity:GetName())
+        -- print("oCompContainer lookup...")
         oCompContainer = oCurrentEntity:FindChild("components")
+        -- print("oCompContainer : " .. oCompContainer:GetName())
         oGGunTargetComp = oCompContainer:FindChild("GGunTargetComponent")
 
         if not oGGunTargetComp then return end
         if oGGunTargetComp:CanInteract() then
-            if oPlayer.bIsHoldingObject == 0 then
+            if self.bIsHoldingObject == 0 then
                 oGGunTargetComp:GravityGunGrabb()
             else
                 oGGunTargetComp:GravityGunThrow()
             end
         end
-        print("Player name : " .. oPlayer:GetName())
-        print("Player World pos : {" ..
-        oPlayer:GetWorldPosition().x .. ", " .. oPlayer:GetWorldPosition().y .. ", " .. oPlayer:GetWorldPosition().z ..
-        "}")
-        print("Player Local pos : {" ..
-        oPlayer:GetPosition().x .. ", " .. oPlayer:GetPosition().y .. ", " .. oPlayer:GetPosition().z .. "}")
-        print("Player pos TEST : {" .. oPlayer.Pos.x .. ", " .. oPlayer.Pos.y .. ", " .. oPlayer.Pos.z .. "}")
-        print("*******  ENDING Interaction  *******")
-        print("")
+
+        -- DEBUG
+        -- print("Player name : " .. oPlayer:GetName())
+        -- print("Player World pos : {" ..
+        -- oPlayer:GetWorldPosition().x .. ", " .. oPlayer:GetWorldPosition().y .. ", " .. oPlayer:GetWorldPosition().z ..
+        -- "}")
+        -- print("Player Local pos : {" ..
+        -- oPlayer:GetPosition().x .. ", " .. oPlayer:GetPosition().y .. ", " .. oPlayer:GetPosition().z .. "}")
+        -- print("Player pos TEST : {" .. oPlayer.Pos.x .. ", " .. oPlayer.Pos.y .. ", " .. oPlayer.Pos.z .. "}")
+        -- print("*******  ENDING Interaction  *******")
+        -- print("")
     end
 end
 
 --Set up the component
 function self:Setup(pNewEmitter, iNewMaxDistance)
-    pEmitter = pNewEmitter
+    oPlayer = pNewEmitter
     iMaxDistance = iNewMaxDistance
-    -- pRootNode = self:GetParent():GetParent():GetParent()
-    -- pRootNode = self:GetParent()
-    -- while pRootNode:GetParent() ~= nil do
-    --     pRootNode = pRootNode:GetParent()
-    -- end
     pRootNode = self:GetParent()
     while pRootNode:GetName() ~= "SceneRoot" do
         pRootNode = pRootNode:GetParent()

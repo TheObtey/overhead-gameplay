@@ -75,15 +75,7 @@ void NodeRigidBody::OnUpdate(double delta)
 		t.setPosition({ pos.x,pos.y,pos.z });
 		t.setOrientation({ rot.x, rot.y, rot.z, rot.w });
 		m_pRigidBodyRP3D->setTransform(t);
-		if (test == false)
-		{
-			test = true;
-		}
-		else if (test)
-		{
-			test = false;
-		}
-			SetIsPrioOverRigidBody(false);
+		SetIsPrioOverRigidBody(false);
 		return;
 	}
 }

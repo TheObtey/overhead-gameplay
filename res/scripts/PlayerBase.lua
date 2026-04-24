@@ -13,17 +13,8 @@ local oGravityGunComponent
 
 local bRotating = false
 self.Pos = fmath.vec3:new()
-local refHeldObject
 
-self.bIsHoldingObject = 0
-self.gravity = 1
-
-self.SetHoldingObj = function(value)
-    self.bIsHoldingObject = value
-end
-self.GetHoldingObj = function()
-    return self.bIsHoldingObject
-end
+self.gravity = 1 -- doit devenir un vecteur & component
 
 local function InitializeRigidbody(iBodyType, iMass, bGravityEnabled, tAngularAxisLock, iLinearDamping, iAngularDamping)
     self:SetBodyType(iBodyType or 2)
@@ -58,27 +49,6 @@ local function InitializeActionMap()
     acmPlayer:CreateAction("DEBUG_POS", 1, EventInput.KEY_A)
 end
 
--- self.TestSetPos =  function(icGkey)
---     print("------- Setting Pos")
---     self:SetLocalPosition(fmath.vec3:new(-5,2,5))
---     print("------- Pos Set")
--- end
--- function self.TestSetPos(icGkey)
---     print("------- Setting Pos")
---     self:SetLocalPosition(fmath.vec3:new(-5,2,5))
---     print("------- Pos Set")
--- end
-self.GravityGun = function(icLeftCLick)
-    if not oRB then return end
-    print("--- GRABBING OBJECT ---")
-    if icLeftCLick:IsPressed() then
-        local vecForward = pEmitter:GetLocalForward()
-        vecForward.z = vecForward.z * -1
-        local oHit = physics.Raycast(pEmitter:GetPosition(), vecForward, 15)
-    end
-end
-
-
 local function BindActions(oMovementComponent, oLookComponent, oInteractEmitterComponent, oGravityGunComponent)
     if oMovementComponent then
         acmPlayer:GetAction("MOVE_FORWARD").Event  = oMovementComponent.MoveForward or
@@ -97,20 +67,9 @@ local function BindActions(oMovementComponent, oLookComponent, oInteractEmitterC
             function() print("PlayerBase: DEBUG_POS callback missing") end
         acmPlayer:GetAction("JUMP").Event          = oMovementComponent.Jump or
             function() print("PlayerBase: Jump callback missing") end
-
-        -- -- JUMP : buffer enregistré dans MovementComponent, saut effectif dans PhysicsUpdate
-        -- acmPlayer:GetAction("JUMP").Event = function()
-        --     oMovementComponent:Jump()
-        -- end
     else
         print("PlayerBase: MovementComponent missing")
     end
-
-
-    -- acmPlayer:GetAction("TEST_SETPOS").Event  = self.TestSetPos or
-    --         function() print("BUG TEST SET POS") end
-    -- acmPlayer:GetAction("GRAVITY_GUN").Event  = self.GravityGun or
-    --     function() print("______________BUG TEST GRAVITY_GUN") end
 
     if oLookComponent then
         acmPlayer:GetAction("LOOK").Event                = oLookComponent.HandleMouseLook or

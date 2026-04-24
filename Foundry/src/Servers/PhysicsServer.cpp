@@ -8,11 +8,18 @@ void PhysicsEvents::onContact(const rp3d::CollisionCallback::CallbackData& data)
 	for (int i = 0; i < nbPairs; i++)
 	{
 		ContactPair pair = data.getContactPair(i);
-		auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
-		auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
-		b1->ContactEvent(*b2);
-		b2->ContactEvent(*b1);
+		auto b1 = static_cast<NodeRigidBody*>(static_cast<NodeRigidBody::Proxy*>(pair.getBody1()->getUserData())->GetProxyOwner());
+		auto b2 = static_cast<NodeRigidBody*>(static_cast<NodeRigidBody::Proxy*>(pair.getBody2()->getUserData())->GetProxyOwner());
 
+		if (b1 == nullptr || b2 == nullptr)
+			continue;
+		if (b1->GetColliders().empty() || b2->GetColliders().empty())
+			continue;
+
+		b1->GetColliders()[0]->ContactEvent(*b2->GetColliders()[0]);
+		b2->GetColliders()[0]->ContactEvent(*b1->GetColliders()[0]);
+
+		// Example of how to get contact points and normals, not used for now
 		//auto eventType = pair.getEventType();
 		//if (eventType == ContactPair::EventType::ContactStart)
 		//	DEBUG("Start Contact\n");
@@ -30,10 +37,16 @@ void PhysicsEvents::onTrigger(const rp3d::OverlapCallback::CallbackData& data)
 	for (int i = 0; i < nbPairs; i++)
 	{
 		rp3d::OverlapCallback::OverlapPair pair = data.getOverlappingPair(i);
-		auto b1 = static_cast<NodeCollider*>(pair.getBody1()->getUserData());
-		auto b2 = static_cast<NodeCollider*>(pair.getBody2()->getUserData());
-		b1->TriggerEvent(*b2);
-		b2->TriggerEvent(*b1);
+		auto b1 = static_cast<NodeRigidBody*>(static_cast<NodeRigidBody::Proxy*>(pair.getBody1()->getUserData())->GetProxyOwner());
+		auto b2 = static_cast<NodeRigidBody*>(static_cast<NodeRigidBody::Proxy*>(pair.getBody2()->getUserData())->GetProxyOwner());
+
+		if (b1 == nullptr || b2 == nullptr)
+			continue;
+		if (b1->GetColliders().empty() || b2->GetColliders().empty())
+			continue;
+
+		b1->GetColliders()[0]->TriggerEvent(*b2->GetColliders()[0]);
+		b2->GetColliders()[0]->TriggerEvent(*b1->GetColliders()[0]);
 	}
 }
 
@@ -71,6 +84,8 @@ void PhysicsServer::Initialize() // ajouter tous les params ?
 	settings.persistentContactDistanceThreshold = 0.03;     // Default is 0.03
 
 	Instance().m_pPhysicsWorld = Instance().m_physicsCommon.createPhysicsWorld(settings);
+	Instance().m_pPhysicsEvents = new PhysicsEvents();
+	Instance().m_pPhysicsWorld->setEventListener(Instance().m_pPhysicsEvents);
 }
 void PhysicsServer::CreateRigidBody(NodeRigidBody& rigidBody)
 {
@@ -111,14 +126,11 @@ void PhysicsServer::FlushCommandsImpl()
 	{
 		Command<PhysicsServer>& command = m_commands.front();
 
-		//auto& node = static_cast<NodeRigidBody&>(*command.To);
-
 		switch (command.Type)
 		{
 			// =========== Rigid Body ===========
 
 		case CommandTyp::CREATE_RIGID_BODY:
-			//S_CreateRigidBody(*command.transform, command.To);
 			S_CreateRigidBody(static_cast<NodeRigidBody&>(*command.To));
 			break;
 		case CommandTyp::DESTROY_RIGID_BODY:
