@@ -50,6 +50,8 @@ public:
 
     static sptr<Ore::Geometry> GetDefaultGeo() { return Instance().m_defaultCubeGeo; }
     static sptr<Ore::Texture> GetDefaultTexture() { return Instance().m_defaultTexture; }
+    static sptr<Ore::Texture> GetDefaultOpacity() { return Instance().m_defaultOpacity; }
+    static sptr<Ore::Texture> GetDefaultSpecular() { return Instance().m_defaultSpecular; }
 
 private:
     void FlushCommandsImpl() override;
@@ -73,6 +75,8 @@ private:
 
     sptr<Ore::Geometry> m_defaultCubeGeo;
     sptr<Ore::Texture> m_defaultTexture;
+    sptr<Ore::Texture> m_defaultOpacity;
+    sptr<Ore::Texture> m_defaultSpecular;
 
     std::vector<NodeWindow*> m_pWindowsToSwap;
 };

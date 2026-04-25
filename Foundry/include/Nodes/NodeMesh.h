@@ -43,6 +43,7 @@ public:
 
 protected:
     void AttachScriptDeserialize(uptr<LuaScriptInstance>& script) override;
+    void SetDefaultTextures();
 
 private:
     uptr<Ore::Mesh> m_pMesh;

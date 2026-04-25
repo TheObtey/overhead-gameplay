@@ -42,8 +42,7 @@ NodeMesh::NodeMesh(std::string const &name) : NodeVisual(name)
     m_pMesh = std::make_unique<Ore::Mesh>();
     SetPrimitive(PrimitivesType::CUBE);
     // problem here
-    if (!s_IsInEditor)
-        AddTextures(GraphicServer::GetDefaultTexture());
+    if (!s_IsInEditor) SetDefaultTextures();
     m_pMesh->SetTransform(m_worldTransform);
 }
 
@@ -124,7 +123,7 @@ void NodeMesh::SetFbxPath(std::filesystem::path const &fbxPath)
         m_textures.push_back(std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE));
     }
 
-    m_pMesh->SetTextures(m_textures);
+    SetDefaultTextures();
 }
 
 void NodeMesh::Serialize(SerializedObject &datas) const
@@ -231,7 +230,8 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
         else
             m_textures.push_back(std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE));
 
-        m_pMesh->SetTextures(m_textures);
+        SetDefaultTextures();
+        //m_pMesh->SetTextures(m_textures);
     }
     m_pMesh->SetTransform(m_transform.GetMatrix());
 }
@@ -239,6 +239,14 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
 void NodeMesh::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
 {
     AttachScript<NodeMesh>(script, *this);
+}
+
+void NodeMesh::SetDefaultTextures()
+{
+    AddTextures(
+           GraphicServer::GetDefaultTexture(),
+           GraphicServer::GetDefaultOpacity(),
+           GraphicServer::GetDefaultSpecular());
 }
 
 ISerializable *NodeMesh::CreateInstance()
