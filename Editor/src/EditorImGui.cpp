@@ -829,27 +829,34 @@ void EditorImGui::ApplyInspectorChanges(json& datas)
 
 	m_selectedNodeDataJson["PUBLIC_DATAS"] = datas;
 
-	m_selectedNodeData.SetJson(m_selectedNodeDataJson);
-
-	json tempJson = m_selectedNodeDataJson;
-
 	json cleanJson;
-	cleanJson["PUBLIC_DATAS"] = tempJson["PUBLIC_DATAS"];
-	cleanJson["PRIVATE_DATAS"] = tempJson["PRIVATE_DATAS"];
-	cleanJson["PRIVATE_DATAS"]["Children"] = json::array();
+	cleanJson["PUBLIC_DATAS"] = m_selectedNodeDataJson["PUBLIC_DATAS"];
 
-	std::string oldName = m_pSelectedNode->GetName();
+	if (m_selectedNodeDataJson.contains("PRIVATE_DATAS"))
+	{
+		json const& sourcePrivateDatas = m_selectedNodeDataJson["PRIVATE_DATAS"];
+		json& cleanPrivateDatas = cleanJson["PRIVATE_DATAS"];
+
+		for (auto it = sourcePrivateDatas.begin(); it != sourcePrivateDatas.end(); ++it)
+		{
+			if (it.key() == "Children")
+				continue;
+
+			cleanPrivateDatas[it.key()] = it.value();
+		}
+
+		cleanPrivateDatas["Children"] = json::array();
+	}
+
+	std::string const oldName = m_pSelectedNode->GetName();
+
 	m_selectedNodeData.SetJson(cleanJson);
-
 	m_pSelectedNode->Deserialize(m_selectedNodeData);
-	std::cout << "Name from m_sceneroor" << m_pSceneRoot->GetChild(0).GetName() << std::endl;
 
 	if (oldName != m_pSelectedNode->GetName())
 	{
 		m_pRaylibEditor->UpdateElementName(oldName, m_pSelectedNode);
 	}
-
-	//DEBUG("[EditorImGui] Applied inspector changes" << std::endl);
 }
 
 void EditorImGui::BeginHierarchyDragSource(Node& node)

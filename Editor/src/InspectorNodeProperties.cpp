@@ -175,17 +175,6 @@ void InspectorNodeProperties::DrawWindow(bool windowState, Node* pNode)
         ImGui::Text("Node Properties");
         ImGui::PopStyleColor();
 
-        SerializedObject nodeObject;
-        pNode->Serialize(nodeObject);
-        std::string nodeType = nodeObject.GetType();
-        if (nodeType.empty())
-        {
-            nodeType = "Node";
-        }
-
-        ImGui::Text("Node Type: %s", nodeType.c_str());
-        ImGui::Separator();
-
         if (pNode != m_pSelectedNode || m_pImguiEditor->m_pRaylibEditor->IsGizmoDirty() || m_isDirty)
         {
             m_currentDatas = m_pImguiEditor->LoadInspectorData();
@@ -194,10 +183,22 @@ void InspectorNodeProperties::DrawWindow(bool windowState, Node* pNode)
             m_isDirty = false;
         }
 
+        std::string nodeType = "Node";
+        json const& selectedData = m_pImguiEditor->m_selectedNodeDataJson;
+        if (selectedData.contains("PRIVATE_DATAS") &&
+            selectedData["PRIVATE_DATAS"].contains("TYPE") &&
+            selectedData["PRIVATE_DATAS"]["TYPE"].is_string())
+        {
+            nodeType = selectedData["PRIVATE_DATAS"]["TYPE"].get<std::string>();
+        }
+
+        ImGui::Text("Node Type: %s", nodeType.c_str());
+        ImGui::Separator();
+
         bool wasModified = DrawDatas(m_currentDatas);
         wasModified |= DrawLuaScriptPicker(m_currentDatas);
         wasModified |= DrawTexturePicker(m_currentDatas);
-        wasModified |= DrawFbxPicker(m_currentDatas); 
+        wasModified |= DrawFbxPicker(m_currentDatas);
 
         if (wasModified)
         {
