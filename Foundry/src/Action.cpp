@@ -40,7 +40,10 @@ void Action::HandleKeyDown(Ore::EventInput const in, Ore::EventAction const ac)
 		if (in == m_controls[i]->GetEventInput() && m_controls[i]->GetControlType() == ControlType::BUTTON)
 		{
 			ButtonControl& button = static_cast<ButtonControl&>(*m_controls[i]);
-			button.SetState(ac == Ore::EventAction::PRESS ? ButtonState::PRESSED : ButtonState::RELEASED);
+			if (ac == Ore::EventAction::PRESS)
+				button.SetState(ButtonState::PRESSED);
+			else if (ac == Ore::EventAction::RELEASE)
+				button.SetState(ButtonState::RELEASED);
 		}
 	}
 };
