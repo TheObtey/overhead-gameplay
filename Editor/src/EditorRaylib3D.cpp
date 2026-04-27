@@ -12,6 +12,9 @@
 #include <cmath>
 #include <filesystem>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
+
 namespace
 {
 	Mesh BuildRaylibMesh(GeoInfo const &geoInfo)
@@ -480,10 +483,9 @@ void EditorRaylib3D::Instanciate3DMesh(Node *pNodeMesh3D)
 	}
 
 	m_loadedMeshes[pNodeMesh3D] = std::make_unique<DrawableElement>();
-	DrawableElement &drawable = *m_loadedMeshes[pNodeMesh3D].get();
+	DrawableElement &drawable = *m_loadedMeshes[pNodeMesh3D];
 	drawable.worldMatrix = MatrixIdentity();
 	drawable.material = LoadMaterialDefault();
-
 	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::PRIMITIVE)
 	{
 		GeoInfo const &geoInfo = GeometryFactory::GetGeometry(pNodeMesh->GetPrimitiveType());
@@ -551,6 +553,14 @@ void EditorRaylib3D::Instanciate3DMesh(Node *pNodeMesh3D)
 	{
 		drawable.worldMatrix = GlmToMatrix(pNodeMesh->GetWorldMatrix());
 	}
+
+	glm::vec3 scale  = pNodeMesh->GetWorldScale();
+	glm::quat rotation = pNodeMesh->GetWorldRotationQuaternion();
+	glm::vec3 translation = pNodeMesh->GetWorldPosition();
+
+	drawable.gizmoTransform.translation = { translation.x,translation.y,translation.z };
+	drawable.gizmoTransform.scale = { scale.x,scale.y,scale.z };
+	drawable.gizmoTransform.rotation = { rotation.x,rotation.y,rotation.z,rotation.w };
 }
 
 void EditorRaylib3D::InstanciateCollider3D()
@@ -677,7 +687,7 @@ void EditorRaylib3D::DrawCameraFrustumWire(NodeCamera const &cameraNode)
 	cameraNode.Serialize(so);
 	nlohmann::json const &pub = so.GetJson()["PUBLIC_DATAS"];
 
-	float const fovRad = ReadPublicFloat(pub, "FOV", 45.0f);
+	float const fovRad = ReadPublicFloat(pub, "FOV", 45.0f) * (pi_t<long double> / 180);
 	float const nearPlane = ReadPublicFloat(pub, "NearPlane", 0.1f);
 	float const farPlane = ReadPublicFloat(pub, "FarPlane", 100.0f);
 	float const aspect = ReadPublicFloat(pub, "AspectRatio", 16.0f / 9.0f);

@@ -88,37 +88,20 @@ void FBXLoader::LoadTextures(FBXLoader::Material& materials, std::vector<sptr<Or
 
 void FBXLoader::LoadDefaultsTextures(SceneMesh& mesh)
 {
-    if (FBXLoader::m_defaultTextures.size() != 0)
-    {
-        mesh.meshTextures = FBXLoader::m_defaultTextures;
-        mesh.paths.push_back("res/textures/diffuse.jpg");
-        mesh.paths.push_back("res/textures/specular.jpg");
-        mesh.paths.push_back("res/textures/NormalMap.png");
-        return;
-    }
-
-    sptr<Ore::Texture> text = AssetLoader::GetSharedTexture("res/textures/NormalMap.png", Ore::TextureMaterialType::NORMAL);
+    sptr<Ore::Texture> text = AssetLoader::GetSharedTexture(AssetLoader::GetDefaultTexturePath(Ore::TextureMaterialType::NORMAL), Ore::TextureMaterialType::NORMAL);
     if (text)
-    {
-        mesh.paths.push_back("res/textures/NormalMap.png");
-        FBXLoader::m_defaultTextures.push_back(text);
-    }
+        mesh.paths.push_back(AssetLoader::GetDefaultTexturePath(Ore::TextureMaterialType::NORMAL));
+    mesh.meshTextures.push_back(text);
 
-    sptr<Ore::Texture> text2 = AssetLoader::GetSharedTexture("res/textures/diffuse.jpg", Ore::TextureMaterialType::DIFFUSE);
+    sptr<Ore::Texture> text2 = AssetLoader::GetSharedTexture(AssetLoader::GetDefaultTexturePath(Ore::TextureMaterialType::DIFFUSE), Ore::TextureMaterialType::DIFFUSE);
     if (text2)
-    {
-        mesh.paths.push_back("res/textures/diffuse.jpg");
-        FBXLoader::m_defaultTextures.push_back(text2);
-    }
+        mesh.paths.push_back(AssetLoader::GetDefaultTexturePath(Ore::TextureMaterialType::DIFFUSE));
+    mesh.meshTextures.push_back(text);
 
-    sptr<Ore::Texture> text3 = AssetLoader::GetSharedTexture("res/textures/specular.jpg", Ore::TextureMaterialType::SPECULAR);
+    sptr<Ore::Texture> text3 = AssetLoader::GetSharedTexture(AssetLoader::GetDefaultTexturePath(Ore::TextureMaterialType::SPECULAR), Ore::TextureMaterialType::SPECULAR);
     if (text3)
-    {
-        mesh.paths.push_back("res/textures/specular.jpg");
-        FBXLoader::m_defaultTextures.push_back(text3);
-    }
-
-    mesh.meshTextures = FBXLoader::m_defaultTextures;
+        mesh.paths.push_back(AssetLoader::GetDefaultTexturePath(Ore::TextureMaterialType::SPECULAR));
+    mesh.meshTextures.push_back(text);
 }
 
 sptr<SceneData> FBXLoader::LoadFile(std::string const& path)

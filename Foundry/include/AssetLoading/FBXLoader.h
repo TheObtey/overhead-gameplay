@@ -49,7 +49,6 @@ private:
 	static std::string NormalizeTexturePath(std::string const& path);
 private:
 	static uint8 m_sTexTypes[];
-	inline static std::vector<sptr<Ore::Texture>> m_defaultTextures = {};
 };
 
 
