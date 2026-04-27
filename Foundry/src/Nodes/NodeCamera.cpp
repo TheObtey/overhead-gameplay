@@ -13,7 +13,6 @@ NodeCamera::NodeCamera(std::string const &name) : Node3D(name)
 
 void NodeCamera::OnUpdate(double delta)
 {
-    AddLocalYaw(0.00050f);
     bool need_update = IsTransformDirty();
     Node3D::OnUpdate(delta);
 

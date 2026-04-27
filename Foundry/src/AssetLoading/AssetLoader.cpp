@@ -76,3 +76,8 @@ sptr<Ore::Texture> AssetLoader::GetSharedTexture(std::string const& path, Ore::T
 	m_textureCache[path] = created;
 	return created;
 }
+
+std::string AssetLoader::GetDefaultTexturePath(Ore::TextureMaterialType type)
+{
+	return m_defaultTexturesPath[type];
+}

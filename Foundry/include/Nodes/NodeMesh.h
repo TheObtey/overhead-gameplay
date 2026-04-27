@@ -18,8 +18,8 @@ enum class MeshGeometrySourceType : uint8
 class SerializedTexturesData : public ISerializable
 {
 public:
-    Ore::TextureMaterialType type;
-    std::filesystem::path path;
+    Ore::TextureMaterialType type = Ore::TextureMaterialType::DIFFUSE;
+    std::filesystem::path path = "";
 
     virtual void Serialize(SerializedObject& datas) const override;
     virtual void Deserialize(SerializedObject const& datas) override;
@@ -39,7 +39,8 @@ public:
     virtual void OnUpdate(double delta) override;
     virtual void Serialize(SerializedObject &datas) const override;
     virtual void Deserialize(SerializedObject const &datas) override;
-
+    void DeserializeTextures(SerializedObject const &datas);
+    void DeserializeTex(std::string& textPath, Ore::TextureMaterialType type, bool isSet,uint8 id);
     bool IsVisible() override;
 
     void SetGeometry(sptr<Ore::Geometry> const &geometry) const;
@@ -52,8 +53,8 @@ public:
     MeshGeometrySourceType GetGeometrySourceType() const { return m_geometrySourceType; }
     PrimitivesType GetPrimitiveType() const { return m_primitiveType; }
     std::filesystem::path const &GetFbxPath() const { return m_fbxPath; }
-    void SetDiffuseTexturePath(std::filesystem::path const& path) { m_diffuseTexturePath = path; }
-    std::filesystem::path const& GetDiffuseTexturePath() const { return m_diffuseTexturePath; }
+    void SetDiffuseTexturePath(std::filesystem::path const& path) { m_diffusePath = path; }
+    std::filesystem::path const& GetDiffuseTexturePath() const { return m_diffusePath; }
 
     uint32 GetMeshID() const {return m_meshIDInSceneFBX;}
 
@@ -79,7 +80,7 @@ private:
     uint32 m_meshIDInSceneFBX = 0;
 
     std::vector<SerializedTexturesData> m_texturesPaths;
-    std::filesystem::path m_diffuseTexturePath{};
+    std::filesystem::path m_diffusePath;
 
     friend class NodeViewport;
 };

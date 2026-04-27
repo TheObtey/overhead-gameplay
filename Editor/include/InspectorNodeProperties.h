@@ -2,7 +2,7 @@
 #define EDITOR_INSPECTOR_NODE_PROPERTIES_H__
 
 #include <Serialization/json.hpp>
-
+#include <Define.h>
 #include <imgui.h>
 #include <imfilebrowser.h>
 
@@ -26,7 +26,7 @@ public:
 private:
     bool DrawDatas(json& publicDataJson);
     bool DrawLuaScriptPicker(json& publicDataJson);
-    bool DrawTexturePicker(json& publicDataJson);
+    bool DrawTexturePicker(json& publicDataJson, uint8 texID);
     bool DrawFbxPicker(json& publicDataJson);
 
 private:
