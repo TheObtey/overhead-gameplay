@@ -150,7 +150,7 @@ InspectorNodeProperties::InspectorNodeProperties(EditorImGui* pImGuiEditor)
     m_luaBrowser.SetTypeFilters({ ".lua" });
     m_luaBrowser.SetDirectory(kScriptStockDir.string());
 
-    m_textureBrowser.SetTitle("Select Diffuse Texture");
+    m_textureBrowser.SetTitle("Select Texture");
     m_textureBrowser.SetTypeFilters({ ".png", ".jpg", ".jpeg" });
     m_textureBrowser.SetDirectory(kTextureRootDir.string());
 
@@ -175,17 +175,6 @@ void InspectorNodeProperties::DrawWindow(bool windowState, Node* pNode)
         ImGui::Text("Node Properties");
         ImGui::PopStyleColor();
 
-        SerializedObject nodeObject;
-        pNode->Serialize(nodeObject);
-        std::string nodeType = nodeObject.GetType();
-        if (nodeType.empty())
-        {
-            nodeType = "Node";
-        }
-
-        ImGui::Text("Node Type: %s", nodeType.c_str());
-        ImGui::Separator();
-
         if (pNode != m_pSelectedNode || m_pImguiEditor->m_pRaylibEditor->IsGizmoDirty() || m_isDirty)
         {
             m_currentDatas = m_pImguiEditor->LoadInspectorData();
@@ -194,10 +183,23 @@ void InspectorNodeProperties::DrawWindow(bool windowState, Node* pNode)
             m_isDirty = false;
         }
 
+        std::string nodeType = "Node";
+        json const& selectedData = m_pImguiEditor->m_selectedNodeDataJson;
+        if (selectedData.contains("PRIVATE_DATAS") &&
+            selectedData["PRIVATE_DATAS"].contains("TYPE") &&
+            selectedData["PRIVATE_DATAS"]["TYPE"].is_string())
+        {
+            nodeType = selectedData["PRIVATE_DATAS"]["TYPE"].get<std::string>();
+        }
+
+        ImGui::Text("Node Type: %s", nodeType.c_str());
+        ImGui::Separator();
+
         bool wasModified = DrawDatas(m_currentDatas);
         wasModified |= DrawLuaScriptPicker(m_currentDatas);
-        wasModified |= DrawTexturePicker(m_currentDatas);
-        wasModified |= DrawFbxPicker(m_currentDatas); 
+        for (uint8 i = 0; i < 3; ++i)
+            wasModified |= DrawTexturePicker(m_currentDatas,i);
+        wasModified |= DrawFbxPicker(m_currentDatas);
 
         if (wasModified)
         {
@@ -283,7 +285,7 @@ bool InspectorNodeProperties::DrawDatas(json& publicDataJson)
     bool wasModified = false;
     for (auto& [key, value] : publicDataJson.items())
     {
-        if (key == "m_scriptPath" || key == "DiffuseTexturePath" || key == "FbxPath")
+        if (key == "m_scriptPath" || key == "DiffuseTexturePath" || key == "FbxPath" || key == "NormalTexturePath" || key == "OpacityTexturePath")
         {
             continue;
         }
@@ -542,11 +544,28 @@ bool InspectorNodeProperties::DrawLuaScriptPicker(json& publicDataJson)
     return wasModified;
 }
 
-bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
+bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson,uint8 texID)
 {
-    if (!publicDataJson.contains("DiffuseTexturePath"))
+    std::string texType = "";
+    switch (texID)
     {
-        return false;
+    case 0: // Diffuse
+        if (!publicDataJson.contains("DiffuseTexturePath"))
+            return false;
+        texType = "Diffuse";
+        break;
+    case 1: // Spec
+        if (!publicDataJson.contains("OpacityTexturePath"))
+            return false;
+        texType = "Opacity";
+        break;
+    case 2: // Normal
+        if (!publicDataJson.contains("NormalTexturePath"))
+            return false;
+        texType = "Normal";
+        break;
+    default:
+        break;
     }
 
     bool wasModified = false;
@@ -554,7 +573,7 @@ bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
     ImGui::Separator();
     ImGui::Text("Texture");
 
-    std::string texturePath = publicDataJson["DiffuseTexturePath"].get<std::string>();
+    std::string texturePath = publicDataJson[(texType + "TexturePath")].get<std::string>();
 
     if (!texturePath.empty() && texturePath != kDefaultTexturePath)
     {
@@ -562,7 +581,7 @@ bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
         if (normalized != texturePath)
         {
             texturePath = normalized;
-            publicDataJson["DiffuseTexturePath"] = texturePath;
+            publicDataJson[(texType + "TexturePath")] = texturePath;
             wasModified = true;
         }
     }
@@ -570,21 +589,22 @@ bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
     char textureBuffer[256] = {};
     strncpy(textureBuffer, texturePath.c_str(), sizeof(textureBuffer) - 1);
 
-    ImGui::InputText("Diffuse", textureBuffer, sizeof(textureBuffer), ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputText(texType.c_str(), textureBuffer, sizeof(textureBuffer), ImGuiInputTextFlags_ReadOnly);
 
     ImGui::SameLine();
-    bool const browseClicked = ImGui::Button("Browse Texture");
+    bool const browseClicked = ImGui::Button((texType + "Browse Texture").c_str());
 
-    bool const clearClicked = ImGui::Button("Clear Texture");
+    bool const clearClicked = ImGui::Button((texType + "Clear Texture").c_str());
 
     if (browseClicked)
     {
         m_showTextureBrowser = true;
+        m_displayWin = { false,false,false };
     }
 
     if (clearClicked && !texturePath.empty())
     {
-        publicDataJson["DiffuseTexturePath"] = "";
+        publicDataJson[(texType + "TexturePath")] = "";
         wasModified = true;
     }
 
@@ -592,19 +612,22 @@ bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
     {
         m_textureBrowser.Open();
         m_showTextureBrowser = false;
+        m_displayWin[texID] = true;
     }
 
-    m_textureBrowser.SetWindowSize(m_fileBrowsingSizeX, m_fileBrowsingSizeY);
-    m_textureBrowser.SetWindowPos(m_screenWidth / 2 - m_fileBrowsingSizeX / 2, m_screenHeight / 2 - m_fileBrowsingSizeY / 2);
-    m_textureBrowser.Display();
+    if (m_displayWin[texID]) {
+        m_textureBrowser.SetWindowSize(m_fileBrowsingSizeX, m_fileBrowsingSizeY);
+        m_textureBrowser.SetWindowPos(m_screenWidth / 2 - m_fileBrowsingSizeX / 2, m_screenHeight / 2 - m_fileBrowsingSizeY / 2);
+        m_textureBrowser.Display();
 
-    if (m_textureBrowser.HasSelected())
-    {
-        publicDataJson["DiffuseTexturePath"] = NormalizeTexturePathForProject(m_textureBrowser.GetSelected());
-        wasModified = true;
-        m_textureBrowser.ClearSelected();
-        m_textureBrowser.Close();
-    }
+        if (m_textureBrowser.HasSelected())
+        {
+            publicDataJson[texType + "TexturePath"] = NormalizeTexturePathForProject(m_textureBrowser.GetSelected());
+            wasModified = true;
+            m_textureBrowser.ClearSelected();
+            m_textureBrowser.Close();
+        }
+   }
 
     return wasModified;
 }

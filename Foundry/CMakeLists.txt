@@ -28,6 +28,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC unofficial::lua::lua)
 target_link_libraries(${PROJECT_NAME} PUBLIC Ore::library)
 target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
 target_link_libraries(${PROJECT_NAME} PUBLIC assimp::assimp)
+target_link_libraries(${PROJECT_NAME} PUBLIC Editor::library)
 #target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 #target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
 

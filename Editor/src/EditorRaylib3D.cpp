@@ -12,6 +12,9 @@
 #include <cmath>
 #include <filesystem>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
+
 namespace
 {
 	Mesh BuildRaylibMesh(GeoInfo const &geoInfo)
@@ -406,7 +409,12 @@ void EditorRaylib3D::RemoveDrawableElement(Node *pNode)
 	{
 		auto &drawable = m_loadedMeshes[pNode];
 		if (drawable->hasTexture)
-			UnloadTexture(drawable->diffuseTexture);
+		{
+			ReleaseSharedTexture(drawable->loadedDiffusePath);
+			drawable->hasTexture = false;
+			drawable->diffuseTexture = {};
+			drawable->loadedDiffusePath.clear();
+		}
 
 		UnloadMaterial(drawable->material);
 
@@ -431,6 +439,16 @@ void EditorRaylib3D::ClearWindow()
 		(void)node;
 		if (drawable)
 		{
+			if (drawable->hasTexture)
+			{
+				ReleaseSharedTexture(drawable->loadedDiffusePath);
+				drawable->hasTexture = false;
+				drawable->diffuseTexture = {};
+				drawable->loadedDiffusePath.clear();
+			}
+
+			UnloadMaterial(drawable->material);
+
 			for (DrawableSubMesh &subMesh : drawable->meshes)
 			{
 				if (subMesh.mesh)
@@ -465,10 +483,9 @@ void EditorRaylib3D::Instanciate3DMesh(Node *pNodeMesh3D)
 	}
 
 	m_loadedMeshes[pNodeMesh3D] = std::make_unique<DrawableElement>();
-	DrawableElement &drawable = *m_loadedMeshes[pNodeMesh3D].get();
+	DrawableElement &drawable = *m_loadedMeshes[pNodeMesh3D];
 	drawable.worldMatrix = MatrixIdentity();
 	drawable.material = LoadMaterialDefault();
-
 	if (pNodeMesh->GetGeometrySourceType() == MeshGeometrySourceType::PRIMITIVE)
 	{
 		GeoInfo const &geoInfo = GeometryFactory::GetGeometry(pNodeMesh->GetPrimitiveType());
@@ -500,24 +517,21 @@ void EditorRaylib3D::Instanciate3DMesh(Node *pNodeMesh3D)
 			return;
 		}
 
-		for (EditorSceneMeshData const &importedMesh : scene->meshes)
+		if (scene->meshes[pNodeMesh->GetMeshID()].geometry.m_vertices.empty() || scene->meshes[pNodeMesh->GetMeshID()].geometry.m_indices.empty())
+			return;
+
+		Mesh m_mesh = BuildRaylibMesh(scene->meshes[pNodeMesh->GetMeshID()].geometry);
+
+		DrawableSubMesh drawableMesh;
+		drawableMesh.mesh = std::make_unique<Mesh>(m_mesh);
+		drawableMesh.localMatrix = GlmToMatrix(scene->meshes[pNodeMesh->GetMeshID()].meshMatrix);
+
+		if (drawable.loadedFbxDiffusePath.empty() && !scene->meshes[pNodeMesh->GetMeshID()].textures.empty())
 		{
-			if (importedMesh.geometry.m_vertices.empty() || importedMesh.geometry.m_indices.empty())
-				continue;
-
-			Mesh m_mesh = BuildRaylibMesh(importedMesh.geometry);
-
-			DrawableSubMesh subMesh;
-			subMesh.mesh = std::make_unique<Mesh>(m_mesh);
-			subMesh.localMatrix = GlmToMatrix(importedMesh.meshMatrix);
-
-			if (drawable.loadedFbxDiffusePath.empty() && !importedMesh.textures.empty())
-			{
-				drawable.loadedFbxDiffusePath = importedMesh.textures[0].path;
-			}
-
-			drawable.meshes.push_back(std::move(subMesh));
+			drawable.loadedFbxDiffusePath = scene->meshes[pNodeMesh->GetMeshID()].textures[0].path;
 		}
+
+		drawable.meshes.push_back(std::move(drawableMesh));
 
 		if (drawable.meshes.empty())
 		{
@@ -537,13 +551,16 @@ void EditorRaylib3D::Instanciate3DMesh(Node *pNodeMesh3D)
 	}
 	else
 	{
-		Matrix world = {};
-		Node3D *pNode3D = static_cast<Node3D *>(FindNode3DWorldMatrix(pNodeMesh3D, world));
-		if (pNode3D != nullptr)
-		{
-			drawable.worldMatrix = GlmToMatrix(pNode3D->GetWorldMatrix());
-		}
+		drawable.worldMatrix = GlmToMatrix(pNodeMesh->GetWorldMatrix());
 	}
+
+	glm::vec3 scale  = pNodeMesh->GetWorldScale();
+	glm::quat rotation = pNodeMesh->GetWorldRotationQuaternion();
+	glm::vec3 translation = pNodeMesh->GetWorldPosition();
+
+	drawable.gizmoTransform.translation = { translation.x,translation.y,translation.z };
+	drawable.gizmoTransform.scale = { scale.x,scale.y,scale.z };
+	drawable.gizmoTransform.rotation = { rotation.x,rotation.y,rotation.z,rotation.w };
 }
 
 void EditorRaylib3D::InstanciateCollider3D()
@@ -571,6 +588,53 @@ std::string EditorRaylib3D::ResolveEditorTexturePath(std::filesystem::path const
 	return ("../Game/res/textures/" + p.filename().generic_string());
 }
 
+bool EditorRaylib3D::AcquireSharedTexture(std::string const& path, Texture2D& outTexture)
+{
+	if (path.empty())
+		return false;
+
+	auto it = m_sharedTextures.find(path);
+	if (it != m_sharedTextures.end())
+	{
+		++it->second.refCount;
+		outTexture = it->second.texture;
+		return it->second.texture.id != 0;
+	}
+
+	Texture2D const tex = LoadTexture(path.c_str());
+	if (tex.id == 0)
+		return false;
+
+	CachedTexture entry = {};
+	entry.texture = tex;
+	entry.refCount = 1;
+	m_sharedTextures[path] = entry;
+
+	outTexture = tex;
+	return true;
+}
+
+void EditorRaylib3D::ReleaseSharedTexture(std::string const& path)
+{
+	if (path.empty())
+		return;
+
+	auto it = m_sharedTextures.find(path);
+	if (it == m_sharedTextures.end())
+		return;
+
+	if (it->second.refCount > 1)
+	{
+		--it->second.refCount;
+		return;
+	}
+
+	if (it->second.texture.id != 0)
+		UnloadTexture(it->second.texture);
+
+	m_sharedTextures.erase(it);
+}
+
 void EditorRaylib3D::UpdateDrawableTexture(NodeMesh const &nodeMesh, DrawableElement &drawable)
 {
 	std::filesystem::path wanted = nodeMesh.GetDiffuseTexturePath();
@@ -586,29 +650,31 @@ void EditorRaylib3D::UpdateDrawableTexture(NodeMesh const &nodeMesh, DrawableEle
 		}
 	}
 
-	std::string const resolved = ResolveEditorTexturePath(wanted);
+	std::string resolved = ResolveEditorTexturePath(wanted);
 	if (resolved == drawable.loadedDiffusePath)
 		return;
 
 	if (drawable.hasTexture)
 	{
-		UnloadTexture(drawable.diffuseTexture);
+		ReleaseSharedTexture(drawable.loadedDiffusePath);
 		drawable.hasTexture = false;
+		drawable.diffuseTexture = {};
+		drawable.loadedDiffusePath.clear();
 	}
 
-	Texture2D tex = LoadTexture(resolved.c_str());
-	if (tex.id == 0)
+	Texture2D tex = {};
+	std::string selectedPath = resolved;
+	if (!AcquireSharedTexture(selectedPath, tex))
 	{
-		tex = LoadTexture("../Game/res/textures/Default.png");
+		selectedPath = "../Game/res/textures/Default.png";
+		if (!AcquireSharedTexture(selectedPath, tex))
+			return;
 	}
 
-	if (tex.id != 0)
-	{
-		drawable.diffuseTexture = tex;
-		drawable.hasTexture = true;
-		drawable.loadedDiffusePath = resolved;
-		SetMaterialTexture(&drawable.material, MATERIAL_MAP_DIFFUSE, drawable.diffuseTexture);
-	}
+	drawable.diffuseTexture = tex;
+	drawable.hasTexture = true;
+	drawable.loadedDiffusePath = selectedPath;
+	SetMaterialTexture(&drawable.material, MATERIAL_MAP_DIFFUSE, drawable.diffuseTexture);
 }
 
 
@@ -621,7 +687,7 @@ void EditorRaylib3D::DrawCameraFrustumWire(NodeCamera const &cameraNode)
 	cameraNode.Serialize(so);
 	nlohmann::json const &pub = so.GetJson()["PUBLIC_DATAS"];
 
-	float const fovDeg = ReadPublicFloat(pub, "FOV", 45.0f);
+	float const fovRad = ReadPublicFloat(pub, "FOV", 45.0f) * (pi_t<long double> / 180);
 	float const nearPlane = ReadPublicFloat(pub, "NearPlane", 0.1f);
 	float const farPlane = ReadPublicFloat(pub, "FarPlane", 100.0f);
 	float const aspect = ReadPublicFloat(pub, "AspectRatio", 16.0f / 9.0f);
@@ -633,7 +699,6 @@ void EditorRaylib3D::DrawCameraFrustumWire(NodeCamera const &cameraNode)
 	glm::vec3 const up = q * glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 const right = q * glm::vec3(1.0f, 0.0f, 0.0f);
 
-	float const fovRad = DEG2RAD * fovDeg;
 	float const nearH = tanf(fovRad * 0.5f) * nearPlane;
 	float const nearW = nearH * aspect;
 	float const farH = tanf(fovRad * 0.5f) * farPlane;
@@ -831,8 +896,8 @@ void EditorRaylib3D::Render()
 		{
 			if (!subMesh.mesh)
 				continue;
-			Matrix const finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
-			DrawMesh(*subMesh.mesh.get(), drawable.material, finalMatrix);
+			//Matrix const finalMatrix = MatrixMultiply(subMesh.localMatrix, drawable.worldMatrix);
+			DrawMesh(*subMesh.mesh.get(), drawable.material, drawable.worldMatrix /*finalMatrix*/);
 		}
 	}
 
@@ -860,7 +925,6 @@ void EditorRaylib3D::DrawViewPort()
 	rlDisableDepthMask();
 	rlPushMatrix();
 	rlTranslatef(0.0f, -0.01f, 0.0f);
-	DrawGrid(200, 1.0f);
 	rlPopMatrix();
 	rlEnableDepthMask();
 
@@ -914,6 +978,14 @@ void EditorRaylib3D::SetCameraOnAxis(RaylibAxis axis)
 
 void EditorRaylib3D::Shutdown()
 {
+	for (auto& [path, cached] : m_sharedTextures)
+	{
+		(void)path;
+		if (cached.texture.id != 0)
+			UnloadTexture(cached.texture);
+	}
+	m_sharedTextures.clear();
+
 	ReleaseDebugPrimitiveModels();
 }
 
