@@ -29,7 +29,7 @@ local fCoyoteTimer    = 0.0
 local JUMP_BUFFER     = 0.12
 local fJumpBufferTimer = 0.0
 
--- Référence à la State Machine
+-- Reference à la State Machine
 local oSM = nil
 
 
@@ -41,25 +41,32 @@ self.MoveForward = function(icForward)
     if not oRB then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
+    --     if icForward:IsHold() then
+    --     bIsMoving = true
+    --     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
+    --     print("HOLDING")
+    -- else
+    --     if icForward:IsReleased() then
+    --         oRB:SetLinearVelocity(fmath.vec3:new(0, 0, 0))
+    --         print("RELEASED") 
+            
+    --     end
+    -- end
 end
 
 self.MoveBackward = function(icBackward)
-    -- print("BACKARD")
     if not oRB then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed))
 end
 
 self.MoveLeft = function(icLeft)
-    -- print("LEFT")
     if not oRB then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
 end
 
 self.MoveRight = function(icRight)
-    -- print("RIGHT")
-    -- print("Forces : {".. oRB:GetTotalForce().x .. ", ".. oRB:GetTotalForce().y .. ", ".. oRB:GetTotalForce().z .. "}")
     if not oRB then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
@@ -80,7 +87,7 @@ self.Jump = function(icJump)
 end
 
 local function TryJump()
-    -- if fCoyoteTimer > 0 and fJumpBufferTimer > 0 then
+    -- if fCoyoteTimer > 0 and fJumpBufferTimer > 0 then // CETTE LIGNE PERMET D'EMPECHER LES SAUTS SUCCESSIFS 
     if fJumpBufferTimer > 0 then
         local vel = oRB:GetLinearVelocity()
         oRB:SetLinearVelocity(fmath.vec3:new(vel.x, 0, vel.z))
@@ -111,11 +118,8 @@ local function ApplyCustomGravity(oMass, dt)
     else
         gravity = GRAVITY_DOWN
     end
-    -- print("____________")
-    -- print("Vel Y = ".. vel.y)
-    -- print("Gravity = ".. gravity)
-    local fGravityForce = gravity * oMass * dt * oRB.gravity 
-    -- print("Gravity = "..fGravityForce)
+    local fGravityForce = gravity * oMass * dt * oRB.gravity
+
     oRB:ApplyWorldForceAtCenterOfMass(fmath.vec3:new(0, fGravityForce, 0))
 end
 
@@ -171,9 +175,7 @@ function self:SetGrounded(bValue)
     end
 end
 
--- function self:IsMoving()
---     return bIsMoving
--- end
+
 function self:IsMoving()
     return bWasMovingLastFrame  
 end
@@ -211,7 +213,7 @@ function self:Setup(oNewRigidBody, iNewMoveSpeed, iNewJumpForce)
 
     oRB        = oNewRigidBody
     MOVE_SPEED = iNewMoveSpeed or 20000
-    JUMP_FORCE = iNewJumpForce or 6500000  -- force * masse
+    JUMP_FORCE = iNewJumpForce or 6500000
 
     print("MovementComponent Initialized")
 end

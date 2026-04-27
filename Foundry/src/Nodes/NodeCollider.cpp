@@ -54,7 +54,14 @@ void NodeCollider::SetLocalRotation(const glm::quat& rot)
 
 void NodeCollider::AttachToRigidBody(NodeRigidBody* rigidBody)
 {
-	PhysicsServer::AttachToRigidBody(rigidBody, *this);
+	if (!m_pShape) return;
+
+	auto rb = rigidBody->GetRigidBody();
+	m_pCollider = rb->addCollider(m_pShape, GetLocalRp3dTransform());
+	m_pRigidBodyRP3D = rb;
+	m_pNodeRigidBody = rigidBody;
+	m_indexInRigidBody = rigidBody->GetColliders().size();
+	rigidBody->GetColliders().push_back(this);
 }
 
 void NodeCollider::Detach()
