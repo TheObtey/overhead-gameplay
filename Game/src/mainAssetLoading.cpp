@@ -37,8 +37,8 @@ Node& LoadScene(Node& node)
     static_cast<NodeCamera*>(nCamera.get())->AddLocalYaw(1.0f);
 
     //sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_3.fbx", AssetLoader::FileType::FBX);
-    sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Staff_Room_Tutoriel/Staff_Room_Fondations.fbx", AssetLoader::FileType::FBX);
-    //sptr<SceneData> Scene4 = AssetLoader::LoadSceneFromFile("res/Assets/Staff_Room_Tutoriel/Staff_Room_Movable_Meshs.fbx", AssetLoader::FileType::FBX);
+    sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Staff_Room_Fondations.fbx", AssetLoader::FileType::FBX);
+    //sptr<SceneData> Scene4 = AssetLoader::LoadSceneFromFile("res/fbx/Staff_Room_Movable_Meshs.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene2 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene3 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Bones.fbx", AssetLoader::FileType::FBX);
 
