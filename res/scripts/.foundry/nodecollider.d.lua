@@ -9,16 +9,17 @@ function CreateNodeCollider(name) end
 
 --- =========== Local transform (offset from RigidBody) ===========
 
----@param pos fmaths.vec3
-function nodecollider:SetLocalPosition(pos) end
+---@overload fun(pos:fmath.vec3)
+---@overload fun(posX:number, posY:number, posZ:number)
+function nodecollider:SetLocalPosition(posX,posY,posZ) end
 
----@param rot fmaths.vec3
+---@param rot fmath.vec3
 function nodecollider:SetLocalRotation(rot) end
 
----@return fmaths.vec3
+---@return fmath.vec3
 function nodecollider:GetLocalPosition() end
 
----@return fmaths.vec3
+---@return fmath.vec3
 function nodecollider:GetLocalRotation() end
 
 

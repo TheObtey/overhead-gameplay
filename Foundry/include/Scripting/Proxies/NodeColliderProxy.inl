@@ -8,6 +8,7 @@ public:
     // =========== Local transform (offset from RigidBody) ===========
 
     void SetLocalPosition(const glm::vec3& pos)             { m_pNode->SetLocalPosition(pos); }
+    //void SetLocalPosition(float posX,float posY, float posZ){ m_pNode->SetLocalPosition({ posX, posY, posZ }); }
     void SetLocalRotation(const glm::quat& rot)             { m_pNode->SetLocalRotation(rot); }
     glm::vec3 const& GetLocalPosition() const               { return m_pNode->GetLocalPosition(); }
     glm::quat const& GetLocalRotation() const               { return m_pNode->GetLocalRotation(); }
@@ -50,7 +51,8 @@ struct NodeCollider::Proxy::ProxyBinding
 			sol::meta_function::garbage_collect, BIND(GCNodeProxy),
 			sol::meta_function::new_index, StoreUserData(),
 			sol::meta_function::index, LoadUserData(),
-			"SetLocalPosition", BIND(SetLocalPosition),
+			//"SetLocalPosition", OVERLOAD(NodeCollider::Proxy, void, const glm::vec3&)		(BIND(SetLocalPosition)),
+			"SetLocalPosition",	(BIND(SetLocalPosition)),
 			"SetLocalRotation", BIND(SetLocalRotation),
 			"GetLocalPosition", BIND(GetLocalPosition),
 			"GetLocalRotation", BIND(GetLocalRotation),

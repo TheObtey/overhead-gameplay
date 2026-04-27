@@ -24,13 +24,37 @@ void Node3D::OnUpdate(double delta)
 	m_transform.Update();
 	UpdateWorldTransform();
 	UpdateLocalTransform();
+	m_prevWorldPosition = { m_worldPosition.x, m_worldPosition.y, m_worldPosition.z };
 }
 
 void Node3D::Reparent(Node& newParent, bool keepGlobalTransform)
 {
-	Node::Reparent(newParent, keepGlobalTransform);
-	m_worldDirty = true;
+	//Node::Reparent(newParent, keepGlobalTransform);
+	//if (keepGlobalTransform)
+	//{
+	//	SetWorldPosition(m_prevWorldPosition);
+	//}
+	//else
+	//{
+	//	m_localDirty = true;
+	//	UpdateWorldTransform();
+	//}
+		// Snapshot AVANT le reparent
+	glm::vec3 savedWorld = m_worldPosition; // ← sauvegarder ici, pas après
+	glm::quat savedRot = m_worldRotation;
+	glm::vec3 savedScale = m_worldScale;
 
+	Node::Reparent(newParent, keepGlobalTransform); // OnParentChange fire ici
+
+	if (keepGlobalTransform)
+	{
+		// Réécrire après le recalcul parasite
+		m_worldPosition = glm::vec4(savedWorld, 1.0f);
+		m_worldRotation = savedRot;
+		m_worldScale = glm::vec4(savedScale, 1.0f);
+		m_worldDirty = true;
+		UpdateLocalTransform(); // recalcule la local depuis la world sauvegardée
+	}
 }
 
 void Node3D::CheckParentTransform()

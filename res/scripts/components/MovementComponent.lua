@@ -1,65 +1,218 @@
----@class node
-local self = self
 
-local iMoveSpeed
+-- ---@class noderigidbody
+-- self = self
+
+local fMoveSpeed
+local MOVE_SPEED
+local fJumpForce
+local JUMP_FORCE
 local oRB
 
-function self:MoveForward(icForward) print("move forward")
+-- ─── Gravité custom ───────────────────────────────────────────────────────────
+local GRAVITY_UP      = -450.0   -- montée légère (saut)
+local GRAVITY_DOWN    = -650.0   -- descente rapide
+local GRAVITY_FALLING = -950.0   -- chute libre
+
+-- ─── État interne ─────────────────────────────────────────────────────────────
+local bIsGrounded     = true
+local bIsMoving       = false
+local bJumpedThisFrame = false
+
+local GROUNDED_GRACE   = 0.12 
+local fGroundedTimer   = GROUNDED_GRACE
+
+-- Coyote time
+local COYOTE_TIME     = 0.12
+local fCoyoteTimer    = 0.0
+
+-- Jump buffer
+local JUMP_BUFFER     = 0.12
+local fJumpBufferTimer = 0.0
+
+-- Référence à la State Machine
+local oSM = nil
+
+
+
+-- ─── Mouvement ────────────────────────────────────────────────────────────────
+
+self.MoveForward = function(icForward)
+    -- print("FORWARD")
     if not oRB then return end
-
-    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -iMoveSpeed))
-
-    print(oRB:GetPosition().x, oRB:GetPosition().y, oRB:GetPosition().z)
-    print("\n\n")
+    bIsMoving = true
+    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
 end
 
-function self:MoveBackward(icBackward) print("move backward")
+self.MoveBackward = function(icBackward)
+    -- print("BACKARD")
     if not oRB then return end
-
-    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, iMoveSpeed))
-
-    print(oRB:GetPosition().x, oRB:GetPosition().y, oRB:GetPosition().z)
-    print("\n\n")
+    bIsMoving = true
+    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed))
 end
 
-function self:MoveLeft(icLeft) print("move left")
+self.MoveLeft = function(icLeft)
+    -- print("LEFT")
     if not oRB then return end
-
-    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-iMoveSpeed, 0, 0))
-
-    print(oRB:GetPosition().x, oRB:GetPosition().y, oRB:GetPosition().z)
-    print("\n\n")
+    bIsMoving = true
+    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
 end
 
-function self:MoveRight(icRight) print("move right")
+self.MoveRight = function(icRight)
+    -- print("RIGHT")
+    -- print("Forces : {".. oRB:GetTotalForce().x .. ", ".. oRB:GetTotalForce().y .. ", ".. oRB:GetTotalForce().z .. "}")
     if not oRB then return end
-
-    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(iMoveSpeed, 0, 0))
-
-    print(oRB:GetPosition().x, oRB:GetPosition().y, oRB:GetPosition().z)
-    print("\n\n")
+    bIsMoving = true
+    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
 end
+self.DebugPos = function(icA)
+    if not oRB then return end
+    if icA:IsPressed() then
+    oRB:SetLocalPosition(fmath.vec3:new(-5,2,5))
+    end
+end
+
+-- ─── Saut ─────────────────────────────────────────────────────────────────────
+
+self.Jump = function(icJump)
+    if not oRB then return end
+    if icJump:IsPressed() then
+    fJumpBufferTimer = JUMP_BUFFER end
+end
+
+local function TryJump()
+    -- if fCoyoteTimer > 0 and fJumpBufferTimer > 0 then
+    if fJumpBufferTimer > 0 then
+        local vel = oRB:GetLinearVelocity()
+        oRB:SetLinearVelocity(fmath.vec3:new(vel.x, 0, vel.z))
+        oRB:SetAngularVelocity(fmath.vec3:new(0, 0, 0))
+        oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, fJumpForce, 0))
+
+        fJumpBufferTimer = 0
+        fCoyoteTimer     = 0
+        bIsGrounded      = false
+        bJumpedThisFrame = true
+        print("JUMPING : " .. fJumpForce)
+        if oSM then oSM:TransitionTo("JUMP") end
+    end
+end
+
+-- ─── Gravité custom ───────────────────────────────────────────────────────────
+
+local function ApplyCustomGravity(oMass, dt)
+    local vel = oRB:GetLinearVelocity()
+    local gravity
+
+    if bIsGrounded then
+        return
+    elseif vel.y > 0 then
+        gravity = GRAVITY_UP
+    elseif vel.y < -0.1 and not bJumpedThisFrame then
+        gravity = GRAVITY_FALLING
+    else
+        gravity = GRAVITY_DOWN
+    end
+    -- print("____________")
+    -- print("Vel Y = ".. vel.y)
+    -- print("Gravity = ".. gravity)
+    local fGravityForce = gravity * oMass * dt * oRB.gravity 
+    -- print("Gravity = "..fGravityForce)
+    oRB:ApplyWorldForceAtCenterOfMass(fmath.vec3:new(0, fGravityForce, 0))
+end
+
+
+-- ─── Update physique 
+
+local bWasMovingLastFrame = false
+
+function self:PhysicsUpdate(dt)
+    if not oRB then return end
+    local oMass = oRB:GetMass()
+    fMoveSpeed = MOVE_SPEED * dt
+    fJumpForce = JUMP_FORCE * dt
+
+    -- grounded timer = time before falling (after running off an edge)
+    if fGroundedTimer > 0 then
+        fGroundedTimer = fGroundedTimer - dt
+        if fGroundedTimer <= 0 then
+            bIsGrounded = false
+        end
+    end
+
+    -- Coyote time = time to jump while falling (after running off an edge)
+    if bIsGrounded then
+        fCoyoteTimer = COYOTE_TIME
+    else
+        fCoyoteTimer = fmath.Max(0, fCoyoteTimer - dt)
+    end
+    fJumpBufferTimer = fmath.Max(0, fJumpBufferTimer - dt)
+
+    TryJump()
+    ApplyCustomGravity(oMass, dt)
+
+    bWasMovingLastFrame = bIsMoving
+    bIsMoving           = false
+    bJumpedThisFrame    = false
+end
+
+
+function self:IsGrounded()
+    return bIsGrounded
+end
+
+function self:SetGrounded(bValue)
+    if bValue then
+        if not bIsGrounded then
+            if oSM then oSM:TransitionTo("LAND") end
+        end
+        bIsGrounded    = true
+        fGroundedTimer = GROUNDED_GRACE
+    else
+        -- si rien ici, le joueur reste "grounded" pendant GROUNDED_GRACE seconde(s)
+    end
+end
+
+-- function self:IsMoving()
+--     return bIsMoving
+-- end
+function self:IsMoving()
+    return bWasMovingLastFrame  
+end
+
+function self:GetVerticalVelocity()
+    if not oRB then return 0 end
+    return oRB:GetLinearVelocity().y
+end
+
+-- ─── Injection de la State Machine 
+
+function self:SetStateMachine(oNewSM)
+    oSM = oNewSM
+    print("StateMachine set in MovementComponent")
+end
+
+-- ─── Setup 
 
 function self:SetMoveSpeed(iNewMoveSpeed)
-    assert(iMoveSpeed ~= nil and type(iMoveSpeed) == "number", "MovementComponent: Valid number expected for move speed")
-    iMoveSpeed = iNewMoveSpeed
+    assert(type(iNewMoveSpeed) == "number", "MovementComponent: Valid number expected for move speed")
+    fMoveSpeed = iNewMoveSpeed
 end
 
-function self:GetMoveSpeed()
-    return iMoveSpeed
+function self:GetMoveSpeed() return fMoveSpeed end
+
+function self:SetJumpForce(iNewJumpForce)
+    assert(type(iNewJumpForce) == "number", "MovementComponent: Valid number expected for jump force")
+    fJumpForce = iNewJumpForce
 end
 
-function self:Setup(oNewRigidBody, iNewMoveSpeed)
+function self:GetJumpForce() return fJumpForce end
+
+function self:Setup(oNewRigidBody, iNewMoveSpeed, iNewJumpForce)
     assert(oNewRigidBody ~= nil, "MovementComponent: Valid rigidbody must be provided")
 
-    oRB = oNewRigidBody
-    iMoveSpeed = iNewMoveSpeed or 3000
+    oRB        = oNewRigidBody
+    MOVE_SPEED = iNewMoveSpeed or 20000
+    JUMP_FORCE = iNewJumpForce or 6500000  -- force * masse
 
     print("MovementComponent Initialized")
 end
 
-function OnInit()
-end
-
-function OnUpdate(iDelta)
-end

@@ -2,6 +2,7 @@
 #include "IProgram.h"
 
 #include <Logger.hpp>
+#include <ranges>
 
 using namespace Ore;
 Mesh::Mesh(sptr<Geometry> const& geometry, TextureSpan textures, glm::mat4 const& transform)
@@ -18,6 +19,7 @@ void Mesh::Draw(IProgram const& pProgram) const
     uint32 specularNr = 1;
     uint32 normalNr = 1;
     uint32 heightNr = 1;
+    uint32 opacityNr = 1;
 
     for(uint32 i = 0; i < m_textures.size(); ++i)
     {
@@ -38,10 +40,14 @@ void Mesh::Draw(IProgram const& pProgram) const
         case(TextureMaterialType::HEIGHT):
             name = "texture_height" + std::to_string(heightNr++);
             break;
+        case(TextureMaterialType::OPACITY):
+            name = "texture_opacity" + std::to_string(opacityNr++);
+            break;
         }
 
         glUniform1i(glGetUniformLocation(pProgram.GetProgramId(), name.c_str()), i);
         m_textures[i]->GetTextureObject().Bind();
+
     }
 
     m_pGeometry->Draw();

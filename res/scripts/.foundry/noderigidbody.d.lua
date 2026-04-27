@@ -1,45 +1,49 @@
 ---@meta
 
----@class noderigidbody
+---@class noderigidbody : node
 noderigidbody = {}
 
 ---@param name string 
 function CreateNodeRigidBody(name) end
 
----@param force fmaths.vec3
-function noderigidbody:ApplyLocalForceAtCenterOfMass(force) end
+---@overload fun(force:fmath.vec3)
+---@overload fun(forceX:number, forceY:number, forceZ:number)
+function noderigidbody:ApplyLocalForceAtCenterOfMass(forceX, forceY, forceZ) end
 
----@param force fmaths.vec3
----@param point fmaths.vec3
+---@param force fmath.vec3
+---@param point fmath.vec3
 function noderigidbody:ApplyLocalForceAtLocalPosition(force, point) end
 
----@param force fmaths.vec3
----@param point fmaths.vec3
+---@param force fmath.vec3
+---@param point fmath.vec3
 function noderigidbody:ApplyLocalForceAtWorldPosition(force, point) end
 
 
----@param force fmaths.vec3
-function noderigidbody:ApplyWorldForceAtCenterOfMass(force) end
+---@overload fun(force:fmath.vec3)
+---@overload fun(forceX:number, forceY:number, forceZ:number)
+function noderigidbody:ApplyWorldForceAtCenterOfMass(forceX, forceY, forceZ) end
 
----@param force fmaths.vec3
----@param point fmaths.vec3
+---@param force fmath.vec3
+---@param point fmath.vec3
 function noderigidbody:ApplyWorldForceAtLocalPosition(force, point) end
 
----@param force fmaths.vec3
----@param point fmaths.vec3
+---@param force fmath.vec3
+---@param point fmath.vec3
 function noderigidbody:ApplyWorldForceAtWorldPosition(force, point) end
 
 
----@param torque fmaths.vec3
-function noderigidbody:ApplyLocalTorque(torque) end
+---@overload fun(torque:fmath.vec3)
+---@overload fun(torqueX:number, torqueY:number, torqueZ:number)
+function noderigidbody:ApplyLocalTorque(torqueX,torqueY,torqueZ) end
 
----@param torque fmaths.vec3
-function noderigidbody:ApplyWorldTorque(torque) end
+---@overload fun(torque:fmath.vec3)
+---@overload fun(torqueX:number, torqueY:number, torqueZ:number)
+function noderigidbody:ApplyWorldTorque(torqueX,torqueY,torqueZ) end
 
 
----@return fmaths.vec3
+---@return fmath.vec3
 function noderigidbody:GetLinearVelocity() end
----@return fmaths.vec3
+---@return fmath.vec3
 function noderigidbody:GetAngularVelocity() end
 --- Return the linear decelerating factor
 ---@return number
@@ -47,15 +51,17 @@ function noderigidbody:GetLinearDamping() end
 ---/ Return the angular velocity damping factor
 ---@return number
 function noderigidbody:GetAngularDamping() end
----@return fmaths.vec3
+---@return fmath.vec3
 function noderigidbody:GetTotalForce() end
 
 
----@param velocity fmaths.vec3
-function noderigidbody:SetLinearVelocity(velocity) end
+---@overload fun(velocity:fmath.vec3)
+---@overload fun(velocityX:number, velocityY:number, velocityZ:number)
+function noderigidbody:SetLinearVelocity(velocityX,velocityY,velocityZ) end
 
----@param velocity fmaths.vec3
-function noderigidbody:SetAngularVelocity(velocity) end
+---@overload fun(velocity:fmath.vec3)
+---@overload fun(velocityX:number, velocityY:number, velocityZ:number)
+function noderigidbody:SetAngularVelocity(velocityX,velocityY,velocityZ) end
 
 --- set the linear decelerating factor
 ---@param linearDamping number

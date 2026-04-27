@@ -4,8 +4,10 @@
 #include <Servers/EngineServer.h>
 #include <Servers/PhysicsServer.h>
 #include <Servers/GraphicServer.h>
+
 #include <AssetLoading/AssetLoader.h>
 #include <AssetLoading/EditorAssetLoader.h>
+#include <Servers/AudioServer.h>
 
 #include <Serialization/SerializeObject.hpp>
 #include <iostream>
@@ -164,6 +166,7 @@ void Editor::Update(float deltaTime)
 	EngineServer::FlushCommands();
 	//GraphicServer::FlushCommands();
 	PhysicsServer::FlushCommands();
+	AudioServer::FlushCommands();
 }
 
 

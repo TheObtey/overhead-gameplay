@@ -98,6 +98,8 @@ void EditorImGui::Init()
 	auto nodeMesh = Node::CreateNode<Node>("NodeMesh");
 
 	auto nodeCamera = Node::CreateNode<Node>("NodeCamera");
+	auto nodeAudioListener = Node::CreateNode<Node>("NodeAudioListener");
+	auto nodeAudioEmitter = Node::CreateNode<Node>("NodeAudioEmitter");
 
 	collider->AddChild(colliderbox);
 	collider->AddChild(collidersphere);
@@ -107,6 +109,8 @@ void EditorImGui::Init()
 	node3D->AddChild(collider);
 	node3D->AddChild(rigibody);
 	node3D->AddChild(nodeCamera);
+	node3D->AddChild(nodeAudioListener);
+	node3D->AddChild(nodeAudioEmitter);
 	m_newNodeTypeSelector->AddChild(node3D);
 	EngineServer::FlushCommands();
 
