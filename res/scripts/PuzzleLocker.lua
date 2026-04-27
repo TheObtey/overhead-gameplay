@@ -1,5 +1,21 @@
 local oCollider
 
+local inseredPieces = 0
+local piecesRequired = 3
+
+function PieceCollector(rigidbody)
+    print("NICE ANOTHER PIECE !!!!")
+    --local shortName = string.sub(rigidbodyName, 1, 5)
+    --print("Short Name : ".. shortName)
+    
+    if rigidbody:GetName() == "Piece1" then -- todo: change
+        if inseredPieces < piecesRequired then
+            inseredPieces = inseredPieces + 1 
+            print("PIECES: " .. inseredPieces .. "/" .. piecesRequired)
+        end
+    end
+end
+
 function OnInit()
     oCollider = self:FindChild("PuzzleTrigger"):As(NodeTypes.NODE_COLLIDER)
     if oCollider ~= nil then
@@ -12,6 +28,7 @@ function OnInit()
         -- Attach OnBodyEntered method of collider to a callback
         local id = oCollider:SubscribeOnTrigger(function(collider, rigidbody) -- Exemple Event 1
             print("TRIGGER avec : ".. rigidbody:GetName())
+            PieceCollector(rigidbody)
         end)
         oCollider:SubscribeOnTrigger(function(collider, rigidbody) -- Exemple Event 2
             print("ANOTHER ONE " .. rigidbody:GetName())
