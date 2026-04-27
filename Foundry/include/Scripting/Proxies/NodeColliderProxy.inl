@@ -8,6 +8,7 @@ public:
     // =========== Local transform (offset from RigidBody) ===========
 
     void SetLocalPosition(const glm::vec3& pos)             { m_pNode->SetLocalPosition(pos); }
+    //void SetLocalPosition(float posX,float posY, float posZ){ m_pNode->SetLocalPosition({ posX, posY, posZ }); }
     void SetLocalRotation(const glm::quat& rot)             { m_pNode->SetLocalRotation(rot); }
     glm::vec3 const& GetLocalPosition() const               { return m_pNode->GetLocalPosition(); }
     glm::quat const& GetLocalRotation() const               { return m_pNode->GetLocalRotation(); }
@@ -37,6 +38,29 @@ public:
     void     SetCollideWithMaskBits(uint16_t mask)          { m_pNode->SetCollideWithMaskBits(mask); }
     uint16_t GetCollisionBitsMask() const                   { return m_pNode->GetCollisionBitsMask(); }
 
+
+
+	Connection SubscribeOnTrigger(sol::function func)
+	{
+		return m_pNode->OnTrigger.Subscribe(std::function<void(NodeCollider&, const NodeRigidBody&)>(
+			[func](NodeCollider& a, const NodeRigidBody& b) {
+				func(static_cast<NodeCollider::Proxy&>(a.GetNodeProxy()), static_cast<NodeRigidBody::Proxy&>(b.GetNodeProxy()));
+			}
+		));
+	}
+
+	Connection SubscribeOnContact(sol::function func)
+	{
+		return m_pNode->OnContact.Subscribe(std::function<void(NodeCollider&, const NodeRigidBody&)>(
+			[func](NodeCollider& a, const NodeRigidBody& b) {
+				func(static_cast<NodeCollider::Proxy&>(a.GetNodeProxy()), static_cast<NodeRigidBody::Proxy&>(b.GetNodeProxy()));
+			}
+		));
+	}
+
+	void UnsubscribeOnTrigger(Connection id) { m_pNode->OnTrigger.Unsubscribe(id); }
+	void UnsubscribeOnContact(Connection id) { m_pNode->OnContact.Unsubscribe(id); }
+
 private:
 	NodeCollider* m_pNode;
 };
@@ -50,7 +74,8 @@ struct NodeCollider::Proxy::ProxyBinding
 			sol::meta_function::garbage_collect, BIND(GCNodeProxy),
 			sol::meta_function::new_index, StoreUserData(),
 			sol::meta_function::index, LoadUserData(),
-			"SetLocalPosition", BIND(SetLocalPosition),
+			//"SetLocalPosition", OVERLOAD(NodeCollider::Proxy, void, const glm::vec3&)		(BIND(SetLocalPosition)),
+			"SetLocalPosition",	(BIND(SetLocalPosition)),
 			"SetLocalRotation", BIND(SetLocalRotation),
 			"GetLocalPosition", BIND(GetLocalPosition),
 			"GetLocalRotation", BIND(GetLocalRotation),
@@ -72,7 +97,12 @@ struct NodeCollider::Proxy::ProxyBinding
 			"SetCollisionCategoryBits", BIND(SetCollisionCategoryBits),
 			"GetCollisionCategoryBits", BIND(GetCollisionCategoryBits),
 			"SetCollideWithMaskBits", BIND(SetCollideWithMaskBits),
-			"GetCollisionBitsMask", BIND(GetCollisionBitsMask));
+			"GetCollisionBitsMask", BIND(GetCollisionBitsMask),
+			"SubscribeOnTrigger", BIND(SubscribeOnTrigger),
+			"SubscribeOnContact", BIND(SubscribeOnContact),
+			"UnsubscribeOnTrigger", BIND(UnsubscribeOnTrigger),
+			"UnsubscribeOnContact", BIND(UnsubscribeOnContact)
+			);
 	};
 };
 

@@ -6,8 +6,8 @@
 #include "Nodes/NodeWindow.h"
 #include "Servers/EngineServer.h"
 #include "Servers/GraphicServer.h"
+#include "Servers/AudioServer.h"
 #include "Servers/PhysicsServer.h"
-#include "Scripting/RegisterProxies.h"
 #include "ActionMap.h"
 
 ActionMap* GameLoop::CurrentActionMap = nullptr;
@@ -48,16 +48,17 @@ void GameLoop::LoopGame()
             ActionMap::PollInputs(CurrentActionMap);
 
         m_accumulator += dt;
-        do
+        
+        while (m_accumulator > PHYSICS_DT)
         {
             m_accumulator -= PHYSICS_DT;
             root.PhysicsUpdate(PHYSICS_DT);
             PhysicsServer::UpdatePhysicsWorld(PHYSICS_DT); // !! si update fait ici, il semble beaucoup trop rapide !!
         }
-        while (m_accumulator > PHYSICS_DT);
 
         //PhysicsServer::UpdatePhysicsWorld(dt);
         root.Update(dt);
+        ScriptingEngine::Update(dt);
         UpdateServers();
         BuildTasksGraph(graph);
 
@@ -74,9 +75,9 @@ void GameLoop::EndGame()
 
 void GameLoop::InitServers()
 {
-    RegisterProxies();
     EngineServer::Initialize();
     GraphicServer::Initialize();
+    AudioServer::Initialize();
     PhysicsServer::Initialize();
 }
 

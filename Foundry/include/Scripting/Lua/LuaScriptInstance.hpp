@@ -26,7 +26,6 @@ private:
 
 	sol::protected_function m_initFunc;
 	sol::protected_function m_updateFunc;
-	sol::protected_function m_timerUpdateFunc;
 	sol::protected_function m_updatePhysicsFunc;
 	sol::protected_function m_destroyFunc;
 };
@@ -45,7 +44,6 @@ inline void LuaScriptInstance::AttachToProxy(T* const proxy)
 
 	m_initFunc = m_enviro["OnInit"];
 	m_updateFunc = m_enviro["OnUpdate"];
-	m_timerUpdateFunc = m_enviro["timer"]["Tick"];
 	m_destroyFunc = m_enviro["OnDestroy"];
 }
 

@@ -14,9 +14,9 @@
 
 namespace
 {
-
     std::filesystem::path const kScriptStockDir = "../Game/ScriptStock";
     std::filesystem::path const kTextureRootDir = "../Game/res/textures";
+    std::filesystem::path const kFbxRootDir = "../Game/res/fbx"; 
     std::filesystem::path const kScriptStockLogicalDir = "ScriptStock";
 
     std::string const kDefaultTexturePath = "res/textures/Default.png";
@@ -52,8 +52,6 @@ namespace
             ec.clear();
             candidateAbs = candidate;
         }
-
-        // Si le fichier est dans ScriptStock, on garde la sous-arborescence
         std::filesystem::path relToStock = std::filesystem::relative(candidateAbs, stockAbs, ec);
         if (!ec && !relToStock.empty())
         {
@@ -104,12 +102,49 @@ namespace
 
         return (std::filesystem::path("res/textures") / candidateAbs.filename()).generic_string();
     }
+
+    std::string NormalizeFbxPathForProject(std::filesystem::path const& inputPath) 
+    {
+        if (inputPath.empty())
+            return {};
+
+        std::error_code ec;
+
+        std::filesystem::path fbxRootAbs = std::filesystem::weakly_canonical(std::filesystem::absolute(kFbxRootDir), ec);
+        if (ec)
+        {
+            ec.clear();
+            fbxRootAbs = std::filesystem::absolute(kFbxRootDir);
+        }
+
+        std::filesystem::path candidate = inputPath;
+        if (candidate.is_relative())
+            candidate = std::filesystem::absolute(candidate);
+
+        std::filesystem::path candidateAbs = std::filesystem::weakly_canonical(candidate, ec);
+        if (ec)
+        {
+            ec.clear();
+            candidateAbs = candidate;
+        }
+
+        std::filesystem::path relToRoot = std::filesystem::relative(candidateAbs, fbxRootAbs, ec);
+        if (!ec && !relToRoot.empty())
+        {
+            std::string const relStr = relToRoot.generic_string();
+            if (!(relStr == ".." || relStr.rfind("../", 0) == 0))
+                return (std::filesystem::path("res/fbx") / relToRoot).generic_string();
+        }
+
+        return (std::filesystem::path("res/fbx") / candidateAbs.filename()).generic_string();
+    }
 }
 
 InspectorNodeProperties::InspectorNodeProperties(EditorImGui* pImGuiEditor)
     : m_pImguiEditor(pImGuiEditor),
       m_luaBrowser(ImGuiFileBrowserFlags_ConfirmOnEnter),
-      m_textureBrowser(ImGuiFileBrowserFlags_ConfirmOnEnter)
+      m_textureBrowser(ImGuiFileBrowserFlags_ConfirmOnEnter),
+      m_fbxBrowser(ImGuiFileBrowserFlags_ConfirmOnEnter)
 {
     m_luaBrowser.SetTitle("Select Lua Script");
     m_luaBrowser.SetTypeFilters({ ".lua" });
@@ -118,6 +153,10 @@ InspectorNodeProperties::InspectorNodeProperties(EditorImGui* pImGuiEditor)
     m_textureBrowser.SetTitle("Select Diffuse Texture");
     m_textureBrowser.SetTypeFilters({ ".png", ".jpg", ".jpeg" });
     m_textureBrowser.SetDirectory(kTextureRootDir.string());
+
+    m_fbxBrowser.SetTitle("Select FBX");
+    m_fbxBrowser.SetTypeFilters({ ".fbx" });
+    m_fbxBrowser.SetDirectory(kFbxRootDir.string());
 }
 
 void InspectorNodeProperties::DrawWindow(bool windowState, Node* pNode)
@@ -158,6 +197,7 @@ void InspectorNodeProperties::DrawWindow(bool windowState, Node* pNode)
         bool wasModified = DrawDatas(m_currentDatas);
         wasModified |= DrawLuaScriptPicker(m_currentDatas);
         wasModified |= DrawTexturePicker(m_currentDatas);
+        wasModified |= DrawFbxPicker(m_currentDatas); 
 
         if (wasModified)
         {
@@ -243,7 +283,7 @@ bool InspectorNodeProperties::DrawDatas(json& publicDataJson)
     bool wasModified = false;
     for (auto& [key, value] : publicDataJson.items())
     {
-        if (key == "m_scriptPath" || key == "DiffuseTexturePath")
+        if (key == "m_scriptPath" || key == "DiffuseTexturePath" || key == "FbxPath")
         {
             continue;
         }
@@ -515,13 +555,8 @@ bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
     ImGui::Text("Texture");
 
     std::string texturePath = publicDataJson["DiffuseTexturePath"].get<std::string>();
-    if (texturePath.empty())
-    {
-        texturePath = kDefaultTexturePath;
-        publicDataJson["DiffuseTexturePath"] = texturePath;
-        wasModified = true;
-    }
-    else if (texturePath != kDefaultTexturePath)
+
+    if (!texturePath.empty() && texturePath != kDefaultTexturePath)
     {
         std::string const normalized = NormalizeTexturePathForProject(texturePath);
         if (normalized != texturePath)
@@ -540,7 +575,6 @@ bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
     ImGui::SameLine();
     bool const browseClicked = ImGui::Button("Browse Texture");
 
-    ImGui::SameLine();
     bool const clearClicked = ImGui::Button("Clear Texture");
 
     if (browseClicked)
@@ -548,9 +582,9 @@ bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
         m_showTextureBrowser = true;
     }
 
-    if (clearClicked && texturePath != kDefaultTexturePath)
+    if (clearClicked && !texturePath.empty())
     {
-        publicDataJson["DiffuseTexturePath"] = kDefaultTexturePath;
+        publicDataJson["DiffuseTexturePath"] = "";
         wasModified = true;
     }
 
@@ -570,6 +604,72 @@ bool InspectorNodeProperties::DrawTexturePicker(json& publicDataJson)
         wasModified = true;
         m_textureBrowser.ClearSelected();
         m_textureBrowser.Close();
+    }
+
+    return wasModified;
+}
+
+bool InspectorNodeProperties::DrawFbxPicker(json& publicDataJson)
+{
+    if (!publicDataJson.contains("FbxPath"))
+    {
+        return false;
+    }
+
+    bool wasModified = false;
+
+    ImGui::Separator();
+    ImGui::Text("FBX");
+
+    std::string fbxPath = publicDataJson["FbxPath"].get<std::string>();
+    if (!fbxPath.empty())
+    {
+        std::string const normalized = NormalizeFbxPathForProject(fbxPath);
+        if (normalized != fbxPath)
+        {
+            fbxPath = normalized;
+            publicDataJson["FbxPath"] = fbxPath;
+            wasModified = true;
+        }
+    }
+
+    char fbxBuffer[256] = {};
+    strncpy(fbxBuffer, fbxPath.c_str(), sizeof(fbxBuffer) - 1);
+
+    ImGui::InputText("Model", fbxBuffer, sizeof(fbxBuffer), ImGuiInputTextFlags_ReadOnly);
+
+    ImGui::SameLine();
+    bool const browseClicked = ImGui::Button("Browse FBX");
+
+    bool const clearClicked = ImGui::Button("Clear FBX");
+
+    if (browseClicked)
+    {
+        m_showFbxBrowser = true;
+    }
+
+    if (clearClicked && !fbxPath.empty())
+    {
+        publicDataJson["FbxPath"] = "";
+        wasModified = true;
+    }
+
+    if (m_showFbxBrowser)
+    {
+        m_fbxBrowser.Open();
+        m_showFbxBrowser = false;
+    }
+
+    m_fbxBrowser.SetWindowSize(m_fileBrowsingSizeX, m_fileBrowsingSizeY);
+    m_fbxBrowser.SetWindowPos(m_screenWidth / 2 - m_fileBrowsingSizeX / 2, m_screenHeight / 2 - m_fileBrowsingSizeY / 2);
+    m_fbxBrowser.Display();
+
+    if (m_fbxBrowser.HasSelected())
+    {
+        publicDataJson["FbxPath"] = NormalizeFbxPathForProject(m_fbxBrowser.GetSelected());
+        wasModified = true;
+        m_fbxBrowser.ClearSelected();
+        m_fbxBrowser.Close();
     }
 
     return wasModified;

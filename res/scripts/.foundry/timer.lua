@@ -53,7 +53,7 @@ function timer.Create(sTimerId, iDelay, iReps, fcCallback)
     assert(type(iDelay) == "number" and iDelay >= 0, "timer.Create: delay must be a positive number")
     assert(type(iReps) == "number" and iReps >= 0, "timer.Create: repetition must be a positive number")
     assert(type(fcCallback) == "function", "timer.Create: valid function expected")
-    
+
     local tTimer = {
         sId = sTimerId,
         iDelay = iDelay,
@@ -73,7 +73,7 @@ end
 function timer.Simple(iDelay, fcCallback)
     assert(type(iDelay) == "number" and iDelay >= 0, "timer.Simple: delay must be a positive number")
     assert(type(fcCallback) == "function", "timer.Simple: valid function expected")
-    
+
     local sTimerId = _newId()
     timer.Create(sTimerId, iDelay, 1, fcCallback)
 
@@ -166,7 +166,7 @@ function timer.RepsLeft(sTimerId)
     local tTimer = _getTimer(sTimerId)
     if not tTimer then return end
 
-    if tTimer.iReps == 0 then return 0 end
+    if tTimer.iReps == 0 then return -1 end
 
     return math.max(0, tTimer.iReps - tTimer.iRan)
 end
@@ -176,8 +176,8 @@ function timer.Adjust(sTimerId, iDelay, iReps, fcCallback)
     assert(type(sTimerId) == "string", "timer.Adjust: id must be a string")
 
     local tTimer = _getTimer(sTimerId)
-    
-    assert(type(tTimer) ~= nil, "timer.Adjust: timer does not exist")
+
+    assert(tTimer ~= nil, "timer.Adjust: timer does not exist")
     assert(type(iDelay) == "number" and iDelay >= 0, "timer.Adjust: delay must be a positive number")
 
     if iReps ~= nil then
@@ -206,15 +206,15 @@ function timer.Tick(iDt, iMaxFiresPerTick)
 
     iNow = iNow + iDt
     iMaxFiresPerTick = iMaxFiresPerTick or 1000
-    
+
     for sId, tTimer in pairs(timer._timers) do
         if not tTimer.bPaused then
-            
+
             local iFires = 0
 
             while tTimer.iNext and iNow >= tTimer.iNext do
                 iFires = iFires + 1
-                
+
                 if iFires > iMaxFiresPerTick then
                     _logError(sId, "max fires per tick reached")
                     break

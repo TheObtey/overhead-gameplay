@@ -98,6 +98,8 @@ void EditorImGui::Init()
 	auto nodeMesh = Node::CreateNode<Node>("NodeMesh");
 
 	auto nodeCamera = Node::CreateNode<Node>("NodeCamera");
+	auto nodeAudioListener = Node::CreateNode<Node>("NodeAudioListener");
+	auto nodeAudioEmitter = Node::CreateNode<Node>("NodeAudioEmitter");
 
 	collider->AddChild(colliderbox);
 	collider->AddChild(collidersphere);
@@ -107,6 +109,8 @@ void EditorImGui::Init()
 	node3D->AddChild(collider);
 	node3D->AddChild(rigibody);
 	node3D->AddChild(nodeCamera);
+	node3D->AddChild(nodeAudioListener);
+	node3D->AddChild(nodeAudioEmitter);
 	m_newNodeTypeSelector->AddChild(node3D);
 	EngineServer::FlushCommands();
 
@@ -756,7 +760,7 @@ void EditorImGui::SaveSceneNoSpecialisation()
 void EditorImGui::SelectedNode(Node* pNode)
 {
 	m_pSelectedNode = pNode;
-	m_pRaylibEditor->SetSelectedNode(pNode->GetName());
+	m_pRaylibEditor->SetSelectedNode(pNode);
 	if (pNode)
 	{
 		DEBUG("[EditorImGui] Selected: " << pNode->GetName() << std::endl);
@@ -936,7 +940,7 @@ void EditorImGui::NotifyNodeWillBeDeleted(Node* pNode)
 	if (m_pSelectedNode != nullptr && isInsideDeletedSubtree(m_pSelectedNode))
 	{
 		m_pSelectedNode = nullptr;
-		m_pRaylibEditor->SetSelectedNode("");
+		m_pRaylibEditor->SetSelectedNode(nullptr);
 	}
 
 	if (m_pViewRoot != nullptr && isInsideDeletedSubtree(m_pViewRoot))

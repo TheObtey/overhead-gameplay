@@ -50,9 +50,10 @@ sptr<SceneData> FBXLoader::LoadFile(std::string const& path)
 {
     Assimp::Importer importer = Assimp::Importer();
     int importFlags = aiProcess_CalcTangentSpace |
-                         aiProcess_Triangulate |
-                         aiProcess_JoinIdenticalVertices |
-                         aiProcess_SortByPType;
+        aiProcess_Triangulate |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_SortByPType |
+        aiProcess_GlobalScale;
     importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
     aiScene const* pAScene = importer.ReadFile(path.c_str(), importFlags);
 
@@ -110,12 +111,20 @@ sptr<SceneNode> FBXLoader::BuildNodesTree(aiScene const* pScene, aiNode const* p
 
 void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material& outMat)
 {
+    glm::mat4 parentMat = { 1.0f };
     // Load Vertices
     for (uint32 nodeIdx = 0; nodeIdx < outScene.allNode.size(); ++nodeIdx)
     {
         if (outScene.allNode[nodeIdx]->MeshIndex == -1)
             continue;
         aiMesh* pMesh = pScene->mMeshes[outScene.allNode[nodeIdx]->MeshIndex];
+      
+        if (outScene.allNode[nodeIdx]->parent == -1) {
+            SceneNode& pMeshParentIndex = *outScene.allNode[outScene.allNode[nodeIdx]->parent];
+            parentMat = parentMat * pMeshParentIndex.transform;
+        }
+
+
         std::vector<Ore::Vertex> vertices = {};
         std::vector<uint32> indices = {};
         vertices.reserve(pMesh->mNumVertices);
@@ -123,7 +132,8 @@ void FBXLoader::BuildMeshs(aiScene const* pScene, SceneData& outScene, Material&
         BuildGeometry(pMesh,vertices, indices);
         std::vector<glm::mat4> bones = {};
         SceneMesh sMesh = {};
-        sMesh.meshMatrix = outScene.allNode[nodeIdx]->transform;
+        //sMesh.meshMatrix = parentMat * outScene.allNode[nodeIdx]->transform;
+        sMesh.meshMatrix =  outScene.allNode[nodeIdx]->transform;
         sMesh.vertices = vertices;
         sMesh.indices = indices;
         if (pMesh->HasBones())

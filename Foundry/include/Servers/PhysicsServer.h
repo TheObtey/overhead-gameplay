@@ -314,6 +314,7 @@ private:
 
 	rp3d::PhysicsCommon m_physicsCommon;
 	rp3d::PhysicsWorld* m_pPhysicsWorld;
+	PhysicsEvents* m_pPhysicsEvents;
 
 	friend Server<PhysicsServer>;
 };
