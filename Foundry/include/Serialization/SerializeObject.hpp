@@ -274,6 +274,8 @@ template <>
 inline std::vector<ISerializable*> SerializedObject::GetPrivateArray(std::string const& arrayName) const
 {
 	std::vector<ISerializable*> array = {};
+	if (!m_elementsInSerializedObject["PRIVATE_DATAS"].contains(arrayName))
+		return array;
 	for (uint32 i = 0; i < m_elementsInSerializedObject["PRIVATE_DATAS"][arrayName].size(); i++)
 	{
 		SerializedObject jsonObject = {};
@@ -549,6 +551,9 @@ template <>
 inline std::vector<ISerializable*> SerializedObject::GetPublicArray(std::string const& arrayName) const
 {
 	std::vector<ISerializable*> array = {};
+	if (!m_elementsInSerializedObject["PUBLIC_DATAS"].contains(arrayName)) {
+		return array;
+	}
 	for (uint32 i = 0; i < m_elementsInSerializedObject["PUBLIC_DATAS"][arrayName].size(); i++)
 	{
 		SerializedObject jsonObject = {};

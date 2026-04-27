@@ -5,7 +5,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -13,7 +12,7 @@
 
 glm::mat4 EditorFBXLoader::AIMatrixToGLMMatrix(aiMatrix4x4 const& matrix)
 {
-	glm::mat4 out = {};
+	glm::mat4 out;
 	memcpy(&out, &matrix, sizeof(aiMatrix4x4));
 	return glm::transpose(out);
 }
@@ -22,185 +21,183 @@ namespace
 {
 	bool IsNearlyIdentity(glm::mat4 const& m, float eps = 1e-4f)
 	{
-		glm::mat4 const id(1.0f);
+		glm::mat4 id(1.0f);
 		for (int c = 0; c < 4; ++c)
-		{
 			for (int r = 0; r < 4; ++r)
-			{
-				if (std::abs(m[c][r] - id[c][r]) > eps) return false;
-			}
-		}
+				if (std::abs(m[c][r] - id[c][r]) > eps)
+					return false;
 		return true;
 	}
 
-	glm::mat4 ExtractTopLevelConverter(aiNode const* root, auto&& toGlm)
+	glm::mat4 ExtractTopLevelConverter(aiNode const* root)
 	{
 		glm::mat4 converter(1.0f);
 		aiNode const* n = root;
 
 		while (n)
 		{
-			bool const converterNode = (n->mNumMeshes == 0) && (n->mNumChildren == 1);
+			bool converterNode = (n->mNumMeshes == 0) && (n->mNumChildren == 1);
 			if (!converterNode) break;
 
-			glm::mat4 const local = toGlm(n->mTransformation);
+			glm::mat4 local = EditorFBXLoader::AIMatrixToGLMMatrix(n->mTransformation);
+
 			if (!IsNearlyIdentity(local))
-			{
-				converter = converter * local;
-			}
+				converter *= local;
 
 			n = n->mChildren[0];
 		}
-
 		return converter;
 	}
+}
+
+void EditorFBXLoader::BuildNodes(aiNode const* pNode, int parent, EditorSceneData& scene)
+{
+	EditorNode node;
+	node.name = pNode->mName.C_Str();
+	node.transform = AIMatrixToGLMMatrix(pNode->mTransformation);
+	node.parent = parent;
+
+	int index = scene.nodes.size();
+	scene.nodes.push_back(node);
+
+	if (parent >= 0)
+		scene.nodes[parent].children.push_back(index);
+	else
+		scene.rootNode = index;
+
+	if (pNode->mNumMeshes > 0)
+		scene.nodes[index].meshIndex = pNode->mMeshes[0];
+
+	for (uint32 i = 0; i < pNode->mNumChildren; ++i)
+		BuildNodes(pNode->mChildren[i], index, scene);
 }
 
 void EditorFBXLoader::BuildMeshes(aiScene const* pScene, std::string const& sourcePath, EditorSceneData& outScene)
 {
 	std::vector<glm::mat4> meshWorldMatrices(pScene->mNumMeshes, glm::mat4(1.0f));
-	std::vector<bool> meshMatrixAssigned(pScene->mNumMeshes, false);
+	std::vector<bool> assigned(pScene->mNumMeshes, false);
 
-	std::function<void(aiNode const*, glm::mat4 const&)> collectNodeTransforms;
+	std::function<void(aiNode const*, glm::mat4 const&)> collect;
 
-	collectNodeTransforms = [&](aiNode const* pNode, glm::mat4 const& parentWorld)
-	{
-		if (!pNode) return;
-
-		glm::mat4 const local = AIMatrixToGLMMatrix(pNode->mTransformation);
-		glm::mat4 const world = parentWorld * local;
-
-		for (uint32 i = 0; i < pNode->mNumMeshes; ++i)
+	collect = [&](aiNode const* n, glm::mat4 const& parent)
 		{
-			uint32 const meshIdx = pNode->mMeshes[i];
-			if (meshIdx < meshWorldMatrices.size() && !meshMatrixAssigned[meshIdx])
+			glm::mat4 local = AIMatrixToGLMMatrix(n->mTransformation);
+			glm::mat4 world = parent * local;
+
+			for (uint32 i = 0; i < n->mNumMeshes; ++i)
 			{
-				meshWorldMatrices[meshIdx] = world;
-				meshMatrixAssigned[meshIdx] = true;
+				uint32 idx = n->mMeshes[i];
+				if (!assigned[idx])
+				{
+					meshWorldMatrices[idx] = world;
+					assigned[idx] = true;
+				}
 			}
-		}
 
-		for (uint32 c = 0; c < pNode->mNumChildren; ++c)
-		{
-			collectNodeTransforms(pNode->mChildren[c], world);
-		}
-	};
+			for (uint32 i = 0; i < n->mNumChildren; ++i)
+				collect(n->mChildren[i], world);
+		};
 
-	collectNodeTransforms(pScene->mRootNode, glm::mat4(1.0f));
+	collect(pScene->mRootNode, glm::mat4(1.0f));
 
 	glm::mat4 sceneFix(1.0f);
-	if (pScene->mRootNode)
-	{
-		glm::mat4 const topConverter = ExtractTopLevelConverter(
-			pScene->mRootNode,
-			[](aiMatrix4x4 const& m) { return EditorFBXLoader::AIMatrixToGLMMatrix(m); });
-
-		if (!IsNearlyIdentity(topConverter))
-		{
-			sceneFix = glm::inverse(topConverter);
-		}
-	}
+	glm::mat4 top = ExtractTopLevelConverter(pScene->mRootNode);
+	if (!IsNearlyIdentity(top))
+		sceneFix = glm::inverse(top);
 
 	for (uint32 meshIndex = 0; meshIndex < pScene->mNumMeshes; ++meshIndex)
 	{
-		aiMesh* pMesh = pScene->mMeshes[meshIndex];
-		if (!pMesh) continue;
+		aiMesh* m = pScene->mMeshes[meshIndex];
+		if (!m) continue;
 
-		EditorSceneMeshData meshData;
-		meshData.geometry.m_vertices.reserve(pMesh->mNumVertices);
-		meshData.geometry.m_indices.reserve(pMesh->mNumFaces * 3);
+		EditorSceneMeshData mesh;
+		mesh.name = "Mesh_" + std::to_string(meshIndex);
 
-		for (uint32 v = 0; v < pMesh->mNumVertices; ++v)
+		for (uint32 v = 0; v < m->mNumVertices; ++v)
 		{
-			Ore::Vertex vertex = {};
-			vertex.position = { pMesh->mVertices[v].x, pMesh->mVertices[v].y, pMesh->mVertices[v].z };
+			Ore::Vertex vert{};
+			vert.position = { m->mVertices[v].x, m->mVertices[v].y, m->mVertices[v].z };
 
-			if (pMesh->HasNormals())
-				vertex.normal = { pMesh->mNormals[v].x, pMesh->mNormals[v].y, pMesh->mNormals[v].z };
+			if (m->HasNormals())
+				vert.normal = { m->mNormals[v].x, m->mNormals[v].y, m->mNormals[v].z };
 
-			if (pMesh->HasTextureCoords(0))
-				vertex.texCoords = { pMesh->mTextureCoords[0][v].x, pMesh->mTextureCoords[0][v].y };
+			if (m->HasTextureCoords(0))
+				vert.texCoords = { m->mTextureCoords[0][v].x, m->mTextureCoords[0][v].y };
 
-			meshData.geometry.m_vertices.push_back(vertex);
+			mesh.geometry.m_vertices.push_back(vert);
 		}
 
-		for (uint32 f = 0; f < pMesh->mNumFaces; ++f)
+		for (uint32 f = 0; f < m->mNumFaces; ++f)
 		{
-			aiFace const& face = pMesh->mFaces[f];
-			for (uint32 i = 0; i < face.mNumIndices; ++i)
-				meshData.geometry.m_indices.push_back(face.mIndices[i]);
+			for (uint32 i = 0; i < m->mFaces[f].mNumIndices; ++i)
+				mesh.geometry.m_indices.push_back(m->mFaces[f].mIndices[i]);
 		}
-		meshData.meshMatrix = sceneFix * meshWorldMatrices[meshIndex];
-		if (pMesh->mMaterialIndex < pScene->mNumMaterials)
+
+		mesh.meshMatrix = sceneFix * meshWorldMatrices[meshIndex];
+
+		if (m->mMaterialIndex < pScene->mNumMaterials)
 		{
-			aiMaterial* pMat = pScene->mMaterials[pMesh->mMaterialIndex];
-			if (pMat)
+			aiMaterial* mat = pScene->mMaterials[m->mMaterialIndex];
+
+			aiTextureType types[] = {
+				aiTextureType_DIFFUSE,
+				aiTextureType_SPECULAR,
+				aiTextureType_NORMALS,
+				aiTextureType_HEIGHT,
+				aiTextureType_OPACITY,
+				aiTextureType_EMISSIVE,
+				aiTextureType_AMBIENT
+			};
+
+			for (uint32 t = 0; t < 7; ++t)
 			{
-				aiTextureType const types[] = {
-					aiTextureType_DIFFUSE,
-					aiTextureType_SPECULAR,
-					aiTextureType_NORMALS,
-					aiTextureType_HEIGHT,
-					aiTextureType_OPACITY,
-					aiTextureType_EMISSIVE,
-					aiTextureType_AMBIENT
-				};
+				if (mat->GetTextureCount(types[t]) == 0)
+					continue;
 
-				for (aiTextureType t : types)
-				{
-					uint32 count = pMat->GetTextureCount(t);
-					for (uint32 ti = 0; ti < count; ++ti)
-					{
-						aiString path;
-						if (pMat->GetTexture(t, ti, &path) != AI_SUCCESS)
-							continue;
+				aiString path;
+				if (mat->GetTexture(types[t], 0, &path) != AI_SUCCESS)
+					continue;
 
-						std::string resolved;
-						std::string raw = path.C_Str();
+				std::string raw = path.C_Str();
+				std::string resolved;
 
-						if (!raw.empty() && raw[0] == '*')
-							resolved = ExtractEmbeddedTexture(pScene, raw, meshIndex, static_cast<uint32>(t));
-						else
-							resolved = ResolveTexturePath(sourcePath, raw);
+				if (!raw.empty() && raw[0] == '*')
+					resolved = ExtractEmbeddedTexture(pScene, raw, meshIndex, t);
+				else
+					resolved = ResolveTexturePath(sourcePath, raw);
 
-						if (!resolved.empty())
-							meshData.textures.push_back({ static_cast<uint32>(t), resolved });
-					}
-				}
+				if (!resolved.empty())
+					mesh.textures.push_back({ t, resolved });
 			}
 		}
 
-		if (!meshData.geometry.m_vertices.empty() && !meshData.geometry.m_indices.empty())
-			outScene.meshes.push_back(std::move(meshData));
+		mesh.ID = outScene.meshes.size();
+		if (!mesh.geometry.m_vertices.empty())
+			outScene.meshes.push_back(std::move(mesh));
 	}
 }
 
 sptr<EditorSceneData> EditorFBXLoader::LoadFile(std::string const& path)
 {
-	Assimp::Importer importer;
+	Assimp::Importer importer = Assimp::Importer();
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-
-	int const importFlags =
-		aiProcess_CalcTangentSpace |
+	int importFlags = aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_SortByPType |
 		aiProcess_GlobalScale;
 
-	aiScene const* pScene = importer.ReadFile(path.c_str(), importFlags);
-	if (!pScene)
+	aiScene const* pAScene = importer.ReadFile(path.c_str(), importFlags);
+	if (pAScene == nullptr)
 	{
-		Logger::LogWithLevel(LogLevel::ERROR, "[EditorFBXLoader] Failed loading: " + path);
+		Logger::LogWithLevel(LogLevel::ERROR, "Failed Loading " + path + " file");
 		return nullptr;
 	}
 
- 	sptr<EditorSceneData> result = std::make_shared<EditorSceneData>();
-	BuildMeshes(pScene, path, *result);
+	auto result = std::make_shared<EditorSceneData>();
 
-	if (result->meshes.empty())
-	{
-		Logger::LogWithLevel(LogLevel::WARNING, "[EditorFBXLoader] No valid mesh in: " + path);
-	}
+	BuildNodes(pAScene->mRootNode, -1, *result);
+	BuildMeshes(pAScene, path, *result);
 
 	return result;
 }
