@@ -7,13 +7,17 @@
 #include "Logger.hpp"
 #include "Program.h"
 #include "Shader.h"
+#include "Passes/UIPass.h"
+#include "UIElements/Image.h"
+#include "UIElements/FTFontFace.h"
+#include "UIElements/Text.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace Ore;
 int main()
 {
-    Window window(1920, 1080, "ORE ORE OREORE ORE ORE OREORE OREORE", false, true);
+    Window window(1920, 1080, "HELLO", false, true);
     window.Open();
     Viewport viewport(0, 0, 1920, 1080, Color::SKY_BLUE);
     window.AddViewport(viewport);
@@ -22,7 +26,8 @@ int main()
     vertices.push_back({ glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f) });
     vertices.push_back({ glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f) });
     vertices.push_back({ glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f) });
-    vertices.push_back({ glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f) });
+    vertices.push_back({
+        glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f) });
 
     std::vector<uint32> indices = {
         0,1,2,
@@ -32,15 +37,18 @@ int main()
     sptr<Geometry> cube     = std::make_shared<Geometry>(vertices, indices);
 
     sptr<Texture> diffuse   = std::make_shared<Texture>("res/textures/diffuse.jpg", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
-    sptr<Texture> specular  = std::make_shared<Texture>("res/textures/specular.jpg", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
-    sptr<Texture> normal    = std::make_shared<Texture>("res/textures/NormalMap.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+    sptr<Texture> specular  = std::make_shared<Texture>("res/textures/defaultSpecular.png", TextureType::TYPE_2D, TextureMaterialType::SPECULAR);
+    sptr<Texture> normal    = std::make_shared<Texture>("res/textures/defaultNormal.png", TextureType::TYPE_2D, TextureMaterialType::NORMAL);
+    sptr<Texture> ui        = std::make_shared<Texture>("res/textures/bib.png", TextureType::TYPE_2D, TextureMaterialType::DIFFUSE);
+    sptr<Texture> opacity   = std::make_shared<Texture>("res/textures/opacity.png", TextureType::TYPE_2D, TextureMaterialType::OPACITY);
 
     std::vector<sptr<Texture>> textures;
     textures.push_back(diffuse);
     textures.push_back(specular);
     textures.push_back(normal);
+    textures.push_back(opacity);
 
-    Mesh mesh(cube, textures, glm::scale(glm::mat4(1.0f), glm::vec3(0.12f)));
+    Mesh mesh(cube, textures, glm::scale(glm::mat4(1.0f), glm::vec3(1.f)));
     Mesh mesh1(cube, textures, glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
 
     sptr<Camera> camera = std::make_shared<Camera>();
@@ -53,8 +61,8 @@ int main()
     for (int i = 0; i < 1; ++i)
     {
         float xPos = 0.0f;
-        float yPos = 2.0f;
-        float zPos = 1.0f;
+        float yPos = 0.0f;
+        float zPos = -1.0f;
         Light light;
         light.quadratic = 0.5f;
         light.linear = 0.4f;
@@ -65,8 +73,8 @@ int main()
     }
 
     Program geometryProgram;
-    Program animatedProgram;
     Program lightProgram;
+    Program UIProgram;
 
     Shader geoFrag(ShaderType::TYPE_FRAGMENT);
     geoFrag.Load("res/shaders/GBuffer.frag");
@@ -93,12 +101,39 @@ int main()
     lightVert.Unload();
 
     lightProgram.Use();
+    lightProgram.SetUniform("gPosition", 0);
+    lightProgram.SetUniform("gNormal", 1);
+    lightProgram.SetUniform("gAlbedoSpec", 2);
+
+    Shader uiFrag(ShaderType::TYPE_FRAGMENT);
+    uiFrag.Load("res/shaders/UIPass.frag");
+    Shader uiVert(ShaderType::TYPE_VERTEX);
+    uiVert.Load("res/shaders/UIPass.vert");
+
+    UIProgram.AddShader(uiFrag);
+    UIProgram.AddShader(uiVert);
+    UIProgram.Load();
+
+    uiFrag.Unload();
+    uiVert.Unload();
+
+    sptr<FontFace> font = std::make_shared<FTFontFace>("res/fonts/FuzzyBubbles-Bold.ttf", 20);
+    Text text("Bonjour le monde !", font);
+    text.color = Color::SKY_BLUE;
+    text.x = 200;
+    text.y = 300;
+    text.width = 20;
+    text.height = 20;
+
 
     GeometryPass geoPass(geometryProgram, camera.get());
     LightPass lightPass(lightProgram, lights, camera.get());
+    UIPass uiPass(UIProgram, camera.get());
+
 
     viewport.AddPass(&geoPass);
     viewport.AddPass(&lightPass);
+    viewport.AddPass(&uiPass);
     float fact = 1.0f;
     float inf = 0.0f;
 
@@ -106,17 +141,7 @@ int main()
     {
         window.Clear();
         viewport.Clear();
-        viewport.Present();
-        geoPass.AddMesh(mesh);
-
         //glm::vec3 camPos = camera->GetPosition() + glm::vec3(0.016f,0.0f,0.0f);
-        if(inf < -1.0f)
-            fact = 1.0f;
-
-        if(inf > 1.0f)
-            fact = -1.0f;
-
-
         //inf += 0.0016f * fact;
         //glm::mat4 meshTransform = glm::translate(mesh.GetTransform(), glm::vec3(0.0016f * fact, 0.0f, 0.0f));
         //mesh.SetTransform(meshTransform);
@@ -125,8 +150,13 @@ int main()
         //camera->SetPosition(camPos);
         //lights[0].position += glm::vec3(1.0f, 0.0f, 0.0f);
 
+        //geoPass.AddMesh(mesh);
         geoPass.AddMesh(mesh);
-        //geoPass.AddMesh(mesh1);
+        //uiPass.AddUIElement(image);
+        //uiPass.AddUIElement(image1);
+        //uiPass.AddUIElement(image2);
+        //uiPass.AddUIElement(image3);
+        uiPass.AddUIElement(text);
         viewport.Present();
         window.Present();
     }

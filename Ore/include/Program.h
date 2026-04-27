@@ -10,6 +10,8 @@
 #include <glm/mat2x2.hpp>
 #include <glm/mat4x4.hpp>
 
+#include "Color.h"
+
 namespace Ore
 {
 class Program : public IProgram
@@ -43,6 +45,12 @@ inline void Program::SetUniform<int32>(const std::string &name, int32 value)
 }
 
 template<>
+inline void Program::SetUniform<bool>(const std::string &name, bool value)
+{
+    glUniform1i(glGetUniformLocation(m_programId, name.c_str()), value);
+}
+
+template<>
 inline void Program::SetUniform<uint32>(const std::string &name, uint32 value)
 {
     glUniform1ui(glGetUniformLocation(m_programId, name.c_str()), value);
@@ -70,6 +78,12 @@ template<>
 inline void Program::SetUniform<glm::vec4>(const std::string &name, glm::vec4 value)
 {
     glUniform4fv(glGetUniformLocation(m_programId, name.c_str()), 1, &value[0]);
+}
+
+template<>
+inline void Program::SetUniform<Color>(const std::string &name, Color value)
+{
+    glUniform4fv(glGetUniformLocation(m_programId, name.c_str()), 1, reinterpret_cast<float*>(&value));
 }
 
 template<>

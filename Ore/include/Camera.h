@@ -26,8 +26,19 @@ public:
         glm::vec3 up = {0.0f, 1.0f, 0.0f};
     };
 
+    struct OrthographicSettings
+    {
+        float left = 0.0f;
+        float bottom = 0.0f;
+        float right = 1920.0f;
+        float top = 1080.0f;
+        float nearPlane = -1.0f;
+        float farPlane = 1.0f;
+    };
+
     Camera() = default;
     Camera(PerspectiveSettings const settings) : Perspective(settings) {}
+    Camera(OrthographicSettings const settings) : Orthographic(settings), m_projectionType(ProjectionType::ORTHOGRAPHIC) {}
     ~Camera() = default;
 
     std::array<glm::vec3, 8> GetFrustum() const;
@@ -39,6 +50,8 @@ public:
 
     void SetTransform(glm::mat4 const& transform);
     PerspectiveSettings Perspective = {};
+    OrthographicSettings Orthographic = {};
+
 private:
     glm::mat4 m_transform {1.0f};
     glm::mat4 m_viewMatrix {1.0f};

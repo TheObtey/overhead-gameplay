@@ -23,7 +23,6 @@ void GeometryPass::Execute()
 
     m_program.Use();
     m_program.SetUniform("viewProj", m_pCamera->GetViewProjMatrix());
-    //m_program.SetUniform("view", viewMatrix);
 
     for (uint32 i = 0; i < m_meshes.size(); ++i)
     {

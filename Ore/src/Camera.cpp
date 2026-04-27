@@ -3,6 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <array>
 
+#include <Logger.hpp>
+
 using namespace Ore;
 std::array<glm::vec3, 8> Camera::GetFrustum() const
 {
@@ -22,7 +24,22 @@ glm::vec3 Camera::GetPosition() const
 
 void Camera::UpdateCamera()
 {
-    glm::mat4 const projMatrix = glm::perspective(Perspective.fov,Perspective.aspectRatio, Perspective.nearPlane, Perspective.farPlane);
+    glm::mat4 projMatrix;
+    switch(m_projectionType)
+    {
+    case ProjectionType::PERSPECTIVE:
+        projMatrix = glm::perspective(Perspective.fov,Perspective.aspectRatio, Perspective.nearPlane, Perspective.farPlane);
+        break;
+    case ProjectionType::ORTHOGRAPHIC:
+        projMatrix = glm::mat4({
+            2.0f / Orthographic.right,  0.0f,                       0.0f,   0.0f,
+            0.0f,                       -2.0f / Orthographic.top,   0.0f,   0.0f,
+            -1.0f,                      1.0f,                       1.0f,   0.0f,
+            0.0f,                       0.0f,                       0.0f,   1.0f,
+        });
+        break;
+    }
+
     m_viewProjMat = projMatrix * m_viewMatrix;
 }
 
