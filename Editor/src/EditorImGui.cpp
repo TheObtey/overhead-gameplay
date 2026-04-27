@@ -118,10 +118,13 @@ void EditorImGui::Init()
 
 	ImGui::FileBrowser SaveBrowseWindow(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir | ImGuiFileBrowserFlags_ConfirmOnEnter);
 	ImGui::FileBrowser LoadBrowseWindow(ImGuiFileBrowserFlags_ConfirmOnEnter);
+	ImGui::FileBrowser ImportFbxBrowseWindow(ImGuiFileBrowserFlags_ConfirmOnEnter);
 	m_saveBrowser = SaveBrowseWindow;
 	m_loadBrowser = LoadBrowseWindow;
+	m_importFbxBrowser = ImportFbxBrowseWindow;
 	m_saveBrowser.SetDirectory("../Game/res");
 	m_loadBrowser.SetDirectory("../Game/res");
+	m_importFbxBrowser.SetDirectory("../Game/res");
 	m_assetBrowser.SetRoot("../");
 	m_assetBrowser.SetThumbnailSize(64.0f);
 	m_assetBrowser.SetTypeFilters({ ".png", ".jpg", ".fbx", ".obj", ".lua", ".json" });
@@ -158,6 +161,7 @@ void EditorImGui::Render()
 
 	ShowSaveAsSceneBrowsing();
 	ShowLoadSceneBrowsing();
+	ShowImportFbxBrowsing();
 	m_assetBrowser.Display();
 
 	ImGui::SetNextWindowPos(ImVec2(m_screenWidth - 120.0f, m_screenHeight - 40.0f));
@@ -196,6 +200,13 @@ void EditorImGui::DrawMenuBar()
 			{
 				m_showLoadPopup = true;
 			}
+
+			if (ImGui::MenuItem("Import FBX to .nd"))
+			{
+				m_showImportFbxPopup = true;
+			}
+
+			ImGui::Separator();
 
 			ImGui::Separator();
 
@@ -655,6 +666,35 @@ void EditorImGui::ShowLoadSceneBrowsing()
 	}
 }
 
+void EditorImGui::ShowImportFbxBrowsing()
+{
+	if (m_showImportFbxPopup)
+	{
+		m_importFbxBrowser.Open();
+		m_showImportFbxPopup = false;
+	}
+
+	m_importFbxBrowser.SetWindowSize(m_fileBrowsingSizeX, m_fileBrowsingSizeY);
+	m_importFbxBrowser.SetWindowPos(m_screenWidth / 2 - m_fileBrowsingSizeX / 2, m_screenHeight / 2 - m_fileBrowsingSizeY / 2);
+
+	m_importFbxBrowser.SetTitle("Import FBX and export .nd.json");
+	m_importFbxBrowser.SetTypeFilters({ ".fbx" });
+	m_importFbxBrowser.Display();
+
+	if (m_importFbxBrowser.HasSelected())
+	{
+		std::filesystem::path const selected = m_importFbxBrowser.GetSelected();
+		if (!selected.empty())
+		{
+			m_command.type = EditorCommand::Type::IMPORT_FBX_TO_ND;
+			m_command.stringParam1 = selected.string();
+		}
+
+		m_importFbxBrowser.ClearSelected();
+		m_importFbxBrowser.Close();
+	}
+}
+
 void EditorImGui::DrawGizmoButtons()
 {
 	if (m_pSelectedNode == nullptr) return;
@@ -793,27 +833,34 @@ void EditorImGui::ApplyInspectorChanges(json& datas)
 
 	m_selectedNodeDataJson["PUBLIC_DATAS"] = datas;
 
-	m_selectedNodeData.SetJson(m_selectedNodeDataJson);
-
-	json tempJson = m_selectedNodeDataJson;
-
 	json cleanJson;
-	cleanJson["PUBLIC_DATAS"] = tempJson["PUBLIC_DATAS"];
-	cleanJson["PRIVATE_DATAS"] = tempJson["PRIVATE_DATAS"];
-	cleanJson["PRIVATE_DATAS"]["Children"] = json::array();
+	cleanJson["PUBLIC_DATAS"] = m_selectedNodeDataJson["PUBLIC_DATAS"];
 
-	std::string oldName = m_pSelectedNode->GetName();
+	if (m_selectedNodeDataJson.contains("PRIVATE_DATAS"))
+	{
+		json const& sourcePrivateDatas = m_selectedNodeDataJson["PRIVATE_DATAS"];
+		json& cleanPrivateDatas = cleanJson["PRIVATE_DATAS"];
+
+		for (auto it = sourcePrivateDatas.begin(); it != sourcePrivateDatas.end(); ++it)
+		{
+			if (it.key() == "Children")
+				continue;
+
+			cleanPrivateDatas[it.key()] = it.value();
+		}
+
+		cleanPrivateDatas["Children"] = json::array();
+	}
+
+	std::string const oldName = m_pSelectedNode->GetName();
+
 	m_selectedNodeData.SetJson(cleanJson);
-
 	m_pSelectedNode->Deserialize(m_selectedNodeData);
-	std::cout << "Name from m_sceneroor" << m_pSceneRoot->GetChild(0).GetName() << std::endl;
 
 	if (oldName != m_pSelectedNode->GetName())
 	{
 		m_pRaylibEditor->UpdateElementName(oldName, m_pSelectedNode);
 	}
-
-	//DEBUG("[EditorImGui] Applied inspector changes" << std::endl);
 }
 
 void EditorImGui::BeginHierarchyDragSource(Node& node)

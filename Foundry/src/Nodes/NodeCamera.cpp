@@ -37,7 +37,7 @@ void NodeCamera::Serialize(SerializedObject& datas) const
     datas.AddPublicElement("FOV", &fov);
     datas.AddPublicElement("NearPlane", &nearPlane);
     datas.AddPublicElement("FarPlane", &farPlane);
-    datas.AddPublicElement("AspectRatio", &aspectRatio);
+    datas.AddPrivateElement("AspectRatio", &aspectRatio);
     datas.AddPublicElement("Up", &up);
 }
 
@@ -48,16 +48,18 @@ void NodeCamera::Deserialize(SerializedObject const& datas)
     float fov = 45.0f;
     float nearPlane = 0.1f;
     float farPlane = 100.0f;
-    float aspectRatio = 1.0f;
+    float aspectRatio = 1920.0f/1080.0f;
     glm::vec3 up = { 0.0f, 1.0f, 0.0f };
 
     datas.GetPublicElement("FOV", &fov);
     datas.GetPublicElement("NearPlane", &nearPlane);
     datas.GetPublicElement("FarPlane", &farPlane);
-    datas.GetPublicElement("AspectRatio", &aspectRatio);
+    if (!datas.TryGetPrivateElement("AspectRatio", &aspectRatio)) {
+        datas.TryGetPublicElement("AspectRatio", &aspectRatio);
+    }
     datas.GetPublicElement("Up", &up);
 
-    m_camera.Perspective.fov = fov;
+    m_camera.Perspective.fov = fov * pi_t<long double> / 180;
     m_camera.Perspective.nearPlane = nearPlane;
     m_camera.Perspective.farPlane = farPlane;
     m_camera.Perspective.aspectRatio = aspectRatio;

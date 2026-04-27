@@ -5,6 +5,11 @@
 #include "Serialization/SerializeObject.hpp"
 #include "Serialization/ISerializableEncaps.h"
 #include "AssetLoading/AssetLoader.h"
+#include "AssetLoading/EditorAssetLoader.h"
+#include "AssetLoading/AssetsStructs.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace
 {
@@ -49,7 +54,7 @@ NodeMesh::NodeMesh(std::string const &name) : NodeVisual(name)
 void NodeMesh::OnUpdate(double delta)
 {
     NodeVisual::OnUpdate(delta);
-    m_pMesh->SetTransform(m_worldTransform);
+    m_pMesh->SetTransform( m_worldTransform * m_meshlocalTransform);
 
     if (IsVisible() && m_pViewport)
         m_pViewport->AddMesh(*this);
@@ -69,6 +74,98 @@ void NodeMesh::SetGeometry(sptr<Ore::Geometry> const &geometry) const
 void NodeMesh::SetActive(bool isActive) const
 {
     m_pMesh->SetActive(isActive);
+}
+
+void NodeMesh::SetFromEditorSceneMesh(EditorSceneMeshData const& sceneMesh, std::filesystem::path const& fbxPath)
+{
+    m_geometrySourceType = MeshGeometrySourceType::FBX;
+    //SetName(sceneMesh.name);
+
+    m_worldTransform = sceneMesh.meshMatrix;
+    m_meshIDInSceneFBX = sceneMesh.ID;
+    m_fbxPath = fbxPath;
+}
+
+void NodeMesh::SetTexturesPaths(SceneMesh const& sceneMesh)
+{
+    bool hasDiffuse = false;
+    bool hasNormal  = false;
+    bool hasOpacity = false;
+
+    for (uint8 i = 0; i < m_textures.size(); ++i)
+    {
+        switch (m_textures[i]->GetTextureMaterialType())
+        {
+        case Ore::TextureMaterialType::DIFFUSE:
+            hasDiffuse = true;
+            break;
+        case Ore::TextureMaterialType::NORMAL:
+            hasDiffuse = true;
+            break;
+        //case Ore::TextureMaterialType::OPACITY:
+        //    hasDiffuse = true;
+        //    break;
+        default:
+            break;
+        }
+        SerializedTexturesData te = {};
+        te.type = m_textures[i]->GetTextureMaterialType();
+        te.path = sceneMesh.paths[i];
+        m_texturesPaths.push_back(te);
+    }
+    if (hasDiffuse == false)
+    {
+        
+        sptr<Ore::Texture> text = AssetLoader::GetSharedTexture("res/textures/Default.png",Ore::TextureMaterialType::DIFFUSE);
+        m_textures.push_back(text);
+        SerializedTexturesData te = {};
+        te.type = Ore::TextureMaterialType::DIFFUSE;
+        te.path = "res/textures/Default.png";
+        m_texturesPaths.push_back(te);
+    }
+    if (hasNormal == false)
+    {
+        sptr<Ore::Texture> text = AssetLoader::GetSharedTexture("res/textures/NormalMap.png", Ore::TextureMaterialType::NORMAL);
+        m_textures.push_back(text);
+        SerializedTexturesData te = {};
+        te.type = Ore::TextureMaterialType::NORMAL;
+        te.path = "res/textures/NormalMap.png";
+        m_texturesPaths.push_back(te);
+    }
+    //if (hasOpacity == false)
+    //{
+    //    sptr<Ore::Texture> text = AssetLoader::GetSharedTexture("res/textures/NormalMap.png", Ore::TextureMaterialType::NORMAL);
+    //    m_textures.push_back(text);
+    //    SerializedTexturesData te = {};
+    //    te.type = Ore::TextureMaterialType::NORMAL;
+    //    te.path = "res/textures/NormalMap.png";
+    //    m_texturesPaths.push_back(te);
+    //}
+}
+
+void NodeMesh::SetFromSceneMesh(SceneMesh const& sceneMesh, std::filesystem::path const& fbxPath)
+{
+    m_geometrySourceType = MeshGeometrySourceType::FBX;
+    sptr<Ore::Geometry> geo = std::make_shared<Ore::Geometry>(sceneMesh.vertices, sceneMesh.indices);
+    m_pMesh->SetGeometry(geo);
+    SetName(sceneMesh.name);
+    m_textures = sceneMesh.meshTextures;
+    glm::vec3 scale(1.0f);
+    glm::quat rotation;
+    glm::vec3 translation;
+    glm::vec3 skew;
+    glm::vec4 perspective;
+    if (glm::decompose(sceneMesh.meshMatrix, scale, rotation, translation, skew, perspective))
+    {
+        SetWorldPosition(translation);
+        SetWorldScale(scale);
+        SetWorldRotationQuaternion(rotation);
+    }
+    bool hasNormal = false;
+    SetTexturesPaths(sceneMesh);
+    m_pMesh->SetTextures(m_textures);
+    m_fbxPath = fbxPath;
+    m_meshIDInSceneFBX = sceneMesh.ID;
 }
 
 void NodeMesh::SetPrimitive(PrimitivesType primitiveType)
@@ -128,6 +225,7 @@ void NodeMesh::SetFbxPath(std::filesystem::path const &fbxPath)
 
 void NodeMesh::Serialize(SerializedObject &datas) const
 {
+
     Node3D::Serialize(datas);
     datas.SetType("NodeMesh");
 
@@ -135,15 +233,23 @@ void NodeMesh::Serialize(SerializedObject &datas) const
     datas.AddPublicElement("IsActive", &isActive);
 
     int const geometrySourceType = static_cast<int>(m_geometrySourceType);
+
     ClampedInt primitiveTypeClamped = ClampedInt(0, 3, static_cast<uint32>(m_primitiveType));
     std::string const fbxPath = m_fbxPath.string();
     std::string const diffusePath = m_diffuseTexturePath.string();
-
+    uint32 tMesh = m_meshIDInSceneFBX;
+    if (m_meshIDInSceneFBX > 3000)
+        tMesh = 0;
+    datas.AddPrivateElement("IdInFBX", &tMesh);
     datas.AddPublicElement("GeometrySourceType", &geometrySourceType);
     datas.AddPublicElement("PrimitiveType", static_cast<ISerializable*>(&primitiveTypeClamped));
     datas.AddPublicElement("FbxPath", &fbxPath);
     datas.AddPublicElement("DiffuseTexturePath", &diffusePath);
-
+    datas.AddPublicArray("TexturePaths");
+    for (uint8 i = 0; i < m_texturesPaths.size();++i)
+    {
+        datas.AddPublicElementInArray("TexturePaths",static_cast<ISerializable const*>(&m_texturesPaths[0]));
+    }
     uint32 textureCount = 1;
     //if (textureCount == 0)
     //    textureCount = static_cast<uint32>(m_textures.size());
@@ -200,12 +306,18 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
     {
         textureCount = 1;
     }
-
+    if (!datas.TryGetPrivateElement("IdInFBX", &m_meshIDInSceneFBX)) {
+        m_meshIDInSceneFBX = 0;
+    }
     datas.GetPublicElement("FbxPath", &fbxPath);
     m_geometrySourceType = static_cast<MeshGeometrySourceType>(geometrySourceType);
     m_primitiveType = static_cast<PrimitivesType>(primitiveTypeClamped.value);
     m_fbxPath = fbxPath;
     m_diffuseTexturePath = diffusePath;
+    std::vector<ISerializable*> tempList = datas.GetPublicArray<ISerializable*>("TexturePaths");
+    m_texturesPaths.clear();
+    for (uint8 i = 0; i < tempList.size(); i++)
+        m_texturesPaths.push_back(*static_cast<SerializedTexturesData*>(tempList[i]));
 
     if (m_geometrySourceType == MeshGeometrySourceType::PRIMITIVE)
     {
@@ -213,27 +325,45 @@ void NodeMesh::Deserialize(SerializedObject const& datas)
     }
     else
     {
-        SetFbxPath(m_fbxPath);
+        if (!s_IsInEditor)
+        {
+            Logger::Log("SceneMeshLoading");
+            SetFromSceneMesh(*AssetLoader::LoadSceneFromFile(m_fbxPath.string(), AssetLoader::FileType::FBX)->allMesh[m_meshIDInSceneFBX], m_fbxPath);
+        }
+        else {
+            SetFromEditorSceneMesh(EditorAssetLoader::LoadSceneFromFile(m_fbxPath.string(), EditorAssetLoader::FileType::FBX)->meshes[m_meshIDInSceneFBX], m_fbxPath);
+		}
     }
 
     bool isActive = true;
     datas.GetPublicElement("IsActive", &isActive);
     m_pMesh->SetActive(isActive);
-
-
-
     if (!s_IsInEditor)
     {
-        m_textures.clear();
-        if (!m_diffuseTexturePath.empty())
-            m_textures.push_back(std::make_shared<Ore::Texture>(m_diffuseTexturePath, Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE));
-        else
-            m_textures.push_back(std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE));
+        if (m_textures.size() == 0)
+        {
+            bool hasDiffuse = false;
+            for (uint8 i = 0; i < m_texturesPaths.size(); i++)
+            {
+                if (m_texturesPaths[i].type == Ore::TextureMaterialType::DIFFUSE)
+                    hasDiffuse = true;
+                m_textures.push_back(std::make_shared<Ore::Texture>(m_texturesPaths[i].path, Ore::TextureType::TYPE_2D, m_texturesPaths[i].type));
+            }
+
+            if (hasDiffuse == false)
+            {
+                if (!m_diffuseTexturePath.empty())
+                    m_textures.push_back(std::make_shared<Ore::Texture>(m_diffuseTexturePath, Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE));
+                else
+                    m_textures.push_back(std::make_shared<Ore::Texture>("res/textures/Default.png", Ore::TextureType::TYPE_2D, Ore::TextureMaterialType::DIFFUSE));
+            }
+        }
 
         SetDefaultTextures();
         //m_pMesh->SetTextures(m_textures);
     }
-    m_pMesh->SetTransform(m_transform.GetMatrix());
+    Update(1);
+    m_pMesh->SetTransform(m_meshlocalTransform * m_transform.GetMatrix());
 }
 
 void NodeMesh::AttachScriptDeserialize(uptr<LuaScriptInstance>& script)
@@ -263,4 +393,20 @@ uptr<Node> NodeMesh::Clone()
 	clone->Deserialize(datas);
 
 	return clone;
+}
+
+void SerializedTexturesData::Serialize(SerializedObject& datas) const
+{
+    datas.SetType("SerializedTexturesData");
+    datas.AddPublicElement("TextureType", &type);
+    std::string val = path.string();
+    datas.AddPublicElement("TexturePath", &val);
+}
+
+void SerializedTexturesData::Deserialize(SerializedObject const& datas)
+{
+    datas.GetPublicElement("TextureType", &type);
+    std::string spath = "";
+    datas.GetPublicElement("TexturePath", &spath);
+    path = spath;
 }
