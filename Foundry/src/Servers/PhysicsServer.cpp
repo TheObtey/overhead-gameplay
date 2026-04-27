@@ -8,25 +8,17 @@ void PhysicsEvents::onContact(const rp3d::CollisionCallback::CallbackData& data)
 	for (int i = 0; i < nbPairs; i++)
 	{
 		ContactPair pair = data.getContactPair(i);
+		int eventType = static_cast<int>(pair.getEventType());
 		auto b1 = static_cast<NodeRigidBody*>(static_cast<NodeRigidBody::Proxy*>(pair.getBody1()->getUserData())->GetProxyOwner());
 		auto b2 = static_cast<NodeRigidBody*>(static_cast<NodeRigidBody::Proxy*>(pair.getBody2()->getUserData())->GetProxyOwner());
-
+		
 		if (b1 == nullptr || b2 == nullptr)
 			continue;
 		if (b1->GetColliders().empty() || b2->GetColliders().empty())
 			continue;
 
-		b1->GetColliders()[0]->ContactEvent(*b2->GetColliders()[0]);
-		b2->GetColliders()[0]->ContactEvent(*b1->GetColliders()[0]);
-
-		// Example of how to get contact points and normals, not used for now
-		//auto eventType = pair.getEventType();
-		//if (eventType == ContactPair::EventType::ContactStart)
-		//	DEBUG("Start Contact\n");
-		//else if (eventType == ContactPair::EventType::ContactStay)
-		//	DEBUG("In Contact\n");
-		//else if (eventType == ContactPair::EventType::ContactExit)
-		//	DEBUG("Got out of Contact\n");
+		b1->GetColliders()[0]->ContactEvent(*b2->GetColliders()[0], eventType);
+		b2->GetColliders()[0]->ContactEvent(*b1->GetColliders()[0], eventType);
 	}
 }
 
@@ -37,6 +29,7 @@ void PhysicsEvents::onTrigger(const rp3d::OverlapCallback::CallbackData& data)
 	for (int i = 0; i < nbPairs; i++)
 	{
 		rp3d::OverlapCallback::OverlapPair pair = data.getOverlappingPair(i);
+		int eventType = static_cast<int>(pair.getEventType());
 		auto b1 = static_cast<NodeRigidBody*>(static_cast<NodeRigidBody::Proxy*>(pair.getBody1()->getUserData())->GetProxyOwner());
 		auto b2 = static_cast<NodeRigidBody*>(static_cast<NodeRigidBody::Proxy*>(pair.getBody2()->getUserData())->GetProxyOwner());
 
@@ -45,8 +38,8 @@ void PhysicsEvents::onTrigger(const rp3d::OverlapCallback::CallbackData& data)
 		if (b1->GetColliders().empty() || b2->GetColliders().empty())
 			continue;
 
-		b1->GetColliders()[0]->TriggerEvent(*b2->GetColliders()[0]);
-		b2->GetColliders()[0]->TriggerEvent(*b1->GetColliders()[0]);
+		b1->GetColliders()[0]->TriggerEvent(*b2->GetColliders()[0], eventType);
+		b2->GetColliders()[0]->TriggerEvent(*b1->GetColliders()[0], eventType);
 	}
 }
 
@@ -66,7 +59,7 @@ void PhysicsServer::OnUnInitialize()
 {
 }
 
-void PhysicsServer::Initialize() // ajouter tous les params ?
+void PhysicsServer::Initialize()
 {
 	rp3d::PhysicsWorld::WorldSettings settings;
 	settings.worldName = "MainWorld";

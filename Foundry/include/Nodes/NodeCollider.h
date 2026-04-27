@@ -62,11 +62,11 @@ public:
 
 	// =========== RP3D Events ===========
 
-	void ContactEvent(NodeCollider& other);
-	void TriggerEvent(NodeCollider& other);
+	void ContactEvent(NodeCollider& other, int state);
+	void TriggerEvent(NodeCollider& other, int state);
 
-	Event<void(NodeCollider&, const NodeRigidBody& data)> OnContact;
-	Event<void(NodeCollider&, const NodeRigidBody& data)> OnTrigger;
+	Event<void(NodeCollider&, const NodeRigidBody& data, int state)> OnContact;
+	Event<void(NodeCollider&, const NodeRigidBody& data, int state)> OnTrigger;
 
 protected:
 	virtual void DestroyShape() = 0;

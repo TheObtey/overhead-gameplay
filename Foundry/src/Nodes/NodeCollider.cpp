@@ -236,13 +236,13 @@ void NodeCollider::Deserialize(SerializedObject const& datas)
 	SetCollideWithMaskBits(collideWithMaskBits);
 }
 
-void NodeCollider::ContactEvent(NodeCollider& other)
+void NodeCollider::ContactEvent(NodeCollider& other, int state)
 {
-	OnContact(*this, *other.m_pNodeRigidBody);
+	OnContact(*this, *other.m_pNodeRigidBody, state);
 }
-void NodeCollider::TriggerEvent(NodeCollider& other)
+void NodeCollider::TriggerEvent(NodeCollider& other, int state)
 {
-	OnTrigger(*this, *other.m_pNodeRigidBody);
+	OnTrigger(*this, *other.m_pNodeRigidBody, state);
 }
 
 void NodeBoxCollider::SetShape(const glm::vec3& halfExtents)
