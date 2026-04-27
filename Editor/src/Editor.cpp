@@ -1,10 +1,12 @@
 #include "Editor.h"
-#include "EditorSerializer.h"
 #include "Debug.h"
 
 #include <Servers/EngineServer.h>
 #include <Servers/PhysicsServer.h>
 #include <Servers/GraphicServer.h>
+
+#include <AssetLoading/AssetLoader.h>
+#include <AssetLoading/EditorAssetLoader.h>
 #include <Servers/AudioServer.h>
 
 #include <Serialization/SerializeObject.hpp>
@@ -15,6 +17,8 @@
 
 #include <rlImGui.h>
 #include <rlImGuiColors.h>
+
+#include <EditorSerializer.h>
 #include <Nodes/Node3D.h>
 #include <Nodes/NodeWindow.h>
 
@@ -202,6 +206,10 @@ void Editor::ProcessUICommands()
 
 	case EditorCommand::Type::EXIT_EDITOR:
 		m_running = false;
+		break;
+
+	case EditorCommand::Type::IMPORT_FBX_TO_ND:
+		ImportFbxToNd(cmd.stringParam1);
 		break;
 
 	default:
@@ -621,4 +629,38 @@ void Editor::SaveSceneNoSpe()
 	else
 		m_editorImgui.ShowSaveAs(false);
 	
+}
+
+void Editor::ImportFbxToNd(std::string const& fbxPath)
+{
+	try
+	{
+		sptr<EditorSceneData> scene = EditorAssetLoader::LoadSceneFromFile(fbxPath, EditorAssetLoader::FBX);
+		if (!scene)
+		{
+			std::cerr << "[Editor] Import FBX failed: " << fbxPath << std::endl;
+			return;
+		}
+
+		uptr<Node> pNode = EditorAssetLoader::CreateNodesFromScene(*scene, fbxPath);
+		if (!pNode)
+		{
+			std::cerr << "[Editor] CreateNodesFromScene failed: " << fbxPath << std::endl;
+			return;
+		}
+
+		static_cast<Node3D*>(pNode.get())->SetLocalPosition({ 0.0f, 0.0f, 0.0f });
+
+		std::filesystem::path const source = fbxPath;
+		std::string const name = source.stem().string();
+		std::filesystem::path const outDir = std::filesystem::path("../Game/res/scenes/FbxJsonLoaded") / name;
+		std::filesystem::create_directories(outDir);
+
+		std::filesystem::path const outNd = outDir / (name + ".nd");
+		EditorSerializer::SaveNode(outNd.string(), pNode);
+	}
+	catch (std::exception const& e)
+	{
+		std::cerr << "[Editor] ImportFbxToNd exception: " << e.what() << std::endl;
+	}
 }

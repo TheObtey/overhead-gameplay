@@ -1,6 +1,6 @@
 #version 450 core
-layout (location = 0) out vec3 gPosition;
-layout (location = 1) out vec3 gNormal;
+layout (location = 0) out vec4 gPosition;
+layout (location = 1) out vec4 gNormal;
 layout (location = 2) out vec4 gAlbedoSpec;
 
 in vec3 FragPos;
@@ -14,12 +14,10 @@ uniform sampler2D texture_opacity1;
 
 void main()
 {    
-    gPosition = FragPos;
+    gPosition = vec4(FragPos, 1.0f);
 
     //gNormal = normalize(Normal);
-    gNormal = texture(texture_normal1, TexCoords).rgb;
-    gNormal = normalize(gNormal * 2.0 - 1.0);
-
+    gNormal = vec4(normalize(texture(texture_normal1, TexCoords).rgb * Normal * 2.0 - 1.0), 1.0);
     gAlbedoSpec.rgb = texture(texture_diffuse1, TexCoords).rgb;
 
     gAlbedoSpec.a = texture(texture_specular1, TexCoords).r * texture(texture_opacity1, TexCoords).r;

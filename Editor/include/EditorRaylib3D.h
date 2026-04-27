@@ -11,6 +11,12 @@
 #include <unordered_set>
 using json = nlohmann::json;
 
+struct CachedTexture
+{
+	Texture2D texture = {};
+	uint32 refCount = 0;
+};
+
 struct DrawableSubMesh
 {
 	uptr<Mesh> mesh;
@@ -63,7 +69,6 @@ public:
 	void Update(float deltaTime);
 	void UpdateDisplay(Node* pNode);
 	void Shutdown();
-
 	void AddDrawableObject(Node* pNode);
 	void UpdateDrawableElement(Node* pNode);
 	void UpdateDrawableTexture(NodeMesh const& nodeMesh, DrawableElement& drawable);
@@ -71,9 +76,6 @@ public:
 	void UpdateElementName(std::string const& oldName, Node* pNode);
 	void RemoveDrawableElement(Node* pNode);
 	void ClearWindow(); 
-	
-	
-
 
 	void SetTranslateGizmo(bool state);
 	void SetScaleGizmo(bool state);
@@ -98,7 +100,6 @@ public:
 	void UpdateDirtyGizmo() { m_gizmoDirty = false; }
 	bool IsGizmoDirty() {return m_gizmoDirty;}
 
-
 private:
 	void DrawViewPort();
 	void DrawDebugOverlays();
@@ -111,8 +112,11 @@ private:
 	void InstanciateCollider3D();
 	void InstanciateLight();
 	Node* FindNode3DWorldMatrix(Node* pNode, Matrix& outMatrix);
+
+	bool AcquireSharedTexture(std::string const& path, Texture2D& outTexture);
+	void ReleaseSharedTexture(std::string const& path);
+
 private:
-	// List of Meshs will depends on NodeMesh for vertices later
 	Camera3D m_camera;
 	Camera2D m_cam;
 	CameraMode m_cameraMode = CAMERA_CUSTOM;
@@ -122,6 +126,8 @@ private:
 
 	Material m_defaultMaterial;
 
+
+	std::unordered_map<std::string, CachedTexture> m_sharedTextures;
 	std::unordered_map<Node*, uptr<DrawableElement>> m_loadedMeshes;
 	std::unordered_map<Node*, uptr<Node3DElement>> m_loadedNode3D;
 	Node* m_pSelectedObject = nullptr;
