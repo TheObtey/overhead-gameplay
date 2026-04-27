@@ -5,6 +5,12 @@ local oCurrentEntity
 local oCompContainer
 local oIrcomp
 local vecForward
+local function GetGravitySign(oBody)
+    if oBody and oBody.GetGravitySign then
+        return oBody:GetGravitySign()
+    end
+    return oBody and oBody.gravity or 1
+end
 
 -- Set the current node in front of the player
 local function SetCurrentEntity(ndHit)
@@ -22,7 +28,7 @@ local function CheckInteraction(origin, forward, distance)
     if not pEmitter then print("No emitter found with name 'Player'") return end
     vecForward = pEmitter:GetLocalForward()
     vecForward.z = vecForward.z * -1
-    vecForward.x = vecForward.x * pEmitter.gravity
+    vecForward.x = vecForward.x * GetGravitySign(pEmitter)
    
     local oHit = physics.Raycast(origin or pEmitter.Pos, forward or vecForward, distance or iMaxDistance)
     

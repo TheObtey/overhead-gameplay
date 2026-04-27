@@ -12,6 +12,12 @@ local iMinPitch = -fmath.Pi / 4
 local iMaxPitch = fmath.Pi / 4
 local iCurPitch = 0.0
 local fCurDt= 0.0
+local function GetGravitySign(oBody)
+    if oBody and oBody.GetGravitySign then
+        return oBody:GetGravitySign()
+    end
+    return oBody and oBody.gravity or 1
+end
 
 self.HandleMouseLook = function(icMouse)
     local vecMouse = icontrol.ReadAsVec2(icMouse)
@@ -26,7 +32,8 @@ self.HandleMouseLook = function(icMouse)
     iCurPitch = iCurPitch + iDelta
     oCameraRoot:AddLocalPitch(iDelta)
 
-    oRB:ApplyWorldTorque(fmath.vec3:new(0, -vecMouse.x * iMouseSensitivityY * 1500 * fCurDt * oRB.gravity, 0))
+    local iGravitySign = GetGravitySign(oRB)
+    oRB:ApplyWorldTorque(fmath.vec3:new(0, -vecMouse.x * iMouseSensitivityY * 1500 * fCurDt * iGravitySign, 0))
 end
 
 local iLastChange = 0

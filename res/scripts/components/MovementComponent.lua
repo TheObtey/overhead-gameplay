@@ -31,6 +31,11 @@ local fJumpBufferTimer = 0.0
 
 -- Reference à la State Machine
 local oSM = nil
+local vecGravityDirection = fmath.vec3:new(0, -1, 0)
+
+local function GetGravitySignY()
+    return vecGravityDirection.y >= 0 and 1 or -1
+end
 
 
 
@@ -41,17 +46,6 @@ self.MoveForward = function(icForward)
     if not oRB then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
-    --     if icForward:IsHold() then
-    --     bIsMoving = true
-    --     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
-    --     print("HOLDING")
-    -- else
-    --     if icForward:IsReleased() then
-    --         oRB:SetLinearVelocity(fmath.vec3:new(0, 0, 0))
-    --         print("RELEASED") 
-            
-    --     end
-    -- end
 end
 
 self.MoveBackward = function(icBackward)
@@ -71,11 +65,11 @@ self.MoveRight = function(icRight)
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
 end
+
 self.DebugPos = function(icA)
     if not oRB then return end
-    if icA:IsPressed() then
+    if not icA:IsPressed() then return end
     oRB:SetLocalPosition(fmath.vec3:new(-5,2,5))
-    end
 end
 
 -- ─── Saut ─────────────────────────────────────────────────────────────────────
@@ -83,44 +77,62 @@ end
 self.Jump = function(icJump)
     if not oRB then return end
     if icJump:IsPressed() then
-    fJumpBufferTimer = JUMP_BUFFER end
+        fJumpBufferTimer = JUMP_BUFFER
+    end
 end
 
 local function TryJump()
-    -- if fCoyoteTimer > 0 and fJumpBufferTimer > 0 then // CETTE LIGNE PERMET D'EMPECHER LES SAUTS SUCCESSIFS 
-    if fJumpBufferTimer > 0 then
-        local vel = oRB:GetLinearVelocity()
-        oRB:SetLinearVelocity(fmath.vec3:new(vel.x, 0, vel.z))
-        oRB:SetAngularVelocity(fmath.vec3:new(0, 0, 0))
-        oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, fJumpForce, 0))
+    if fCoyoteTimer <= 0 or fJumpBufferTimer <= 0 then return end -- CETTE LIGNE PERMET D'EMPECHER LES SAUTS SUCCESSIFS
+    if fJumpBufferTimer <= 0 then return end
 
-        fJumpBufferTimer = 0
-        fCoyoteTimer     = 0
-        bIsGrounded      = false
-        bJumpedThisFrame = true
-        print("JUMPING : " .. fJumpForce)
-        if oSM then oSM:TransitionTo("JUMP") end
-    end
+    local vel = oRB:GetLinearVelocity()
+
+    oRB:SetLinearVelocity(fmath.vec3:new(vel.x, 0, vel.z))
+    oRB:SetAngularVelocity(fmath.vec3:new(0, 0, 0))
+
+    local vecJumpForce = fmath.vec3:new(
+        -vecGravityDirection.x * fJumpForce,
+        -vecGravityDirection.y * fJumpForce,
+        -vecGravityDirection.z * fJumpForce
+    )
+
+    oRB:ApplyWorldForceAtCenterOfMass(vecJumpForce)
+
+    fJumpBufferTimer = 0
+    fCoyoteTimer     = 0
+    bIsGrounded      = false
+    bJumpedThisFrame = true
+
+    print("JUMPING : " .. fJumpForce)
+
+    if oSM then oSM:TransitionTo("JUMP") end
 end
 
 -- ─── Gravité custom ───────────────────────────────────────────────────────────
 
 local function ApplyCustomGravity(oMass, dt)
-    local vel = oRB:GetLinearVelocity()
     local gravity
+    local vel = oRB:GetLinearVelocity()
+    local fVerticalVel = vel.x * vecGravityDirection.x + vel.y * vecGravityDirection.y + vel.z * vecGravityDirection.z
 
     if bIsGrounded then
         return
-    elseif vel.y > 0 then
+    elseif fVerticalVel < 0 then
         gravity = GRAVITY_UP
-    elseif vel.y < -0.1 and not bJumpedThisFrame then
+    elseif fVerticalVel > 0.1 and not bJumpedThisFrame then
         gravity = GRAVITY_FALLING
     else
         gravity = GRAVITY_DOWN
     end
-    local fGravityForce = gravity * oMass * dt * oRB.gravity
 
-    oRB:ApplyWorldForceAtCenterOfMass(fmath.vec3:new(0, fGravityForce, 0))
+    local fGravityForce = gravity * oMass * dt
+    local vecForce = fmath.vec3:new(
+        vecGravityDirection.x * -fGravityForce,
+        vecGravityDirection.y * -fGravityForce,
+        vecGravityDirection.z * -fGravityForce
+    )
+
+    oRB:ApplyWorldForceAtCenterOfMass(vecForce)
 end
 
 
@@ -182,7 +194,40 @@ end
 
 function self:GetVerticalVelocity()
     if not oRB then return 0 end
-    return oRB:GetLinearVelocity().y
+    local vel = oRB:GetLinearVelocity()
+    return vel.x * vecGravityDirection.x + vel.y * vecGravityDirection.y + vel.z * vecGravityDirection.z
+end
+
+function self:SetGravityDirection(vecNewGravityDirection)
+    if not vecNewGravityDirection then
+        return
+    end
+
+    local len = fmath.Sqrt(
+        vecNewGravityDirection.x * vecNewGravityDirection.x +
+        vecNewGravityDirection.y * vecNewGravityDirection.y +
+        vecNewGravityDirection.z * vecNewGravityDirection.z
+    )
+    if len < 0.0001 then
+        return
+    end
+
+    vecGravityDirection = fmath.vec3:new(
+        vecNewGravityDirection.x / len,
+        vecNewGravityDirection.y / len,
+        vecNewGravityDirection.z / len
+    )
+
+    -- Legacy compatibility: some scripts still read oRB.gravity.
+    oRB.gravity = GetGravitySignY()
+end
+
+function self:GetGravityDirection()
+    return vecGravityDirection
+end
+
+function self:GetGravitySign()
+    return GetGravitySignY()
 end
 
 -- ─── Injection de la State Machine 
@@ -212,8 +257,9 @@ function self:Setup(oNewRigidBody, iNewMoveSpeed, iNewJumpForce)
     assert(oNewRigidBody ~= nil, "MovementComponent: Valid rigidbody must be provided")
 
     oRB        = oNewRigidBody
-    MOVE_SPEED = iNewMoveSpeed or 20000
-    JUMP_FORCE = iNewJumpForce or 6500000
+    MOVE_SPEED = iNewMoveSpeed or 10000
+    JUMP_FORCE = iNewJumpForce or 800000
+    self:SetGravityDirection(vecGravityDirection)
 
     print("MovementComponent Initialized")
 end

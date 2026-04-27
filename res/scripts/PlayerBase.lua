@@ -10,15 +10,16 @@ local oLookComponent
 local oInteractEmitterComponent
 local oStateMachineComponent
 local oGravityGunComponent
+local oGravityReceiverComponent
 
 local bRotating = false
 self.Pos = fmath.vec3:new()
 
-self.gravity = 1 -- doit devenir un vecteur & component
+self.gravity = 1 -- legacy compatibility for other scripts
 
 local function InitializeRigidbody(iBodyType, iMass, bGravityEnabled, tAngularAxisLock, iLinearDamping, iAngularDamping)
     self:SetBodyType(iBodyType or 2)
-    self:SetMass(iMass or 10)
+    self:SetMass(iMass or 20)
     self:SetIsGravityEnabled(false)
     -- self:SetBounciness(0,0)
 
@@ -139,6 +140,12 @@ function OnInit()
         oGravityGunComponent:Setup(self, 1.5)
     end
 
+    -- GravityReceiverComponent
+    oGravityReceiverComponent = self:GetNode("components/GravityReceiverComponent")
+    if oGravityReceiverComponent ~= nil then
+        oGravityReceiverComponent:Setup(self)
+    end
+
     InitializeActionMap()
     BindActions(oMovementComponent, oLookComponent, oInteractEmitterComponent, oGravityGunComponent)
 end
@@ -168,10 +175,6 @@ function OnUpdate(dt)
     -- end
 
     CheckIfGrounded()
-    CheckGravityField(dt)
-    if bRotating then
-        OnGravityFieldChange(dt)
-    end
 end
 
 function OnPhysicsUpdate(dt)
@@ -183,7 +186,8 @@ end
 
 function CheckIfGrounded()
     if oMovementComponent ~= nil then
-        local hit = physics.Raycast(self:GetPosition(), fmath.vec3:new(0, -1 * self.gravity, 0), 1.001)
+        local vecGravityDirection = oMovementComponent:GetGravityDirection()
+        local hit = physics.Raycast(self:GetPosition(), vecGravityDirection, 1.001)
         if hit then
             oMovementComponent:SetGrounded(true)
             -- print("_______ GROUNDED _________")
@@ -194,51 +198,18 @@ function CheckIfGrounded()
     end
 end
 
-function CheckGravityField(dt)
-    if self.gravity > 0 then
-        if self:GetPosition().y >= 10 then
-            self.gravity = self.gravity * -1
-            bRotating = true
-            self.bIsRotating = false
-        end
-    else
-        if self:GetPosition().y < 10 then
-            self.gravity = self.gravity * -1
-            bRotating = true
-            self.bIsRotating = false
-        end
+function self:GetGravityDirection()
+    if oMovementComponent and oMovementComponent.GetGravityDirection then
+        return oMovementComponent:GetGravityDirection()
     end
+    return fmath.vec3:new(0, -1, 0)
 end
 
-self.bIsRotating = false
-local worldRoll = 0
-local lerpFactor = 0
-local bTest = false
-function OnGravityFieldChange(dt)
-    -- self:LockAngularAxis(true, true, true)
-    bTest = not bTest
-    -- if not bTest then return end
-    local roll = self:GetLocalRoll()
-    print(" --- ROTATING --- !" .. roll)
-
-    self:AddLocalRotation(fmath.vec3:new(0, 0, dt * 1.5 * fmath.Pi))
-
-    worldRoll = worldRoll + dt * 1.5 * fmath.Pi
-    print("Player World Roll = " .. worldRoll)
-
-    if worldRoll >= 3.13 or worldRoll <= -3.13
-    then
-        if self.gravity == -1 then
-            self:SetLocalRotationDeg(fmath.vec3:new(0, 0, 180))
-        else
-            if self.gravity == 1 then
-                self:SetLocalRotationDeg(fmath.vec3:new(0, 0, 0))
-            end
-        end
-        -- self:LockAngularAxis(true, false, true)
-        print("We have rotated !")
-        worldRoll = 0
-        bRotating = false
-        self.bIsRotating = false
+function self:GetGravitySign()
+    if oMovementComponent and oMovementComponent.GetGravitySign then
+        local sign = oMovementComponent:GetGravitySign()
+        self.gravity = sign
+        return sign
     end
+    return self.gravity or 1
 end
