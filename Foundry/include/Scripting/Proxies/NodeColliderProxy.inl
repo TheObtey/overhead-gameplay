@@ -42,18 +42,18 @@ public:
 
 	Connection SubscribeOnTrigger(sol::function func)
 	{
-		return m_pNode->OnTrigger.Subscribe(std::function<void(NodeCollider&, const NodeRigidBody&)>(
-			[func](NodeCollider& a, const NodeRigidBody& b) {
-				func(static_cast<NodeCollider::Proxy&>(a.GetNodeProxy()), static_cast<NodeRigidBody::Proxy&>(b.GetNodeProxy()));
+		return m_pNode->OnTrigger.Subscribe(std::function<void(NodeCollider&, const NodeRigidBody&, uint8 state)>(
+			[func](NodeCollider& a, const NodeRigidBody& b, uint8 state) {
+				func(static_cast<NodeCollider::Proxy&>(a.GetNodeProxy()), static_cast<NodeRigidBody::Proxy&>(b.GetNodeProxy()), state);
 			}
 		));
 	}
 
 	Connection SubscribeOnContact(sol::function func)
 	{
-		return m_pNode->OnContact.Subscribe(std::function<void(NodeCollider&, const NodeRigidBody&)>(
-			[func](NodeCollider& a, const NodeRigidBody& b) {
-				func(static_cast<NodeCollider::Proxy&>(a.GetNodeProxy()), static_cast<NodeRigidBody::Proxy&>(b.GetNodeProxy()));
+		return m_pNode->OnContact.Subscribe(std::function<void(NodeCollider&, const NodeRigidBody&, uint8 state)>(
+			[func](NodeCollider& a, const NodeRigidBody& b, uint8 state) {
+				func(static_cast<NodeCollider::Proxy&>(a.GetNodeProxy()), static_cast<NodeRigidBody::Proxy&>(b.GetNodeProxy()), state);
 			}
 		));
 	}
