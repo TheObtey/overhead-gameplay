@@ -28,10 +28,17 @@ end
 -- Do the raycast and analyze it
 local function CheckInteraction(origin, forward, distance)
     if not oPlayer then print("No emitter found with name 'Player'") return else print("Emitter in CheckInteraction GGun OK") end
+    local oCameraRoot = oPlayer:FindChild("CameraRoot"):As(NodeTypes.NODE3D)
+    local oCamera = oPlayer:FindChild("CameraRoot"):FindChild("Camera"):As(NodeTypes.NODE_CAMERA)
+    if not oCamera then print ("PB CAM GRAVITYGUN COMPONENT") return end
+ print("oCamera name : ".. oCamera:GetName())
     vecForward = oPlayer:GetLocalForward()
-    
+    -- vecForward = oCamera:GetLocalForward()
+    vecForward.y = oCameraRoot:GetLocalForward().y
+    -- vecForward = oCamera.VecForward
     vecForward.z = vecForward.z * -1
-    vecForward.x = vecForward.x * oPlayer.gravity
+    print("VecForward cam = ".. vecForward.x..", ".. vecForward.y..", ".. vecForward.z)
+    -- vecForward.x = vecForward.x * oPlayer.gravity
     
     local oHit = physics.Raycast(origin or oPlayer.Pos, forward or vecForward, distance or iMaxDistance)
     

@@ -15,9 +15,10 @@ function self.CanInteract()
 end
 
 --Function to implement in the parent script
-function self.Interact()
+self.Interact = function(pEmitter)
     if not oBase or not oBase:Is(NodeTypes.NODE_RIGIDBODY) then return end
-    oBase:Interaction()
+    assert(pEmitter ~= nil, "pEmitter est nil")
+    oBase.Interaction(pEmitter)
 end
 --Function to implement in the parent script
 function self.GravityGunInteraction()
