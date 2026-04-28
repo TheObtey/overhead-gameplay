@@ -7,6 +7,9 @@ local acmAudio
 local music
 local sfx
 
+local volume = 0.1
+
+
 function OnInit()
 	print("audio init !");
 
@@ -46,7 +49,7 @@ function OnInit()
 
 	-- ACTIONS
 
-	audioserver.SetMasterVolume(0.5)
+	audioserver.SetMasterVolume(volume)
 end
 
 function OnUpdate(dt) end

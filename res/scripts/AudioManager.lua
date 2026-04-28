@@ -1,38 +1,41 @@
-local audioEm
+local musicEm
+
 local audioListen
 local acmAudio
 
---local mixer
-local music
+local channelMusic
+
+local volume = 0.01
 
 function OnInit()
 	print("audio init !");
 
 	--- Audio Server ---
-	music = audioserver.CreateChannel("Music");
+	channelMusic = audioserver.CreateChannel("Music");
 
 	-- Audio Emitter
-	audioEm = CreateNodeAudioEmitter("nodeaudioemitter")
+	musicEm = CreateNodeAudioEmitter("nodeaudioemitter")
 
-	audioEm:Load("res/audio/mainTheme.mp3", music);
+	musicEm:Load("res/audio/mainTheme.mp3", channelMusic);
 
-	local audioEmPos = fmath.vec3:new(100,0,0)
+	local audioEmPos = fmath.vec3:new(0,0,0)
 
 	--audioEm:SetSourcePosition(audioEmPos); --allways after load
 
 	--audioEm->SetLoop(true);
 
-	audioEm:Play();
+	musicEm:Play();
 
 	--- Audio Listener ---
 	audioListen = CreateNodeAudioListener("nodeaudiolistener")
     audioEmPos = fmath.vec3:new(0,0,0)
 	--audioListen:SetListenerPosition(audioEmPos);
 
-	print("audio1 x:".. tostring(audioEm:GetSourcePosition().x));
+	print("audio1 x:".. tostring(musicEm:GetSourcePosition().x));
 	print("listener x:".. tostring(audioListen:GetListenerPosition().x));
 
-	audioserver.SetMasterVolume(1)
+	audioserver.SetMasterVolume(volume)
+	--audioserver.SetGroupVolume(channelMusic, 1)
 end
 
 function OnUpdate(dt) end
