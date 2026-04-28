@@ -18,7 +18,7 @@ self.gravity = 1 -- doit devenir un vecteur & component
 
 local function InitializeRigidbody(iBodyType, iMass, bGravityEnabled, tAngularAxisLock, iLinearDamping, iAngularDamping)
     self:SetBodyType(iBodyType or 2)
-    self:SetMass(iMass or 10)
+    self:SetMass(iMass or 40)
     self:SetIsGravityEnabled(false)
     -- self:SetBounciness(0,0)
 
