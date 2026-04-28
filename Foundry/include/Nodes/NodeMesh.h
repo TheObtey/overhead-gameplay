@@ -48,7 +48,7 @@ public:
     void SetPrimitive(PrimitivesType primitiveType);
     void SetFbxPath(std::filesystem::path const &fbxPath);
     void SetFromEditorSceneMesh(EditorSceneMeshData const & sceneMesh, std::filesystem::path const& fbxPath);
-    void SetFromSceneMesh(SceneMesh const & sceneMesh, std::filesystem::path const& fbxPath);
+    void SetFromSceneMesh(SceneMesh const & sceneMesh, std::filesystem::path const& fbxPath, bool usePos = true);
     void SetTexturesPaths(SceneMesh const& sceneMesh);
     MeshGeometrySourceType GetGeometrySourceType() const { return m_geometrySourceType; }
     PrimitivesType GetPrimitiveType() const { return m_primitiveType; }
