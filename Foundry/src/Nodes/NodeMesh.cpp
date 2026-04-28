@@ -352,6 +352,7 @@ void NodeMesh::DeserializeTextures(SerializedObject const& datas)
     std::string normalPath = "";
     std::string opacityPath = "";
     bool textureSet = false;
+    m_textures.clear();
     for (uint8 i = 0; i < m_texturesPaths.size();++i)
     {
         switch (m_texturesPaths[i].type)
@@ -429,15 +430,16 @@ void NodeMesh::DeserializeTextures(SerializedObject const& datas)
         m_texturesPaths.push_back({});
         m_texturesPaths[m_texturesPaths.size() - 1].path = opacityPath;
         m_texturesPaths[m_texturesPaths.size() - 1].type = Ore::TextureMaterialType::OPACITY;
-        m_texturesPaths.push_back({});
-        m_texturesPaths[m_texturesPaths.size() - 1].path = opacityPath;
-        m_texturesPaths[m_texturesPaths.size() - 1].type = Ore::TextureMaterialType::SPECULAR;
         if (!s_IsInEditor)
-        {
             m_textures.push_back(AssetLoader::GetSharedTexture(opacityPath, Ore::TextureMaterialType::OPACITY));
-            m_textures.push_back(AssetLoader::GetSharedTexture(opacityPath, Ore::TextureMaterialType::SPECULAR));
-        }
     }
+    m_texturesPaths.push_back({});
+    std::string specPath = AssetLoader::GetDefaultTexturePath(Ore::TextureMaterialType::SPECULAR);
+    m_texturesPaths[m_texturesPaths.size() - 1].path = specPath;
+    m_texturesPaths[m_texturesPaths.size() - 1].type = Ore::TextureMaterialType::SPECULAR;
+    if (!s_IsInEditor)
+        m_textures.push_back(AssetLoader::GetSharedTexture(specPath, Ore::TextureMaterialType::SPECULAR));
+
     m_diffusePath = diffusePath;
     uint32 textureCount = 1;
     if (!datas.TryGetPrivateElement("TextureCount", &textureCount))
