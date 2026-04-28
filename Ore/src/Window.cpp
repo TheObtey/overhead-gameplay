@@ -108,8 +108,6 @@ void Window::Present()
 {
 	glfwSwapBuffers(m_pWindow);
 	glfwPollEvents();
-	if (m_currentCursorState == CursorState::LOCKED)
-		glfwSetCursorPos(m_pWindow, m_width / 2, m_height / 2);
 }
 
 void Window::SetSize(uint16 width, uint16 height)
