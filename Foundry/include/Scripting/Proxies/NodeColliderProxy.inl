@@ -38,6 +38,29 @@ public:
     void     SetCollideWithMaskBits(uint16_t mask)          { m_pNode->SetCollideWithMaskBits(mask); }
     uint16_t GetCollisionBitsMask() const                   { return m_pNode->GetCollisionBitsMask(); }
 
+
+
+	Connection SubscribeOnTrigger(sol::function func)
+	{
+		return m_pNode->OnTrigger.Subscribe(std::function<void(NodeCollider&, const NodeRigidBody&, uint8 state)>(
+			[func](NodeCollider& a, const NodeRigidBody& b, uint8 state) {
+				func(static_cast<NodeCollider::Proxy&>(a.GetNodeProxy()), static_cast<NodeRigidBody::Proxy&>(b.GetNodeProxy()), state);
+			}
+		));
+	}
+
+	Connection SubscribeOnContact(sol::function func)
+	{
+		return m_pNode->OnContact.Subscribe(std::function<void(NodeCollider&, const NodeRigidBody&, uint8 state)>(
+			[func](NodeCollider& a, const NodeRigidBody& b, uint8 state) {
+				func(static_cast<NodeCollider::Proxy&>(a.GetNodeProxy()), static_cast<NodeRigidBody::Proxy&>(b.GetNodeProxy()), state);
+			}
+		));
+	}
+
+	void UnsubscribeOnTrigger(Connection id) { m_pNode->OnTrigger.Unsubscribe(id); }
+	void UnsubscribeOnContact(Connection id) { m_pNode->OnContact.Unsubscribe(id); }
+
 private:
 	NodeCollider* m_pNode;
 };
@@ -74,7 +97,12 @@ struct NodeCollider::Proxy::ProxyBinding
 			"SetCollisionCategoryBits", BIND(SetCollisionCategoryBits),
 			"GetCollisionCategoryBits", BIND(GetCollisionCategoryBits),
 			"SetCollideWithMaskBits", BIND(SetCollideWithMaskBits),
-			"GetCollisionBitsMask", BIND(GetCollisionBitsMask));
+			"GetCollisionBitsMask", BIND(GetCollisionBitsMask),
+			"SubscribeOnTrigger", BIND(SubscribeOnTrigger),
+			"SubscribeOnContact", BIND(SubscribeOnContact),
+			"UnsubscribeOnTrigger", BIND(UnsubscribeOnTrigger),
+			"UnsubscribeOnContact", BIND(UnsubscribeOnContact)
+			);
 	};
 };
 

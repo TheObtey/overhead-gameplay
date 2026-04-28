@@ -44,6 +44,9 @@ public:
     void Open() override;
 
 private:
+    void InitFreeType();
+
+private:
     static std::unordered_map<GLFWwindow*, Window*> s_windows;
     GLFWwindow* m_pWindow;
     std::vector<Viewport*> m_viewports;

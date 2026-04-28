@@ -28,10 +28,10 @@ void LightPass::GenerateQuad()
     std::vector<float> quadVertices =
     {
         // positions        // texture Coords
-        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-        1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        -1.0f,  1.0f, 0.1f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.1f, 0.0f, 0.0f,
+         1.0f,  1.0f, 0.1f, 1.0f, 1.0f,
+         1.0f, -1.0f, 0.1f, 1.0f, 0.0f,
     };
 
     glGenVertexArrays(1, &m_quadVAOId);
@@ -57,7 +57,7 @@ void LightPass::Execute()
 {
     if (m_pCamera == nullptr) return;
 
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer);
     m_program.Use();
 
@@ -87,6 +87,7 @@ void LightPass::Execute()
 
     m_program.SetUniform("viewPos", m_pCamera->GetPosition());
     RenderQuad();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void LightPass::RenderQuad()

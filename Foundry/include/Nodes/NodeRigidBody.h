@@ -53,7 +53,7 @@ public:
 	// =========== Material ===========
 
 	void AddCollider(NodeCollider &collider);
-	std::vector<NodeCollider *> GetColliders() const { return m_colliders; }
+	std::vector<NodeCollider *>& GetColliders() { return m_colliders; }
 
 	void SetBounciness(float bounciness);
 	float GetBounciness() const;
@@ -143,7 +143,6 @@ private:
 
 	std::vector<NodeCollider *> m_colliders;
 	bool m_rigidBodyCreated = false;
-	bool test = false;
 	friend class PhysicsServer;
 };
 

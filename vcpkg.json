@@ -9,7 +9,8 @@
     "imgui",
     "glm",
     "reactphysics3d",
-    "bigsimp"
+    "bigsimp",
+    "freetype"
   ],
   "overrides": [
     {

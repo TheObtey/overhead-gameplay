@@ -13,6 +13,7 @@ enum class TextureMaterialType : uint8
     SPECULAR,
     NORMAL,
     HEIGHT,
+    OPACITY,
 
     COUNT
 };

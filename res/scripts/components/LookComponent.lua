@@ -6,10 +6,12 @@ local oWindow
 local oCameraRoot
 
 local csCurrentCursorState = CursorState.LOCKED
-local iMouseSensitivity = 0.2
-local iMinPitch = -fmath.Pi 
-local iMaxPitch = fmath.Pi 
+local iMouseSensitivityY = 5000
+local iMouseSensitivityX = 0.05
+local iMinPitch = -fmath.Pi / 4
+local iMaxPitch = fmath.Pi / 4
 local iCurPitch = 0.0
+local fCurDt= 0.0
 
 self.HandleMouseLook = function(icMouse)
     local vecMouse = icontrol.ReadAsVec2(icMouse)
@@ -17,15 +19,14 @@ self.HandleMouseLook = function(icMouse)
     if oRB.bIsRotating then return end
 
     if not oRB or not oCameraRoot or csCurrentCursorState ~= CursorState.LOCKED then return end
-local v = (vecMouse.y + 0.017905) * 5
-    local iMouseInput = v * iMouseSensitivity
+
+    local iMouseInput = vecMouse.y * fCurDt * iMouseSensitivityY
     local iNewPitch = fmath.Clamp(iCurPitch + iMouseInput, iMinPitch, iMaxPitch)
-    local iDelta =  iNewPitch - iCurPitch
+    local iDelta = iNewPitch - iCurPitch
     iCurPitch = iCurPitch + iDelta
     oCameraRoot:AddLocalPitch(iDelta)
-    -- oCameraRoot:AddLocalYaw((-vecMouse.x * 3) * iMouseSensitivity * oRB.gravity)
 
-    oRB:ApplyWorldTorque(fmath.vec3:new(0, (-vecMouse.x * 3) * iMouseSensitivity * 20000 * oRB.gravity, 0))
+    oRB:ApplyWorldTorque(fmath.vec3:new(0, -vecMouse.x * iMouseSensitivityY * 1500 * fCurDt * oRB.gravity, 0))
 end
 
 local iLastChange = 0
@@ -62,5 +63,6 @@ end
 function OnInit()
 end
 
-function OnUpdate(iDelta)
+function OnUpdate(fDelta)
+    fCurDt = fDelta
 end
