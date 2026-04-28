@@ -5,6 +5,7 @@
 
 #include <Define.h>
 #include <Geometry.h>
+#include <Texture.h>
 #include <unordered_map>
 #include <map>
 #include <string>
@@ -27,24 +28,25 @@ public:
 	static sptr<SceneData> LoadFile(std::string const& path);
 
 private:
-	static sptr<SceneNode> BuildNodesTree(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, SceneData& outScene, Material& outMat);
+	static sptr<SceneNode> BuildNodesTree(aiScene const* pScene, aiNode const* pNode, int32 parentIndex, SceneData& outScene, Material& outMat, std::map<std::string, glm::mat4>& bonesTransform);
+	static void BuildNodeMesh(aiScene const* pScene, aiNode const* pNode, sptr<SceneNode> outNode,uint32 parentIndex, SceneData& outScene);
 	
 	static void LoadEmbeddedTexture(std::string const& path, std::string& outPath, aiScene const* pScene, uint32& matIndex, Ore::TextureMaterialType type);
 	static void BuildMaterials(aiScene const* pScene, Material& outMat);
 
 	static void BuildGeometry(aiMesh const* pMesh,std::vector<Ore::Vertex>& vertices, std::vector<uint32>& indices);
-	static void BuildBones(SceneData& outScene, aiMesh const* pMesh, SceneMesh& mesh);
-	static void BuildMeshs(aiScene const* pScene, SceneData& outScene, Material& outMat);
-
+	static void BuildBones(std::map<std::string, glm::mat4>& bonesTransform, aiMesh const* pMesh, SceneMesh& mesh);
+	static void BuildMeshs(aiScene const* pScene, SceneData& outScene, Material& outMat, std::map<std::string, glm::mat4>& bonesTransform);
 
 	static void BuildLights(aiScene const* pScene, SceneData& outScene);
 	
-	static void BuildAnimations(aiScene const* pScene, SceneData& outScene);
-	static void BuildAnimationsChannels(SceneData& outScene,aiAnimation const* pAnim, Animation& outAnim, uint32 channelID,uint8 ctrID, uint8 boneID);
-
+	static void BuildAnimations(aiScene const* pScene, SceneData& outScene, std::map<std::string, glm::mat4>& bonesTransform);
+	static void BuildAnimationsChannels(std::map<std::string, glm::mat4>& bonesTransform,aiAnimation const* pAnim, Animation& outAnim, uint32 channelID,uint8 ctrID, uint8 boneID);
 
 	static void LoadTextures(FBXLoader::Material& materials,std::vector<sptr<Ore::Texture>>& vect, uint32 matIndex);
-	static void LoadDefaultsTextures(std::vector<sptr<Ore::Texture>>& vect);
+	static void LoadDefaultsTextures(SceneMesh& mesh);
+
+	static std::string NormalizeTexturePath(std::string const& path);
 private:
 	static uint8 m_sTexTypes[];
 };
