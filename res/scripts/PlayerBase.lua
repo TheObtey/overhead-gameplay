@@ -11,7 +11,7 @@ local oInteractEmitterComponent
 local oStateMachineComponent
 local oGravityGunComponent
 
-local bRotating = false
+self.bRotating = false
 self.Pos = fmath.vec3:new()
 
 self.gravity = 1 -- doit devenir un vecteur & component
@@ -169,7 +169,7 @@ function OnUpdate(dt)
 
     CheckIfGrounded()
     CheckGravityField(dt)
-    if bRotating then
+    if self.bRotating then
         OnGravityFieldChange(dt)
     end
 end
@@ -195,39 +195,22 @@ function CheckIfGrounded()
 end
 
 function CheckGravityField(dt)
-    if self.gravity > 0 then
-        if self:GetPosition().y >= 10 then
-            self.gravity = self.gravity * -1
-            bRotating = true
-            self.bIsRotating = false
-        end
-    else
-        if self:GetPosition().y < 10 then
-            self.gravity = self.gravity * -1
-            bRotating = true
-            self.bIsRotating = false
-        end
-    end
 end
 
 self.bIsRotating = false
 local worldRoll = 0
-local lerpFactor = 0
-local bTest = false
-function OnGravityFieldChange(dt)
+function OnGravityFieldChange(iDeltaTime)
     -- self:LockAngularAxis(true, true, true)
-    bTest = not bTest
-    -- if not bTest then return end
+
     local roll = self:GetLocalRoll()
     print(" --- ROTATING --- !" .. roll)
 
-    self:AddLocalRotation(fmath.vec3:new(0, 0, dt * 1.5 * fmath.Pi))
+    self:AddLocalRotation(fmath.vec3:new(0, 0, iDeltaTime * 1.5 * fmath.Pi))
 
-    worldRoll = worldRoll + dt * 1.5 * fmath.Pi
+    worldRoll = worldRoll + iDeltaTime * 1.5 * fmath.Pi
     print("Player World Roll = " .. worldRoll)
 
-    if worldRoll >= 3.13 or worldRoll <= -3.13
-    then
+    if worldRoll >= 3.13 or worldRoll <= -3.13 then
         if self.gravity == -1 then
             self:SetLocalRotationDeg(fmath.vec3:new(0, 0, 180))
         else
@@ -238,7 +221,7 @@ function OnGravityFieldChange(dt)
         -- self:LockAngularAxis(true, false, true)
         print("We have rotated !")
         worldRoll = 0
-        bRotating = false
+        self.bRotating = false
         self.bIsRotating = false
     end
 end

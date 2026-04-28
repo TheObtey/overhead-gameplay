@@ -76,42 +76,31 @@ end
 
 function _RegisterPlayerStates()
     RegisterState("IDLE", {
-        OnEnter  = function() print("-> IDLE") end,
-        OnUpdate = function(dt) end,
+        OnEnter  = function() end,
+        OnUpdate = function(dt) end
     })
 
     RegisterState("RUN", {
-        OnEnter  = function() print("-> RUN")
-            -- oPlayer:SetLinearDamping(0)
-         end,
+        OnEnter  = function() end,
         OnUpdate = function(dt) end,
-        OnExit   = function() print("RUN ->")
-            -- oPlayer:SetLinearDamping(1)
-         end,        
+        OnExit   = function() end
     })
 
     RegisterState("JUMP", {
-        OnEnter  = function()
-            print("-> JUMP")
-            -- Impulsion initiale gérée par MovementComponent.Jump()
-        end,
+        OnEnter  = function() end,
         OnUpdate = function(dt) end,
-        OnExit   = function() print("JUMP ->") end,
+        OnExit   = function() end
     })
 
     RegisterState("FALL", {
-        OnEnter  = function() print("-> FALL") end,
+        OnEnter  = function() end,
         OnUpdate = function(dt) end,
-        OnExit   = function() print("FALL ->") end,
+        OnExit   = function() end
     })
 
     RegisterState("LAND", {
-        OnEnter  = function()
-            print("-> LAND")
-            -- oPlayer:ResetForces()
-            -- Ex : déclencher une anim d'atterrissage courte
-        end,
-        OnUpdate = function(dt) end,
+        OnEnter  = function() end,
+        OnUpdate = function(dt) end
     })
 end
 
@@ -137,6 +126,7 @@ function _RegisterPlayerTransitions()
     RegisterTransition("IDLE", "FALL", function()
         return not oMov():IsGrounded()
     end)
+
     RegisterTransition("RUN", "FALL", function()
         return not oMov():IsGrounded()
     end)
@@ -155,6 +145,7 @@ function _RegisterPlayerTransitions()
     RegisterTransition("LAND", "RUN", function()
         return oMov():IsMoving()
     end)
+
     RegisterTransition("LAND", "IDLE", function()
         return not oMov():IsMoving()
     end)
