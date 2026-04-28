@@ -6,7 +6,7 @@ local oWindow
 local oCameraRoot
 
 local csCurrentCursorState = CursorState.LOCKED
-local iMouseSensitivityY = 5000
+local iMouseSensitivityY = 50
 local iMouseSensitivityX = 0.05
 local iMinPitch = -fmath.Pi / 4
 local iMaxPitch = fmath.Pi / 4

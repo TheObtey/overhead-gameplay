@@ -1,20 +1,37 @@
 ---@type NodeRigidBody
 
 local self = self
-local oActivatorComponent
+local oCompContainer
 local oReceiverComponent
+local oActivatorComponent
+
 local bIsActivated = false
 
 local function ResetInteraction()
     oReceiverComponent:SetInteract(true)
 end
 
-function self:Interaction()
-    oReceiverComponent:SetInteract(false) --Stop the capacity to interact
-    timer.Simple(2, ResetInteraction)
-    bIsActivated = not bIsActivated
+local function HasKeyCard()
+    local oInventoryComponent = self:GetNode("/SceneRoot/Player/components/InventoryComponent")
+    assert(oInventoryComponent ~= nil, "Inventory is nil")
 
-    oActivatorComponent:DoAction()
+    if oInventoryComponent:HasItem("KeyCard") then
+        return true
+    else 
+        return false
+    end
+end
+
+function self:Interaction(pEmitter)
+    oReceiverComponent:SetInteract(false) --Stop the capacity to interact
+
+    if HasKeyCard() == true then
+        timer.Simple(2, ResetInteraction)
+        bIsActivated = not bIsActivated
+        oActivatorComponent:DoAction()
+    else
+        ResetInteraction()
+    end
 end
 
 function self:GetPrompt()
@@ -26,11 +43,9 @@ function self:GetPrompt()
 end
 
 function OnInit()
-    local oCompContainer = self:FindChild("components")
+    oCompContainer = self:FindChild("components")
     oReceiverComponent = oCompContainer:FindChild("InteractReceiverComponent")
     oActivatorComponent = self:GetNode("/SceneRoot/RB_Door/components/ActivableComponent")
-
-    if not oActivatorComponent then return end
 end
 
 function OnUpdate(iDelta) end
