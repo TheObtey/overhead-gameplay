@@ -24,6 +24,7 @@ struct EditorCommand
 		CREATE_NEW_SCENE,
 		SAVE_SCENE,
 		LOAD_SCENE,
+		IMPORT_FBX_TO_ND,
 		EXIT_EDITOR,
 		LUNCH_GAME,
 		COUNT
@@ -94,6 +95,7 @@ private:
 
 	void ShowSaveAsSceneBrowsing();
 	void ShowLoadSceneBrowsing();
+	void ShowImportFbxBrowsing();
 
 	void SelectedNode(Node* pNode);
 	void NewNodeSelected(Node* pNode);
@@ -124,8 +126,10 @@ private:
 
 	bool m_showSaveAsPopup = false;
 	bool m_showLoadPopup = false;
+	bool m_showImportFbxPopup = false;
 	ImGui::FileBrowser m_saveBrowser;
 	ImGui::FileBrowser m_loadBrowser;
+	ImGui::FileBrowser m_importFbxBrowser;
 	ImGui::AssetBrowser m_assetBrowser;
 	int m_fileBrowsingSizeX = 800;
 	int m_fileBrowsingSizeY = 450;

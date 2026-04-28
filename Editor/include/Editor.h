@@ -53,6 +53,7 @@ private:
 	bool WritePlayScene(std::filesystem::path const& outputScenePath, ScriptPathMap const& scriptMap);
 	void UpdateScriptPathsInJson(json& nodeJson, ScriptPathMap const& scriptMap);
 	void RemoveStringClone(Node* pNode);
+	void ImportFbxToNd(std::string const& fbxPath);
 private:
 	// Editor Parts
 	EditorRaylib3D m_editorRaylib;

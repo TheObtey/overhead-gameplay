@@ -16,7 +16,6 @@ enum SceneNodeType
 {
 	GLOBAL,
 	MESH,
-	BONE,
 };
 
 struct SceneNode
@@ -36,19 +35,23 @@ struct SceneNode
 struct SceneMesh
 {
 	// Geometry
+	std::string name;
+	uint32 ID;
  	std::vector<Ore::Vertex> vertices;
 	std::vector<uint32> indices;
 
 	std::vector<sptr<Ore::Texture>> meshTextures;
+	std::vector<std::string> paths;
 	std::vector<glm::mat4> bonesOffest;
 	std::vector<glm::mat4> bonesTransform;
-	glm::mat4 meshMatrix;
+	glm::mat4 meshMatrix = glm::mat4(1.0f);
 	std::vector<uint32> animationlinked;
 };
 
 struct SceneData
 {
 	sptr<SceneNode> rootNode;
+	std::filesystem::path path;
 	bool isAnimated = false;
 	std::vector<sptr<SceneNode>> allNode;
 	std::vector<sptr<Ore::Light>> alllights;

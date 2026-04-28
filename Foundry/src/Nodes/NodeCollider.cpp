@@ -54,7 +54,14 @@ void NodeCollider::SetLocalRotation(const glm::quat& rot)
 
 void NodeCollider::AttachToRigidBody(NodeRigidBody* rigidBody)
 {
-	PhysicsServer::AttachToRigidBody(rigidBody, *this);
+	if (!m_pShape) return;
+
+	auto rb = rigidBody->GetRigidBody();
+	m_pCollider = rb->addCollider(m_pShape, GetLocalRp3dTransform());
+	m_pRigidBodyRP3D = rb;
+	m_pNodeRigidBody = rigidBody;
+	m_indexInRigidBody = rigidBody->GetColliders().size();
+	rigidBody->GetColliders().push_back(this);
 }
 
 void NodeCollider::Detach()
@@ -153,7 +160,7 @@ void NodeCollider::Serialize(SerializedObject& datas) const
 	datas.SetType("NodeCollider");
 
 	glm::vec3 localPosition = m_localPosition;
-	glm::vec4 localRotation{ m_localRotation.x, m_localRotation.y, m_localRotation.z, m_localRotation.w };
+	glm::vec3 rotEuler = glm::degrees(glm::eulerAngles(m_localRotation));
 
 	float bounciness = GetBounciness();
 	float friction = GetFrictionCoefficient();
@@ -165,7 +172,7 @@ void NodeCollider::Serialize(SerializedObject& datas) const
 	uint16_t collideWithMaskBits = GetCollisionBitsMask();
 
 	datas.AddPublicElement("LocalPosition", &localPosition);
-	datas.AddPublicElement("LocalRotation", &localRotation);
+	datas.AddPublicElement("LocalRotation", &rotEuler);
 	datas.AddPublicElement("Bounciness", &bounciness);
 	datas.AddPublicElement("FrictionCoefficient", &friction);
 	datas.AddPublicElement("MassDensity", &massDensity);
@@ -183,9 +190,9 @@ void NodeCollider::Deserialize(SerializedObject const& datas)
 	glm::vec3 localPosition = m_localPosition;
 	datas.GetPublicElement("LocalPosition", &localPosition);
 
-	glm::vec4 localRotationVec{ m_localRotation.x, m_localRotation.y, m_localRotation.z, m_localRotation.w };
-	datas.GetPublicElement("LocalRotation", &localRotationVec);
-	glm::quat localRotation(localRotationVec.w, localRotationVec.x, localRotationVec.y, localRotationVec.z);
+	glm::vec3 rotEuler = {};
+	datas.GetPublicElement("LocalRotation", &rotEuler);
+	m_localRotation = glm::quat(glm::vec3(glm::radians(rotEuler.x), glm::radians(rotEuler.y), glm::radians(rotEuler.z)));
 
 	float bounciness = GetBounciness();
 	datas.GetPublicElement("Bounciness", &bounciness);
@@ -212,7 +219,6 @@ void NodeCollider::Deserialize(SerializedObject const& datas)
 	datas.GetPublicElement("CollideWithMaskBits", &collideWithMaskBits);
 
 	m_localPosition = localPosition;
-	m_localRotation = localRotation;
 
 	if (m_pCollider)
 	{
@@ -230,13 +236,13 @@ void NodeCollider::Deserialize(SerializedObject const& datas)
 	SetCollideWithMaskBits(collideWithMaskBits);
 }
 
-void NodeCollider::ContactEvent(NodeCollider& other)
+void NodeCollider::ContactEvent(NodeCollider& other, int state)
 {
-	OnContact(*this, *other.m_pNodeRigidBody);
+	OnContact(*this, *other.m_pNodeRigidBody, state);
 }
-void NodeCollider::TriggerEvent(NodeCollider& other)
+void NodeCollider::TriggerEvent(NodeCollider& other, int state)
 {
-	OnTrigger(*this, *other.m_pNodeRigidBody);
+	OnTrigger(*this, *other.m_pNodeRigidBody, state);
 }
 
 void NodeBoxCollider::SetShape(const glm::vec3& halfExtents)
