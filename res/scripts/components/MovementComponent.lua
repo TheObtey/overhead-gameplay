@@ -37,8 +37,7 @@ local oSM = nil
 -- ─── Mouvement ────────────────────────────────────────────────────────────────
 
 self.MoveForward = function(icForward)
-    -- print("FORWARD")
-    if not oRB then return end
+    if not oRB and not icForward.IsHold() then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
     --     if icForward:IsHold() then
@@ -49,31 +48,30 @@ self.MoveForward = function(icForward)
     --     if icForward:IsReleased() then
     --         oRB:SetLinearVelocity(fmath.vec3:new(0, 0, 0))
     --         print("RELEASED") 
-            
     --     end
     -- end
 end
 
 self.MoveBackward = function(icBackward)
-    if not oRB then return end
+    if not oRB and not icBackward.IsHold() then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed))
 end
 
 self.MoveLeft = function(icLeft)
-    if not oRB then return end
+    if not oRB and not icLeft.IsHold() then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
 end
 
 self.MoveRight = function(icRight)
-    if not oRB then return end
+    if not oRB and not icRight.IsHold() then return end
     bIsMoving = true
     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
 end
 self.DebugPos = function(icA)
-    if not oRB then return end
-    if icA:IsPressed() then
+    if not oRB and not icA.IsHold() then return end
+    if icA:IsHold() then
     oRB:SetLocalPosition(fmath.vec3:new(-5,2,5))
     end
 end
@@ -81,9 +79,8 @@ end
 -- ─── Saut ─────────────────────────────────────────────────────────────────────
 
 self.Jump = function(icJump)
-    if not oRB then return end
-    if icJump:IsPressed() then
-    fJumpBufferTimer = JUMP_BUFFER end
+    if not oRB and not icJump.IsHold() then return end
+    fJumpBufferTimer = JUMP_BUFFER
 end
 
 local function TryJump()

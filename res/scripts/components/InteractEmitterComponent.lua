@@ -71,7 +71,7 @@ self.TryInteract = function(icInteract)
         if not oIrcomp then return end
 
         if oIrcomp:CanInteract() then
-            oIrcomp:Interact()
+            oIrcomp.Interact(pEmitter)
         end
 
         oCurrentEntity:ResetForces()
