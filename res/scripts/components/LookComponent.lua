@@ -24,11 +24,11 @@ self.HandleMouseLook = function(icMouse)
 
     if not oRB or not oCameraRoot or csCurrentCursorState ~= CursorState.LOCKED then return end
     local v = vDeltaMouse.y * fCurDt
-    local iMouseInput = v * -iMouseSensitivity * 5
+    local iMouseInput = v * -iMouseSensitivityY * 5
     oCameraRoot:AddLocalPitch(iMouseInput)
     -- oCameraRoot:AddLocalYaw((-vecMouse.x * 3) * iMouseSensitivity * oRB.gravity)
 
-    oRB:ApplyWorldTorque(fmath.vec3:new(0, (vDeltaMouse.x * 3) * iMouseSensitivity * 2000 * oRB.gravity, 0))
+    oRB:ApplyWorldTorque(fmath.vec3:new(0, (vDeltaMouse.x * 3) * iMouseSensitivityX * 2000 * oRB.gravity, 0))
     vLastMousePos = vecMouse;
 
 --     local iMouseInput = vecMouse.y * iMouseSensitivityY
