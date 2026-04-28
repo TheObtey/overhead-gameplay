@@ -3,6 +3,7 @@
 -- ---@class noderigidbody
 -- self = self
 
+local oGravityComponent
 local oPlayer
 local pRootNode
 local bIsEquipped = false
@@ -74,7 +75,7 @@ function self.GetThrown()
     self:SetBodyType(2)
     self:SetBounciness(1)
     print("Bounciness = ".. self:GetBounciness())
-    
+
     local vecForward = oPlayer:GetLocalForward()
     vecForward.z = vecForward.z * -1
     vecForward.x = vecForward.x * oPlayer.gravity
@@ -104,29 +105,30 @@ function self.GetThrown()
     bIsEquipped = false
 end
 
-function CheckParent(node)
-
-    return 
+function self:SetGravityDirection(iNewGravity)
+    if not oGravityComponent then return end
+    oGravityComponent:SetGravityDirection(iNewGravity)
 end
 
 function OnInit()
     self:SetBodyType(2)
     self:SetIsGravityEnabled(true)
     pRootNode = self:GetParent()
+
     while pRootNode:GetName() ~= "SceneRoot" do
         pRootNode = pRootNode:GetParent()
     end
-    print("=== INIT INTERCACTABLE CUBE, parent is : " .. pRootNode:GetName())
 
-    self:SetBounciness(1) -- fonctionne pas dans l'init ?
+    oGravityComponent = self:GetNode("components/GravityComponent")
+    if oGravityComponent then 
+        local vecPos = self:GetWorldPosition()
+        if not vecPos or type(vecPos.x) ~= "number" then return end
 
-    -- oPlayer = pRootNode:FindChild("Player"):As(NodeTypes.NODE_RIGIDBODY)
-    -- if not oPlayer then
-    --     print("--- Interactable Obj did not find Player ref --- ")
-    -- else
-    --     print("--- Interactable Obj found Player ref successfully --- ")
-    -- end
+        local iDefaultGravity = vecPos.y < 10.0 and 1 or -1
+        oGravityComponent:Setup(self, iDefaultGravity)
+     end
 end
+
 local count = 0
 local i = 0
 function OnUpdate(dt)
