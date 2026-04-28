@@ -6,6 +6,8 @@ local oCompContainer
 local oGGunTargetComp
 local vecForward
 
+local bWasUsingGGun = false
+
 self.refHeldObject = nil
 
 self.bIsHoldingObject = 0
@@ -79,6 +81,15 @@ end
 
 local bUsingGGun = false
 self.Use = function(icInteract)
+    -- Hook
+    local bIsPressed = icInteract:IsPressed()
+    -- START USE
+    if bIsPressed and not bWasUsingGGun then
+        hook.Call("OnUseGun")
+    end
+    bWasUsingGGun = bIsPressed
+    if not bIsPressed then return end
+
     if icInteract:IsPressed() then
         local oPlayer = pRootNode:FindChild("Player"):As(NodeTypes.NODE_RIGIDBODY)
         bUsingGGun = true

@@ -153,6 +153,15 @@ function self:PhysicsUpdate(dt)
     TryJump()
     ApplyCustomGravity(oMass, dt)
 
+    -- Hook for other scripts
+    local wasMoving = bIsMoving
+    if not bWasMovingLastFrame and wasMoving then
+        hook.Call("OnPlayerMove")
+    end
+    if bWasMovingLastFrame and not wasMoving then
+        hook.Call("OnPlayerStop")
+    end
+
     bWasMovingLastFrame = bIsMoving
     bIsMoving           = false
     bJumpedThisFrame    = false
