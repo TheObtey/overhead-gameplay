@@ -132,6 +132,9 @@ local function TryJump()
         fCoyoteTimer     = 0
         bIsGrounded      = false
         bJumpedThisFrame = true
+
+        hook.Call("OnJump")
+
         print("JUMPING : " .. fJumpForce)
         if oSM then oSM:TransitionTo("JUMP") end
     end

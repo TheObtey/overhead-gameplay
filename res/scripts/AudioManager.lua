@@ -1,17 +1,20 @@
-local musicEm
-local audioListen
-
-local channelMusic
-local channelSound
-
+-- ─── Audio Volume ───────────────────────────────────────────────────────────
 local globalVolume = 1
 local musicVolume = 0.3
 local soundVolume = 0.7
 
-local acmAudio
 
+--local audioListen
+
+-- ─── Channels ───────────────────────────────────────────────────────────
+local channelMusic
+local channelSound
+
+-- ─── Audio files ───────────────────────────────────────────────────────────
+local audioMusic
 local audioWalk
 local audioGravGun
+local audioJump
 
 function PlayWalkSound()
     if audioWalk then
@@ -31,20 +34,12 @@ function PlayGravGunSound()
     	audioGravGun:Play()
     end
 end
-function StopGravGunSound()
-    if audioGravGun then
-        audioGravGun:Stop()
+
+function PlayJumpSound()
+    if audioJump then
+        audioJump:Stop()
+    	audioJump:Play()
     end
-end
-
-
-local function InitializeActionMap()
-    acmAudio = actionmap:new("AUDIO")
-    acmAudio:CreateAction("WALK_SOUND", 1, EventInput.KEY_Z)
-
-	acmAudio:GetAction("WALK_SOUND").Event = function() 
-		audioWalk:Play()
-	end
 end
 
 function OnInit()
@@ -55,50 +50,48 @@ function OnInit()
 	channelSound = audioserver.CreateChannel("Sound")
 
 	-- Audio Emitter
-	musicEm = CreateNodeAudioEmitter("nodeaudioemitter")
+	audioMusic = CreateNodeAudioEmitter("nodeaudioemitter")
 	audioWalk = CreateNodeAudioEmitter("nodeaudioemitter")
 	audioGravGun = CreateNodeAudioEmitter("nodeaudioemitter")
+	audioJump = CreateNodeAudioEmitter("nodeaudioemitter")
 
-	musicEm:Load("res/audio/mainTheme.mp3", channelMusic);
+	audioMusic:Load("res/audio/mainTheme.mp3", channelMusic);
 	audioWalk:Load("res/audio/moonBoots.mp3", channelSound);
 	audioGravGun:Load("res/audio/gravityGunActivation.wav", channelSound);
+	audioJump:Load("res/audio/jump.wav", channelSound);
 
-	local audioEmPos = fmath.vec3:new(0,0,0)
-
+	--local audioEmPos = fmath.vec3:new(0,0,0)
 	--audioEm:SetSourcePosition(audioEmPos); --allways after load
+	audioMusic:SetLoop(true);
 
-	--audioEm->SetLoop(true);
-
-	musicEm:Play()
+	audioMusic:Play()
 
 	--- Audio Listener ---
-	audioListen = CreateNodeAudioListener("nodeaudiolistener")
-    audioEmPos = fmath.vec3:new(0,0,0)
+	--audioListen = CreateNodeAudioListener("nodeaudiolistener")
+    --audioEmPos = fmath.vec3:new(0,0,0)
 	--audioListen:SetListenerPosition(audioEmPos);
-
-	print("audio1 x:".. tostring(musicEm:GetSourcePosition().x))
-	print("listener x:".. tostring(audioListen:GetListenerPosition().x))
+	--print("audio1 x:".. tostring(musicEm:GetSourcePosition().x))
+	--print("listener x:".. tostring(audioListen:GetListenerPosition().x))
 
 	audioserver.SetMasterVolume(globalVolume)
 	audioserver.SetGroupVolume(channelMusic, musicVolume)
 	audioserver.SetGroupVolume(channelSound, soundVolume)
 
-	--InitializeActionMap() cannot use multiple action map in project
-
-	-- Hooks from other scripts
+	-- ─── Hooks from other scripts ───────────────────────────────────────────────────────────
 	hook.Add("OnPlayerMove", "OnPlayerMove:PlayWalkSound", function() 
 		PlayWalkSound()
 	end)
 	hook.Add("OnPlayerStop", "OnPlayerStop:StopWalkSound", function() 
 		StopWalkSound()
 	end)
-
 	hook.Add("OnUseGun", "OnUseGun:PlayGravGunSound", function() 
 		PlayGravGunSound()
 	end)
-	hook.Add("OnStopGun", "OnStopGun:StopGravGunSound", function() 
-		StopGravGunSound()
+	hook.Add("OnJump", "OnJump:PlayJumpSound", function() 
+		PlayJumpSound()
 	end)
+
+
 end
 
 function OnUpdate(dt) end
