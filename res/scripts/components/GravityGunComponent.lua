@@ -32,10 +32,10 @@ local function CheckInteraction(origin, forward, distance)
     local oCameraRoot = oPlayer:FindChild("CameraRoot"):As(NodeTypes.NODE3D)
     local oCamera = oCameraRoot:FindChild("Camera"):As(NodeTypes.NODE_CAMERA)
     if not oCamera then print ("PB CAM GRAVITYGUN COMPONENT") return end
-    vecForward = oPlayer:GetLocalForward()
+    local vecForward = oPlayer:GetLocalForward()
     vecForward.y = oCameraRoot:GetLocalForward().y
     vecForward.z = vecForward.z * -1
-    print("VecForward cam = ".. vecForward.x..", ".. vecForward.y..", ".. vecForward.z)
+    vecForward.x = vecForward.x * oPlayer.gravity
     
     local oHit = physics.Raycast(origin or oPlayer.Pos, forward or vecForward, distance or iMaxDistance)
     
@@ -48,9 +48,6 @@ local function CheckInteraction(origin, forward, distance)
         SetCurrentEntity(nil)
         return
     end
-    local raycasted = oHit.node
-    vecForward = raycasted:GetLocalForward()
-    vecForward.z = vecForward.z * -1
 
     oCompContainer = oHit.node:FindChild("components")
     if not oCompContainer then print("oCompContainer NOT FOUND ")return end

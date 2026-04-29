@@ -212,10 +212,10 @@ function OnGravityFieldChange(iDeltaTime)
 
     if worldRoll >= 3.13 or worldRoll <= -3.13 then
         if self.gravity == -1 then
-            self:SetLocalRotationDeg(fmath.vec3:new(0, 0, 180))
+            self:SetWorldRotation(fmath.vec3:new(0, 0, 180))
         else
             if self.gravity == 1 then
-                self:SetLocalRotationDeg(fmath.vec3:new(0, 0, 0))
+                self:SetWorldRotation(fmath.vec3:new(0, 0, 0))
             end
         end
         -- self:LockAngularAxis(true, false, true)
