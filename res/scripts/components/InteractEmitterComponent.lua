@@ -20,9 +20,14 @@ end
 local function CheckInteraction(origin, forward, distance)
     pEmitter = pRootNode:FindChild("Player"):As(NodeTypes.NODE_RIGIDBODY)
     if not pEmitter then print("No emitter found with name 'Player'") return end
-    vecForward = pEmitter:GetLocalForward()
+    
+    local oCamera = pEmitter:FindChild("CameraRoot"):FindChild("Camera"):As(NodeTypes.NODE_CAMERA)
+    if not oCamera then print ("PB CAM GRAVITYGUN COMPONENT") return end
+    vecForward = oCamera:GetLocalForward()
+    -- vecForward = oCamera.VecForward
+    -- vecForward = pEmitter:GetLocalForward()
     vecForward.z = vecForward.z * -1
-    vecForward.x = vecForward.x * pEmitter.gravity
+    -- vecForward.x = vecForward.x * pEmitter.gravity
    
     local oHit = physics.Raycast(origin or pEmitter.Pos, forward or vecForward, distance or iMaxDistance)
     
@@ -71,7 +76,7 @@ self.TryInteract = function(icInteract)
         if not oIrcomp then return end
 
         if oIrcomp:CanInteract() then
-            oIrcomp:Interact()
+            oIrcomp.Interact(pEmitter)
         end
 
         oCurrentEntity:ResetForces()

@@ -5,6 +5,7 @@ local oCurrentEntity
 local oCompContainer
 local oGGunTargetComp
 local vecForward
+local iCurDT
 
 self.refHeldObject = nil
 
@@ -28,10 +29,16 @@ end
 -- Do the raycast and analyze it
 local function CheckInteraction(origin, forward, distance)
     if not oPlayer then print("No emitter found with name 'Player'") return else print("Emitter in CheckInteraction GGun OK") end
+    local oCameraRoot = oPlayer:FindChild("CameraRoot"):As(NodeTypes.NODE3D)
+    local oCamera = oCameraRoot:FindChild("Camera"):As(NodeTypes.NODE_CAMERA)
+    if not oCamera then print ("PB CAM GRAVITYGUN COMPONENT") return end
     vecForward = oPlayer:GetLocalForward()
-    
+    vecForward.y = oCameraRoot:GetLocalForward().y
+    -- vecForward = oCamera:GetLocalForward()
+    -- vecForward = oCamera.VecForward
     vecForward.z = vecForward.z * -1
-    vecForward.x = vecForward.x * oPlayer.gravity
+    print("VecForward cam = ".. vecForward.x..", ".. vecForward.y..", ".. vecForward.z)
+    -- vecForward.x = vecForward.x * oPlayer.gravity
     
     local oHit = physics.Raycast(origin or oPlayer.Pos, forward or vecForward, distance or iMaxDistance)
     
@@ -78,8 +85,14 @@ end
 
 
 local bUsingGGun = false
+local iThrowForce = 6000
+local iCount = 0
 self.Use = function(icInteract)
-    if icInteract:IsPressed() then
+    if icInteract:IsHold() then
+        iCount = iCount + iCurDT
+        if iCount >= 2 then iCount = 2 end
+    end
+    if icInteract:IsReleased() then
         local oPlayer = pRootNode:FindChild("Player"):As(NodeTypes.NODE_RIGIDBODY)
         bUsingGGun = true
         -- DEBUG
@@ -129,7 +142,7 @@ self.Use = function(icInteract)
             if self.bIsHoldingObject == 0 then
                 oGGunTargetComp:GravityGunGrabb()
             else
-                oGGunTargetComp:GravityGunThrow()
+                oGGunTargetComp:GravityGunThrow(iThrowForce * iCount / 2)
             end
         end
 
@@ -158,5 +171,7 @@ end
 
 function OnInit() end
 
-function OnUpdate(dt) end
+function OnUpdate(dt)
+    iCurDT = dt
+end
 function OnDestroy() end
