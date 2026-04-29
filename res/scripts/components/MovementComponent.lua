@@ -35,39 +35,76 @@ local oSM = nil
 
 
 -- ─── Mouvement ────────────────────────────────────────────────────────────────
-
+local iForwardcount = 0
 self.MoveForward = function(icForward)
     if not oRB and not icForward.IsHold() then return end
-    bIsMoving = true
-    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
-    --     if icForward:IsHold() then
-    --     bIsMoving = true
-    --     oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
-    --     print("HOLDING")
-    -- else
-    --     if icForward:IsReleased() then
-    --         oRB:SetLinearVelocity(fmath.vec3:new(0, 0, 0))
-    --         print("RELEASED") 
-    --     end
-    -- end
+    -- bIsMoving = true
+    -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
+    if icForward:IsHold() then
+        iForwardcount =  iForwardcount + 1
+        bIsMoving = true
+        oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
+    else
+        if icForward:IsReleased() then
+            local vel = oRB:GetLinearVelocity()
+            oRB:SetLinearVelocity(fmath.vec3:new(vel.x, vel.y, vel.z/2))
+            -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed*iForwardcount/2))
+            iForwardcount = 0
+        end
+    end
 end
 
+local iBackwardcount = 0
 self.MoveBackward = function(icBackward)
     if not oRB and not icBackward.IsHold() then return end
-    bIsMoving = true
-    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed))
+    -- bIsMoving = true
+    -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed))
+    if icBackward:IsHold() then
+        bIsMoving = true
+        iBackwardcount = iBackwardcount + 1
+        oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed))
+    else
+        if icBackward:IsReleased() then
+            local vel = oRB:GetLinearVelocity()
+            oRB:SetLinearVelocity(fmath.vec3:new(vel.x, vel.y, vel.z/2))
+            -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed*iBackwardcount/2))
+            iBackwardcount = 0
+        end
+    end
 end
 
+local iLeftcount = 0
 self.MoveLeft = function(icLeft)
     if not oRB and not icLeft.IsHold() then return end
-    bIsMoving = true
-    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
+    -- bIsMoving = true
+    -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
+    if icLeft:IsHold() then
+        bIsMoving = true
+        oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
+    else
+        if icLeft:IsReleased() then
+            local vel = oRB:GetLinearVelocity()
+            oRB:SetLinearVelocity(fmath.vec3:new(vel.x/2, vel.y, vel.z))
+            -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
+        end
+    end
 end
 
+local iRightcount = 0
 self.MoveRight = function(icRight)
     if not oRB and not icRight.IsHold() then return end
-    bIsMoving = true
-    oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
+    -- bIsMoving = true
+    -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
+    if icRight:IsHold() then
+        bIsMoving = true
+        oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
+    else
+        if icRight:IsReleased() then
+            local vel = oRB:GetLinearVelocity()
+            oRB:SetLinearVelocity(fmath.vec3:new(vel.x/2, vel.y, vel.z))
+            -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
+        end
+    end
 end
 self.DebugPos = function(icA)
     if not oRB and not icA.IsHold() then return end
@@ -84,8 +121,8 @@ self.Jump = function(icJump)
 end
 
 local function TryJump()
-    -- if fCoyoteTimer > 0 and fJumpBufferTimer > 0 then // CETTE LIGNE PERMET D'EMPECHER LES SAUTS SUCCESSIFS 
-    if fJumpBufferTimer > 0 then
+    -- if fJumpBufferTimer > 0 then -- CETTE LIGNE PERMET LES SAUTS SUCCESSIFS 
+    if fCoyoteTimer > 0 and fJumpBufferTimer > 0 then 
         local vel = oRB:GetLinearVelocity()
         oRB:SetLinearVelocity(fmath.vec3:new(vel.x, 0, vel.z))
         oRB:SetAngularVelocity(fmath.vec3:new(0, 0, 0))
@@ -218,8 +255,8 @@ function self:Setup(oNewRigidBody, iNewMoveSpeed, iNewJumpForce)
     assert(oNewRigidBody ~= nil, "MovementComponent: Valid rigidbody must be provided")
 
     oRB        = oNewRigidBody
-    MOVE_SPEED = iNewMoveSpeed or 20000
-    JUMP_FORCE = iNewJumpForce or 6500000
+    MOVE_SPEED = iNewMoveSpeed or 8000
+    JUMP_FORCE = iNewJumpForce or 4000000
 
     print("MovementComponent Initialized")
 end
