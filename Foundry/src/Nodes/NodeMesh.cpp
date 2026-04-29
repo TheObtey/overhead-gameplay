@@ -379,17 +379,6 @@ void NodeMesh::DeserializeTextures(SerializedObject const& datas)
             if (!s_IsInEditor)
                 m_textures.push_back(AssetLoader::GetSharedTexture(normalPath, Ore::TextureMaterialType::NORMAL));
             break;
-        case Ore::TextureMaterialType::SPECULAR:
-            if (opacityPath != "")
-            {
-                m_texturesPaths.erase(m_texturesPaths.begin() + i);
-                break;
-            }
-            textureSet = datas.TryGetPublicElement("OpacityTexturePath", &opacityPath);
-            DeserializeTex(opacityPath, Ore::TextureMaterialType::SPECULAR, textureSet, i);
-            if (!s_IsInEditor)
-                m_textures.push_back(AssetLoader::GetSharedTexture(opacityPath, Ore::TextureMaterialType::SPECULAR));
-            break;
         case Ore::TextureMaterialType::OPACITY:
             if (opacityPath != "")
             {

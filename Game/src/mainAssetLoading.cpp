@@ -37,7 +37,7 @@ Node& LoadScene(Node& node)
     static_cast<NodeCamera*>(nCamera.get())->AddLocalYaw(1.0f);
 
     //sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim_3.fbx", AssetLoader::FileType::FBX);
-    sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Player/LastHopeBob.fbx", AssetLoader::FileType::FBX);
+    sptr<SceneData> Scene1 = AssetLoader::LoadSceneFromFile("res/fbx/Player/BibHopeBone.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene4 = AssetLoader::LoadSceneFromFile("res/Assets/Staff_Room_Tutoriel/Staff_Room_Movable_Meshs.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene2 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Anim.fbx", AssetLoader::FileType::FBX);
     //sptr<SceneData> Scene3 = AssetLoader::LoadSceneFromFile("res/fbx/Test_Bones.fbx", AssetLoader::FileType::FBX);
@@ -46,7 +46,7 @@ Node& LoadScene(Node& node)
     //uptr<Node> pNode4 = AssetLoader::CreateNodesFromScene(*Scene4);
     static_cast<Node3D*>(pNode1.get())->SetLocalPosition({ 0.0f,0.0f,0.f });
     //static_cast<Node3D*>(pNode4.get())->SetLocalPosition({ 0.0f,0.0f,0.f });
-    EditorSerializer::SaveNode("res/BIIIB.nd", pNode1);
+    EditorSerializer::SaveNode("res/BibBones.nd", pNode1);
     //EditorSerializer::SaveNode("Staff_Room_Movable_Meshs.nd",pNode4);
 
     nViewport->AddChild(nCamera);
