@@ -14,12 +14,6 @@ function self.CanInteract()
     return bCanInteract
 end
 
---Function to implement in the parent script
--- function self.GravityGunInteraction()
---     if not oBase or not oBase:Is(NodeTypes.NODE_RIGIDBODY) then return end
---     print("Name oBase : "..oBase:GetName())
---     oBase:GravityGunUse()
--- end
 function self.GravityGunGrabb()
     if not oBase or not oBase:Is(NodeTypes.NODE_RIGIDBODY) then return end
     print("GravityGunGrabb | oBase : "..oBase:GetName())

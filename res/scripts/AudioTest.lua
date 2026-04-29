@@ -10,17 +10,14 @@ local sfx
 function OnInit()
 	print("audio init !");
 
-	--- Audio Server ---
 	music = audioserver.CreateChannel("Music");
 	sfx =  audioserver.CreateChannel("Sfx");
 
 	--- Mixer ---
 
 	-- Audio Emitter
-    --audioEm  = nodeaudioemitter:new("nodeaudioemitter")
 	audioEm = CreateNodeAudioEmitter("nodeaudioemitter")
 	audioEm2 = CreateNodeAudioEmitter("nodeaudioemitter")
-    --audioEm2 = nodeaudioemitter:new("nodeaudioemitter")
 
 	audioEm:Load("res/freeman.mp3", music);
 	audioEm2:Load("res/applause.mp3", sfx);
@@ -29,8 +26,6 @@ function OnInit()
 
 	audioEm2:SetSourcePosition(v); --allways after load
 
-	--audioEm->SetLoop(true);
-	--audioEm2:SetLoop(true);
 
 	audioEm:Play();
 	audioEm2:Play();

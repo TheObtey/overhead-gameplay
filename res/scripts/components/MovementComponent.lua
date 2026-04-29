@@ -38,8 +38,6 @@ local oSM = nil
 local iForwardcount = 0
 self.MoveForward = function(icForward)
     if not oRB and not icForward.IsHold() then return end
-    -- bIsMoving = true
-    -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed))
     if icForward:IsHold() then
         iForwardcount =  iForwardcount + 1
         bIsMoving = true
@@ -48,7 +46,6 @@ self.MoveForward = function(icForward)
         if icForward:IsReleased() then
             local vel = oRB:GetLinearVelocity()
             oRB:SetLinearVelocity(fmath.vec3:new(vel.x, vel.y, vel.z/2))
-            -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed*iForwardcount/2))
             iForwardcount = 0
         end
     end
@@ -57,8 +54,6 @@ end
 local iBackwardcount = 0
 self.MoveBackward = function(icBackward)
     if not oRB and not icBackward.IsHold() then return end
-    -- bIsMoving = true
-    -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, fMoveSpeed))
     if icBackward:IsHold() then
         bIsMoving = true
         iBackwardcount = iBackwardcount + 1
@@ -67,7 +62,6 @@ self.MoveBackward = function(icBackward)
         if icBackward:IsReleased() then
             local vel = oRB:GetLinearVelocity()
             oRB:SetLinearVelocity(fmath.vec3:new(vel.x, vel.y, vel.z/2))
-            -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(0, 0, -fMoveSpeed*iBackwardcount/2))
             iBackwardcount = 0
         end
     end
@@ -76,8 +70,6 @@ end
 local iLeftcount = 0
 self.MoveLeft = function(icLeft)
     if not oRB and not icLeft.IsHold() then return end
-    -- bIsMoving = true
-    -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
     if icLeft:IsHold() then
         bIsMoving = true
         oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
@@ -85,7 +77,6 @@ self.MoveLeft = function(icLeft)
         if icLeft:IsReleased() then
             local vel = oRB:GetLinearVelocity()
             oRB:SetLinearVelocity(fmath.vec3:new(vel.x/2, vel.y, vel.z))
-            -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
         end
     end
 end
@@ -93,8 +84,6 @@ end
 local iRightcount = 0
 self.MoveRight = function(icRight)
     if not oRB and not icRight.IsHold() then return end
-    -- bIsMoving = true
-    -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
     if icRight:IsHold() then
         bIsMoving = true
         oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(fMoveSpeed, 0, 0))
@@ -102,7 +91,6 @@ self.MoveRight = function(icRight)
         if icRight:IsReleased() then
             local vel = oRB:GetLinearVelocity()
             oRB:SetLinearVelocity(fmath.vec3:new(vel.x/2, vel.y, vel.z))
-            -- oRB:ApplyLocalForceAtCenterOfMass(fmath.vec3:new(-fMoveSpeed, 0, 0))
         end
     end
 end
@@ -121,8 +109,7 @@ self.Jump = function(icJump)
 end
 
 local function TryJump()
-    if fJumpBufferTimer > 0 then -- CETTE LIGNE PERMET LES SAUTS SUCCESSIFS 
-    -- if fCoyoteTimer > 0 and fJumpBufferTimer > 0 then 
+    if fCoyoteTimer > 0 and fJumpBufferTimer > 0 then 
         local vel = oRB:GetLinearVelocity()
         oRB:SetLinearVelocity(fmath.vec3:new(vel.x, 0, vel.z))
         oRB:SetAngularVelocity(fmath.vec3:new(0, 0, 0))
@@ -132,6 +119,9 @@ local function TryJump()
         fCoyoteTimer     = 0
         bIsGrounded      = false
         bJumpedThisFrame = true
+
+        hook.Call("OnJump")
+
         print("JUMPING : " .. fJumpForce)
         if oSM then oSM:TransitionTo("JUMP") end
     end
@@ -187,6 +177,15 @@ function self:PhysicsUpdate(dt)
     TryJump()
     ApplyCustomGravity(oMass, dt)
 
+    -- Hook for other scripts
+    local wasMoving = bIsMoving
+    if not bWasMovingLastFrame and wasMoving then
+        hook.Call("OnPlayerMove")
+    end
+    if bWasMovingLastFrame and not wasMoving then
+        hook.Call("OnPlayerStop")
+    end
+
     bWasMovingLastFrame = bIsMoving
     bIsMoving           = false
     bJumpedThisFrame    = false
@@ -205,7 +204,6 @@ function self:SetGrounded(bValue)
         bIsGrounded    = true
         fGroundedTimer = GROUNDED_GRACE
     else
-        -- si rien ici, le joueur reste "grounded" pendant GROUNDED_GRACE seconde(s)
     end
 end
 
@@ -247,7 +245,7 @@ function self:Setup(oNewRigidBody, iNewMoveSpeed, iNewJumpForce)
 
     oRB        = oNewRigidBody
     MOVE_SPEED = iNewMoveSpeed or 8000
-    JUMP_FORCE = iNewJumpForce or 600000
+    JUMP_FORCE = iNewJumpForce or 4000000
 
     print("MovementComponent Initialized")
 end

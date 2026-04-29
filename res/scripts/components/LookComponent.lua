@@ -27,8 +27,6 @@ self.HandleMouseLook = function(icMouse)
     local iDelta = iNewPitch - iCurPitch
     iCurPitch = iCurPitch + iDelta
     oCameraRoot:AddLocalPitch(iDelta)
-    -- oCameraRoot:AddLocalPitch(iMouseInput)
-    -- oCameraRoot:AddLocalYaw((-vecMouse.x * 3) * iMouseSensitivity * oRB.gravity)
 
     oRB:ApplyWorldTorque(fmath.vec3:new(0, vDeltaMouse.x * iMouseSensitivityX * oRB.gravity, 0))
     vLastMousePos = vecMouse;

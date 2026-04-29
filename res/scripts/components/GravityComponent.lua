@@ -27,8 +27,6 @@ local function ApplyCustomGravity(iDeltaTime)
     local fGravityForce = gravity * iMass * iDeltaTime * self.gravity
     local vecForce = fmath.vec3:new(0, fGravityForce, 0)
 
-    -- print(vecForce.x, vecForce.y, vecForce.z)
-
     self.oRigidbody:ApplyWorldForceAtCenterOfMass(vecForce)
 end
 

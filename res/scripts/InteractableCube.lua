@@ -34,22 +34,11 @@ function self.GetGrabbed()
 
     oPlayerGGunComp.bIsHoldingObject = 1
     oPlayerGGunComp.refHeldObject = self
-    -- oPlayer.bIsHoldingObject = 1
-    -- oPlayer.refHeldObject = self
-    print("\nName sphere = " .. self:GetName())
-    print("++++++++++++++")
-    print("Name RefHeldObj = " .. oPlayerGGunComp.refHeldObject:GetName())
     local vec = oPlayerGGunComp.refHeldObject:GetPosition()
     local vec2 = oPlayerGGunComp.refHeldObject:GetWorldPosition()
-    print(oPlayerGGunComp.refHeldObject:GetName() .. " LOCAL POS : {" .. vec.x .. ", " .. vec.y .. ", " .. vec.z .. "}")
-    print(oPlayerGGunComp.refHeldObject:GetName() .. " WORLD POS : {" .. vec2.x .. ", " .. vec2.y .. ", " .. vec2.z .. "}")
-    print("++++++++++++++")
 
-    -- local vec = self:GetPosition()
-    -- print("pos before sphere : {" .. vec.x .. ", " .. vec.y .. ", " .. vec.z .. "}")
-    -- local vec2 = self:GetPosition()
-    -- print("POS after sphere : {" .. vec2.x .. ", " .. vec2.y .. ", " .. vec2.z .. "}")
-    -- self:ResetForces()
+
+
     bIsEquipped = true
 end
 
@@ -67,14 +56,11 @@ function self.GetThrown(iThrowForce)
     local oPlayerGGunComp = oCompContainer:FindChild("GravityGunComponent")
     if oPlayerGGunComp == nil then print ("PlayerGGunComp not found") return end
 
-    print("P_Name :" .. oPlayer:GetName())
     local curPos = self:GetWorldPosition()
     self:Reparent(pRootNode, true)
-    print("\nRESETING POS AFTER REPARENT TO : {" .. curPos.x .. ", " .. curPos.y .. ", " .. curPos.z .. "}")
     self:SetWorldPosition(curPos)
     self:SetBodyType(2)
     self:SetBounciness(1)
-    print("Bounciness = ".. self:GetBounciness())
 
     local oCameraRoot = oPlayer:FindChild("CameraRoot"):As(NodeTypes.NODE3D)
     local oCamera = oCameraRoot:FindChild("Camera"):As(NodeTypes.NODE_CAMERA)
@@ -85,31 +71,16 @@ function self.GetThrown(iThrowForce)
     local vecForward = oPlayer:GetLocalForward()
     vecForward.y = oCameraRoot:GetLocalForward().y
     vecForward.z = vecForward.z * -1
-    -- local vecForward = oPlayer:GetLocalForward()
-    -- vecForward.z = vecForward.z * -1
     vecForward.x = vecForward.x * oPlayer.gravity
 
     local throwForce = vecForward *6000
     self:ApplyWorldForceAtCenterOfMass(throwForce)
 
-    print("Name sphere = " .. self:GetName())
-    print("****************************")
-    print("Name RefHeldObj = " .. oPlayerGGunComp.refHeldObject:GetName())
     local vec = oPlayerGGunComp.refHeldObject:GetPosition()
     local vec2 = oPlayerGGunComp.refHeldObject:GetWorldPosition()
-    print(oPlayerGGunComp.refHeldObject:GetName() .. " LOCAL POS : {" .. vec.x .. ", " .. vec.y .. ", " .. vec.z .. "}")
-    print(oPlayerGGunComp.refHeldObject:GetName() .. " WORLD POS : {" .. vec2.x .. ", " .. vec2.y .. ", " .. vec2.z .. "}")
-    print("****************************")
-    print("||")
 
     oPlayerGGunComp.bIsHoldingObject = 0
     oPlayerGGunComp.refHeldObject = nil
-    -- oPlayer.bIsHoldingObject = 0
-    -- oPlayer.refHeldObject = nil
-    -- local vec = self:GetPosition()
-    -- print("pos before sphere : {" .. vec.x .. ", " .. vec.y .. ", " .. vec.z .. "}")
-    -- local vec2 = self:GetPosition()
-    -- print("POS after sphere : {" .. vec2.x .. ", " .. vec2.y .. ", " .. vec2.z .. "}")
 
     bIsEquipped = false
 end
@@ -142,18 +113,6 @@ local count = 0
 local i = 0
 function OnUpdate(dt)
     self:SetBounciness(0.6)
-        -- DEBUG Pos toutes les 4000 frames
-    -- count = count + 1
-    -- if count > 4000 then
-    --     print( "======")
-    --         local vec = self:GetPosition()
-    -- local vec2 = self:GetWorldPosition()
-    --     print(self:GetName() .. " LOCAL POS : {" .. vec.x .. ", " .. vec.y .. ", " .. vec.z .. "}")
-    --     print(self:GetName() .. " WORLD POS : {" .. vec2.x .. ", " .. vec2.y .. ", " .. vec2.z .. "}")
-    --     print( "======")
-    --     -- print("Player Forward : {"..self:GetLocalForward().x..";"..self:GetLocalForward().y..";"..self:GetLocalForward().z.."}")
-    --     count = 0
-    -- end
 end
 
 function OnDestroy() end
